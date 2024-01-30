@@ -1,0 +1,22 @@
+{
+  "name": "quasar-app-extension-danx",
+  "version": "0.0.1",
+  "description": "Danx Quasar app extension",
+  "author": "Dan <dan@flytedesk.com>",
+  "license": "MIT",
+  "type": "module",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/flytedan/quasar-app-extension-danx"
+  },
+  "bugs": "",
+  "homepage": "",
+  "dependencies": {
+    "quasar-ui-danx": "latest"
+  },
+  "engines": {
+    "node": ">= 8.9.0",
+    "npm": ">= 5.6.0",
+    "yarn": ">= 1.6.0"
+  }
+}

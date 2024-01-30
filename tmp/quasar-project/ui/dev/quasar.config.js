@@ -46,19 +46,6 @@ module.exports = function (ctx) {
     build: {
       vueRouterMode: 'history',
 
-      extendViteConf (viteConf, { isClient, isServer }) {
-        viteConf.resolve.alias.merge({
-          ui: path.resolve(__dirname, `../src/index.esm.js`)
-        })
-
-        viteConf.define = {
-          __UI_VERSION__: `'${require('../package.json').version}'`
-        }
-
-        // enable ts support
-        viteConf.resolve.extensions.push('.ts')
-      },
-
       chainWebpack (chain) {
         chain.resolve.alias.merge({
           ui: path.resolve(__dirname, `../src/index.esm.js`)

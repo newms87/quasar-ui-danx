@@ -4,9 +4,18 @@
 
     <h1>Danx Examples</h1>
 
-    <ListItemDraggable v-for="item in listItems">
-      {{ item.name }}
-    </ListItemDraggable>
+    <div data-drop-zone="list-items">
+      <ListItemDraggable
+        v-for="item in listItems"
+        drop-zone="list-items"
+        v-model:list-items="listItems"
+        :key="item.name"
+        @position="onPosition"
+        show-handle
+      >
+        {{ item.name }}
+      </ListItemDraggable>
+    </div>
 
   </q-page>
 </template>
@@ -14,7 +23,10 @@
 import { ref } from "vue";
 import ListItemDraggable from "../../../src/components/DragAndDrop/ListItemDraggable";
 
-const listItems = [{name: "item1"}, {name: "item2"}, {name: "item3"}];
+const listItems = ref([{ name: "item1" }, { name: "item2" }, { name: "item3" }]);
+function onPosition(newPosition) {
+  console.log('position', newPosition, listItems.value);
+}
 </script>
 <style lang="sass" scoped>
 .directive-target

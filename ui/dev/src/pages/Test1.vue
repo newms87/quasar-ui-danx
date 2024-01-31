@@ -2,7 +2,7 @@
   <q-page padding>
 
 
-    <h1>Danx Examples</h1>
+    <h1 class="text-2xl mb-3">Danx Examples</h1>
 
     <div data-drop-zone="list-items">
       <ListItemDraggable

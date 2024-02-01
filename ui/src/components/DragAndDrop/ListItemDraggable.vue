@@ -7,7 +7,7 @@
   >
     <div class="flex items-center">
       <div v-if="showHandle">
-        <img :src="DragHandleIcon" class="w-4 h-4" alt="drag-handle" />
+        <SvgImg :svg="DragHandleIcon" class="w-4 h-4" alt="drag-handle" />
       </div>
       <div class="flex-grow">
         <slot />
@@ -16,6 +16,7 @@
   </div>
 </template>
 <script setup>
+import SvgImg from "../Utility/SvgImg";
 import { HandleDraggableDotsIcon as DragHandleIcon } from "./Icons";
 import { ListDragAndDrop } from "./listDragAndDrop";
 

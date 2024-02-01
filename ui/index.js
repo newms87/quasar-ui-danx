@@ -1,1 +1,1 @@
-export * from "./vue-plugin";
+export * from "./src";

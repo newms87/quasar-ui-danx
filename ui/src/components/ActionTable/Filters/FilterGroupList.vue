@@ -2,51 +2,51 @@
   <QList>
     <div class="px-4 py-2 max-w-full">
       <template
-        v-for="(group, index) in filterGroups"
-        :key="'group-' + group.name"
+          v-for="(group, index) in filterGroups"
+          :key="'group-' + group.name"
       >
         <template v-if="group.flat">
           <FilterableField
-            v-for="field in group.fields"
-            :key="'field-' + field.name"
-            :model-value="field.calcValue ? field.calcValue(filter) : filter[field.name]"
-            :field="field"
-            :loading="loading"
-            class="mb-4"
-            @update:model-value="updateFilter(field, $event)"
+              v-for="field in group.fields"
+              :key="'field-' + field.name"
+              :model-value="field.calcValue ? field.calcValue(filter) : filter[field.name]"
+              :field="field"
+              :loading="loading"
+              class="mb-4"
+              @update:model-value="updateFilter(field, $event)"
           />
         </template>
 
         <FilterGroupItem
-          v-else
-          :name="group.name"
-          :count="activeCountByGroup[group.name]"
+            v-else
+            :name="group.name"
+            :count="activeCountByGroup[group.name]"
         >
           <FilterableField
-            v-for="field in group.fields"
-            :key="'field-' + field.name"
-            :model-value="field.calcValue ? field.calcValue(filter) : filter[field.name]"
-            :field="field"
-            :loading="loading"
-            class="mb-4"
-            @update:model-value="updateFilter(field, $event)"
+              v-for="field in group.fields"
+              :key="'field-' + field.name"
+              :model-value="field.calcValue ? field.calcValue(filter) : filter[field.name]"
+              :field="field"
+              :loading="loading"
+              class="mb-4"
+              @update:model-value="updateFilter(field, $event)"
           />
         </FilterGroupItem>
 
         <QSeparator
-          v-if="index < (filterGroups.length - 1)"
-          class="my-2"
+            v-if="index < (filterGroups.length - 1)"
+            class="my-2"
         />
       </template>
     </div>
   </QList>
 </template>
 <script setup>
-import FilterableField from "src/components/ActionTable/Filters/FilterableField";
-import FilterGroupItem from "src/components/ActionTable/Filters/FilterGroupItem";
-import { computed } from "vue";
+import { computed } from 'vue';
+import FilterableField from './FilterableField';
+import FilterGroupItem from './FilterGroupItem';
 
-const emit = defineEmits(["update:filter"]);
+const emit = defineEmits(['update:filter']);
 const props = defineProps({
   filterGroups: {
     type: Array,
@@ -71,6 +71,6 @@ function updateFilter(field, value) {
   if (field.filterBy) {
     fieldFilter = field.filterBy(value);
   }
-  emit("update:filter", { ...props.filter, ...fieldFilter });
+  emit('update:filter', { ...props.filter, ...fieldFilter });
 }
 </script>

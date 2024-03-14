@@ -1,28 +1,28 @@
 <template>
   <LabeledInput
-    type="password"
-    v-bind="props"
-    :rules="rules"
-    @update:model-value="$emit('update:model-value', $event)"
+      type="password"
+      v-bind="props"
+      :rules="rules"
+      @update:model-value="$emit('update:model-value', $event)"
   />
 </template>
 
 <script setup>
-import LabeledInput from "src/components/ActionTable/Form/Fields/LabeledInput";
+import LabeledInput from './LabeledInput';
 
-defineEmits(["update:model-value"]);
+defineEmits(['update:model-value']);
 const props = defineProps({
   name: {
     type: String,
-    default: "password"
+    default: 'password'
   },
   label: {
     type: String,
-    default: "Password"
+    default: 'Password'
   },
   placeholder: {
     type: String,
-    default: "Enter Password"
+    default: 'Enter Password'
   },
   modelValue: {
     type: [String, Number],
@@ -35,5 +35,5 @@ const props = defineProps({
   disabled: Boolean
 });
 
-const rules = [(val) => val.length >= 8 || "Please use at least 8 characters"];
+const rules = [(val) => val.length >= 8 || 'Please use at least 8 characters'];
 </script>

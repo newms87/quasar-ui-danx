@@ -1,10 +1,10 @@
 <template>
   <QPopupProxy
-    :model-value="true"
-    cover
-    transition-show="scale"
-    transition-hide="scale"
-    class="bg-transparent shadow-none flex items-stretch"
+      :model-value="true"
+      cover
+      transition-show="scale"
+      transition-hide="scale"
+      class="bg-transparent shadow-none flex items-stretch"
   >
     <QDate v-model="dateTime" :mask="mask" :color="color">
       <div class="flex items-center justify-center">
@@ -13,10 +13,10 @@
         </div>
         <div>
           <QBtn
-            label="Cancel"
-            color="blue-base"
-            flat
-            @click="$emit('cancel')"
+              label="Cancel"
+              color="blue-base"
+              flat
+              @click="$emit('cancel')"
           />
           <QBtn label="Set" color="blue-base" flat @click="$emit('save')" />
         </div>
@@ -26,10 +26,10 @@
   </QPopupProxy>
 </template>
 <script setup>
-import { dbDateTime, localizedDateTime, remoteDateTime } from "../helpers/formats";
-import { computed } from "vue";
+import { dbDateTime, localizedDateTime, remoteDateTime } from '@/helpers/formats';
+import { computed } from 'vue';
 
-const emit = defineEmits(["update:modelValue", "save", "cancel", "clear"]);
+const emit = defineEmits(['update:modelValue', 'save', 'cancel', 'clear']);
 const props = defineProps({
   modelValue: {
     type: String,
@@ -37,11 +37,11 @@ const props = defineProps({
   },
   mask: {
     type: String,
-    default: "YYYY-MM-DD HH:mm"
+    default: 'YYYY-MM-DD HH:mm'
   },
   color: {
     type: String,
-    default: "blue-base"
+    default: 'blue-base'
   },
   nullable: Boolean
 });
@@ -52,7 +52,7 @@ const dateTime = computed({
     const newValue = value ? dbDateTime(remoteDateTime(value)) : null;
 
     if (newValue || props.nullable) {
-      emit("update:modelValue", newValue);
+      emit('update:modelValue', newValue);
     }
   }
 });

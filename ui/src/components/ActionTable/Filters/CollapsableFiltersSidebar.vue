@@ -1,23 +1,23 @@
 <template>
   <CollapsableSidebar
-    :collapse="!showFilters"
-    disabled
-    min-width="0"
-    max-width="18rem"
-    name="admin-ads"
-    @update:collapse="$emit('update:show-filters', !$event)"
+      :collapse="!showFilters"
+      disabled
+      min-width="0"
+      max-width="18rem"
+      name="admin-ads"
+      @update:collapse="$emit('update:show-filters', !$event)"
   >
     <FilterGroupList
-      :filter="filter"
-      :filter-groups="filterGroups"
-      @update:filter="$emit('update:filter', $event)"
+        :filter="filter"
+        :filter-groups="filterGroups"
+        @update:filter="$emit('update:filter', $event)"
     />
   </CollapsableSidebar>
 </template>
 <script setup>
-import { CollapsableSidebar, FilterGroupList } from "src/components";
+import { CollapsableSidebar, FilterGroupList } from '@/components';
 
-defineEmits(["update:filter", "update:show-filters"]);
+defineEmits(['update:filter', 'update:show-filters']);
 defineProps({
   name: {
     type: String,

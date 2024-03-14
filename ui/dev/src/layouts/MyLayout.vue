@@ -19,21 +19,14 @@
     </q-header>
 
     <q-page-container>
-      <router-view />
+      <div class="flex">
+        <CollapsableSidebar />
+        <router-view />
+      </div>
     </q-page-container>
   </q-layout>
 </template>
 
-<script>
-import { version } from 'ui' // "ui" is aliased in quasar.conf.js
-
-export default {
-  name: 'MyLayout',
-
-  setup () {
-    return {
-      version
-    }
-  }
-}
+<script setup>
+import { CollapsableSidebar, version } from 'ui';
 </script>

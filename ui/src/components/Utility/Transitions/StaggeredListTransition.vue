@@ -1,26 +1,25 @@
 <template>
   <TransitionGroup
-    ref="list"
-    tag="div"
-    appear
-    :css="false"
-    @before-enter="onBeforeEnter"
-    @enter="onEnter"
-    @leave="onLeave"
+      ref="list"
+      tag="div"
+      appear
+      :css="false"
+      @before-enter="onBeforeEnter"
+      @enter="onEnter"
+      @leave="onLeave"
   >
     <slot />
   </TransitionGroup>
 </template>
 
 <script setup>
-import gsap from "gsap";
-import { isTestMode } from "../helpers/testing";
-import { computed, ref } from "vue";
+import gsap from 'gsap';
+import { computed, ref } from 'vue';
 
 const props = defineProps({
   height: {
     type: [String, Number],
-    default: "auto"
+    default: 'auto'
   },
   duration: {
     type: Number,
@@ -29,7 +28,8 @@ const props = defineProps({
   delayOffset: {
     type: Number,
     default: 0.5
-  }
+  },
+  disabled: Boolean
 });
 
 const list = ref(null);
@@ -38,7 +38,7 @@ const indexDelay = computed(() => {
 });
 
 function onBeforeEnter(el) {
-  if (isTestMode.value) {
+  if (props.disabled) {
     return;
   }
   el.style.opacity = 0;
@@ -46,7 +46,7 @@ function onBeforeEnter(el) {
 }
 
 function onEnter(el, onComplete) {
-  if (isTestMode.value) {
+  if (props.disabled) {
     onComplete();
     return;
   }
@@ -61,7 +61,7 @@ function onEnter(el, onComplete) {
 }
 
 function onLeave(el, onComplete) {
-  if (isTestMode.value) {
+  if (props.disabled) {
     onComplete();
     return;
   }

@@ -1,19 +1,19 @@
 <!--suppress VueUnrecognizedSlot -->
 <template>
   <QTable
-    ref="actionTable"
-    :selected="selectedRows"
-    :pagination="quasarPagination"
-    :columns="columns"
-    :loading="isLoadingList"
-    :rows="pagedItems?.data || []"
-    selection="multiple"
-    :rows-per-page-options="[25,50,100]"
-    class="sticky-column sticky-header w-full !border-0"
-    color="blue-base"
-    @update:selected="$emit('update:selected-rows', $event)"
-    @update:pagination="() => {}"
-    @request="$emit('update:quasar-pagination', $event.pagination)"
+      ref="actionTable"
+      :selected="selectedRows"
+      :pagination="quasarPagination"
+      :columns="columns"
+      :loading="isLoadingList"
+      :rows="pagedItems?.data || []"
+      selection="multiple"
+      :rows-per-page-options="[25,50,100]"
+      class="sticky-column sticky-header w-full !border-0"
+      color="blue-base"
+      @update:selected="$emit('update:selected-rows', $event)"
+      @update:pagination="() => {}"
+      @request="$emit('update:quasar-pagination', $event.pagination)"
   >
     <template #no-data>
       <slot name="empty">
@@ -22,27 +22,27 @@
     </template>
     <template #top-row>
       <TableSummaryRow
-        :label="label"
-        :item-count="summary?.count || 0"
-        :selected-count="selectedRows.length"
-        :loading="isLoadingSummary"
-        :summary="summary"
-        :columns="columns"
-        @clear="$emit('update:selected-rows',  [])"
+          :label="label"
+          :item-count="summary?.count || 0"
+          :selected-count="selectedRows.length"
+          :loading="isLoadingSummary"
+          :summary="summary"
+          :columns="columns"
+          @clear="$emit('update:selected-rows',  [])"
       />
     </template>
     <template #header-cell="rowProps">
       <QTh
-        :key="rowProps.key"
-        :props="rowProps"
-        :data-drop-zone="`resize-column-` + rowProps.col.name"
+          :key="rowProps.key"
+          :props="rowProps"
+          :data-drop-zone="`resize-column-` + rowProps.col.name"
       >
         {{ rowProps.col.label }}
         <HandleDraggable
-          v-if="rowProps.col.resizeable"
-          :drop-zone="`resize-column-` + rowProps.col.name"
-          class="resize-handle"
-          @resize="rowProps.col.onResize"
+            v-if="rowProps.col.resizeable"
+            :drop-zone="`resize-column-` + rowProps.col.name"
+            class="resize-handle"
+            @resize="rowProps.col.onResize"
         >
           <RowResizeIcon class="w-4 text-neutral-base" />
         </HandleDraggable>
@@ -52,8 +52,8 @@
       <QTd :key="rowProps.key" :props="rowProps">
         <template v-if="rowProps.col.component">
           <RenderComponentColumn
-            :row-props="rowProps"
-            @action="$emit('action', $event)"
+              :row-props="rowProps"
+              @action="$emit('action', $event)"
           />
         </template>
         <template v-else-if="rowProps.col.fieldList">
@@ -77,12 +77,17 @@
 </template>
 
 <script setup>
-import { DragHandleIcon as RowResizeIcon } from "@/svg";
-import { EmptyTableState, registerStickyScrolling, RenderComponentColumn, TableSummaryRow } from "src/components";
-import { HandleDraggable } from "quasar-ui-src";
-import { ref } from "vue";
+import {
+  EmptyTableState,
+  HandleDraggable,
+  registerStickyScrolling,
+  RenderComponentColumn,
+  TableSummaryRow
+} from '@/components';
+import { DragHandleIcon as RowResizeIcon } from '@/svg';
+import { ref } from 'vue';
 
-defineEmits(["action", "filter", "update:quasar-pagination", "update:selected-rows"]);
+defineEmits(['action', 'filter', 'update:quasar-pagination', 'update:selected-rows']);
 defineProps({
   label: {
     type: String,

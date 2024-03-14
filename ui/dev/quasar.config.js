@@ -1,8 +1,8 @@
 // Configuration for your app
 // https://quasar.dev/quasar-cli/quasar-conf-js
 
-const path = require('path')
-const webpack = require('webpack')
+const path = require('path');
+const webpack = require('webpack');
 
 module.exports = function (ctx) {
   return {
@@ -46,23 +46,24 @@ module.exports = function (ctx) {
     build: {
       vueRouterMode: 'history',
 
-      chainWebpack (chain) {
+      chainWebpack(chain) {
         chain.resolve.alias.merge({
           ui: path.resolve(__dirname, `../src/index.esm.js`),
-        })
+          '@': path.resolve(__dirname, '../src')
+        });
 
         chain.plugin('define-ui')
           .use(webpack.DefinePlugin, [{
             __UI_VERSION__: `'${require('../package.json').version}'`
-          }])
+          }]);
 
         // enable ts support
-        chain.resolve.extensions.add('.ts')
+        chain.resolve.extensions.add('.ts');
         chain.module.rule('typescript')
           .test(/\.ts$/)
           .use('ts-loader')
           .loader('ts-loader')
-          .end()
+          .end();
       }
     },
 
@@ -77,5 +78,5 @@ module.exports = function (ctx) {
         'render' // keep this as last one
       ]
     }
-  }
-}
+  };
+};

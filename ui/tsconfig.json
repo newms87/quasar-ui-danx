@@ -23,10 +23,7 @@
     "paths": {
       "@/*": [
         "./src/*"
-      ],
-      "src/*": [
-        "./src/*"
-      ],
+      ]
       // Path alias to resolve imports (adjust as needed)
     }
   },

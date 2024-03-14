@@ -1,20 +1,20 @@
 <template>
   <div>
     <QInput
-      :model-value="fLocalizedDateTime(modelValue)"
-      :color="color"
-      class="bg-white rounded overflow-hidden px-2 w-48"
-      dense
-      readonly
-      @click="isShowing = true"
+        :model-value="fLocalizedDateTime(modelValue)"
+        :color="color"
+        class="bg-white rounded overflow-hidden px-2 w-48"
+        dense
+        readonly
+        @click="isShowing = true"
     >
       <template #append>
         <QIcon name="event" class="cursor-pointer">
           <QPopupProxy v-model="isShowing">
             <DateTimePicker
-              v-model="dateTime"
-              @cancel="isShowing = false"
-              @save="onSave"
+                v-model="dateTime"
+                @cancel="isShowing = false"
+                @save="onSave"
             />
           </QPopupProxy>
         </QIcon>
@@ -24,11 +24,11 @@
 </template>
 
 <script setup>
-import DateTimePicker from "src/components/ActionTable/Form/Fields/DateTimePicker";
-import { fLocalizedDateTime } from "../helpers/formats";
-import { ref } from "vue";
+import { fLocalizedDateTime } from '@/helpers/formats';
+import { ref } from 'vue';
+import DateTimePicker from './DateTimePicker';
 
-const emit = defineEmits(["update:model-value"]);
+const emit = defineEmits(['update:model-value']);
 const props = defineProps({
   modelValue: {
     type: String,
@@ -36,7 +36,7 @@ const props = defineProps({
   },
   color: {
     type: String,
-    default: "blue-base"
+    default: 'blue-base'
   }
 });
 
@@ -44,7 +44,7 @@ const isShowing = ref(false);
 const dateTime = ref(props.modelValue);
 
 function onSave() {
-  emit("update:model-value", dateTime.value);
+  emit('update:model-value', dateTime.value);
   isShowing.value = false;
 }
 </script>

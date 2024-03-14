@@ -1,36 +1,36 @@
 <template>
   <div>
     <ContentDrawer
-      v-model:show="showDrawer"
-      content-class=""
-      position="bottom"
-      :title="'Filter ' + label"
+        v-model:show="showDrawer"
+        content-class=""
+        position="bottom"
+        :title="'Filter ' + label"
     >
       <div
-        v-for="option in formattedOptions"
-        :key="'select-drawer-' + option.value"
-        :data-dusk="'drawer-opt-' + option.value"
-        class="cursor-pointer hover:bg-gray-light px-8 py-3 flex items-center border-b border-gray-light"
-        @click="toggleSelect(option)"
+          v-for="option in formattedOptions"
+          :key="'select-drawer-' + option.value"
+          :data-dusk="'drawer-opt-' + option.value"
+          class="cursor-pointer hover:bg-gray-light px-8 py-3 flex items-center border-b border-gray-light"
+          @click="toggleSelect(option)"
       >
         <QCheckbox
-          :model-value="isSelected(option)"
-          class="mr-2"
+            :model-value="isSelected(option)"
+            class="mr-2"
         />
         <slot
-          name="option"
-          :opt="option"
+            name="option"
+            :opt="option"
         >{{ option.label }}
         </slot>
       </div>
     </ContentDrawer>
 
     <QChip
-      ref="select"
-      outline
-      clickable
-      size="16px"
-      @click="showDrawer = true"
+        ref="select"
+        outline
+        clickable
+        size="16px"
+        @click="showDrawer = true"
     >
       <slot name="selected">
         <slot name="label">{{ label }}:&nbsp;</slot>
@@ -39,7 +39,7 @@
             <template v-if="multiple">
               {{ getOptionLabel(modelValue[0]) }}
               <template
-                v-if="modelValue.length > 1"
+                  v-if="modelValue.length > 1"
               >+ {{ modelValue.length - 1 }}
               </template
               >
@@ -58,10 +58,10 @@
 </template>
 
 <script setup>
-import { ContentDrawer } from "src/components/Utility";
-import { computed, ref } from "vue";
+import { ContentDrawer } from '@/components';
+import { computed, ref } from 'vue';
 
-const emit = defineEmits(["update:modelValue"]);
+const emit = defineEmits(['update:modelValue']);
 const props = defineProps({
   modelValue: {
     type: [Object, String, Array, null],
@@ -74,24 +74,24 @@ const props = defineProps({
   multiple: Boolean,
   label: {
     type: String,
-    default: "Select"
+    default: 'Select'
   },
   placeholder: {
     type: String,
-    default: "All"
+    default: 'All'
   }
 });
 
 const showDrawer = ref(false);
 const formattedOptions = computed(() =>
-  props.options.map((opt) =>
-    typeof opt === "string"
-      ? {
-        label: opt,
-        value: opt
-      }
-      : opt
-  )
+    props.options.map((opt) =>
+        typeof opt === 'string'
+            ? {
+              label: opt,
+              value: opt
+            }
+            : opt
+    )
 );
 
 function getOptionValue(option) {
@@ -131,6 +131,6 @@ function toggleSelect(option) {
     }
   }
 
-  emit("update:modelValue", selection);
+  emit('update:modelValue', selection);
 }
 </script>

@@ -1,50 +1,50 @@
 <template>
   <div>
     <QInput
-      v-if="!readonly"
-      :data-dusk="'text-field-' + field?.id"
-      :data-testid="'text-field-' + field?.id"
-      :placeholder="field?.placeholder"
-      outlined
-      dense
-      :disable="disabled"
-      :label-slot="!noLabel"
-      :input-class="inputClass"
-      :class="parentClass"
-      stack-label
-      :type="type"
-      :model-value="modelValue"
-      :debounce="debounce"
-      @keydown.enter="$emit('submit')"
-      @update:model-value="$emit('update:model-value', $event)"
+        v-if="!readonly"
+        :data-dusk="'text-field-' + field?.id"
+        :data-testid="'text-field-' + field?.id"
+        :placeholder="field?.placeholder"
+        outlined
+        dense
+        :disable="disabled"
+        :label-slot="!noLabel"
+        :input-class="inputClass"
+        :class="parentClass"
+        stack-label
+        :type="type"
+        :model-value="modelValue"
+        :debounce="debounce"
+        @keydown.enter="$emit('submit')"
+        @update:model-value="$emit('update:model-value', $event)"
     >
       <template #label>
         <FieldLabel
-          :field="field"
-          :label="label"
-          :show-name="showName"
-          :class="labelClass"
+            :field="field"
+            :label="label"
+            :show-name="showName"
+            :class="labelClass"
         />
       </template>
     </QInput>
     <div v-if="readonly">
       <LabelValueBlock
-        :label="label || field.label"
-        :value="modelValue"
+          :label="label || field.label"
+          :value="modelValue"
       />
     </div>
   </div>
 </template>
 
 <script setup>
-import LabelValueBlock from "components/Common/LabelValueBlock";
-import FieldLabel from "src/components/ActionTable/Form/Fields/FieldLabel";
+import FieldLabel from './FieldLabel';
+import LabelValueBlock from './LabelValueBlock';
 
-defineEmits(["update:model-value", "submit"]);
+defineEmits(['update:model-value', 'submit']);
 defineProps({
   modelValue: {
     type: [String, Number],
-    default: ""
+    default: ''
   },
   field: {
     type: Object,
@@ -52,7 +52,7 @@ defineProps({
   },
   type: {
     type: String,
-    default: "text"
+    default: 'text'
   },
   label: {
     type: String,
@@ -60,15 +60,15 @@ defineProps({
   },
   labelClass: {
     type: String,
-    default: "text-sm text-gray-shadow"
+    default: 'text-sm text-gray-shadow'
   },
   parentClass: {
     type: String,
-    default: ""
+    default: ''
   },
   inputClass: {
     type: String,
-    default: ""
+    default: ''
   },
   noLabel: Boolean,
   showName: Boolean,

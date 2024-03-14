@@ -16,25 +16,25 @@
   </div>
 </template>
 <script setup>
-import SvgImg from "../Utility/SvgImg";
-import { HandleDraggableDotsIcon as DragHandleIcon } from "./Icons";
-import { ListDragAndDrop } from "./listDragAndDrop";
+import { ListDragAndDrop } from '@/components';
+import { DragHandleDotsIcon as DragHandleIcon } from '@/svg';
+import SvgImg from '../Utility/SvgImg';
 
-const emit = defineEmits(["position", "update:list-items"]);
+const emit = defineEmits(['position', 'update:list-items']);
 const props = defineProps({
   dropZone: {
     type: [Function, String],
-    required: true,
+    required: true
   },
   direction: {
     type: String,
-    default: "vertical",
-    validator: (value) => ["vertical", "horizontal"].includes(value),
+    default: 'vertical',
+    validator: (value) => ['vertical', 'horizontal'].includes(value)
   },
   showHandle: Boolean,
   listItems: {
     type: Array,
-    default: null,
+    default: null
   }
 });
 
@@ -42,12 +42,12 @@ const dragAndDrop = new ListDragAndDrop()
     .setDropZone(props.dropZone)
     .setOptions({ showPlaceholder: true, direction: props.direction })
     .onPositionChange((newPosition, oldPosition) => {
-      emit("position", newPosition);
+      emit('position', newPosition);
 
       if (props.listItems) {
         const items = [...props.listItems];
         items.splice(newPosition, 0, items.splice(oldPosition, 1)[0]);
-        emit("update:list-items", items);
+        emit('update:list-items', items);
       }
     });
 </script>

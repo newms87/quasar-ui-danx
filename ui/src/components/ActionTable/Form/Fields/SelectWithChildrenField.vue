@@ -4,22 +4,22 @@
       <div class="text-gray-silver">No options available</div>
     </template>
     <SelectField
-      v-model="selectedOption"
-      :options="options"
-      :label="label"
-      :placeholder="placeholder"
-      :option-value="opt => opt"
-      :loading="loading"
-      @update:model-value="onSelectOption"
+        v-model="selectedOption"
+        :options="options"
+        :label="label"
+        :placeholder="placeholder"
+        :option-value="opt => opt"
+        :loading="loading"
+        @update:model-value="onSelectOption"
     />
     <div v-if="selectedOption">
       <QCheckbox
-        v-for="child in selectedOption.children"
-        :key="child.id"
-        :model-value="selectedChildren.includes(child.id)"
-        :field="child"
-        class="mt-3"
-        @update:model-value="onSelectChild(child)"
+          v-for="child in selectedOption.children"
+          :key="child.id"
+          :model-value="selectedChildren.includes(child.id)"
+          :field="child"
+          class="mt-3"
+          @update:model-value="onSelectChild(child)"
       >
         <div>{{ child.label }}</div>
         <div class="text-xs text-gray-silver">{{ child.name }}</div>
@@ -28,11 +28,11 @@
   </div>
 </template>
 <script setup>
-import SelectField from "src/components/ActionTable/Form/Fields/SelectField";
-import { remove } from "../helpers/array";
-import { ref, watch } from "vue";
+import { remove } from '@/helpers/array';
+import { ref, watch } from 'vue';
+import SelectField from './SelectField';
 
-const emit = defineEmits(["update:model-value"]);
+const emit = defineEmits(['update:model-value']);
 const props = defineProps({
   modelValue: {
     type: Array,
@@ -40,11 +40,11 @@ const props = defineProps({
   },
   label: {
     type: String,
-    default: "Selection"
+    default: 'Selection'
   },
   placeholder: {
     type: String,
-    default: "Select an option"
+    default: 'Select an option'
   },
   options: {
     type: Array,
@@ -68,11 +68,11 @@ function onSelectChild(child) {
   } else {
     selectedChildren.value.push(child.id);
   }
-  emit("update:model-value", selectedChildren.value.length > 0 ? selectedChildren.value : undefined);
+  emit('update:model-value', selectedChildren.value.length > 0 ? selectedChildren.value : undefined);
 }
 function onSelectOption() {
   selectedChildren.value = [];
-  emit("update:model-value", undefined);
+  emit('update:model-value', undefined);
 }
 watch(() => props.modelValue, (value) => {
   selectedOption.value = resolveSelectedOption();

@@ -1,21 +1,21 @@
 <template>
   <QTr
-    class="sticky-column-1 transition-all sticky-row"
-    :class="{'!bg-neutral-plus-7': !selectedCount, '!bg-blue-base text-white selected': selectedCount, 'opacity-50': loading}"
+      class="sticky-column-1 transition-all sticky-row"
+      :class="{'!bg-neutral-plus-7': !selectedCount, '!bg-blue-base text-white selected': selectedCount, 'opacity-50': loading}"
   >
     <QTd
-      :colspan="stickyColspan"
-      class="font-bold transition-all"
-      :class="{'!bg-neutral-plus-7 !pl-5': !selectedCount, '!bg-blue-base text-white !pl-4': selectedCount}"
+        :colspan="stickyColspan"
+        class="font-bold transition-all"
+        :class="{'!bg-neutral-plus-7 !pl-5': !selectedCount, '!bg-blue-base text-white !pl-4': selectedCount}"
     >
       <div class="flex flex-nowrap items-center">
         <div
-          v-if="selectedCount"
-          class="flex items-center"
+            v-if="selectedCount"
+            class="flex items-center"
         >
           <ClearIcon
-            class="w-6 mr-3"
-            @click="$emit('clear')"
+              class="w-6 mr-3"
+              @click="$emit('clear')"
           />
           {{ fNumber(selectedCount) }} {{ selectedLabel }}
         </div>
@@ -23,16 +23,16 @@
           {{ fNumber(itemCount) }} {{ label }}
         </div>
         <QSpinner
-          v-if="loading"
-          class="ml-3"
-          size="18"
+            v-if="loading"
+            class="ml-3"
+            size="18"
         />
       </div>
     </QTd>
     <QTd
-      v-for="column in summaryColumns"
-      :key="column.name"
-      :align="column.align || 'left'"
+        v-for="column in summaryColumns"
+        :key="column.name"
+        :align="column.align || 'left'"
     >
       <template v-if="summary">
         {{ formatValue(column) }}
@@ -41,20 +41,20 @@
   </QTr>
 </template>
 <script setup>
-import { XCircleIcon as ClearIcon } from "@heroicons/vue/solid";
-import { fNumber } from "../helpers/formats";
-import { computed } from "vue";
+import { fNumber } from '@/helpers/formats';
+import { XCircleIcon as ClearIcon } from '@heroicons/vue/solid';
+import { computed } from 'vue';
 
-defineEmits(["clear"]);
+defineEmits(['clear']);
 const props = defineProps({
   loading: Boolean,
   label: {
     type: String,
-    default: "Rows"
+    default: 'Rows'
   },
   selectedLabel: {
     type: String,
-    default: "Selected"
+    default: 'Selected'
   },
   selectedCount: {
     type: Number,
@@ -85,7 +85,7 @@ const summaryColumns = computed(() => {
 
 function formatValue(column) {
   const value = props.summary[column.name];
-  if (value === undefined) return "";
+  if (value === undefined) return '';
 
   if (column.format) {
     return column.format(value);

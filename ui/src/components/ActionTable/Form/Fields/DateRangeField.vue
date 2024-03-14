@@ -1,17 +1,17 @@
 <template>
   <div>
     <div
-      v-if="label"
-      class="font-bold text-xs mb-2"
+        v-if="label"
+        class="font-bold text-xs mb-2"
     >
       {{ label }}
     </div>
     <template v-if="inline">
       <QDate
-        v-model="dateRange"
-        range
-        class="reactive"
-        @update:model-value="onSave"
+          v-model="dateRange"
+          range
+          class="reactive"
+          @update:model-value="onSave"
       />
     </template>
     <template v-else>
@@ -28,9 +28,9 @@
       </div>
       <QPopupProxy>
         <QDate
-          v-model="dateRange"
-          range
-          @update:model-value="onSave"
+            v-model="dateRange"
+            range
+            @update:model-value="onSave"
         />
       </QPopupProxy>
     </template>
@@ -38,11 +38,11 @@
 </template>
 
 <script setup>
-import { CalendarIcon as DateIcon } from "@heroicons/vue/outline";
-import { fDate, parseQDate, parseQDateTime } from "../helpers/formats";
-import { computed, ref, watch } from "vue";
+import { fDate, parseQDate, parseQDateTime } from '@/helpers/formats';
+import { CalendarIcon as DateIcon } from '@heroicons/vue/outline';
+import { computed, ref, watch } from 'vue';
 
-const emit = defineEmits(["update:model-value"]);
+const emit = defineEmits(['update:model-value']);
 const props = defineProps({
   modelValue: {
     type: Object,
@@ -60,14 +60,14 @@ const formattedDates = computed(() => {
   if (dateRangeValue.value) {
     if (props.withTime) {
       return {
-        from: fDate(parseQDateTime(dateRangeValue.value.from || "0000-00-00")),
-        to: fDate(parseQDateTime(dateRangeValue.value.to || "9999-12-31"))
+        from: fDate(parseQDateTime(dateRangeValue.value.from || '0000-00-00')),
+        to: fDate(parseQDateTime(dateRangeValue.value.to || '9999-12-31'))
       };
     }
 
     return {
-      from: fDate(parseQDate(dateRangeValue.value.from || "0000-00-00")),
-      to: fDate(parseQDate(dateRangeValue.value.to || "9999-12-31"))
+      from: fDate(parseQDate(dateRangeValue.value.from || '0000-00-00')),
+      to: fDate(parseQDate(dateRangeValue.value.to || '9999-12-31'))
     };
   }
   return {
@@ -89,7 +89,7 @@ function toQDateValue(val) {
 const dateRangeValue = computed(() => {
   let range = dateRange.value;
 
-  if (typeof range === "string") {
+  if (typeof range === 'string') {
     range = {
       from: range,
       to: range
@@ -97,14 +97,14 @@ const dateRangeValue = computed(() => {
   }
 
   if (range?.from && range?.to && props.withTime) {
-    range.from += " 00:00:00";
-    range.to += " 23:59:59";
+    range.from += ' 00:00:00';
+    range.to += ' 23:59:59';
   }
 
   return range;
 });
 
 function onSave() {
-  emit("update:model-value", dateRangeValue.value);
+  emit('update:model-value', dateRangeValue.value);
 }
 </script>

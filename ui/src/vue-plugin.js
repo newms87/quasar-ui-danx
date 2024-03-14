@@ -1,7 +1,7 @@
-export * from "./helpers";
-export * from "./components/DragAndDrop";
+export * from './helpers';
+export * from './components';
 
-import packageJson from "../package.json";
+import packageJson from '../package.json';
 
 const { version } = packageJson;
 
@@ -11,5 +11,5 @@ function install(app) {
 
 export {
     version,
-    install,
+    install
 };

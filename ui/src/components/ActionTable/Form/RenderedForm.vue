@@ -1,37 +1,39 @@
 <template>
   <div class="rendered-form">
     <div
-      v-for="(field, index) in mappedFields"
-      :key="field.id"
-      :class="{ 'mt-4': index > 0 }"
+        v-for="(field, index) in mappedFields"
+        :key="field.id"
+        :class="{ 'mt-4': index > 0 }"
     >
       <Component
-        :is="field.component"
-        v-model="fieldValues[field.name]"
-        :field="field"
-        :label="field.label || undefined"
-        :no-label="noLabel"
-        :show-name="showName"
-        :disable="disable"
-        :readonly="readonly"
-        @update:model-value="onInput(field.name, $event)"
+          :is="field.component"
+          v-model="fieldValues[field.name]"
+          :field="field"
+          :label="field.label || undefined"
+          :no-label="noLabel"
+          :show-name="showName"
+          :disable="disable"
+          :readonly="readonly"
+          @update:model-value="onInput(field.name, $event)"
       />
     </div>
   </div>
 </template>
 <script setup>
-import BooleanField from "src/components/ActionTable/Form/Fields/BooleanField";
-import DateField from "src/components/ActionTable/Form/Fields/DateField";
-import DateRangeField from "src/components/ActionTable/Form/Fields/DateRangeField";
-import IntegerField from "src/components/ActionTable/Form/Fields/IntegerField";
-import MultiFileField from "src/components/ActionTable/Form/Fields/MultiFileField";
-import NumberField from "src/components/ActionTable/Form/Fields/NumberField";
-import SingleFileField from "src/components/ActionTable/Form/Fields/SingleFileField";
-import TextField from "src/components/ActionTable/Form/Fields/TextField";
-import WysiwygField from "src/components/ActionTable/Form/Fields/WysiwygField";
-import { reactive } from "vue";
+import { reactive } from 'vue';
+import {
+  BooleanField,
+  DateField,
+  DateRangeField,
+  IntegerField,
+  MultiFileField,
+  NumberField,
+  SingleFileField,
+  TextField,
+  WysiwygField
+} from './Fields';
 
-const emit = defineEmits(["update:values"]);
+const emit = defineEmits(['update:values']);
 const props = defineProps({
   values: {
     type: Object,
@@ -63,12 +65,12 @@ const mappedFields = props.fields.map((field) => ({
   placeholder: `Enter ${field.label}`,
   ...field,
   component: FORM_FIELD_MAP[field.type],
-  default: field.type === "BOOLEAN" ? false : ""
+  default: field.type === 'BOOLEAN' ? false : ''
 }));
 
 const fieldValues = reactive(props.values || {});
 
 function onInput(key, value) {
-  emit("update:values", { ...fieldValues, [key]: value });
+  emit('update:values', { ...fieldValues, [key]: value });
 }
 </script>

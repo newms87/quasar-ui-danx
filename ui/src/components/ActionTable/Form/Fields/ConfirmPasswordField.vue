@@ -1,28 +1,28 @@
 <template>
   <LabeledInput
-    type="password"
-    v-bind="props"
-    :rules="rules"
-    @update:model-value="$emit('update:model-value', $event)"
+      type="password"
+      v-bind="props"
+      :rules="rules"
+      @update:model-value="$emit('update:model-value', $event)"
   />
 </template>
 
 <script setup>
-import LabeledInput from "src/components/ActionTable/Form/Fields/LabeledInput";
+import LabeledInput from './LabeledInput';
 
-defineEmits(["update:model-value"]);
+defineEmits(['update:model-value']);
 const props = defineProps({
   name: {
     type: String,
-    default: "password_confirmation"
+    default: 'password_confirmation'
   },
   label: {
     type: String,
-    default: "Confirm Password"
+    default: 'Confirm Password'
   },
   placeholder: {
     type: String,
-    default: "Confirm Password"
+    default: 'Confirm Password'
   },
   modelValue: {
     type: [String, Number],
@@ -34,13 +34,13 @@ const props = defineProps({
   },
   password: {
     type: String,
-    default: ""
+    default: ''
   },
   disabled: Boolean
 });
 
 const rules = [
   (val) =>
-    val === props.password || "The password and confirmation do not match"
+      val === props.password || 'The password and confirmation do not match'
 ];
 </script>

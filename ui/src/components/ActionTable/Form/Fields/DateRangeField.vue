@@ -39,7 +39,7 @@
 
 <script setup>
 import { CalendarIcon as DateIcon } from "@heroicons/vue/outline";
-import { fDate, parseQDate, parseQDateTime } from "danx/src/helpers/formats";
+import { fDate, parseQDate, parseQDateTime } from "../helpers/formats";
 import { computed, ref, watch } from "vue";
 
 const emit = defineEmits(["update:model-value"]);

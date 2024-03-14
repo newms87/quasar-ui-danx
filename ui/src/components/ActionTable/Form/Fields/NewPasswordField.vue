@@ -8,7 +8,7 @@
 </template>
 
 <script setup>
-import LabeledInput from "danx/src/components/ActionTable/Form/Fields/LabeledInput";
+import LabeledInput from "src/components/ActionTable/Form/Fields/LabeledInput";
 
 defineEmits(["update:model-value"]);
 const props = defineProps({

@@ -7,7 +7,7 @@
 
 function extendConf (conf, api) {
   // register our boot file
-  conf.boot.push('~quasar-app-extension-danx/src/boot/register.js')
+  conf.boot.push('~quasar-app-extension-src/boot/register.js')
 
   if (api.hasWebpack) {
     // make sure app extension files & ui package gets transpiled
@@ -19,7 +19,7 @@ function extendConf (conf, api) {
   }
 
   // make sure the stylesheet goes through webpack to avoid SSR issues
-  conf.css.push('~quasar-ui-danx/src/index.sass')
+  conf.css.push('~quasar-ui-src/index.sass')
 }
 
 export default function (api) {
@@ -37,7 +37,7 @@ export default function (api) {
 
 
   // Uncomment the line below if you provide a JSON API for your component
-  // api.registerDescribeApi('Danx', '~quasar-ui-danx/src/components/Danx.json')
+  // api.registerDescribeApi('Danx', '~quasar-ui-src/components/Danx.json')
 
 
   // We extend /quasar.conf.js

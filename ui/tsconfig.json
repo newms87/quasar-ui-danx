@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "target": "es5",
+    "target": "esnext",
     // Specify ECMAScript target version
     "module": "esnext",
     // Specify module code generation
@@ -22,8 +22,11 @@
     // Base directory to resolve non-relative module names
     "paths": {
       "@/*": [
-        "src/*"
-      ]
+        "./src/*"
+      ],
+      "src/*": [
+        "./src/*"
+      ],
       // Path alias to resolve imports (adjust as needed)
     }
   },

@@ -1,4 +1,4 @@
-import { FlashMessages, useCompatibility } from "danx/src/helpers";
+import { FlashMessages, useCompatibility } from "../helpers";
 import ExifReader from "exifreader";
 
 export async function resolveFileLocation(file, waitMessage = null) {

@@ -20,8 +20,8 @@
 </template>
 
 <script setup>
-import FieldLabel from "danx/src/components/ActionTable/Form/Fields/FieldLabel";
-import { fNumber } from "danx/src/helpers/formats";
+import FieldLabel from "src/components/ActionTable/Form/Fields/FieldLabel";
+import { fNumber } from "../helpers/formats";
 import { computed, nextTick, ref, watch } from "vue";
 
 const emit = defineEmits(["update:model-value"]);

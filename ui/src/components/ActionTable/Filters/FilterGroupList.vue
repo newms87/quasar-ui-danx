@@ -42,8 +42,8 @@
   </QList>
 </template>
 <script setup>
-import FilterableField from "danx/src/components/ActionTable/Filters/FilterableField";
-import FilterGroupItem from "danx/src/components/ActionTable/Filters/FilterGroupItem";
+import FilterableField from "src/components/ActionTable/Filters/FilterableField";
+import FilterGroupItem from "src/components/ActionTable/Filters/FilterGroupItem";
 import { computed } from "vue";
 
 const emit = defineEmits(["update:filter"]);

@@ -24,8 +24,8 @@
 </template>
 <script setup>
 import { PencilIcon as EditIcon } from "@heroicons/vue/solid";
-import DateTimePicker from "danx/src/components/ActionTable/Form/Fields/DateTimePicker";
-import { fLocalizedDateTime } from "danx/src/helpers/formats";
+import DateTimePicker from "src/components/ActionTable/Form/Fields/DateTimePicker";
+import { fLocalizedDateTime } from "../helpers/formats";
 
 const emit = defineEmits(["close", "save", "update:model-value"]);
 defineProps({

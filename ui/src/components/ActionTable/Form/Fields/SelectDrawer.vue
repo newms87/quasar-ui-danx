@@ -58,7 +58,7 @@
 </template>
 
 <script setup>
-import { ContentDrawer } from "danx/src/components/Utility";
+import { ContentDrawer } from "src/components/Utility";
 import { computed, ref } from "vue";
 
 const emit = defineEmits(["update:modelValue"]);

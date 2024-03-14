@@ -20,15 +20,15 @@
   </div>
 </template>
 <script setup>
-import BooleanField from "danx/src/components/ActionTable/Form/Fields/BooleanField";
-import DateField from "danx/src/components/ActionTable/Form/Fields/DateField";
-import DateRangeField from "danx/src/components/ActionTable/Form/Fields/DateRangeField";
-import IntegerField from "danx/src/components/ActionTable/Form/Fields/IntegerField";
-import MultiFileField from "danx/src/components/ActionTable/Form/Fields/MultiFileField";
-import NumberField from "danx/src/components/ActionTable/Form/Fields/NumberField";
-import SingleFileField from "danx/src/components/ActionTable/Form/Fields/SingleFileField";
-import TextField from "danx/src/components/ActionTable/Form/Fields/TextField";
-import WysiwygField from "danx/src/components/ActionTable/Form/Fields/WysiwygField";
+import BooleanField from "src/components/ActionTable/Form/Fields/BooleanField";
+import DateField from "src/components/ActionTable/Form/Fields/DateField";
+import DateRangeField from "src/components/ActionTable/Form/Fields/DateRangeField";
+import IntegerField from "src/components/ActionTable/Form/Fields/IntegerField";
+import MultiFileField from "src/components/ActionTable/Form/Fields/MultiFileField";
+import NumberField from "src/components/ActionTable/Form/Fields/NumberField";
+import SingleFileField from "src/components/ActionTable/Form/Fields/SingleFileField";
+import TextField from "src/components/ActionTable/Form/Fields/TextField";
+import WysiwygField from "src/components/ActionTable/Form/Fields/WysiwygField";
 import { reactive } from "vue";
 
 const emit = defineEmits(["update:values"]);

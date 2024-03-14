@@ -28,8 +28,8 @@
   </div>
 </template>
 <script setup>
-import SelectField from "danx/src/components/ActionTable/Form/Fields/SelectField";
-import { remove } from "danx/src/helpers/array";
+import SelectField from "src/components/ActionTable/Form/Fields/SelectField";
+import { remove } from "../helpers/array";
 import { ref, watch } from "vue";
 
 const emit = defineEmits(["update:model-value"]);

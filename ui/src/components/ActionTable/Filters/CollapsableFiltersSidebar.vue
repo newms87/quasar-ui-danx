@@ -15,7 +15,7 @@
   </CollapsableSidebar>
 </template>
 <script setup>
-import { CollapsableSidebar, FilterGroupList } from "danx/src/components";
+import { CollapsableSidebar, FilterGroupList } from "src/components";
 
 defineEmits(["update:filter", "update:show-filters"]);
 defineProps({

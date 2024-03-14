@@ -1,4 +1,4 @@
-import { download } from "danx/src/helpers/download";
+import { download } from "../helpers/download";
 
 /**
  * Asynchronously load a file from the URL and trigger a download in the browser

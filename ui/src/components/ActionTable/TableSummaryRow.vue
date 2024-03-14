@@ -42,7 +42,7 @@
 </template>
 <script setup>
 import { XCircleIcon as ClearIcon } from "@heroicons/vue/solid";
-import { fNumber } from "danx/src/helpers/formats";
+import { fNumber } from "../helpers/formats";
 import { computed } from "vue";
 
 defineEmits(["clear"]);

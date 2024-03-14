@@ -9,7 +9,7 @@
 </template>
 
 <script setup>
-import NumberField from "danx/src/components/ActionTable/Form/Fields/NumberField";
+import NumberField from "src/components/ActionTable/Form/Fields/NumberField";
 
 defineEmits(["update:model-value"]);
 defineProps({

@@ -41,10 +41,10 @@ export function mapSortBy(pagination, columns) {
  *
  * @param ref
  * @param value
- * @returns {Promise<unknown>}
+ * @returns {Promise<void>}
  */
 export function waitForRef(ref, value) {
-  return new Promise((resolve) => {
+  return new Promise<void>((resolve) => {
     watch(ref, (newValue) => {
       if (newValue === value) {
         resolve();

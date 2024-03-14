@@ -1,5 +1,5 @@
-import { getFilterFromUrl, mapSortBy, waitForRef } from "danx/src/components/ActionTable/tableHelpers";
-import { getItem, setItem } from "danx/src/helpers";
+import { getFilterFromUrl, mapSortBy, waitForRef } from "src/components/ActionTable/tableHelpers";
+import { getItem, setItem } from "@/helpers";
 import { computed, ref, watch } from "vue";
 
 export function useListActions(name, {

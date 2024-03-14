@@ -38,7 +38,7 @@
 
 <script setup>
 import LabelValueBlock from "components/Common/LabelValueBlock";
-import FieldLabel from "danx/src/components/ActionTable/Form/Fields/FieldLabel";
+import FieldLabel from "src/components/ActionTable/Form/Fields/FieldLabel";
 
 defineEmits(["update:model-value", "submit"]);
 defineProps({

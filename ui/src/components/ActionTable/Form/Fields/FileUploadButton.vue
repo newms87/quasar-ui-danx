@@ -19,7 +19,7 @@
 </template>
 <script setup>
 import { PlusIcon } from "@heroicons/vue/outline";
-import { FileUpload } from "danx/src/helpers";
+import { FileUpload } from "../helpers";
 import { QBtn } from "quasar";
 import { ref } from "vue";
 

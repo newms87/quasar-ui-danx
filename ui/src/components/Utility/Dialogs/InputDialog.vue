@@ -15,7 +15,7 @@
   </ConfirmDialog>
 </template>
 <script setup>
-import ConfirmDialog from "danx/src/components/Utility/Dialogs/ConfirmDialog";
+import ConfirmDialog from "src/components/Utility/Dialogs/ConfirmDialog";
 import { ref } from "vue";
 
 defineEmits(["confirm", "close", "update:input"]);

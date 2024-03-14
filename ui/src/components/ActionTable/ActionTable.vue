@@ -78,8 +78,8 @@
 
 <script setup>
 import { DragHandleIcon as RowResizeIcon } from "@/svg";
-import { EmptyTableState, registerStickyScrolling, RenderComponentColumn, TableSummaryRow } from "danx/src/components";
-import { HandleDraggable } from "quasar-ui-danx/src";
+import { EmptyTableState, registerStickyScrolling, RenderComponentColumn, TableSummaryRow } from "src/components";
+import { HandleDraggable } from "quasar-ui-src";
 import { ref } from "vue";
 
 defineEmits(["action", "filter", "update:quasar-pagination", "update:selected-rows"]);

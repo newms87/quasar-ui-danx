@@ -24,8 +24,8 @@
 </template>
 
 <script setup>
-import DateTimePicker from "danx/src/components/ActionTable/Form/Fields/DateTimePicker";
-import { fLocalizedDateTime } from "danx/src/helpers/formats";
+import DateTimePicker from "src/components/ActionTable/Form/Fields/DateTimePicker";
+import { fLocalizedDateTime } from "../helpers/formats";
 import { ref } from "vue";
 
 const emit = defineEmits(["update:model-value"]);

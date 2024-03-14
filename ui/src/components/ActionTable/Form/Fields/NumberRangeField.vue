@@ -40,8 +40,8 @@
 import { PercentIcon } from "@/svg";
 import { CurrencyDollarIcon as CurrencyIcon, HashtagIcon as NumberIcon } from "@heroicons/vue/outline";
 import { useDebounceFn } from "@vueuse/core";
-import NumberField from "danx/src/components/ActionTable/Form/Fields/NumberField";
-import { fCurrency, fNumber, fPercent } from "danx/src/helpers/formats";
+import NumberField from "src/components/ActionTable/Form/Fields/NumberField";
+import { fCurrency, fNumber, fPercent } from "../helpers/formats";
 import { computed, ref, watch } from "vue";
 
 const emit = defineEmits(["update:model-value"]);

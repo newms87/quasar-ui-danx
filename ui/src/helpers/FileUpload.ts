@@ -1,4 +1,4 @@
-import { FlashMessages, resolveFileLocation } from "danx/src/helpers";
+import { FlashMessages, resolveFileLocation } from "../helpers";
 import { uid } from "quasar";
 
 export type FileUploadOptions = {

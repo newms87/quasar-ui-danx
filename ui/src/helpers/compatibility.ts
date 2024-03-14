@@ -1,5 +1,5 @@
 import { useGeolocation } from "@vueuse/core";
-import { sleep } from "quasar-ui-danx/src/helpers";
+import { sleep } from "../helpers";
 import { computed } from "vue";
 
 let isLoaded = false;

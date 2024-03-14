@@ -26,7 +26,7 @@
   </QPopupProxy>
 </template>
 <script setup>
-import { dbDateTime, localizedDateTime, remoteDateTime } from "danx/src/helpers/formats";
+import { dbDateTime, localizedDateTime, remoteDateTime } from "../helpers/formats";
 import { computed } from "vue";
 
 const emit = defineEmits(["update:modelValue", "save", "cancel", "clear"]);

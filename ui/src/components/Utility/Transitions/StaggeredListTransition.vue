@@ -14,7 +14,7 @@
 
 <script setup>
 import gsap from "gsap";
-import { isTestMode } from "src/helpers/testing";
+import { isTestMode } from "../helpers/testing";
 import { computed, ref } from "vue";
 
 const props = defineProps({

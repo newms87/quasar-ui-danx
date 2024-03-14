@@ -102,13 +102,13 @@
   </div>
 </template>
 <script setup>
-import BooleanField from "danx/src/components/ActionTable/Form/Fields/BooleanField";
-import DateField from "danx/src/components/ActionTable/Form/Fields/DateField";
-import DateRangeField from "danx/src/components/ActionTable/Form/Fields/DateRangeField";
-import MultiKeywordField from "danx/src/components/ActionTable/Form/Fields/MultiKeywordField";
-import NumberRangeField from "danx/src/components/ActionTable/Form/Fields/NumberRangeField";
-import SelectField from "danx/src/components/ActionTable/Form/Fields/SelectField";
-import SelectWithChildrenField from "danx/src/components/ActionTable/Form/Fields/SelectWithChildrenField";
+import BooleanField from "src/components/ActionTable/Form/Fields/BooleanField";
+import DateField from "src/components/ActionTable/Form/Fields/DateField";
+import DateRangeField from "src/components/ActionTable/Form/Fields/DateRangeField";
+import MultiKeywordField from "src/components/ActionTable/Form/Fields/MultiKeywordField";
+import NumberRangeField from "src/components/ActionTable/Form/Fields/NumberRangeField";
+import SelectField from "src/components/ActionTable/Form/Fields/SelectField";
+import SelectWithChildrenField from "src/components/ActionTable/Form/Fields/SelectWithChildrenField";
 
 const emit = defineEmits(["update:model-value"]);
 const props = defineProps({

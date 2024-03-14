@@ -1,4 +1,4 @@
-import { getItem, setItem } from "danx/src/helpers";
+import { getItem, setItem } from "@/helpers";
 import { computed, ref, watch } from "vue";
 
 export function useTableColumns(name, columns, options = { titleMinWidth: 120, titleMaxWidth: 200 }) {

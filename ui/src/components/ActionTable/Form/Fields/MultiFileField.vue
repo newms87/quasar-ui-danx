@@ -62,8 +62,8 @@
 
 <script setup>
 import ImagePreview from "components/Common/ImagePreview";
-import FieldLabel from "danx/src/components/ActionTable/Form/Fields/FieldLabel";
-import { useMultiFileUpload } from "src/helpers/multiFileUpload";
+import FieldLabel from "src/components/ActionTable/Form/Fields/FieldLabel";
+import { useMultiFileUpload } from "../helpers/multiFileUpload";
 import { onMounted } from "vue";
 
 const emit = defineEmits(["update:model-value"]);

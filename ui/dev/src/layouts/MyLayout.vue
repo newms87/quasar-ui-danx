@@ -20,8 +20,8 @@
 
     <q-page-container>
       <div class="flex">
-        <CollapsableSidebar>
-          <NavigationMenu :items="menu" />
+        <CollapsableSidebar v-model:collapse="isCollapsed">
+          <NavigationMenu :items="menu" :hide-label="isCollapsed" />
         </CollapsableSidebar>
         <router-view />
       </div>
@@ -33,8 +33,9 @@
 import NavigationMenu from '@/components/NavigationMenu';
 import { PdfIcon } from '@ui/svg';
 import { CollapsableSidebar, version } from 'ui';
-import { shallowRef } from 'vue';
+import { ref, shallowRef } from 'vue';
 
+const isCollapsed = ref(false);
 const menu = shallowRef([
   {
     label: 'List Item Draggable',

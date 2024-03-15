@@ -24,7 +24,7 @@
 </template>
 
 <script setup>
-import { apiKey } from '@/vendor/tinymce-config';
+import { apiKey } from '@ui/vendor/tinymce-config';
 import { default as TinyMceEditor } from '@tinymce/tinymce-vue';
 import FieldLabel from './FieldLabel';
 

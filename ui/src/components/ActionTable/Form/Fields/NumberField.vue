@@ -20,7 +20,7 @@
 </template>
 
 <script setup>
-import { fNumber } from '@/helpers/formats';
+import { fNumber } from '@ui/helpers/formats';
 import { computed, nextTick, ref, watch } from 'vue';
 import FieldLabel from './FieldLabel';
 

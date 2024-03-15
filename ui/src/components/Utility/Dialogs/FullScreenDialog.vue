@@ -20,7 +20,7 @@
 </template>
 
 <script setup>
-import { XIcon } from '@/svg';
+import { XIcon } from '@ui/svg';
 import { computed } from 'vue';
 
 const emit = defineEmits(['update:model-value', 'close']);

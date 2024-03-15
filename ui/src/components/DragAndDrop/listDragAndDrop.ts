@@ -1,4 +1,4 @@
-import { DragAndDrop } from "@/components";
+import { DragAndDrop } from "@ui/components";
 
 /**
  * ListDragAndDrop supports dragging elements in a list to new positions in the same list.

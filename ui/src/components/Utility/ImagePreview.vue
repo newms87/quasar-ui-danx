@@ -98,9 +98,9 @@
 </template>
 
 <script setup>
-import { FullScreenCarouselDialog } from '@/components';
-import { download } from '@/helpers';
-import { ImageIcon, PdfIcon, TrashIcon as RemoveIcon } from '@/svg';
+import { FullScreenCarouselDialog } from '@ui/components';
+import { download } from '@ui/helpers';
+import { ImageIcon, PdfIcon, TrashIcon as RemoveIcon } from '@ui/svg';
 import { DownloadIcon, PlayIcon } from '@heroicons/vue/outline';
 import { computed, ref } from 'vue';
 

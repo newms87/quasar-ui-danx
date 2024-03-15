@@ -58,7 +58,7 @@
 </template>
 
 <script setup>
-import { ContentDrawer } from '@/components';
+import { ContentDrawer } from '@ui/components';
 import { computed, ref } from 'vue';
 
 const emit = defineEmits(['update:modelValue']);

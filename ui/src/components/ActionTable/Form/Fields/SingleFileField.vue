@@ -48,8 +48,8 @@
 </template>
 
 <script setup>
-import { ImagePreview } from '@/components';
-import { useSingleFileUpload } from '@/helpers/singleFileUpload';
+import { ImagePreview } from '@ui/components';
+import { useSingleFileUpload } from '@ui/helpers/singleFileUpload';
 import { onMounted } from 'vue';
 import FieldLabel from './FieldLabel';
 

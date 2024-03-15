@@ -1,6 +1,6 @@
-import { getFilterFromUrl, mapSortBy, waitForRef } from "@/components";
-import { getItem, setItem } from "@/helpers";
+import { getItem, setItem } from "@ui/helpers";
 import { computed, ref, watch } from "vue";
+import { getFilterFromUrl, mapSortBy, waitForRef } from "./tableHelpers";
 
 export function useListActions(name, {
     listRoute,

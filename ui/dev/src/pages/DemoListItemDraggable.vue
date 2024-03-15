@@ -1,7 +1,5 @@
 <template>
-  <q-page padding>
-    <h1 class="text-2xl mb-3">Danx Examples</h1>
-
+  <PageLayout title="List Item Draggable Demo">
     <div data-drop-zone="list-items">
       <ListItemDraggable
         v-for="item in listItems"
@@ -13,15 +11,12 @@
         {{ item.name }}
       </ListItemDraggable>
     </div>
-
-    <div class="mt-5">
-
-    </div>
-  </q-page>
+  </PageLayout>
 </template>
 <script setup>
-import { ListItemDraggable } from "ui";
-import { ref } from "vue";
+import PageLayout from '@/layouts/PageLayout';
+import { ListItemDraggable } from 'ui';
+import { ref } from 'vue';
 
-const listItems = ref([{ name: "item1" }, { name: "item2" }, { name: "item3" }]);
+const listItems = ref([{ name: 'item1' }, { name: 'item2' }, { name: 'item3' }]);
 </script>

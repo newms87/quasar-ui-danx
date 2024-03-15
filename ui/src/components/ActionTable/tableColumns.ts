@@ -1,4 +1,4 @@
-import { getItem, setItem } from "@/helpers";
+import { getItem, setItem } from "@ui/helpers";
 import { computed, ref, watch } from "vue";
 
 export function useTableColumns(name, columns, options = { titleMinWidth: 120, titleMaxWidth: 200 }) {

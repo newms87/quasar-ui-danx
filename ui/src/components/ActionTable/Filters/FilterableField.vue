@@ -110,7 +110,7 @@ import {
   NumberRangeField,
   SelectField,
   SelectWithChildrenField
-} from '@/components';
+} from '@ui/components';
 
 const emit = defineEmits(['update:model-value']);
 const props = defineProps({

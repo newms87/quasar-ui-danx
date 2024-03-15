@@ -20,7 +20,9 @@
 
     <q-page-container>
       <div class="flex">
-        <CollapsableSidebar />
+        <CollapsableSidebar>
+          <NavigationMenu :items="menu" />
+        </CollapsableSidebar>
         <router-view />
       </div>
     </q-page-container>
@@ -28,5 +30,21 @@
 </template>
 
 <script setup>
+import NavigationMenu from '@/components/NavigationMenu';
+import { PdfIcon } from '@ui/svg';
 import { CollapsableSidebar, version } from 'ui';
+import { shallowRef } from 'vue';
+
+const menu = shallowRef([
+  {
+    label: 'List Item Draggable',
+    icon: PdfIcon,
+    path: 'demo-list-item-draggable'
+  },
+  {
+    label: 'Action Table',
+    icon: PdfIcon,
+    path: 'demo-action-table'
+  }
+]);
 </script>

@@ -24,7 +24,7 @@
 </template>
 
 <script setup>
-import { fLocalizedDateTime } from '@/helpers/formats';
+import { fLocalizedDateTime } from '@ui/helpers/formats';
 import { ref } from 'vue';
 import DateTimePicker from './DateTimePicker';
 

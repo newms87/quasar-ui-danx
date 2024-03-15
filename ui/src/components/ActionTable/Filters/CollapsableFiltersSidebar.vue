@@ -15,7 +15,7 @@
   </CollapsableSidebar>
 </template>
 <script setup>
-import { CollapsableSidebar, FilterGroupList } from '@/components';
+import { CollapsableSidebar, FilterGroupList } from '@ui/components';
 
 defineEmits(['update:filter', 'update:show-filters']);
 defineProps({

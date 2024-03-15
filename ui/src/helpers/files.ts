@@ -1,4 +1,4 @@
-import { FlashMessages, useCompatibility } from "@/helpers";
+import { FlashMessages, useCompatibility } from "@ui/helpers";
 import ExifReader from "exifreader";
 
 export async function resolveFileLocation(file, waitMessage = null) {

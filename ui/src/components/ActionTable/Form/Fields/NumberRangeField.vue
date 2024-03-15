@@ -37,8 +37,8 @@
 </template>
 
 <script setup>
-import { fCurrency, fNumber, fPercent } from '@/helpers';
-import { PercentIcon } from '@/svg';
+import { fCurrency, fNumber, fPercent } from '@ui/helpers';
+import { PercentIcon } from '@ui/svg';
 import { CurrencyDollarIcon as CurrencyIcon, HashtagIcon as NumberIcon } from '@heroicons/vue/outline';
 import { useDebounceFn } from '@vueuse/core';
 import { computed, ref, watch } from 'vue';

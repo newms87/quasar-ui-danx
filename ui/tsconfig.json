@@ -1,30 +1,32 @@
 {
   "compilerOptions": {
-    "target": "esnext",
     // Specify ECMAScript target version
-    "module": "esnext",
+    "target": "esnext",
     // Specify module code generation
-    "strict": false,
+    "module": "esnext",
     // Enable all strict type-checking options
-    "esModuleInterop": true,
+    "strict": false,
     // Enables compatibility with Babel-imported CommonJS modules
-    "moduleResolution": "node",
+    "esModuleInterop": true,
     // Resolve modules using Node.js style
-    "allowSyntheticDefaultImports": true,
+    "moduleResolution": "node",
     // Allow default imports from modules with no default export
-    "experimentalDecorators": true,
+    "allowSyntheticDefaultImports": true,
     // Enables experimental support for decorators
-    "skipLibCheck": true,
+    "experimentalDecorators": true,
     // Skip type checking of all declaration files (*.d.ts)
-    "forceConsistentCasingInFileNames": true,
+    "skipLibCheck": true,
     // Disallow inconsistently-cased references to the same file.
+    "forceConsistentCasingInFileNames": true,
+    // Base directory to resolve non-relative module names,
     "baseUrl": "./",
-    // Base directory to resolve non-relative module names
     "paths": {
       "@/*": [
+        "./dev/src/*"
+      ],
+      "@ui/*": [
         "./src/*"
       ]
-      // Path alias to resolve imports (adjust as needed)
     }
   },
   "include": [
@@ -35,6 +37,5 @@
   ],
   "exclude": [
     "node_modules"
-    // Exclude the node_modules directory
   ]
 }

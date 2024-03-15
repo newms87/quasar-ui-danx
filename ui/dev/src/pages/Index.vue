@@ -1,5 +1,5 @@
 <template>
-  <q-page padding class="row justify-center">
+  <PageLayout class="row justify-center">
     <q-list dense class="list">
       <div class="text-h4 q-mb-md">Test pages</div>
       <q-item
@@ -18,19 +18,14 @@
         </q-item-section>
       </q-item>
     </q-list>
-  </q-page>
+  </PageLayout>
 </template>
 
-<script>
-import pages from '../router/pages'
+<script setup>
+import PageLayout from '../layouts/PageLayout';
+import pages from '../router/pages';
 
-export default {
-  setup () {
-    return {
-      pages
-    }
-  }
-}
+console.log('pages', pages);
 </script>
 
 <style lang="sass" scoped>

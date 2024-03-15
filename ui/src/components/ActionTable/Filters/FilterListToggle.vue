@@ -22,7 +22,7 @@
   </div>
 </template>
 <script setup>
-import { FilterIcon } from '@/svg';
+import { FilterIcon } from '@ui/svg';
 import { computed } from 'vue';
 
 defineEmits(['update:show-filters', 'update:filter']);

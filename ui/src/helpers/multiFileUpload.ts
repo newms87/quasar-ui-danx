@@ -1,4 +1,4 @@
-import { FileUpload, FileUploadOptions } from "@/helpers/FileUpload";
+import { FileUpload, FileUploadOptions } from "@ui/helpers/FileUpload";
 import { ref } from "vue";
 
 export function useMultiFileUpload(options: FileUploadOptions) {

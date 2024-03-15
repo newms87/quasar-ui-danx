@@ -23,7 +23,7 @@
   </div>
 </template>
 <script setup>
-import { fLocalizedDateTime } from '@/helpers/formats';
+import { fLocalizedDateTime } from '@ui/helpers/formats';
 import { PencilIcon as EditIcon } from '@heroicons/vue/solid';
 import DateTimePicker from './DateTimePicker';
 

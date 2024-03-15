@@ -62,7 +62,7 @@
     "last 4 iOS versions"
   ],
   "dependencies": {
-    "@heroicons/vue": "^2.1.1",
+    "@heroicons/vue": "v1",
     "@tinymce/tinymce-vue": "^5.1.1",
     "@vueuse/core": "^10.7.2",
     "exifreader": "^4.21.1",

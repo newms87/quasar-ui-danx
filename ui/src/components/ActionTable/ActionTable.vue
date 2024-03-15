@@ -83,8 +83,8 @@ import {
   registerStickyScrolling,
   RenderComponentColumn,
   TableSummaryRow
-} from '@/components';
-import { DragHandleIcon as RowResizeIcon } from '@/svg';
+} from '@ui/components';
+import { DragHandleIcon as RowResizeIcon } from '@ui/svg';
 import { ref } from 'vue';
 
 defineEmits(['action', 'filter', 'update:quasar-pagination', 'update:selected-rows']);

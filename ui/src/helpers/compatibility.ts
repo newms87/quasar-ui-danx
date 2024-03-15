@@ -1,4 +1,4 @@
-import { sleep } from "@/helpers";
+import { sleep } from "@ui/helpers";
 import { useGeolocation } from "@vueuse/core";
 import { computed } from "vue";
 

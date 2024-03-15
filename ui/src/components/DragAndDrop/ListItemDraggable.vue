@@ -16,8 +16,8 @@
   </div>
 </template>
 <script setup>
-import { ListDragAndDrop } from '@/components';
-import { DragHandleDotsIcon as DragHandleIcon } from '@/svg';
+import { ListDragAndDrop } from '@ui/components';
+import { DragHandleDotsIcon as DragHandleIcon } from '@ui/svg';
 import SvgImg from '../Utility/SvgImg';
 
 const emit = defineEmits(['position', 'update:list-items']);

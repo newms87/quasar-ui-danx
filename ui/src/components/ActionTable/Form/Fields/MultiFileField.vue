@@ -61,8 +61,8 @@
 </template>
 
 <script setup>
-import { ImagePreview } from '@/components';
-import { useMultiFileUpload } from '@/helpers';
+import { ImagePreview } from '@ui/components';
+import { useMultiFileUpload } from '@ui/helpers';
 import { onMounted } from 'vue';
 import FieldLabel from './FieldLabel';
 

@@ -27,7 +27,7 @@
 </template>
 
 <script setup>
-import { fDate, parseQDate } from '@/helpers/formats';
+import { fDate, parseQDate } from '@ui/helpers/formats';
 import { CalendarIcon as DateIcon } from '@heroicons/vue/outline';
 import { computed, ref, watch } from 'vue';
 

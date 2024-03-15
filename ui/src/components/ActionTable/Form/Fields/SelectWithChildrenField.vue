@@ -28,7 +28,7 @@
   </div>
 </template>
 <script setup>
-import { remove } from '@/helpers/array';
+import { remove } from '@ui/helpers/array';
 import { ref, watch } from 'vue';
 import SelectField from './SelectField';
 

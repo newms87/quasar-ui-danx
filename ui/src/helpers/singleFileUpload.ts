@@ -1,4 +1,4 @@
-import { FileUpload, FileUploadOptions } from "@/helpers";
+import { FileUpload, FileUploadOptions } from "@ui/helpers";
 import { computed, ref } from "vue";
 
 export function useSingleFileUpload(options: FileUploadOptions) {

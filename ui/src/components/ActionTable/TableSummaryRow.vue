@@ -41,7 +41,7 @@
   </QTr>
 </template>
 <script setup>
-import { fNumber } from '@/helpers/formats';
+import { fNumber } from '@ui/helpers/formats';
 import { XCircleIcon as ClearIcon } from '@heroicons/vue/solid';
 import { computed } from 'vue';
 

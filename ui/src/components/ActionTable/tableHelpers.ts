@@ -1,4 +1,4 @@
-import { getUrlParam } from "@/helpers";
+import { getUrlParam } from "@ui/helpers";
 import { onMounted, watch } from "vue";
 
 export function registerStickyScrolling(tableRef) {

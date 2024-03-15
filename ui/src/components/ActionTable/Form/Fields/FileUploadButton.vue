@@ -18,7 +18,7 @@
   </QBtn>
 </template>
 <script setup>
-import { FileUpload } from '@/helpers';
+import { FileUpload } from '@ui/helpers';
 import { PlusIcon } from '@heroicons/vue/outline';
 import { QBtn } from 'quasar';
 import { ref } from 'vue';

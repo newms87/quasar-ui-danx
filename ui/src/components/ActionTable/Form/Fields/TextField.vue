@@ -1,6 +1,6 @@
 <template>
   <div>
-    <QInput
+    <q-input
         v-if="!readonly"
         :data-dusk="'text-field-' + field?.id"
         :data-testid="'text-field-' + field?.id"
@@ -26,13 +26,13 @@
             :class="labelClass"
         />
       </template>
-    </QInput>
-    <div v-if="readonly">
-      <LabelValueBlock
-          :label="label || field.label"
-          :value="modelValue"
-      />
-    </div>
+      </q-input>
+      <div v-if="readonly">
+        <LabelValueBlock
+            :label="label || field.label"
+            :value="modelValue"
+        />
+      </div>
   </div>
 </template>
 

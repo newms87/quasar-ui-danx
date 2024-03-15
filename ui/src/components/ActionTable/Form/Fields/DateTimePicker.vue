@@ -1,29 +1,29 @@
 <template>
-  <QPopupProxy
+  <q-popup-proxy
       :model-value="true"
       cover
       transition-show="scale"
       transition-hide="scale"
       class="bg-transparent shadow-none flex items-stretch"
   >
-    <QDate v-model="dateTime" :mask="mask" :color="color">
+    <q-date v-model="dateTime" :mask="mask" :color="color">
       <div class="flex items-center justify-center">
         <div v-if="nullable" class="flex-grow">
-          <QBtn label="Clear" color="blue-base" flat @click="dateTime = null" />
+          <q-btn label="Clear" color="blue-base" flat @click="dateTime = null" />
         </div>
         <div>
-          <QBtn
+          <q-btn
               label="Cancel"
               color="blue-base"
               flat
               @click="$emit('cancel')"
           />
-          <QBtn label="Set" color="blue-base" flat @click="$emit('save')" />
+          <q-btn label="Set" color="blue-base" flat @click="$emit('save')" />
         </div>
       </div>
-    </QDate>
-    <QTime v-model="dateTime" :mask="mask" :color="color" class="ml-3" />
-  </QPopupProxy>
+    </q-date>
+    <q-time v-model="dateTime" :mask="mask" :color="color" class="ml-3" />
+  </q-popup-proxy>
 </template>
 <script setup>
 import { dbDateTime, localizedDateTime, remoteDateTime } from '@ui/helpers/formats';

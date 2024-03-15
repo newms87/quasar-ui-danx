@@ -23,7 +23,6 @@ module.exports = function (ctx) {
       // 'eva-icons',
       // 'themify',
       // 'line-awesome',
-      // 'roboto-font-latin-ext', // this or either 'roboto-font', NEVER both!
 
       'roboto-font', // optional, you are not bound to it
       'material-icons' // optional, you are not bound to it
@@ -48,7 +47,7 @@ module.exports = function (ctx) {
 
       chainWebpack(chain) {
         chain.resolve.alias.merge({
-          '@': path.resolve(__dirname, './src'),
+          '@': path.resolve(__dirname, '../dev/src'),
           ui: path.resolve(__dirname, `../src/index.esm.js`),
           '@ui': path.resolve(__dirname, `../src/`)
         });

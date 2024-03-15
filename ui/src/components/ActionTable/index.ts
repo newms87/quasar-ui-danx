@@ -1,8 +1,8 @@
 export * from "./Filters";
 export * from "./Form";
 export * from "./listActions";
+export * from "./listHelpers";
 export * from "./tableColumns";
-export * from "./tableHelpers";
 export { default as ActionTable } from "./ActionTable.vue";
 export { default as BatchActionMenu } from "./BatchActionMenu.vue";
 export { default as EmptyTableState } from "./EmptyTableState.vue";

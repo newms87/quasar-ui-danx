@@ -4,34 +4,34 @@
       <slot name="label">{{ label }}</slot>
     </label>
     <div class="mt-1">
-      <QInput
-        :model-value="modelValue"
-        :error-message="error"
-        :error="!!error"
-        no-error-icon
-        outlined
-        dense
-        :disable="disabled"
-        :readonly="disabled"
-        :type="type"
-        :name="name"
-        :placeholder="placeholder || label"
-        :required="required"
-        :rules="rules"
-        :lazy-rules="!!rules"
-        class="w-full"
-        @update:model-value="$emit('update:model-value', $event)"
+      <q-input
+          :model-value="modelValue"
+          :error-message="error"
+          :error="!!error"
+          no-error-icon
+          outlined
+          dense
+          :disable="disabled"
+          :readonly="disabled"
+          :type="type"
+          :name="name"
+          :placeholder="placeholder || label"
+          :required="required"
+          :rules="rules"
+          :lazy-rules="!!rules"
+          class="w-full"
+          @update:model-value="$emit('update:model-value', $event)"
       />
     </div>
   </div>
 </template>
 
 <script setup>
-defineEmits(["update:model-value"]);
+defineEmits(['update:model-value']);
 defineProps({
   type: {
     type: String,
-    default: "text"
+    default: 'text'
   },
   name: {
     type: String,

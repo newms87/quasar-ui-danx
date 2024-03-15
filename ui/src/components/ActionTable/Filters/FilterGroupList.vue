@@ -1,5 +1,5 @@
 <template>
-  <QList>
+  <q-list>
     <div class="px-4 py-2 max-w-full">
       <template
           v-for="(group, index) in filterGroups"
@@ -33,13 +33,13 @@
           />
         </FilterGroupItem>
 
-        <QSeparator
+        <q-separator
             v-if="index < (filterGroups.length - 1)"
             class="my-2"
         />
       </template>
     </div>
-  </QList>
+    </q-list>
 </template>
 <script setup>
 import { computed } from 'vue';

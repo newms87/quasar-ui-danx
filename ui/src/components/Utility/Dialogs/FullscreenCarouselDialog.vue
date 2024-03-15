@@ -1,5 +1,5 @@
 <template>
-  <QDialog
+  <q-dialog
       :model-value="true"
       maximized
       @update:model-value="$emit('close')"
@@ -7,7 +7,7 @@
       @keyup.right="carousel.next()"
   >
     <div class="absolute top-0 left-0 w-full h-full">
-      <QCarousel
+      <q-carousel
           ref="carousel"
           v-model="currentSlide"
           height="100%"
@@ -17,7 +17,7 @@
           infinite
           class="carousel"
       >
-        <QCarouselSlide
+        <q-carousel-slide
             v-for="file in files"
             :key="'file-' + file.id"
             :name="file.id"
@@ -37,14 +37,14 @@
             </template>
             <img v-else :alt="file.filename" :src="file.url" />
           </div>
-        </QCarouselSlide>
-      </QCarousel>
-      <CloseIcon
-          class="absolute top-4 right-4 cursor-pointer text-white w-8 h-8"
-          @click="$emit('close')"
-      />
+        </q-carousel-slide>
+        </q-carousel>
+        <CloseIcon
+            class="absolute top-4 right-4 cursor-pointer text-white w-8 h-8"
+            @click="$emit('close')"
+        />
     </div>
-  </QDialog>
+    </q-dialog>
 </template>
 <script setup>
 import { XIcon as CloseIcon } from '@ui/svg';

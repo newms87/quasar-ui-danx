@@ -17,18 +17,18 @@
         </template>
       </div>
     </div>
-    <QPopupProxy>
-      <QDate
+    <q-popup-proxy>
+      <q-date
           v-model="date"
           @update:model-value="onSave"
       />
-    </QPopupProxy>
+    </q-popup-proxy>
   </div>
 </template>
 
 <script setup>
-import { fDate, parseQDate } from '@ui/helpers/formats';
 import { CalendarIcon as DateIcon } from '@heroicons/vue/outline';
+import { fDate, parseQDate } from '@ui/helpers/formats';
 import { computed, ref, watch } from 'vue';
 
 const emit = defineEmits(['update:model-value']);

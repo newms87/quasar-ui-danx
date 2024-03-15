@@ -20,7 +20,7 @@
         </template>
       </div>
     </div>
-    <QPopupProxy>
+    <q-popup-proxy>
       <NumberField
           v-model="range.from"
           :field="minField"
@@ -32,14 +32,14 @@
           :field="maxField"
           @update:model-value="onSave"
       />
-    </QPopupProxy>
+      </q-popup-proxy>
   </div>
 </template>
 
 <script setup>
+import { CurrencyDollarIcon as CurrencyIcon, HashtagIcon as NumberIcon } from '@heroicons/vue/outline';
 import { fCurrency, fNumber, fPercent } from '@ui/helpers';
 import { PercentIcon } from '@ui/svg';
-import { CurrencyDollarIcon as CurrencyIcon, HashtagIcon as NumberIcon } from '@heroicons/vue/outline';
 import { useDebounceFn } from '@vueuse/core';
 import { computed, ref, watch } from 'vue';
 import NumberField from './NumberField';

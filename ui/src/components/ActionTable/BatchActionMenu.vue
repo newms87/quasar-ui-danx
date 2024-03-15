@@ -6,19 +6,19 @@
         :disabled="selectedRows.length === 0"
         @action="onAction"
     />
-    <QTooltip v-if="selectedRows.length === 0">
+    <q-tooltip v-if="selectedRows.length === 0">
       Batch actions require a selection
-    </QTooltip>
-    <slot>
-      <Component
-          :is="activeComponent.is"
-          v-if="activeComponent"
-          v-bind="activeComponent.props"
-          :is-saving="isSaving"
-          @close="activeAction = false"
-          @confirm="onConfirmAction"
-      />
-    </slot>
+      </q-tooltip>
+      <slot>
+        <Component
+            :is="activeComponent.is"
+            v-if="activeComponent"
+            v-bind="activeComponent.props"
+            :is-saving="isSaving"
+            @close="activeAction = false"
+            @confirm="onConfirmAction"
+        />
+      </slot>
   </div>
 </template>
 <script setup>

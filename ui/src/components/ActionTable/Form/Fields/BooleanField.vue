@@ -1,23 +1,23 @@
 <template>
-  <QToggle
-    :data-testid="'boolean-field-' + field.id"
-    :model-value="modelValue"
-    :toggle-indeterminate="toggleIndeterminate"
-    :indeterminate-value="undefined"
-    @update:model-value="$emit('update:model-value', $event)"
+  <q-toggle
+      :data-testid="'boolean-field-' + field.id"
+      :model-value="modelValue"
+      :toggle-indeterminate="toggleIndeterminate"
+      :indeterminate-value="undefined"
+      @update:model-value="$emit('update:model-value', $event)"
   >
     <FieldLabel
-      :field="field"
-      :show-name="showName"
-      :class="labelClass"
+        :field="field"
+        :show-name="showName"
+        :class="labelClass"
     />
-  </QToggle>
+    </q-toggle>
 </template>
 
 <script setup>
-import FieldLabel from "./FieldLabel";
+import FieldLabel from './FieldLabel';
 
-defineEmits(["update:model-value"]);
+defineEmits(['update:model-value']);
 defineProps({
   modelValue: {
     type: [Boolean],
@@ -29,7 +29,7 @@ defineProps({
   },
   labelClass: {
     type: String,
-    default: "text-sm"
+    default: 'text-sm'
   },
   showName: Boolean,
   toggleIndeterminate: Boolean

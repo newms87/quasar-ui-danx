@@ -7,7 +7,7 @@
       {{ label }}
     </div>
     <template v-if="inline">
-      <QDate
+      <q-date
           v-model="dateRange"
           range
           class="reactive"
@@ -26,20 +26,20 @@
           </template>
         </div>
       </div>
-      <QPopupProxy>
-        <QDate
+      <q-popup-proxy>
+        <q-date
             v-model="dateRange"
             range
             @update:model-value="onSave"
         />
-      </QPopupProxy>
+      </q-popup-proxy>
     </template>
   </div>
 </template>
 
 <script setup>
-import { fDate, parseQDate, parseQDateTime } from '@ui/helpers/formats';
 import { CalendarIcon as DateIcon } from '@heroicons/vue/outline';
+import { fDate, parseQDate, parseQDateTime } from '@ui/helpers/formats';
 import { computed, ref, watch } from 'vue';
 
 const emit = defineEmits(['update:model-value']);

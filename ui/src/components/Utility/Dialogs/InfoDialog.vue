@@ -1,5 +1,5 @@
 <template>
-  <QDialog
+  <q-dialog
     :full-height="fullHeight"
     :full-width="fullWidth"
     :model-value="!!modelValue"
@@ -7,8 +7,8 @@
     :maximized="maximized"
     @update:model-value="onClose"
   >
-    <QCard class="flex flex-col flex-nowrap">
-      <QCardSection
+    <q-card class="flex flex-col flex-nowrap">
+      <q-card-section
         v-if="title || $slots.title"
         class="pl-6 pr-10 border-b border-gray-medium"
       >
@@ -23,24 +23,24 @@
           class="mt-1 text-sm"
         >{{ subtitle }}
         </div>
-      </QCardSection>
-      <QCardSection
+      </q-card-section>
+      <q-card-section
         v-if="content || $slots.default"
         class="px-6 bg-neutral-plus-7 flex-grow max-h-full overflow-y-auto"
       >
         <slot>{{ content }}</slot>
-      </QCardSection>
+      </q-card-section>
       <div
         class="flex items-center justify-center px-6 py-4 border-t border-gray-medium"
       >
         <div class="flex-grow text-right">
-          <QBtn
+          <q-btn
             :label="doneText"
             class="action-btn btn-white-gray"
             @click="onClose"
           >
             <slot name="done-text" />
-          </QBtn>
+          </q-btn>
         </div>
       </div>
       <a
@@ -49,8 +49,8 @@
       >
         <CloseIcon class="w-5" />
       </a>
-    </QCard>
-  </QDialog>
+    </q-card>
+  </q-dialog>
 </template>
 
 <script setup>

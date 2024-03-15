@@ -1,6 +1,6 @@
 <!--suppress VueUnrecognizedSlot -->
 <template>
-  <QTable
+  <q-table
       ref="actionTable"
       :selected="selectedRows"
       :pagination="quasarPagination"
@@ -32,7 +32,7 @@
       />
     </template>
     <template #header-cell="rowProps">
-      <QTh
+      <q-th
           :key="rowProps.key"
           :props="rowProps"
           :data-drop-zone="`resize-column-` + rowProps.col.name"
@@ -46,10 +46,10 @@
         >
           <RowResizeIcon class="w-4 text-neutral-base" />
         </HandleDraggable>
-      </QTh>
+      </q-th>
     </template>
     <template #body-cell="rowProps">
-      <QTd :key="rowProps.key" :props="rowProps">
+      <q-td :key="rowProps.key" :props="rowProps">
         <template v-if="rowProps.col.component">
           <RenderComponentColumn
               :row-props="rowProps"
@@ -71,9 +71,9 @@
             {{ rowProps.value }}
           </slot>
         </template>
-      </QTd>
+      </q-td>
     </template>
-  </QTable>
+    </q-table>
 </template>
 
 <script setup>

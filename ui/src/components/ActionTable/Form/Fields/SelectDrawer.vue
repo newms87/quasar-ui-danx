@@ -13,7 +13,7 @@
           class="cursor-pointer hover:bg-gray-light px-8 py-3 flex items-center border-b border-gray-light"
           @click="toggleSelect(option)"
       >
-        <QCheckbox
+        <q-checkbox
             :model-value="isSelected(option)"
             class="mr-2"
         />
@@ -25,7 +25,7 @@
       </div>
     </ContentDrawer>
 
-    <QChip
+    <q-chip
         ref="select"
         outline
         clickable
@@ -53,7 +53,7 @@
           <slot name="placeholder">{{ placeholder }}</slot>
         </template>
       </slot>
-    </QChip>
+      </q-chip>
   </div>
 </template>
 

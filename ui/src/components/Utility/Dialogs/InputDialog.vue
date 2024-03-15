@@ -5,7 +5,7 @@
       @close="$emit('close', $event)"
   >
     <slot>
-      <QInput
+      <q-input
           v-model="newInput"
           type="number"
           class="w-full"

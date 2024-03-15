@@ -1,5 +1,5 @@
 <template>
-  <QBtn v-bind="$props" @click="$refs.fileUpload.click()">
+  <q-btn v-bind="$props" @click="$refs.fileUpload.click()">
     <slot>
       <PlusIcon class="w-5 mr-2" />
       {{ text }}
@@ -15,11 +15,11 @@
         multiple
         @change="onAttachFiles"
     />
-  </QBtn>
+    </q-btn>
 </template>
 <script setup>
-import { FileUpload } from '@ui/helpers';
 import { PlusIcon } from '@heroicons/vue/outline';
+import { FileUpload } from '@ui/helpers';
 import { QBtn } from 'quasar';
 import { ref } from 'vue';
 

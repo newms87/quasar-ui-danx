@@ -40,12 +40,12 @@ const menu = shallowRef([
   {
     label: 'List Item Draggable',
     icon: PdfIcon,
-    path: 'demo-list-item-draggable'
+    path: 'demo-list-item-draggable-page'
   },
   {
     label: 'Action Table',
     icon: PdfIcon,
-    path: 'demo-action-table'
+    path: 'demo-action-table-page'
   }
 ]);
 </script>

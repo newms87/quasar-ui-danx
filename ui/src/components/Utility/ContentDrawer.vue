@@ -1,33 +1,33 @@
 <template>
-  <QDialog
-    v-model="isShowing"
-    maximized
-    :position="position"
-    :seamless="seamless"
-    :class="{'hide-backdrop': !overlay}"
+  <q-dialog
+      v-model="isShowing"
+      maximized
+      :position="position"
+      :seamless="seamless"
+      :class="{'hide-backdrop': !overlay}"
   >
     <div>
       <div
-        v-if="title"
-        class="dialog-title"
-        @click.stop.prevent
+          v-if="title"
+          class="dialog-title"
+          @click.stop.prevent
       >
         {{ title }}
       </div>
       <div
-        class="dialog-content bg-white"
-        :class="{ [contentClass]: true }"
+          class="dialog-content bg-white"
+          :class="{ [contentClass]: true }"
       >
         <slot />
       </div>
     </div>
-  </QDialog>
+    </q-dialog>
 </template>
 
 <script setup>
-import { computed } from "vue";
+import { computed } from 'vue';
 
-const emit = defineEmits(["update:show"]);
+const emit = defineEmits(['update:show']);
 
 const props = defineProps({
   show: Boolean,
@@ -35,27 +35,27 @@ const props = defineProps({
   overlay: Boolean,
   position: {
     type: String,
-    default: "bottom"
+    default: 'bottom'
   },
   contentClass: {
     type: String,
-    default: "py-8 px-12"
+    default: 'py-8 px-12'
   },
   title: {
     type: String,
-    default: "Edit"
+    default: 'Edit'
   }
 });
 
 const isShowing = computed({
   get: () => props.show,
-  set: (value) => emit("update:show", value)
+  set: (value) => emit('update:show', value)
 });
 </script>
 
 <style
-  lang="scss"
-  scoped
+    lang="scss"
+    scoped
 >
 .dialog-title {
   @apply bg-gray-very-light text-gray-default font-medium uppercase text-xs px-6 py-3 border-b border-neutral-plus-5 rounded-t-md;

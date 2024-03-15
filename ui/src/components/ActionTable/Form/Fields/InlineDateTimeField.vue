@@ -5,7 +5,7 @@
     >
       {{ fLocalizedDateTime(modelValue, { empty: 'Never' }) }}
       <EditIcon class="w-4 font-bold ml-2 text-gray-base" />
-      <QPopupEdit
+      <q-popup-edit
           v-slot="scope"
           :model-value="modelValue"
           touch-position
@@ -18,13 +18,13 @@
             @save="onSave(scope)"
             @cancel="scope.cancel"
         />
-      </QPopupEdit>
+        </q-popup-edit>
     </div>
   </div>
 </template>
 <script setup>
-import { fLocalizedDateTime } from '@ui/helpers/formats';
 import { PencilIcon as EditIcon } from '@heroicons/vue/solid';
+import { fLocalizedDateTime } from '@ui/helpers/formats';
 import DateTimePicker from './DateTimePicker';
 
 const emit = defineEmits(['close', 'save', 'update:model-value']);

@@ -23,64 +23,74 @@ const listItems = (() => {
   return items;
 })();
 
-export async function itemListCb(pager) {
-  let pagedListItems = [...listItems];
+function getFilteredItems(filter) {
+  let filteredItems = [...listItems];
 
-  // perform filter
-  if (pager.filter) {
-    if (pager.filter.status) {
-      pagedListItems = pagedListItems.filter((item) => pager.filter.status.includes(item.status));
-    }
-
-    if (pager.filter.filterDateRange) {
-      const [start, end] = [dbDateTime(pager.filter.filterDateRange.from), dbDateTime(pager.filter.filterDateRange.to)];
-      pagedListItems = pagedListItems.filter((item) => {
-        return dbDateTime(item.start_date) <= end && dbDateTime(item.end_date) >= start;
-      });
-    }
+  if (filter.status) {
+    filteredItems = filteredItems.filter((item) => filter.status.includes(item.status));
   }
 
-  // Track total items before sort and pagination
-  const total = pagedListItems.length;
+  if (filter.filterDateRange) {
+    const [start, end] = [dbDateTime(filter.filterDateRange.from), dbDateTime(filter.filterDateRange.to)];
+    filteredItems = filteredItems.filter((item) => {
+      return dbDateTime(item.start_date) <= end && dbDateTime(item.end_date) >= start;
+    });
+  }
+
+  return filteredItems;
+}
+
+function sortListItems(items, column, dir) {
+  items.sort((a, b) => {
+    if (a[column] > b[column]) {
+      return dir === "asc" ? 1 : -1;
+    }
+    if (a[column] < b[column]) {
+      return dir === "asc" ? -1 : 1;
+    }
+    return 0;
+  });
+}
+
+function paginateListItems(items, perPage, page) {
+  const start = (page - 1) * perPage;
+  const end = start + perPage;
+  return items.slice(start, end);
+}
+
+export async function itemListCb(pager) {
+  const filteredListItems = getFilteredItems(pager.filter || {});
 
   // Perform sort
   if (pager.sort) {
-    const column = pager.sort[0].column;
-    const direction = pager.sort[0].order;
-
-    pagedListItems.sort((a, b) => {
-      if (a[column] > b[column]) {
-        return direction === "asc" ? 1 : -1;
-      }
-      if (a[column] < b[column]) {
-        return direction === "asc" ? -1 : 1;
-      }
-      return 0;
-    });
+    sortListItems(filteredListItems, pager.sort[0].column, pager.sort[0].order);
   }
 
   // Perform pagination
   const perPage = pager.perPage || 10;
   const page = pager.page || 1;
-  const start = (page - 1) * perPage;
-  const end = start + perPage;
-  pagedListItems = pagedListItems.slice(start, end);
+  const pagedListItems = paginateListItems(filteredListItems, perPage, page);
 
   return {
     data: pagedListItems,
     meta: {
-      total,
+      total: filteredListItems.length,
       page,
       perPage,
     }
   };
 }
 
-export async function summaryCb() {
+export async function summaryCb(filter) {
+  const filteredListItems = getFilteredItems(filter || {});
+  const completedItems = filteredListItems.filter((item) => item.status === "Done");
+  const minStartDate = filteredListItems.reduce((min, item) => item.start_date < min ? item.start_date : min, filteredListItems[0].start_date);
+  const maxEndDate = filteredListItems.reduce((max, item) => item.end_date > max ? item.end_date : max, filteredListItems[0].end_date);
   return {
-    total: 100,
-    active: 3,
-    inactive: 2,
+    name: "",
+    start_date: minStartDate,
+    end_date: maxEndDate,
+    status: completedItems.length + " / " + filteredListItems.length,
   };
 }
 

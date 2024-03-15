@@ -11,6 +11,7 @@
         v-model:quasar-pagination="quasarPagination"
         v-model:selected-rows="selectedRows"
         :paged-items="pagedItems"
+        :summary="summary"
       />
     </div>
   </PageLayout>
@@ -23,7 +24,8 @@ import {
   filterGroups,
   pagedItems,
   quasarPagination,
-  selectedRows
+  selectedRows,
+  summary
 } from '../components/DemoActionTable/demoTableActions';
 import PageLayout from '../layouts/PageLayout';
 </script>

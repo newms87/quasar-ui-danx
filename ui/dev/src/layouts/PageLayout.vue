@@ -1,5 +1,5 @@
 <template>
-  <q-page padding>
+  <q-page padding class="w-full">
     <h1 v-if="$slots.header || title" class="text-xl mb-3">
       <slot name="header">{{ title }}</slot>
     </h1>

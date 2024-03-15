@@ -19,7 +19,7 @@
     </q-header>
 
     <q-page-container>
-      <div class="flex">
+      <div class="flex flex-nowrap">
         <CollapsableSidebar v-model:collapse="isCollapsed">
           <NavigationMenu :items="menu" :hide-label="isCollapsed" />
         </CollapsableSidebar>
@@ -31,7 +31,7 @@
 
 <script setup>
 import NavigationMenu from '@/components/NavigationMenu';
-import { PdfIcon } from '@ui/svg';
+import { DragHandleDotsIcon as DragIcon, FilterIcon } from '@ui/svg';
 import { CollapsableSidebar, version } from 'ui';
 import { ref, shallowRef } from 'vue';
 
@@ -39,12 +39,12 @@ const isCollapsed = ref(false);
 const menu = shallowRef([
   {
     label: 'List Item Draggable',
-    icon: PdfIcon,
+    icon: DragIcon,
     path: 'demo-list-item-draggable-page'
   },
   {
     label: 'Action Table',
-    icon: PdfIcon,
+    icon: FilterIcon,
     path: 'demo-action-table-page'
   }
 ]);

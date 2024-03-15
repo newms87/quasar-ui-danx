@@ -1,4 +1,3 @@
-<!--suppress VueUnrecognizedSlot -->
 <template>
   <q-table
       ref="actionTable"
@@ -8,7 +7,7 @@
       :loading="isLoadingList"
       :rows="pagedItems?.data || []"
       selection="multiple"
-      :rows-per-page-options="[25,50,100]"
+      :rows-per-page-options="rowsPerPageOptions"
       class="sticky-column sticky-header w-full !border-0"
       color="blue-base"
       @update:selected="$emit('update:selected-rows', $event)"
@@ -73,7 +72,7 @@
         </template>
       </q-td>
     </template>
-    </q-table>
+  </q-table>
 </template>
 
 <script setup>
@@ -114,6 +113,10 @@ defineProps({
   columns: {
     type: Array,
     required: true
+  },
+  rowsPerPageOptions: {
+    type: Array,
+    default: () => [10, 25, 50, 100]
   }
 });
 const actionTable = ref(null);

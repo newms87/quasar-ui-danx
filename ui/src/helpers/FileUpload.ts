@@ -1,4 +1,5 @@
-import { FlashMessages, resolveFileLocation } from "@ui/helpers";
+import { resolveFileLocation } from "@ui/helpers/files";
+import { FlashMessages } from "@ui/helpers/FlashMessages";
 import { uid } from "quasar";
 
 export type FileUploadOptions = {

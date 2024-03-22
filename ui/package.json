@@ -1,11 +1,11 @@
 {
   "name": "quasar-ui-danx",
-  "version": "0.0.13",
+  "version": "0.0.17",
   "author": "Dan <dan@flytedesk.com>",
   "description": "DanX Vue / Quasar component library",
   "license": "MIT",
-  "module": "dist/index.esm.js",
-  "main": "dist/index.common.js",
+  "module": "src/index.esm.js",
+  "main": "src/index.common.js",
   "scripts": {
     "dev": "cd dev && yarn dev && cd ..",
     "dev:umd": "yarn build && node build/script.open-umd.js",

@@ -16,12 +16,12 @@
       </div>
       <slot />
     </div>
-    </q-dialog>
+  </q-dialog>
 </template>
 
 <script setup>
-import { XIcon } from '@ui/svg';
 import { computed } from 'vue';
+import { XIcon } from '../../../svg';
 
 const emit = defineEmits(['update:model-value', 'close']);
 const props = defineProps({

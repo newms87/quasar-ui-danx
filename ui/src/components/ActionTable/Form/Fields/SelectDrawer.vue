@@ -53,13 +53,13 @@
           <slot name="placeholder">{{ placeholder }}</slot>
         </template>
       </slot>
-      </q-chip>
+    </q-chip>
   </div>
 </template>
 
 <script setup>
-import { ContentDrawer } from '@ui/components';
 import { computed, ref } from 'vue';
+import { ContentDrawer } from '../../../Utility';
 
 const emit = defineEmits(['update:modelValue']);
 const props = defineProps({

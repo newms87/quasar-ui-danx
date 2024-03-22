@@ -16,12 +16,12 @@
           :show-name="showName"
       />
     </template>
-    </q-input>
+  </q-input>
 </template>
 
 <script setup>
-import { fNumber } from '@ui/helpers/formats';
 import { computed, nextTick, ref, watch } from 'vue';
+import { fNumber } from '../../../../helpers';
 import FieldLabel from './FieldLabel';
 
 const emit = defineEmits(['update:model-value']);

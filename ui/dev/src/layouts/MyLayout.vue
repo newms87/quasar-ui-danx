@@ -31,8 +31,7 @@
 
 <script setup>
 import NavigationMenu from '@/components/NavigationMenu';
-import { DragHandleDotsIcon as DragIcon, FilterIcon } from '@ui/svg';
-import { CollapsableSidebar, version } from 'ui';
+import { CollapsableSidebar, DragHandleDotsIcon as DragIcon, FilterIcon, version } from 'ui';
 import { ref, shallowRef } from 'vue';
 
 const isCollapsed = ref(false);

@@ -1,4 +1,4 @@
-import { fDate } from "@ui/helpers";
+import { fDate } from "ui";
 
 export const columns = [
   {

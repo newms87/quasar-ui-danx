@@ -1,4 +1,4 @@
-import { useListActions } from "@ui/components/ActionTable";
+import { useListActions } from "ui";
 import { applyActionCb, filterFieldOptionsCb, itemListCb, summaryCb } from "./demoTableCallbacks";
 import { columns } from "./demoTableColumns";
 import { filterGroups } from "./demoTableFilters";

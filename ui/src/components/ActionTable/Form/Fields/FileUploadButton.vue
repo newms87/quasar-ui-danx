@@ -15,13 +15,13 @@
         multiple
         @change="onAttachFiles"
     />
-    </q-btn>
+  </q-btn>
 </template>
 <script setup>
 import { PlusIcon } from '@heroicons/vue/outline';
-import { FileUpload } from '@ui/helpers';
 import { QBtn } from 'quasar';
 import { ref } from 'vue';
+import { FileUpload } from '../../../../helpers';
 
 defineExpose({ upload });
 const emit = defineEmits([

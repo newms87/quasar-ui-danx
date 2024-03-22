@@ -23,13 +23,13 @@
       >
         <div>{{ child.label }}</div>
         <div class="text-xs text-gray-silver">{{ child.name }}</div>
-        </q-checkbox>
+      </q-checkbox>
     </div>
   </div>
 </template>
 <script setup>
-import { remove } from '@ui/helpers/array';
 import { ref, watch } from 'vue';
+import { remove } from '../../../../helpers';
 import SelectField from './SelectField';
 
 const emit = defineEmits(['update:model-value']);

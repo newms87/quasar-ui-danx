@@ -32,16 +32,16 @@
           :field="maxField"
           @update:model-value="onSave"
       />
-      </q-popup-proxy>
+    </q-popup-proxy>
   </div>
 </template>
 
 <script setup>
 import { CurrencyDollarIcon as CurrencyIcon, HashtagIcon as NumberIcon } from '@heroicons/vue/outline';
-import { fCurrency, fNumber, fPercent } from '@ui/helpers';
-import { PercentIcon } from '@ui/svg';
 import { useDebounceFn } from '@vueuse/core';
 import { computed, ref, watch } from 'vue';
+import { fCurrency, fNumber, fPercent } from '../../../../helpers';
+import { PercentIcon } from '../../../../svg';
 import NumberField from './NumberField';
 
 const emit = defineEmits(['update:model-value']);

@@ -48,9 +48,9 @@
 </template>
 
 <script setup>
-import { ImagePreview } from '@ui/components';
-import { useSingleFileUpload } from '@ui/helpers/singleFileUpload';
 import { onMounted } from 'vue';
+import { useSingleFileUpload } from '../../../../helpers';
+import { ImagePreview } from '../../../Utility';
 import FieldLabel from './FieldLabel';
 
 const emit = defineEmits(['update:model-value']);

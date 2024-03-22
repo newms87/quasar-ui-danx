@@ -38,17 +38,17 @@
             <img v-else :alt="file.filename" :src="file.url" />
           </div>
         </q-carousel-slide>
-        </q-carousel>
-        <CloseIcon
-            class="absolute top-4 right-4 cursor-pointer text-white w-8 h-8"
-            @click="$emit('close')"
-        />
+      </q-carousel>
+      <CloseIcon
+          class="absolute top-4 right-4 cursor-pointer text-white w-8 h-8"
+          @click="$emit('close')"
+      />
     </div>
-    </q-dialog>
+  </q-dialog>
 </template>
 <script setup>
-import { XIcon as CloseIcon } from '@ui/svg';
 import { ref } from 'vue';
+import { XIcon as CloseIcon } from '../../../svg';
 
 defineEmits(['close']);
 const props = defineProps({

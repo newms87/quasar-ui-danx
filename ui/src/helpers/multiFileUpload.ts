@@ -1,5 +1,5 @@
-import { FileUpload, FileUploadOptions } from "@ui/helpers/FileUpload";
 import { ref } from "vue";
+import { FileUpload, FileUploadOptions } from "./FileUpload";
 
 export function useMultiFileUpload(options: FileUploadOptions) {
     const uploadedFiles = ref([]);

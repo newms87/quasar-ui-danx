@@ -2,6 +2,7 @@ export * from './helpers';
 export * from './components/DragAndDrop';
 export * from './components/ActionTable';
 export * from './components/Utility';
+export * from './svg';
 // export * from './components';
 
 import packageJson from '../package.json';

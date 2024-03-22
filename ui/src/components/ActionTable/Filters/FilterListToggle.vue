@@ -12,7 +12,7 @@
             rounded
             :color="activeCount > 0 ? 'blue-base' : 'gray-base'"
         />
-        </q-btn>
+      </q-btn>
     </div>
     <a
         v-if="activeCount > 0"
@@ -22,8 +22,8 @@
   </div>
 </template>
 <script setup>
-import { FilterIcon } from '@ui/svg';
 import { computed } from 'vue';
+import { FilterIcon } from '../../../svg';
 
 defineEmits(['update:show-filters', 'update:filter']);
 const props = defineProps({

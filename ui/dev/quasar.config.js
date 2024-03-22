@@ -48,8 +48,7 @@ module.exports = function (ctx) {
       chainWebpack(chain) {
         chain.resolve.alias.merge({
           '@': path.resolve(__dirname, '../dev/src'),
-          ui: path.resolve(__dirname, `../src/index.esm.js`),
-          '@ui': path.resolve(__dirname, `../src/`)
+          ui: path.resolve(__dirname, `../src/index.esm.js`)
         });
 
         chain.plugin('define-ui')

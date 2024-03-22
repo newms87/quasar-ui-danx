@@ -13,8 +13,8 @@
   </div>
 </template>
 <script setup>
-import { DragAndDrop } from '@ui/components';
 import { useDebounceFn } from '@vueuse/core';
+import { DragAndDrop } from './dragAndDrop';
 
 const emit = defineEmits(['start', 'end', 'resize']);
 const props = defineProps({

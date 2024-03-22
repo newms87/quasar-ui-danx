@@ -1,5 +1,5 @@
-import { FileUpload, FileUploadOptions } from "@ui/helpers/FileUpload";
 import { computed, ref } from "vue";
+import { FileUpload, FileUploadOptions } from "./FileUpload";
 
 export function useSingleFileUpload(options: FileUploadOptions) {
     const uploadedFile = ref(null);

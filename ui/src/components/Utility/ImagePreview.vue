@@ -75,17 +75,17 @@
           @click.stop="download(computedImage.url)"
       >
         <DownloadIcon class="w-4 h-5" />
-        </q-btn>
+      </q-btn>
 
-        <q-btn
-            v-if="removable"
-            size="sm"
-            class="bg-red-dark text-white !p-1 opacity-50 hover:opacity-100"
-            @click.stop="onRemove"
-        >
-          <div v-if="isConfirmingRemove" class="font-bold text-[1rem] leading-[1.2rem]">?</div>
-          <RemoveIcon v-else class="w-3" />
-          </q-btn>
+      <q-btn
+          v-if="removable"
+          size="sm"
+          class="bg-red-dark text-white !p-1 opacity-50 hover:opacity-100"
+          @click.stop="onRemove"
+      >
+        <div v-if="isConfirmingRemove" class="font-bold text-[1rem] leading-[1.2rem]">?</div>
+        <RemoveIcon v-else class="w-3" />
+      </q-btn>
     </div>
 
     <FullScreenCarouselDialog
@@ -99,10 +99,10 @@
 
 <script setup>
 import { DownloadIcon, PlayIcon } from '@heroicons/vue/outline';
-import { FullScreenCarouselDialog } from '@ui/components';
-import { download } from '@ui/helpers';
-import { ImageIcon, PdfIcon, TrashIcon as RemoveIcon } from '@ui/svg';
 import { computed, ref } from 'vue';
+import { FullScreenCarouselDialog } from '.';
+import { download } from '../../helpers';
+import { ImageIcon, PdfIcon, TrashIcon as RemoveIcon } from '../../svg';
 
 const emit = defineEmits(['remove']);
 const props = defineProps({

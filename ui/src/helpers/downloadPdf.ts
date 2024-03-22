@@ -1,4 +1,4 @@
-import { download } from "@ui/helpers/download";
+import { download } from "./download";
 
 /**
  * Asynchronously load a file from the URL and trigger a download in the browser

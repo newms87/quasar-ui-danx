@@ -8,22 +8,22 @@
     />
     <q-tooltip v-if="selectedRows.length === 0">
       Batch actions require a selection
-      </q-tooltip>
-      <slot>
-        <Component
-            :is="activeComponent.is"
-            v-if="activeComponent"
-            v-bind="activeComponent.props"
-            :is-saving="isSaving"
-            @close="activeAction = false"
-            @confirm="onConfirmAction"
-        />
-      </slot>
+    </q-tooltip>
+    <slot>
+      <Component
+          :is="activeComponent.is"
+          v-if="activeComponent"
+          v-bind="activeComponent.props"
+          :is-saving="isSaving"
+          @close="activeAction = false"
+          @confirm="onConfirmAction"
+      />
+    </slot>
   </div>
 </template>
 <script setup>
-import PopoverMenu from '@ui/components/Utility/Popover/PopoverMenu';
 import { computed, ref } from 'vue';
+import PopoverMenu from '../../components/Utility/Popover/PopoverMenu';
 
 const emit = defineEmits(['action']);
 const props = defineProps({

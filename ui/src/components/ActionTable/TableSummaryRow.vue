@@ -28,22 +28,22 @@
             size="18"
         />
       </div>
-      </q-td>
-      <q-td
-          v-for="column in summaryColumns"
-          :key="column.name"
-          :align="column.align || 'left'"
-      >
-        <template v-if="summary">
-          {{ formatValue(column) }}
-        </template>
-        </q-td>
-        </q-tr>
+    </q-td>
+    <q-td
+        v-for="column in summaryColumns"
+        :key="column.name"
+        :align="column.align || 'left'"
+    >
+      <template v-if="summary">
+        {{ formatValue(column) }}
+      </template>
+    </q-td>
+  </q-tr>
 </template>
 <script setup>
-import { fNumber } from '@ui/helpers/formats';
 import { XCircleIcon as ClearIcon } from '@heroicons/vue/solid';
 import { computed } from 'vue';
+import { fNumber } from '../../helpers';
 
 defineEmits(['clear']);
 const props = defineProps({

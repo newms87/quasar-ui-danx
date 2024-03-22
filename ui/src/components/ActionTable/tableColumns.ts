@@ -1,5 +1,5 @@
-import { getItem, setItem } from "@ui/helpers";
 import { computed, ref, watch } from "vue";
+import { getItem, setItem } from "../../helpers";
 
 export function useTableColumns(name, columns, options = { titleMinWidth: 120, titleMaxWidth: 200 }) {
     const COLUMN_ORDER_KEY = `${name}-column-order`;

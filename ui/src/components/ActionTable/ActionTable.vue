@@ -76,15 +76,10 @@
 </template>
 
 <script setup>
-import {
-  EmptyTableState,
-  HandleDraggable,
-  registerStickyScrolling,
-  RenderComponentColumn,
-  TableSummaryRow
-} from '@ui/components';
-import { DragHandleIcon as RowResizeIcon } from '@ui/svg';
 import { ref } from 'vue';
+import { EmptyTableState, registerStickyScrolling, RenderComponentColumn, TableSummaryRow } from '.';
+import { DragHandleIcon as RowResizeIcon } from '../../svg';
+import { HandleDraggable } from '../DragAndDrop';
 
 defineEmits(['action', 'filter', 'update:quasar-pagination', 'update:selected-rows']);
 defineProps({

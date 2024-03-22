@@ -24,8 +24,6 @@
 <script setup>
 import PageLayout from '../layouts/PageLayout';
 import pages from '../router/pages';
-
-console.log('pages', pages);
 </script>
 
 <style lang="sass" scoped>

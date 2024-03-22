@@ -1,5 +1,7 @@
 {
   "compilerOptions": {
+    "outDir": "./dist",
+    "declaration": true,
     // Specify ECMAScript target version
     "target": "esnext",
     // Specify module code generation
@@ -36,6 +38,7 @@
     "types/**/*.d.ts"
   ],
   "exclude": [
-    "node_modules"
+    "node_modules",
+    "dist"
   ]
 }

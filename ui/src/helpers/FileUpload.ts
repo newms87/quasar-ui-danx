@@ -1,4 +1,5 @@
 import { uid } from "quasar";
+import { danxOptions } from "../config";
 import { resolveFileLocation } from "./files";
 import { FlashMessages } from "./FlashMessages";
 
@@ -15,13 +16,9 @@ export class FileUpload {
     onProgressCb = null;
     onCompleteCb = null;
     onAllCompleteCb = null;
-    options: FileUploadOptions = {
-        directory: "file-upload",
-        presignedUploadUrl: null,
-        uploadCompletedUrl: null
-    };
+    options: FileUploadOptions = null;
 
-    constructor(files, options: FileUploadOptions) {
+    constructor(files, options: FileUploadOptions = null) {
         if (!Array.isArray(files) && !(files instanceof FileList)) {
             files = [files];
         }
@@ -33,9 +30,14 @@ export class FileUpload {
         this.onAllCompleteCb = null;
 
         this.options = {
+            ...danxOptions.fileUpload,
             ...this.options,
             ...options
         };
+
+        if (!this.options.presignedUploadUrl) {
+            throw new Error("Please configure the danxOptions: import { configure } from 'quasar-ui-danx';");
+        }
         this.prepare();
     }
 

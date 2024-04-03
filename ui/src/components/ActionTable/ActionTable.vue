@@ -77,9 +77,9 @@
 
 <script setup>
 import { ref } from 'vue';
-import { EmptyTableState, registerStickyScrolling, RenderComponent, TableSummaryRow } from '.';
 import { DragHandleIcon as RowResizeIcon } from '../../svg';
 import { HandleDraggable } from '../DragAndDrop';
+import { EmptyTableState, registerStickyScrolling, RenderComponent, TableSummaryRow } from './index';
 
 defineEmits(['action', 'filter', 'update:quasar-pagination', 'update:selected-rows']);
 defineProps({

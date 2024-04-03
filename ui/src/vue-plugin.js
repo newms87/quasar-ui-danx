@@ -1,3 +1,4 @@
+export * from './config';
 export * from './helpers';
 export * from './components/DragAndDrop';
 export * from './components/ActionTable';

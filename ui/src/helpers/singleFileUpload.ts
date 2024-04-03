@@ -1,7 +1,7 @@
 import { computed, ref } from "vue";
 import { FileUpload, FileUploadOptions } from "./FileUpload";
 
-export function useSingleFileUpload(options: FileUploadOptions) {
+export function useSingleFileUpload(options: FileUploadOptions = null) {
     const uploadedFile = ref(null);
     const onCompleteCb = ref(null);
     const onFileChangeCb = ref(null);

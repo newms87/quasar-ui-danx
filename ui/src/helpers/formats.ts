@@ -8,9 +8,9 @@ const SERVER_TZ = new IANAZone("America/Chicago");
  * @returns {DateTime}
  */
 export function localizedDateTime(dateTimeString) {
-  dateTimeString = dateTimeString?.replace("T", " ");
-  // noinspection JSCheckFunctionSignatures
-  return DateTime.fromSQL(dateTimeString, { zone: SERVER_TZ }).setZone("local");
+    dateTimeString = dateTimeString?.replace("T", " ");
+    // noinspection JSCheckFunctionSignatures
+    return DateTime.fromSQL(dateTimeString, { zone: SERVER_TZ }).setZone("local");
 }
 
 /**
@@ -19,9 +19,9 @@ export function localizedDateTime(dateTimeString) {
  * @returns {DateTime}
  */
 export function remoteDateTime(dateTimeString) {
-  dateTimeString = dateTimeString?.replace("T", " ");
-  // noinspection JSCheckFunctionSignatures
-  return DateTime.fromSQL(dateTimeString, { zone: "local" }).setZone(SERVER_TZ);
+    dateTimeString = dateTimeString?.replace("T", " ");
+    // noinspection JSCheckFunctionSignatures
+    return DateTime.fromSQL(dateTimeString, { zone: "local" }).setZone(SERVER_TZ);
 }
 
 /**
@@ -29,11 +29,11 @@ export function remoteDateTime(dateTimeString) {
  * @returns {DateTime|*}
  */
 export function parseDateTime(dateTime) {
-  if (typeof dateTime === "string") {
-    dateTime = dateTime.replace("T", " ").replace(/\//g, "-");
-    return DateTime.fromSQL(dateTime);
-  }
-  return dateTime || DateTime.fromSQL("0000-00-00 00:00:00");
+    if (typeof dateTime === "string") {
+        dateTime = dateTime.replace("T", " ").replace(/\//g, "-");
+        return DateTime.fromSQL(dateTime);
+    }
+    return dateTime || DateTime.fromSQL("0000-00-00 00:00:00");
 }
 
 /**
@@ -43,7 +43,7 @@ export function parseDateTime(dateTime) {
  * @returns {DateTime}
  */
 export function parseQDate(date, format = "yyyy/MM/dd") {
-  return DateTime.fromFormat(date, format);
+    return DateTime.fromFormat(date, format);
 }
 
 /**
@@ -53,7 +53,7 @@ export function parseQDate(date, format = "yyyy/MM/dd") {
  * @returns {DateTime}
  */
 export function parseQDateTime(date, format = "yyyy/MM/dd HH:mm:ss") {
-  return DateTime.fromFormat(date, format);
+    return DateTime.fromFormat(date, format);
 }
 
 /**
@@ -62,7 +62,7 @@ export function parseQDateTime(date, format = "yyyy/MM/dd HH:mm:ss") {
  * @returns {string}
  */
 export function fQDate(date) {
-  return fDate(date, { format: "yyyy/MM/dd" });
+    return fDate(date, { format: "yyyy/MM/dd" });
 }
 
 /**
@@ -72,7 +72,7 @@ export function fQDate(date) {
  * @returns {string}
  */
 export function fLocalizedDateTime(dateTimeString, options = {}) {
-  return fDateTime(localizedDateTime(dateTimeString), options);
+    return fDateTime(localizedDateTime(dateTimeString), options);
 }
 
 /**
@@ -84,11 +84,11 @@ export function fLocalizedDateTime(dateTimeString, options = {}) {
  * @returns {string}
  */
 export function fDateTime(
-  dateTime = null,
-  { format = "M/d/yy h:mma", empty = "- -" } = {}
+    dateTime = null,
+    { format = "M/d/yy h:mma", empty = "- -" } = {}
 ) {
-  const formatted = (dateTime ? parseDateTime(dateTime) : DateTime.now()).toFormat(format).toLowerCase();
-  return formatted === "invalid datetime" ? empty : formatted;
+    const formatted = (dateTime ? parseDateTime(dateTime) : DateTime.now()).toFormat(format).toLowerCase();
+    return formatted === "invalid datetime" ? empty : formatted;
 }
 
 /**
@@ -97,7 +97,7 @@ export function fDateTime(
  * @returns {string}
  */
 export function dbDateTime(dateTime = null) {
-  return fDateTime(dateTime, { format: "yyyy-MM-dd HH:mm:ss", empty: null });
+    return fDateTime(dateTime, { format: "yyyy-MM-dd HH:mm:ss", empty: null });
 }
 
 /**
@@ -108,8 +108,8 @@ export function dbDateTime(dateTime = null) {
  * @returns {string}
  */
 export function fDate(dateTime, { empty = "--", format = "M/d/yy" } = {}) {
-  const formatted = parseDateTime(dateTime).toFormat(format);
-  return ["Invalid DateTime", "invalid datetime"].includes(formatted) ? empty : formatted;
+    const formatted = parseDateTime(dateTime).toFormat(format);
+    return ["Invalid DateTime", "invalid datetime"].includes(formatted) ? empty : formatted;
 }
 
 /**
@@ -119,9 +119,9 @@ export function fDate(dateTime, { empty = "--", format = "M/d/yy" } = {}) {
  * @returns {string}
  */
 export function fSecondsToTime(second) {
-  const time = DateTime.now().setZone("UTC").startOf("year").set({ second });
-  const hours = Math.floor(second / 3600);
-  return (hours ? hours + ":" : "") + time.toFormat("mm:ss");
+    const time = DateTime.now().setZone("UTC").startOf("year").set({ second });
+    const hours = Math.floor(second / 3600);
+    return (hours ? hours + ":" : "") + time.toFormat("mm:ss");
 }
 
 /**
@@ -130,10 +130,10 @@ export function fSecondsToTime(second) {
  * @returns {string}
  */
 export function fCurrency(amount) {
-  return new Intl.NumberFormat("en-US", {
-    style: "currency",
-    currency: "USD"
-  }).format(amount);
+    return new Intl.NumberFormat("en-US", {
+        style: "currency",
+        currency: "USD"
+    }).format(amount);
 }
 
 /**
@@ -143,7 +143,7 @@ export function fCurrency(amount) {
  * @returns {string}
  */
 export function fNumber(number, options = {}) {
-  return new Intl.NumberFormat("en-US", options).format(number);
+    return new Intl.NumberFormat("en-US", options).format(number);
 }
 
 /**
@@ -153,17 +153,17 @@ export function fNumber(number, options = {}) {
  * @returns {string|*}
  */
 export function centerTruncate(str, maxLength) {
-  if (str.length > maxLength) {
-    const frontCharCount = Math.floor((maxLength - 3) / 2);
-    const backCharCount = maxLength - frontCharCount - 3;
-    return (
-      str.substring(0, frontCharCount) +
-      "..." +
-      str.substring(str.length - backCharCount)
-    );
-  } else {
-    return str;
-  }
+    if (str.length > maxLength) {
+        const frontCharCount = Math.floor((maxLength - 3) / 2);
+        const backCharCount = maxLength - frontCharCount - 3;
+        return (
+            str.substring(0, frontCharCount) +
+            "..." +
+            str.substring(str.length - backCharCount)
+        );
+    } else {
+        return str;
+    }
 }
 
 /**
@@ -173,11 +173,52 @@ export function centerTruncate(str, maxLength) {
  * @returns {string}
  */
 export function fPercent(num, options = { multiplier: 100, maximumFractionDigits: 1, NaN: "N/A" }) {
-  num = parseFloat(num);
+    num = parseFloat(num);
 
-  if (isNaN(num)) {
-    return options.NaN;
-  }
+    if (isNaN(num)) {
+        return options.NaN;
+    }
 
-  return fNumber(num * options.multiplier, options) + "%";
+    return fNumber(num * options.multiplier, options) + "%";
+}
+
+
+export function fPhone(value) {
+    if (!value || typeof value !== "string") {
+        return value || "";
+    }
+
+    const input = value.replace(/\D/g, "").split("");
+    let phone = "";
+
+    const startsWithOne = input.length > 0 && input[0] === "1";
+    const shift = startsWithOne ? 1 : 0;
+
+    input.map((number, index) => {
+        switch (index) {
+            case shift:
+                phone += "(";
+                break;
+            case shift + 3:
+                phone += ") ";
+                break;
+            case shift + 6:
+                phone += "-";
+                break;
+            case shift + 10:
+                phone += " x";
+                break;
+        }
+        if (index === 0 && number === "1") {
+            phone += "+1 ";
+        } else {
+            phone += number;
+        }
+    });
+
+    if (value === "+1 (") {
+        return "";
+    }
+
+    return phone;
 }

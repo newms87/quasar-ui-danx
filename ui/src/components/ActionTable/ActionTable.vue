@@ -49,27 +49,27 @@
     </template>
     <template #body-cell="rowProps">
       <q-td :key="rowProps.key" :props="rowProps">
-        <template v-if="rowProps.col.component">
-          <RenderComponentColumn
-              :row-props="rowProps"
-              @action="$emit('action', $event)"
-          />
-        </template>
-        <template v-else-if="rowProps.col.fieldList">
-          <div v-for="field in rowProps.col.fieldList" :key="field">
-            {{ rowProps.row[field] }}
-          </div>
-        </template>
-        <template v-else-if="rowProps.col.filterOnClick">
-          <a @click="$emit('filter', rowProps.col.filterOnClick(rowProps.row))">
-            {{ rowProps.value }}
-          </a>
-        </template>
-        <template v-else>
-          <slot v-bind="{name: rowProps.col.name, row: rowProps.row, value: rowProps.value}">
-            {{ rowProps.value }}
-          </slot>
-        </template>
+        <component
+            :is="rowProps.col.onClick ? 'a' : 'div'"
+            @click="() => rowProps.col.onClick && rowProps.col.onClick(rowProps.row)"
+        >
+          <template v-if="rowProps.col.component">
+            <RenderComponent
+                :row-props="rowProps"
+                @action="$emit('action', $event)"
+            />
+          </template>
+          <template v-else-if="rowProps.col.fieldList">
+            <div v-for="field in rowProps.col.fieldList" :key="field">
+              {{ rowProps.row[field] }}
+            </div>
+          </template>
+          <template v-else>
+            <slot v-bind="{name: rowProps.col.name, row: rowProps.row, value: rowProps.value}">
+              {{ rowProps.value }}
+            </slot>
+          </template>
+        </component>
       </q-td>
     </template>
   </q-table>
@@ -77,7 +77,7 @@
 
 <script setup>
 import { ref } from 'vue';
-import { EmptyTableState, registerStickyScrolling, RenderComponentColumn, TableSummaryRow } from '.';
+import { EmptyTableState, registerStickyScrolling, RenderComponent, TableSummaryRow } from '.';
 import { DragHandleIcon as RowResizeIcon } from '../../svg';
 import { HandleDraggable } from '../DragAndDrop';
 

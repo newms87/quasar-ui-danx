@@ -31,20 +31,8 @@ const props = defineProps({
     type: Object,
     required: true
   },
-  filterGroups: {
-    type: Array,
-    required: true
-  },
   showFilters: Boolean
 });
 
-const filterNameDictionary = computed(() => {
-  return props.filterGroups.reduce((acc, fg) => {
-    fg.fields.forEach(f => {
-      acc[f.name] = true;
-    });
-    return acc;
-  }, {});
-});
-const activeCount = computed(() => Object.keys(props.filter).filter(key => props.filter[key] !== undefined && filterNameDictionary.value[key]).length);
+const activeCount = computed(() => Object.keys(props.filter).filter(key => props.filter[key] !== undefined).length);
 </script>

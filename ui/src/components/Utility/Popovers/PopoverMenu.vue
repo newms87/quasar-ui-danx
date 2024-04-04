@@ -37,19 +37,19 @@
               :key="item.action"
               clickable
               :class="item.class"
-              @click="$emit('action', item.action)"
+              @click="onAction(item)"
           >
             {{ item.label }}
-            </q-item>
+          </q-item>
         </template>
-        </q-list>
-        </q-menu>
+      </q-list>
+    </q-menu>
   </a>
 </template>
 <script setup>
 import { DotsVerticalIcon as MenuIcon } from '@heroicons/vue/outline';
 
-defineEmits(['action']);
+const emit = defineEmits(['action', 'action-item']);
 defineProps({
   items: {
     type: Array,
@@ -61,4 +61,9 @@ defineProps({
   disabled: Boolean,
   loading: Boolean
 });
+
+function onAction(item) {
+  emit('action', item.action);
+  emit('action-item', item);
+}
 </script>

@@ -1,6 +1,6 @@
 import { computed, ref, watch } from "vue";
 import { getItem, setItem } from "../../helpers";
-import { getFilterFromUrl, mapSortBy, waitForRef } from "./listHelpers";
+import { getFilterFromUrl, waitForRef } from "./listHelpers";
 
 export function useListActions(name, {
     listRoute,
@@ -10,7 +10,6 @@ export function useListActions(name, {
     applyActionRoute = null,
     applyBatchActionRoute = null,
     itemDetailsRoute = null,
-    columns = null,
     filterGroups = null,
     refreshFilters = false,
     urlPattern = null,
@@ -30,6 +29,7 @@ export function useListActions(name, {
     const filterActiveCount = computed(() => Object.keys(filter.value).filter(key => filter.value[key] !== undefined).length);
 
     const PAGING_DEFAULT = {
+        __sort: null,
         sortBy: null,
         descending: false,
         page: 1,
@@ -42,7 +42,7 @@ export function useListActions(name, {
         perPage: quasarPagination.value.rowsPerPage,
         page: quasarPagination.value.page,
         filter: { ...filter.value, ...globalFilter.value },
-        sort: columns ? mapSortBy(quasarPagination.value, columns) : undefined
+        sort: quasarPagination.value.__sort || undefined
     }));
 
     // When any part of the filter changes, get the new list of creatives
@@ -95,15 +95,15 @@ export function useListActions(name, {
         isLoadingFilters.value = false;
     }
 
-    // A flat list of valid filterable field names
-    const validFilterKeys = computed(() => filterGroups?.value?.map(group => group.fields.map(field => field.name)).flat());
-
     /**
      * Watches for a filter URL parameter and applies the filter if it is set.
      */
-    function applyFilterFromUrl(url) {
+    function applyFilterFromUrl(url, filterGroups = null) {
         if (url.match(urlPattern)) {
-            const urlFilter = getFilterFromUrl(url, validFilterKeys.value);
+            // A flat list of valid filterable field names
+            const validFilterKeys = filterGroups?.value?.map(group => group.fields.map(field => field.name)).flat();
+
+            const urlFilter = getFilterFromUrl(url, validFilterKeys);
 
             if (Object.keys(urlFilter).length > 0) {
                 filter.value = urlFilter;
@@ -186,9 +186,6 @@ export function useListActions(name, {
             // If no local storage settings, apply the default filters
             filter.value = { ...filterDefaults, ...filter.value };
         }
-
-        // Load the URL filters if they are set
-        applyFilterFromUrl(window.location.href);
 
         setTimeout(() => {
             if (!isLoadingList.value) {
@@ -355,7 +352,6 @@ export function useListActions(name, {
         isApplyingBatchAction,
         activeItem,
         formTab,
-        columns,
         filterGroups,
 
         // Actions

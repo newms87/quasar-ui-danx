@@ -12,7 +12,7 @@
       color="blue-base"
       @update:selected="$emit('update:selected-rows', $event)"
       @update:pagination="() => {}"
-      @request="$emit('update:quasar-pagination', $event.pagination)"
+      @request="$emit('update:quasar-pagination', {...$event.pagination, __sort: mapSortBy($event.pagination, columns)})"
   >
     <template #no-data>
       <slot name="empty">
@@ -51,24 +51,30 @@
       <q-td :key="rowProps.key" :props="rowProps">
         <component
             :is="rowProps.col.onClick ? 'a' : 'div'"
+            class="flex items-center flex-nowrap"
             @click="() => rowProps.col.onClick && rowProps.col.onClick(rowProps.row)"
         >
-          <template v-if="rowProps.col.component">
-            <RenderComponent
-                :row-props="rowProps"
-                @action="$emit('action', $event)"
-            />
-          </template>
-          <template v-else-if="rowProps.col.fieldList">
+          <RenderComponent
+              v-if="rowProps.col.component"
+              :row-props="rowProps"
+              @action="$emit('action', $event)"
+          />
+          <div v-else-if="rowProps.col.fieldList">
             <div v-for="field in rowProps.col.fieldList" :key="field">
               {{ rowProps.row[field] }}
             </div>
-          </template>
-          <template v-else>
+          </div>
+          <div v-else>
             <slot v-bind="{name: rowProps.col.name, row: rowProps.row, value: rowProps.value}">
               {{ rowProps.value }}
             </slot>
-          </template>
+          </div>
+          <ActionMenu
+              v-if="rowProps.col.actions" class="ml-2"
+              :items="rowProps.col.actions"
+              :rows="[rowProps.row]"
+              @action="(action) => $emit('action', {action: action, row: rowProps.row})"
+          />
         </component>
       </q-td>
     </template>
@@ -79,7 +85,14 @@
 import { ref } from 'vue';
 import { DragHandleIcon as RowResizeIcon } from '../../svg';
 import { HandleDraggable } from '../DragAndDrop';
-import { EmptyTableState, registerStickyScrolling, RenderComponent, TableSummaryRow } from './index';
+import {
+  ActionMenu,
+  EmptyTableState,
+  mapSortBy,
+  registerStickyScrolling,
+  RenderComponent,
+  TableSummaryRow
+} from './index';
 
 defineEmits(['action', 'filter', 'update:quasar-pagination', 'update:selected-rows']);
 defineProps({

@@ -33,7 +33,7 @@
     </div>
 
     <div class="max-w-[50em] flex items-stretch justify-start">
-      <ImagePreview
+      <FilePreview
           v-for="file in uploadedFiles"
           :key="'file-upload-' + file.id"
           class="w-32 m-2 cursor-pointer bg-neutral-plus-5"
@@ -44,7 +44,7 @@
           :removable="!readonly && !disable"
           @remove="onRemove(file)"
       />
-      <ImagePreview
+      <FilePreview
           v-if="!disable && !readonly"
           class="w-32 m-2 cursor-pointer border border-dashed border-blue-base"
           disabled
@@ -63,7 +63,7 @@
 <script setup>
 import { onMounted } from 'vue';
 import { useMultiFileUpload } from '../../../../helpers';
-import { ImagePreview } from '../../../Utility';
+import { FilePreview } from '../../../Utility';
 import FieldLabel from './FieldLabel';
 
 const emit = defineEmits(['update:model-value']);

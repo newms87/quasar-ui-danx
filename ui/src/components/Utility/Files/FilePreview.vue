@@ -99,10 +99,10 @@
 
 <script setup>
 import { DocumentTextIcon as TextFileIcon, DownloadIcon, PlayIcon } from '@heroicons/vue/outline';
-import { FullScreenCarouselDialog } from 'src/components/Utility/index';
-import { download } from 'src/helpers';
-import { ImageIcon, PdfIcon, TrashIcon as RemoveIcon } from 'src/svg';
 import { computed, ref } from 'vue';
+import { download } from '../../../helpers';
+import { ImageIcon, PdfIcon, TrashIcon as RemoveIcon } from '../../../svg';
+import { FullScreenCarouselDialog } from '../Dialogs';
 
 const emit = defineEmits(['remove']);
 const props = defineProps({

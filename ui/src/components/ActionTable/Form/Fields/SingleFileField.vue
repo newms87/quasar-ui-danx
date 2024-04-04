@@ -31,7 +31,7 @@
       />
     </div>
 
-    <ImagePreview
+    <FilePreview
         v-if="!readonly || uploadedFile"
         class="w-32 cursor-pointer mt-2"
         :class="{'border border-dashed border-blue-base': !uploadedFile, 'mx-auto': !readonly}"
@@ -50,7 +50,7 @@
 <script setup>
 import { onMounted } from 'vue';
 import { useSingleFileUpload } from '../../../../helpers';
-import { ImagePreview } from '../../../Utility';
+import { FilePreview } from '../../../Utility';
 import FieldLabel from './FieldLabel';
 
 const emit = defineEmits(['update:model-value']);

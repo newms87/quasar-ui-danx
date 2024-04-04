@@ -23,7 +23,7 @@
 </template>
 <script setup>
 import { computed, ref } from 'vue';
-import PopoverMenu from '../../components/Utility/Popover/PopoverMenu';
+import { PopoverMenu } from '../Utility';
 
 const emit = defineEmits(['action']);
 const props = defineProps({

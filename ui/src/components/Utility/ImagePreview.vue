@@ -23,21 +23,21 @@
             <PlayIcon class="w-16" />
           </button>
         </div>
-        <div
-            v-if="isPdf && !thumbUrl"
-            class="flex items-center justify-center h-full"
-        >
-          <PdfIcon class="w-24" />
-        </div>
         <q-img
-            v-else
+            v-if="thumbUrl || isPreviewable"
             fit="scale-down"
             class="non-selectable max-h-full max-w-full h-full"
             :src="(thumbUrl || previewUrl) + '#t=0.1'"
             preload="auto"
             data-testid="previewed-image"
-            data-dusk="previewed-image"
         />
+        <div
+            v-else
+            class="flex items-center justify-center h-full"
+        >
+          <PdfIcon v-if="isPdf" class="w-24" />
+          <TextFileIcon v-else class="w-24" />
+        </div>
       </div>
       <div
           v-if="$slots['action-button']"
@@ -98,7 +98,7 @@
 </template>
 
 <script setup>
-import { DownloadIcon, PlayIcon } from '@heroicons/vue/outline';
+import { DocumentTextIcon as TextFileIcon, DownloadIcon, PlayIcon } from '@heroicons/vue/outline';
 import { computed, ref } from 'vue';
 import { FullScreenCarouselDialog } from '.';
 import { download } from '../../helpers';
@@ -148,6 +148,7 @@ const computedImage = computed(() => {
 const mimeType = computed(
     () => computedImage.value.type || computedImage.value.mime
 );
+const isImage = computed(() => mimeType.value.match(/^image\//));
 const isVideo = computed(() => mimeType.value.match(/^video\//));
 const isPdf = computed(() => mimeType.value.match(/^application\/pdf/));
 const previewUrl = computed(
@@ -156,7 +157,9 @@ const previewUrl = computed(
 const thumbUrl = computed(() => {
   return computedImage.value.transcodes?.thumb?.url;
 });
-
+const isPreviewable = computed(() => {
+  return !!thumbUrl.value || isVideo.value || isImage.value;
+});
 const isConfirmingRemove = ref(false);
 function onRemove() {
   if (!isConfirmingRemove.value) {

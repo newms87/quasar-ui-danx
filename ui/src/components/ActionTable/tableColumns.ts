@@ -11,7 +11,7 @@ export function useTableColumns(name, columns, options = { titleMinWidth: 120, t
     const columnOrder = ref(getItem(COLUMN_ORDER_KEY) || []);
 
     // Manages visible columns on the table
-    const hiddenColumnNames = ref(getItem(VISIBLE_COLUMNS_KEY, columns.filter(c => c.category !== "General" || c.name === "status").map(c => c.name)));
+    const hiddenColumnNames = ref(getItem(VISIBLE_COLUMNS_KEY, []));
 
     // Title columns will have their name appear on the first column of the table as part of the records' title
     const titleColumnNames = ref(getItem(TITLE_COLUMNS_KEY, []));

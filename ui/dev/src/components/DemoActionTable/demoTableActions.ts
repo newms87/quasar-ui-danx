@@ -1,9 +1,6 @@
 import { useListActions } from "ui";
 import { applyActionCb, filterFieldOptionsCb, itemListCb, summaryCb } from "./demoTableCallbacks";
-import { columns } from "./demoTableColumns";
-import { filterGroups } from "./demoTableFilters";
 
-export { columns, filterGroups };
 export const {
   // State
   filter,
@@ -25,7 +22,5 @@ export const {
   filterFieldOptionsRoute: filterFieldOptionsCb,
   applyActionRoute: applyActionCb,
   refreshFilters: true,
-  urlPattern: /\/admin-v4\/campaigns/,
-  columns,
-  filterGroups,
+  urlPattern: /\/admin-v4\/campaigns/
 });

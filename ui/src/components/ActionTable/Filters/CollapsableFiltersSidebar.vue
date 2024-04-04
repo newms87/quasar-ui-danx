@@ -9,7 +9,7 @@
   >
     <FilterGroupList
         :filter="filter"
-        :filter-groups="filterGroups"
+        :filter-fields="filterFields"
         @update:filter="$emit('update:filter', $event)"
     />
   </CollapsableSidebar>
@@ -29,7 +29,7 @@ defineProps({
     type: Object,
     default: null
   },
-  filterGroups: {
+  filterFields: {
     type: Array,
     default: () => []
   }

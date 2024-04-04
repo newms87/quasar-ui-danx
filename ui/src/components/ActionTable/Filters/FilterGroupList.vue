@@ -2,7 +2,7 @@
   <q-list>
     <div class="px-4 py-2 max-w-full">
       <template
-          v-for="(group, index) in filterGroups"
+          v-for="(group, index) in filterFields"
           :key="'group-' + group.name"
       >
         <template v-if="group.flat">
@@ -34,12 +34,12 @@
         </FilterGroupItem>
 
         <q-separator
-            v-if="index < (filterGroups.length - 1)"
+            v-if="index < (filterFields.length - 1)"
             class="my-2"
         />
       </template>
     </div>
-    </q-list>
+  </q-list>
 </template>
 <script setup>
 import { computed } from 'vue';
@@ -48,7 +48,7 @@ import FilterGroupItem from './FilterGroupItem';
 
 const emit = defineEmits(['update:filter']);
 const props = defineProps({
-  filterGroups: {
+  filterFields: {
     type: Array,
     required: true
   },
@@ -61,7 +61,7 @@ const props = defineProps({
 
 const activeCountByGroup = computed(() => {
   const activeCountByGroup = {};
-  for (const group of props.filterGroups) {
+  for (const group of props.filterFields) {
     activeCountByGroup[group.name] = group.fields.filter(field => props.filter[field.name] !== undefined).length;
   }
   return activeCountByGroup;

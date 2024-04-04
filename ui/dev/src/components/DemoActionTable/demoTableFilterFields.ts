@@ -1,7 +1,7 @@
 import { computed } from "vue";
 import { filterFieldOptions } from "./demoTableActions";
 
-export const filterGroups = computed(() => [
+export const filterFields = computed(() => [
   {
     name: "Dates",
     flat: true,

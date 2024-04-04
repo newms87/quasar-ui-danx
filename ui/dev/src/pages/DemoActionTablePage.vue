@@ -2,7 +2,7 @@
   <PageLayout title="Action Table Demo">
     <div class="flex items-start flex-nowrap">
       <div>
-        <FilterGroupList :filter-groups="filterGroups" v-model:filter="filter" />
+        <FilterGroupList :filter-fields="filterFields" v-model:filter="filter" />
       </div>
       <ActionTable
         class="w-full"
@@ -17,11 +17,11 @@
   </PageLayout>
 </template>
 <script setup>
+import { columns } from '@/components/DemoActionTable/demoTableColumns';
+import { filterFields } from '@/components/DemoActionTable/demoTableFilterFields';
 import { ActionTable, FilterGroupList } from 'ui';
 import {
-  columns,
   filter,
-  filterGroups,
   pagedItems,
   quasarPagination,
   selectedRows,

@@ -16,9 +16,11 @@ export function useListActions(name, {
     urlPattern = null,
     filterDefaults = {}
 }) {
+    let isInitialized = false;
     const PAGE_SETTINGS_KEY = `${name}-pagination-settings`;
     const pagedItems = ref(null);
     const filter = ref({});
+    const globalFilter = ref({});
     const showFilters = ref(getItem(`${name}-show-filters`, true));
     const selectedRows = ref([]);
     const isLoadingList = ref(false);
@@ -39,7 +41,7 @@ export function useListActions(name, {
     const pager = computed(() => ({
         perPage: quasarPagination.value.rowsPerPage,
         page: quasarPagination.value.page,
-        filter: filter.value,
+        filter: { ...filter.value, ...globalFilter.value },
         sort: columns ? mapSortBy(quasarPagination.value, columns) : undefined
     }));
 
@@ -59,15 +61,17 @@ export function useListActions(name, {
     }
 
     async function loadList() {
-        isLoadingList.value = true;
-        setPagedItems(await listRoute(pager.value));
-        isLoadingList.value = false;
+        if (isInitialized) {
+            isLoadingList.value = true;
+            setPagedItems(await listRoute(pager.value));
+            isLoadingList.value = false;
+        }
     }
 
     async function loadSummary() {
-        if (summaryRoute) {
+        if (summaryRoute && isInitialized) {
             isLoadingSummary.value = true;
-            const summaryFilter = { id: null, ...filter.value };
+            const summaryFilter = { id: null, ...filter.value, ...globalFilter.value };
             if (selectedRows.value.length) {
                 summaryFilter.id = selectedRows.value.map((row) => row.id);
             }
@@ -146,7 +150,7 @@ export function useListActions(name, {
         const newItems = await moreRoute({
             page: index + 1,
             perPage,
-            filter: filter.value
+            filter: { ...filter.value, ...globalFilter.value }
         });
 
         if (newItems && newItems.length > 0) {
@@ -169,6 +173,9 @@ export function useListActions(name, {
      * Loads the filter and pagination settings from local storage.
      */
     function loadSettings() {
+        // Only load settings when the class is fully initialized
+        if (!isInitialized) return;
+
         const settings = getItem(PAGE_SETTINGS_KEY);
 
         // Load the filter settings from local storage
@@ -324,12 +331,16 @@ export function useListActions(name, {
     }
 
     // Async load the settings for this Action List
-    setTimeout(loadSettings, 1);
+    setTimeout(() => {
+        isInitialized = true;
+        loadSettings();
+    }, 1);
 
     return {
         // State
         pagedItems,
         filter,
+        globalFilter,
         filterActiveCount,
         showFilters,
         summary,

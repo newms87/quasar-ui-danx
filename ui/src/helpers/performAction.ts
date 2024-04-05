@@ -29,7 +29,9 @@ export function usePerformAction(actions: any[]) {
             targets = Array.isArray(targets) ? targets : [targets];
 
             await performAction({ ...action, ...options }, targets);
-        }
+        },
+
+        batchActions: actions.filter(a => a.batch)
     };
 }
 

@@ -52,6 +52,7 @@
         <component
             :is="rowProps.col.onClick ? 'a' : 'div'"
             class="flex items-center flex-nowrap"
+            :class="{'justify-end': rowProps.col.align === 'right', 'justify-center': rowProps.col.align === 'center', 'justify-start': rowProps.col.align === 'left'}"
             @click="() => rowProps.col.onClick && rowProps.col.onClick(rowProps.row)"
         >
           <RenderComponent
@@ -72,7 +73,7 @@
           <ActionMenu
               v-if="rowProps.col.actions" class="ml-2"
               :items="rowProps.col.actions"
-              :rows="[rowProps.row]"
+              :targets="[rowProps.row]"
               @action="(action) => $emit('action', {action: action, row: rowProps.row})"
           />
         </component>

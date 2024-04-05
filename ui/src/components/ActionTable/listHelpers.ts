@@ -1,4 +1,4 @@
-import { onMounted, watch } from "vue";
+import { onMounted } from "vue";
 import { getUrlParam } from "../../helpers";
 
 export function registerStickyScrolling(tableRef) {
@@ -38,28 +38,11 @@ export function mapSortBy(pagination, columns) {
 }
 
 /**
- * Wait for a ref to have a value and then resolve the promise
- *
- * @param ref
- * @param value
- * @returns {Promise<void>}
- */
-export function waitForRef(ref, value) {
-    return new Promise<void>((resolve) => {
-        watch(ref, (newValue) => {
-            if (newValue === value) {
-                resolve();
-            }
-        });
-    });
-}
-
-/**
  * Returns the filter from the URL if it is set
  * @param url
  * @param allowedKeys
  */
-export function getFilterFromUrl(url, allowedKeys = null) {
+export function getFilterFromUrl(url: string, allowedKeys = null) {
     const filter = {};
     const urlFilter = getUrlParam("filter", url);
     if (urlFilter) {

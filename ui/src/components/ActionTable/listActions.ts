@@ -1,6 +1,6 @@
 import { computed, ref, watch } from "vue";
-import { getItem, setItem } from "../../helpers";
-import { getFilterFromUrl, waitForRef } from "./listHelpers";
+import { getItem, setItem, waitForRef } from "../../helpers";
+import { getFilterFromUrl } from "./listHelpers";
 
 export function useListActions(name, {
     listRoute,

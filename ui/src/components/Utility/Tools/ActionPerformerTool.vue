@@ -12,6 +12,7 @@
 </template>
 <script setup>
 import { onMounted, ref, shallowRef } from 'vue';
+import { FlashMessages } from '../../../helpers';
 
 const emit = defineEmits(['done']);
 const props = defineProps({
@@ -31,7 +32,7 @@ const isSaving = ref(null);
 onMounted(async () => {
   // If there is no dialog, we auto-confirm the action
   if (!confirmDialog.value) {
-    onConfirmAction();
+    await onConfirmAction();
   }
 });
 
@@ -44,8 +45,31 @@ async function onConfirmAction(input) {
   const result = await props.action.onAction(props.targets, input);
   isSaving.value = false;
 
+  if (!result.success) {
+    const errors = [];
+    if (result.errors) {
+      errors.push(...result.errors);
+    } else if (result.error) {
+      errors.push(result.error.message);
+    } else {
+      errors.push('An unknown error occurred. Please try again later.');
+    }
+
+    FlashMessages.combine('error', errors);
+
+    if (props.action.onError) {
+      await props.action.onError(result, props.targets, input);
+    }
+  }
+
+  FlashMessages.success(`The update was successful`);
+
+  if (props.action.onSuccess) {
+    await props.action.onSuccess(result, props.targets, input);
+  }
+
   if (props.action.onFinish) {
-    props.action.onFinish(result, props.targets, input);
+    await props.action.onFinish(result, props.targets, input);
   }
 
   emit('done');

@@ -1,4 +1,5 @@
 import { ref } from "vue";
+import { waitForRef } from "./index";
 
 export const activeAction = ref(null);
 export const actionTargets = ref([]);
@@ -13,9 +14,10 @@ export const actionTargets = ref([]);
  * @param targets
  * @returns {Promise<void>}
  */
-export async function performAction(action, targets) {
+export async function performAction(action: any, targets: any[]): Promise<void> {
     activeAction.value = action;
     actionTargets.value = targets;
+    await waitForRef(activeAction, null);
 }
 
 /**

@@ -34,7 +34,7 @@
           </a>
           <q-item
               v-else
-              :key="item.action"
+              :key="item.name || item.action"
               clickable
               :class="item.class"
               @click="onAction(item)"
@@ -55,7 +55,7 @@ defineProps({
     type: Array,
     required: true,
     validator(items) {
-      return items.every((item) => item.label && (item.url || item.action));
+      return items.every((item) => item.label && (item.url || item.action || item.name));
     }
   },
   disabled: Boolean,
@@ -63,7 +63,7 @@ defineProps({
 });
 
 function onAction(item) {
-  emit('action', item.action);
+  emit('action', item.name || item.action);
   emit('action-item', item);
 }
 </script>

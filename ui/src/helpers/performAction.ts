@@ -18,16 +18,17 @@ export function usePerformAction(actions: any[]) {
          *
          * @param name - can either be a string or an action object
          * @param targets - an array of targets (or a single target object)
+         * @param options
          * @returns {Promise<void>}
          */
-        async performAction(name, targets) {
+        async performAction(name, targets, options = {}) {
             const action = typeof name === "string" ? actions.find(a => a.name === name) : name;
             if (!action) {
                 throw new Error(`Unknown action: ${name}`);
             }
             targets = Array.isArray(targets) ? targets : [targets];
 
-            await performAction(action, targets);
+            await performAction({ ...action, ...options }, targets);
         }
     };
 }

@@ -165,7 +165,7 @@ export function useListActions(name, {
      * @returns {Promise<Awaited<void>[]>}
      */
     async function refreshAll() {
-        return Promise.all([loadList(), loadSummary(), loadFilterFieldOptions()]);
+        return Promise.all([loadList(), loadSummary(), loadFilterFieldOptions(), getActiveItemDetails()]);
     }
 
     /**
@@ -260,19 +260,30 @@ export function useListActions(name, {
     // Controls the tab on the Ad Form
     const formTab = ref("general");
 
+    /**
+     * Gets the additional details for the currently active item.
+     * (ie: data that is not normally loaded in the list because it is not needed for the list view)
+     * @returns {Promise<void>}
+     */
+    async function getActiveItemDetails() {
+        if (!activeItem.value) return;
+        
+        const result = await itemDetailsRoute(activeItem.value);
+
+        // Only set the ad details if we are the response for the currently loaded item
+        // NOTE: race conditions might allow the finished loading item to be different to the currently
+        // requested item
+        if (result?.id === activeItem.value?.id) {
+            activeItem.value = result;
+        }
+    }
+
     // Whenever the active item changes, fill the additional item details
     // (ie: tasks, verifications, creatives, etc.)
     if (itemDetailsRoute) {
         watch(() => activeItem.value, async (newItem, oldItem) => {
             if (newItem && oldItem?.id !== newItem.id) {
-                const result = await itemDetailsRoute(newItem);
-
-                // Only set the ad details if we are the response for the currently loaded item
-                // NOTE: race conditions might allow the finished loading item to be different to the currently
-                // requested item
-                if (result?.id === activeItem.value?.id) {
-                    activeItem.value = result;
-                }
+                await getActiveItemDetails();
             }
         });
     }

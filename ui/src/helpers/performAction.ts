@@ -5,6 +5,34 @@ export const activeAction = ref(null);
 export const actionTargets = ref([]);
 
 /**
+ * Hook to perform an action on a set of targets
+ * This helper allows you to perform actions by name on a set of targets using a provided list of actions
+ *
+ * @param actions
+ * @returns {{performAction(name, targets): Promise<void>}}
+ */
+export function usePerformAction(actions: any[]) {
+    return {
+        /**
+         * Perform an action on a set of targets
+         *
+         * @param name - can either be a string or an action object
+         * @param targets - an array of targets (or a single target object)
+         * @returns {Promise<void>}
+         */
+        async performAction(name, targets) {
+            const action = typeof name === "string" ? actions.find(a => a.name === name) : name;
+            if (!action) {
+                throw new Error(`Unknown action: ${name}`);
+            }
+            targets = Array.isArray(targets) ? targets : [targets];
+
+            await performAction(action, targets);
+        }
+    };
+}
+
+/**
  * Perform an action on a set of targets
  *
  * NOTE: This function and variables should be used w/ the ActionPerformerTool - make sure to use a Layout that has

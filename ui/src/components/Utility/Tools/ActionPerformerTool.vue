@@ -45,7 +45,15 @@ async function onConfirmAction(input) {
   const result = await props.action.onAction(props.targets, input);
   isSaving.value = false;
 
-  if (!result.success) {
+  if (result.success) {
+    FlashMessages.success(`The update was successful`);
+
+    if (props.action.onSuccess) {
+      await props.action.onSuccess(result, props.targets, input);
+    }
+
+    emit('done');
+  } else {
     const errors = [];
     if (result.errors) {
       errors.push(...result.errors);
@@ -62,16 +70,8 @@ async function onConfirmAction(input) {
     }
   }
 
-  FlashMessages.success(`The update was successful`);
-
-  if (props.action.onSuccess) {
-    await props.action.onSuccess(result, props.targets, input);
-  }
-
   if (props.action.onFinish) {
     await props.action.onFinish(result, props.targets, input);
   }
-
-  emit('done');
 }
 </script>

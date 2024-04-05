@@ -3,6 +3,7 @@
       class="p-3 actionable"
       :class="{'opacity-50 cursor-not-allowed': disabled}"
   >
+    <slot />
     <Transition
         mode="out-in"
         :duration="150"

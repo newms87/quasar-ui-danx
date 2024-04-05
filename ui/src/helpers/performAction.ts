@@ -12,6 +12,17 @@ export const actionTargets = ref([]);
  * @returns {{performAction(name, targets): Promise<void>}}
  */
 export function usePerformAction(actions: any[]) {
+
+    function filterActions(filters) {
+        let filteredActions = [...actions];
+
+        for (const filter of Object.keys(filters)) {
+            const filterValue = filters[filter];
+            filteredActions = filteredActions.filter(a => a[filter] === filterValue || (Array.isArray(filterValue) && filterValue.includes(a[filter])));
+        }
+        return filteredActions;
+    }
+
     return {
         /**
          * Perform an action on a set of targets
@@ -31,7 +42,8 @@ export function usePerformAction(actions: any[]) {
             await performAction({ ...action, ...options }, targets);
         },
 
-        batchActions: actions.filter(a => a.batch)
+        actions,
+        filterActions,
     };
 }
 

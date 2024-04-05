@@ -1,0 +1,10 @@
+.action-button {
+  cursor: pointer;
+  border-radius: 0.5em;
+  transition: all 0.5s;
+  outline: 1px solid transparent;
+
+  &:hover {
+    @apply bg-blue-light outline outline-blue-base;
+  }
+}

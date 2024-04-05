@@ -70,12 +70,13 @@
               {{ rowProps.value }}
             </slot>
           </div>
-          <ActionMenu
-              v-if="rowProps.col.actions" class="ml-2"
-              :items="rowProps.col.actions"
-              :targets="[rowProps.row]"
-              @action="(action) => $emit('action', {action: action, row: rowProps.row})"
-          />
+          <div v-if="rowProps.col.actions" class="flex-grow flex justify-end pl-2">
+            <ActionMenu
+                :items="rowProps.col.actions"
+                :targets="[rowProps.row]"
+                @action="(action) => $emit('action', {action: action, row: rowProps.row})"
+            />
+          </div>
         </component>
       </q-td>
     </template>

@@ -6,7 +6,6 @@ export * from "./listHelpers";
 export * from "./tableColumns";
 export { default as ActionMenu } from "./ActionMenu.vue";
 export { default as ActionTable } from "./ActionTable.vue";
-export { default as BatchActionMenu } from "./BatchActionMenu.vue";
 export { default as EmptyTableState } from "./EmptyTableState.vue";
 export { default as RenderComponent } from "./RenderComponent.vue";
 export { default as TableSummaryRow } from "./TableSummaryRow.vue";

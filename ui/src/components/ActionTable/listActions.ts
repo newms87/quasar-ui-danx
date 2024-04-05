@@ -2,18 +2,30 @@ import { computed, ref, watch } from "vue";
 import { getItem, setItem, waitForRef } from "../../helpers";
 import { getFilterFromUrl } from "./listHelpers";
 
-export function useListActions(name, {
+interface ListActionsOptions {
+    listRoute: Function;
+    summaryRoute?: Function;
+    filterFieldOptionsRoute?: Function;
+    moreRoute?: Function;
+    applyActionRoute?: Function;
+    itemDetailsRoute?: Function;
+    urlPattern?: RegExp;
+    filterDefaults?: Record<string, any>;
+    refreshFilters?: boolean;
+}
+
+
+export function useListActions(name: string, {
     listRoute,
-    filterFieldOptionsRoute,
     summaryRoute = null,
+    filterFieldOptionsRoute = null,
     moreRoute = null,
     applyActionRoute = null,
-    applyBatchActionRoute = null,
     itemDetailsRoute = null,
     refreshFilters = false,
     urlPattern = null,
     filterDefaults = {}
-}) {
+}: ListActionsOptions) {
     let isInitialized = false;
     const PAGE_SETTINGS_KEY = `${name}-pagination-settings`;
     const pagedItems = ref(null);
@@ -60,23 +72,22 @@ export function useListActions(name, {
     }
 
     async function loadList() {
-        if (isInitialized) {
-            isLoadingList.value = true;
-            setPagedItems(await listRoute(pager.value));
-            isLoadingList.value = false;
-        }
+        if (!isInitialized) return;
+        isLoadingList.value = true;
+        setPagedItems(await listRoute(pager.value));
+        isLoadingList.value = false;
     }
 
     async function loadSummary() {
-        if (summaryRoute && isInitialized) {
-            isLoadingSummary.value = true;
-            const summaryFilter = { id: null, ...filter.value, ...globalFilter.value };
-            if (selectedRows.value.length) {
-                summaryFilter.id = selectedRows.value.map((row) => row.id);
-            }
-            summary.value = await summaryRoute(summaryFilter);
-            isLoadingSummary.value = false;
+        if (!summaryRoute || !isInitialized) return;
+
+        isLoadingSummary.value = true;
+        const summaryFilter = { id: null, ...filter.value, ...globalFilter.value };
+        if (selectedRows.value.length) {
+            summaryFilter.id = selectedRows.value.map((row) => row.id);
         }
+        summary.value = await summaryRoute(summaryFilter);
+        isLoadingSummary.value = false;
     }
 
     // Filter fields are the field values available for the currently applied filter on Creative Groups
@@ -89,6 +100,7 @@ export function useListActions(name, {
     });
 
     async function loadFilterFieldOptions() {
+        if (!filterFieldOptionsRoute || !isInitialized) return;
         isLoadingFilters.value = true;
         filterFieldOptions.value = await filterFieldOptionsRoute(filter.value);
         isLoadingFilters.value = false;
@@ -240,21 +252,6 @@ export function useListActions(name, {
         return result;
     }
 
-    /**
-     * Applies an action to all selected items.
-     */
-    const isApplyingBatchAction = ref(false);
-
-    async function applyBatchAction(input) {
-        isApplyingBatchAction.value = true;
-        const batchFilter = { id: selectedRows.value.map(r => r.id) };
-        const result = await applyBatchActionRoute(batchFilter, input);
-        isApplyingBatchAction.value = false;
-        await refreshAll();
-
-        return result;
-    }
-
     // The active ad for viewing / editing in the Ad Form
     const activeItem = ref(null);
     // Controls the tab on the Ad Form
@@ -267,7 +264,7 @@ export function useListActions(name, {
      */
     async function getActiveItemDetails() {
         if (!activeItem.value) return;
-        
+
         const result = await itemDetailsRoute(activeItem.value);
 
         // Only set the ad details if we are the response for the currently loaded item
@@ -337,11 +334,11 @@ export function useListActions(name, {
         activeItem.value = pagedItems.value.data[nextIndex];
     }
 
-    // Async load the settings for this Action List
-    setTimeout(() => {
+    // Initialize the list actions and load settings, lists, summaries, filter fields, etc.
+    function initialize() {
         isInitialized = true;
         loadSettings();
-    }, 1);
+    }
 
     return {
         // State
@@ -359,18 +356,17 @@ export function useListActions(name, {
         pager,
         quasarPagination,
         isApplyingActionToItem,
-        isApplyingBatchAction,
         activeItem,
         formTab,
 
         // Actions
+        initialize,
         loadSummary,
         resetPaging,
         loadList,
         loadMore,
         refreshAll,
         applyAction,
-        applyBatchAction,
         getNextItem,
         openItemForm,
         applyFilterFromUrl

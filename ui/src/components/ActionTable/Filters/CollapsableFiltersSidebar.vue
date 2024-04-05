@@ -7,7 +7,7 @@
       name="admin-ads"
       @update:collapse="$emit('update:show-filters', !$event)"
   >
-    <FilterGroupList
+    <FilterFieldList
         :filter="filter"
         :filter-fields="filterFields"
         @update:filter="$emit('update:filter', $event)"
@@ -15,7 +15,7 @@
   </CollapsableSidebar>
 </template>
 <script setup>
-import { FilterGroupList } from '.';
+import { FilterFieldList } from '.';
 import { CollapsableSidebar } from '../../Utility';
 
 defineEmits(['update:filter', 'update:show-filters']);

@@ -17,7 +17,7 @@
           />
         </template>
 
-        <FilterGroupItem
+        <FilterFieldItem
             v-else
             :name="group.name"
             :count="activeCountByGroup[group.name]"
@@ -31,7 +31,7 @@
               class="mb-4"
               @update:model-value="updateFilter(field, $event)"
           />
-        </FilterGroupItem>
+        </FilterFieldItem>
 
         <q-separator
             v-if="index < (filterFields.length - 1)"
@@ -44,7 +44,7 @@
 <script setup>
 import { computed } from 'vue';
 import FilterableField from './FilterableField';
-import FilterGroupItem from './FilterGroupItem';
+import FilterFieldItem from './FilterFieldItem';
 
 const emit = defineEmits(['update:filter']);
 const props = defineProps({

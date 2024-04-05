@@ -10,7 +10,6 @@ export function useListActions(name, {
     applyActionRoute = null,
     applyBatchActionRoute = null,
     itemDetailsRoute = null,
-    filterGroups = null,
     refreshFilters = false,
     urlPattern = null,
     filterDefaults = {}
@@ -98,10 +97,10 @@ export function useListActions(name, {
     /**
      * Watches for a filter URL parameter and applies the filter if it is set.
      */
-    function applyFilterFromUrl(url, filterGroups = null) {
+    function applyFilterFromUrl(url, filterFields = null) {
         if (url.match(urlPattern)) {
             // A flat list of valid filterable field names
-            const validFilterKeys = filterGroups?.value?.map(group => group.fields.map(field => field.name)).flat();
+            const validFilterKeys = filterFields?.value?.map(group => group.fields.map(field => field.name)).flat();
 
             const urlFilter = getFilterFromUrl(url, validFilterKeys);
 
@@ -352,7 +351,6 @@ export function useListActions(name, {
         isApplyingBatchAction,
         activeItem,
         formTab,
-        filterGroups,
 
         // Actions
         loadSummary,

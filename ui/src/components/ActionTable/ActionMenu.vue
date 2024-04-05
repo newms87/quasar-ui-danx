@@ -5,19 +5,11 @@
         :items="items"
         @action-item="onAction"
     />
-    <Component
-        v-if="confirmDialog"
-        :is="confirmDialog.is"
-        v-bind="confirmDialog.props"
-        :is-saving="isSaving"
-        @close="onCancel"
-        @confirm="onConfirmAction"
-    />
   </div>
 </template>
 <script setup>
 import { ref, shallowRef } from 'vue';
-import { FlashMessages } from '../../helpers';
+import { FlashMessages, performAction } from '../../helpers';
 import { PopoverMenu } from '../Utility';
 
 const emit = defineEmits(['action']);
@@ -40,13 +32,7 @@ const isSaving = ref(false);
 function onAction(item) {
   emit('action', item);
 
-  activeAction.value = item;
-
-  if (item.confirmDialog) {
-    confirmDialog.value = typeof item.confirmDialog === 'function' ? item.confirmDialog(props.rows) : item.confirmDialog;
-  } else {
-    console.log('handle default action');
-  }
+  performAction(item, props.rows);
 }
 
 function onCancel() {

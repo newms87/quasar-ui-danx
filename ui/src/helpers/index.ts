@@ -9,6 +9,7 @@ export * from "./FlashMessages";
 export * from "./formats";
 export * from "./http";
 export * from "./multiFileUpload";
+export * from "./performAction";
 export * from "./singleFileUpload";
 export * from "./storage";
 export * from "./utils";

@@ -252,10 +252,10 @@ export function useListActions(name: string, {
         return result;
     }
 
-    // The active ad for viewing / editing in the Ad Form
+    // The active ad for viewing / editing
     const activeItem = ref(null);
-    // Controls the tab on the Ad Form
-    const formTab = ref("general");
+    // Controls the active panel (ie: tab) if rendering a panels drawer or similar
+    const activePanel = ref(null);
 
     /**
      * Gets the additional details for the currently active item.
@@ -293,7 +293,7 @@ export function useListActions(name: string, {
      */
     function openItemForm(item, tab) {
         activeItem.value = item;
-        formTab.value = tab;
+        activePanel.value = tab;
     }
 
     /**
@@ -357,7 +357,7 @@ export function useListActions(name: string, {
         quasarPagination,
         isApplyingActionToItem,
         activeItem,
-        formTab,
+        activePanel,
 
         // Actions
         initialize,

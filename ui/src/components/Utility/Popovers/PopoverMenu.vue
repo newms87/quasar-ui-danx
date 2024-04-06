@@ -3,14 +3,16 @@
       class="p-3 actionable"
       :class="{'opacity-50 cursor-not-allowed': disabled}"
   >
-    <slot />
+    <q-tooltip v-if="$slots.tooltip || tooltip">
+      <slot name="tooltip">{{ tooltip }}</slot>
+    </q-tooltip>
     <Transition
         mode="out-in"
         :duration="150"
     >
-      <q-spinner
+      <RenderComponent
           v-if="loading"
-          class="w-4 h-4 text-black"
+          :component="loadingComponent"
       />
       <MenuIcon
           v-else
@@ -49,6 +51,8 @@
 </template>
 <script setup>
 import { DotsVerticalIcon as MenuIcon } from '@heroicons/vue/outline';
+import { QSpinner } from 'quasar';
+import { RenderComponent } from '../index';
 
 const emit = defineEmits(['action', 'action-item']);
 defineProps({
@@ -56,11 +60,22 @@ defineProps({
     type: Array,
     required: true,
     validator(items) {
-      return items.every((item) => item.label && (item.url || item.action || item.name));
+      return items.every((item) => item.url || item.action || item.name);
     }
   },
+  tooltip: {
+    type: String,
+    default: null
+  },
   disabled: Boolean,
-  loading: Boolean
+  loading: Boolean,
+  loadingComponent: {
+    type: [Function, Object],
+    default: () => ({
+      is: QSpinner,
+      props: { class: 'w-4 h-4 text-black' }
+    })
+  }
 });
 
 function onAction(item) {

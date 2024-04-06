@@ -41,7 +41,7 @@
             v-if="rowProps.col.resizeable"
             :drop-zone="`resize-column-` + rowProps.col.name"
             class="resize-handle"
-            @resize="rowProps.col.onResize"
+            @resize="onResizeColumn(rowProps.col, $event)"
         >
           <RowResizeIcon class="w-4 text-neutral-base" />
         </HandleDraggable>
@@ -53,6 +53,7 @@
             :is="rowProps.col.onClick ? 'a' : 'div'"
             class="flex items-center flex-nowrap"
             :class="{'justify-end': rowProps.col.align === 'right', 'justify-center': rowProps.col.align === 'center', 'justify-start': rowProps.col.align === 'left'}"
+            :style="getColumnStyle(rowProps.col)"
             @click="() => rowProps.col.onClick && rowProps.col.onClick(rowProps.row)"
         >
           <RenderComponent
@@ -87,19 +88,18 @@
 
 <script setup>
 import { ref } from 'vue';
+import { getItem, setItem } from '../../helpers';
 import { DragHandleIcon as RowResizeIcon } from '../../svg';
 import { HandleDraggable } from '../DragAndDrop';
-import {
-  ActionMenu,
-  EmptyTableState,
-  mapSortBy,
-  registerStickyScrolling,
-  RenderComponent,
-  TableSummaryRow
-} from './index';
+import { mapSortBy, RenderComponent } from '../index';
+import { ActionMenu, EmptyTableState, registerStickyScrolling, TableSummaryRow } from './index';
 
 defineEmits(['action', 'filter', 'update:quasar-pagination', 'update:selected-rows']);
-defineProps({
+const props = defineProps({
+  name: {
+    type: String,
+    required: true
+  },
   label: {
     type: String,
     required: true
@@ -133,6 +133,23 @@ defineProps({
 });
 const actionTable = ref(null);
 registerStickyScrolling(actionTable);
+
+const COLUMN_SETTINGS_KEY = `column-settings-${props.name}`;
+const columnSettings = ref(getItem(COLUMN_SETTINGS_KEY) || {});
+function onResizeColumn(column, val) {
+  columnSettings.value[column.name] = Math.max(Math.min(val.distance + val.startDropZoneSize, column.maxWidth || 500), column.minWidth || 80);
+  setItem(COLUMN_SETTINGS_KEY, columnSettings.value);
+}
+function getColumnStyle(column) {
+  const width = columnSettings.value[column.name] || column.width;
+
+  if (width) {
+    return {
+      width: `${width}px`
+    };
+  }
+  return null;
+}
 </script>
 
 <style lang="scss" scoped>

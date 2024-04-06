@@ -42,11 +42,22 @@ async function onConfirmAction(input) {
   }
 
   isSaving.value = true;
-  const result = await props.action.onAction(props.targets, input);
+  let result;
+  try {
+    result = await props.action.onAction(props.targets, input);
+  } catch (e) {
+    console.error(e);
+    result = { error: `An error occurred while performing the action ${props.action.label}. Please try again later.` };
+  }
+
   isSaving.value = false;
 
-  if (result.success) {
-    FlashMessages.success(`The update was successful`);
+  // If there is no return value or the result marks it as successful, we show a success message
+  if (result === undefined || result?.success) {
+
+    if (result?.success) {
+      FlashMessages.success(`The update was successful`);
+    }
 
     if (props.action.onSuccess) {
       await props.action.onSuccess(result, props.targets, input);
@@ -58,7 +69,7 @@ async function onConfirmAction(input) {
     if (result.errors) {
       errors.push(...result.errors);
     } else if (result.error) {
-      errors.push(result.error.message);
+      errors.push(typeof result.error === 'string' ? result.error : result.error.message);
     } else {
       errors.push('An unknown error occurred. Please try again later.');
     }

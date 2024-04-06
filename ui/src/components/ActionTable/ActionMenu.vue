@@ -3,13 +3,14 @@
       class="px-2 flex action-button"
       :items="activeItems"
       :disabled="targets.length === 0"
+      :tooltip="targets.length === 0 ? tooltip : null"
+      :loading="isSaving"
+      :loading-component="loadingComponent"
       @action-item="onAction"
-  >
-    <q-tooltip v-if="targets.length === 0">{{ tooltip }}</q-tooltip>
-  </PopoverMenu>
+  />
 </template>
 <script setup>
-import { computed } from 'vue';
+import { computed, ref } from 'vue';
 import { performAction } from '../../helpers';
 import { PopoverMenu } from '../Utility';
 
@@ -26,6 +27,10 @@ const props = defineProps({
   tooltip: {
     type: String,
     default: 'First select records to perform a batch action'
+  },
+  loadingComponent: {
+    type: [Function, Object],
+    default: undefined
   }
 });
 
@@ -34,8 +39,11 @@ const activeItems = computed(() => props.items.filter(item => {
   return typeof item.enabled === 'function' ? !!item.enabled(props.targets?.[0] ?? null, props.targets) : !!item.enabled;
 }));
 
-function onAction(item) {
+const isSaving = ref(false);
+async function onAction(item) {
   emit('action', item);
-  performAction(item, props.targets);
+  isSaving.value = true;
+  await performAction(item, props.targets);
+  isSaving.value = false;
 }
 </script>

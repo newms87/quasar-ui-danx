@@ -1,11 +1,10 @@
 import { computed, ref, watch } from "vue";
 import { getItem, setItem } from "../../helpers";
 
-export function useTableColumns(name, columns, options = { titleMinWidth: 120, titleMaxWidth: 200 }) {
+export function useTableColumns(name, columns) {
     const COLUMN_ORDER_KEY = `${name}-column-order`;
     const VISIBLE_COLUMNS_KEY = `${name}-visible-columns`;
     const TITLE_COLUMNS_KEY = `${name}-title-columns`;
-    const TITLE_WIDTH_KEY = `${name}-title-width`;
 
     // The list that defines the order the columns should appear in
     const columnOrder = ref(getItem(COLUMN_ORDER_KEY) || []);
@@ -15,17 +14,6 @@ export function useTableColumns(name, columns, options = { titleMinWidth: 120, t
 
     // Title columns will have their name appear on the first column of the table as part of the records' title
     const titleColumnNames = ref(getItem(TITLE_COLUMNS_KEY, []));
-
-    // The width of the title column
-    const titleWidth = ref(getItem(TITLE_WIDTH_KEY, options.titleMinWidth));
-
-    /**
-     * When the title column is resized, update the titleWidth
-     * @param val
-     */
-    function onResizeTitleColumn(val) {
-        titleWidth.value = Math.max(Math.min(val.distance + val.startDropZoneSize, options.titleMaxWidth), options.titleMinWidth);
-    }
 
     // Columns that should be locked to the left side of the table
     const lockedColumns = computed(() => orderedColumns.value.slice(0, 1));
@@ -57,7 +45,6 @@ export function useTableColumns(name, columns, options = { titleMinWidth: 120, t
     // Save changes to the list of hidden columns in localStorage
     watch(() => hiddenColumnNames.value, () => setItem(VISIBLE_COLUMNS_KEY, hiddenColumnNames.value));
     watch(() => titleColumnNames.value, () => setItem(TITLE_COLUMNS_KEY, titleColumnNames.value));
-    watch(() => titleWidth.value, () => setItem(TITLE_WIDTH_KEY, titleWidth.value));
 
     return {
         sortableColumns,
@@ -65,8 +52,6 @@ export function useTableColumns(name, columns, options = { titleMinWidth: 120, t
         visibleColumns,
         hiddenColumnNames,
         titleColumnNames,
-        titleWidth,
-        orderedTitleColumns,
-        onResizeTitleColumn
+        orderedTitleColumns
     };
 }

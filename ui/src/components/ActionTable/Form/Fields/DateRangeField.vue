@@ -87,16 +87,21 @@ function toQDateValue(val) {
 }
 
 const dateRangeValue = computed(() => {
-  let range = dateRange.value;
+  let range;
 
-  if (typeof range === 'string') {
+  if (typeof dateRange.value === 'string') {
     range = {
-      from: range,
-      to: range
+      from: dateRange.value,
+      to: dateRange.value
+    };
+  } else if (dateRange.value) {
+    range = {
+      from: dateRange.value.from,
+      to: dateRange.value.to
     };
   }
 
-  if (range?.from && range?.to && props.withTime) {
+  if (range?.from && range?.to && props.withTime && !range.from.includes('00:00:00')) {
     range.from += ' 00:00:00';
     range.to += ' 23:59:59';
   }

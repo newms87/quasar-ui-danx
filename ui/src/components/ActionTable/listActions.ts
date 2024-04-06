@@ -228,11 +228,11 @@ export function useListActions(name: string, {
     /**
      * Applies an action to an item.
      */
-    const isApplyingActionToItem = ref(null);
+    const isSavingItem = ref(null);
     let actionResultCount = 0;
 
     async function applyAction(item, input, itemData = {}) {
-        isApplyingActionToItem.value = item;
+        isSavingItem.value = item;
         const resultNumber = ++actionResultCount;
         setItemInPagedList({ ...item, ...input, ...itemData });
         const result = await applyActionRoute(item, input);
@@ -248,7 +248,7 @@ export function useListActions(name: string, {
                 activeItem.value = { ...activeItem.value, ...result.item };
             }
         }
-        isApplyingActionToItem.value = null;
+        isSavingItem.value = null;
         return result;
     }
 
@@ -355,7 +355,7 @@ export function useListActions(name: string, {
         isLoadingSummary,
         pager,
         quasarPagination,
-        isApplyingActionToItem,
+        isSavingItem,
         activeItem,
         activePanel,
 

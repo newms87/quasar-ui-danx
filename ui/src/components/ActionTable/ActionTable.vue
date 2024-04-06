@@ -75,8 +75,9 @@
           </div>
           <div v-if="rowProps.col.actions" class="flex-grow flex justify-end pl-2">
             <ActionMenu
-                :items="rowProps.col.actions"
+                :actions="rowProps.col.actions"
                 :targets="[rowProps.row]"
+                :loading="isSavingItem?.id === rowProps.row.id"
                 @action="(action) => $emit('action', {action: action, row: rowProps.row})"
             />
           </div>
@@ -111,6 +112,10 @@ const props = defineProps({
   quasarPagination: {
     type: Object,
     required: true
+  },
+  isSavingItem: {
+    type: Object,
+    default: null
   },
   isLoadingList: Boolean,
   pagedItems: {

@@ -1,10 +1,10 @@
 <template>
   <PopoverMenu
       class="px-2 flex action-button"
-      :items="activeItems"
+      :items="activeActions"
       :disabled="targets.length === 0"
       :tooltip="targets.length === 0 ? tooltip : null"
-      :loading="isSaving"
+      :loading="loading || isSaving"
       :loading-component="loadingComponent"
       @action-item="onAction"
   />
@@ -16,7 +16,7 @@ import { PopoverMenu } from '../Utility';
 
 const emit = defineEmits(['action']);
 const props = defineProps({
-  items: {
+  actions: {
     type: Array,
     required: true
   },
@@ -28,22 +28,23 @@ const props = defineProps({
     type: String,
     default: 'First select records to perform a batch action'
   },
+  loading: Boolean,
   loadingComponent: {
     type: [Function, Object],
     default: undefined
   }
 });
 
-const activeItems = computed(() => props.items.filter(item => {
-  if (item.enabled === undefined) return true;
-  return typeof item.enabled === 'function' ? !!item.enabled(props.targets?.[0] ?? null, props.targets) : !!item.enabled;
+const activeActions = computed(() => props.actions.filter(action => {
+  if (action.enabled === undefined) return true;
+  return typeof action.enabled === 'function' ? !!action.enabled(props.targets?.[0] ?? null, props.targets) : !!action.enabled;
 }));
 
 const isSaving = ref(false);
-async function onAction(item) {
-  emit('action', item);
+async function onAction(action) {
+  emit('action', action);
   isSaving.value = true;
-  await performAction(item, props.targets);
+  await performAction(action, props.targets);
   isSaving.value = false;
 }
 </script>

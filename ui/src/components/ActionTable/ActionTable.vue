@@ -57,7 +57,9 @@
         >
           <RenderComponent
               v-if="rowProps.col.component"
-              :row-props="rowProps"
+              :params="[rowProps.row]"
+              :component="rowProps.col.component"
+              :text="rowProps.value"
               @action="$emit('action', $event)"
           />
           <div v-else-if="rowProps.col.fieldList">

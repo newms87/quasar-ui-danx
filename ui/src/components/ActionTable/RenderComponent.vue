@@ -1,22 +1,37 @@
 <template>
   <Component
-    :is="component.is"
-    v-bind="component.props"
-    @action="$emit('action', $event)"
-  >{{ component.value || component.props?.text || rowProps.value }}</Component>
+      :is="resolvedComponent.is"
+      v-bind="{...resolvedComponent.props, ...overrideProps}"
+      @action="$emit('action', $event)"
+  >{{ resolvedComponent.value || resolvedComponent.props?.text || text }}</Component>
 </template>
 <script setup>
-import { computed } from "vue";
+import { computed } from 'vue';
 
-defineEmits(["action"]);
+defineEmits(['action']);
 const props = defineProps({
-  rowProps: {
-    type: Object,
+  component: {
+    type: [Function, Object],
     required: true
+  },
+  params: {
+    type: Array,
+    default: () => []
+  },
+  text: {
+    type: String,
+    default: ''
+  },
+  overrideProps: {
+    type: Object,
+    default: () => ({})
   }
 });
 
-const component = computed(() => {
-  return props.rowProps.col.component(props.rowProps.row);
+const resolvedComponent = computed(() => {
+  if (typeof props.component === 'function') {
+    return props.component(...props.params);
+  }
+  return props.component;
 });
 </script>

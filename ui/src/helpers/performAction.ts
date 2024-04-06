@@ -4,14 +4,27 @@ import { waitForRef } from "./index";
 export const activeAction = ref(null);
 export const actionTargets = ref([]);
 
+interface ActionOptions {
+    name: string;
+    label: string;
+    menu?: boolean;
+    batch?: boolean;
+    confirmDialog?: (targets: object[]) => any;
+    enabled?: (target: object) => boolean;
+    onAction?: (action: string | null, target: object, input: any) => void;
+    onBatchAction?: (action: string | null, targets: object[], input: any) => void;
+    onFinish?: (action: string | null, targets: object, input: any) => void;
+}
+
 /**
  * Hook to perform an action on a set of targets
  * This helper allows you to perform actions by name on a set of targets using a provided list of actions
  *
  * @param actions
+ * @param {ActionOptions} globalOptions
  * @returns {{performAction(name, targets): Promise<void>}}
  */
-export function usePerformAction(actions: any[]) {
+export function usePerformAction(actions: ActionOptions[], globalOptions: ActionOptions = null) {
 
     function filterActions(filters) {
         let filteredActions = [...actions];
@@ -39,7 +52,7 @@ export function usePerformAction(actions: any[]) {
             }
             targets = Array.isArray(targets) ? targets : [targets];
 
-            await performAction({ ...action, ...options }, targets);
+            await performAction({ ...globalOptions, ...action, ...options }, targets);
         },
 
         actions,

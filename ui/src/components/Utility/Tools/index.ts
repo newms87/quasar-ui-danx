@@ -1,2 +1,2 @@
-export { default as ActionPerformerTool } from "./ActionPerformerTool.vue";
+export { default as ActionInputComponent } from "./ActionInputComponent.vue";
 export { default as RenderComponent } from "./RenderComponent.vue";

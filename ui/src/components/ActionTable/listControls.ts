@@ -7,20 +7,17 @@ interface ListActionsOptions {
     summaryRoute?: Function;
     filterFieldOptionsRoute?: Function;
     moreRoute?: Function;
-    applyActionRoute?: Function;
     itemDetailsRoute?: Function;
     urlPattern?: RegExp;
     filterDefaults?: Record<string, any>;
     refreshFilters?: boolean;
 }
 
-
-export function useListActions(name: string, {
+export function useListControls(name: string, {
     listRoute,
     summaryRoute = null,
     filterFieldOptionsRoute = null,
     moreRoute = null,
-    applyActionRoute = null,
     itemDetailsRoute = null,
     refreshFilters = false,
     urlPattern = null,
@@ -225,33 +222,6 @@ export function useListActions(name: string, {
         setItem(PAGE_SETTINGS_KEY, settings);
     }
 
-    /**
-     * Applies an action to an item.
-     */
-    const isSavingItem = ref(null);
-    let actionResultCount = 0;
-
-    async function applyAction(item, input, itemData = {}) {
-        isSavingItem.value = item;
-        const resultNumber = ++actionResultCount;
-        setItemInPagedList({ ...item, ...input, ...itemData });
-        const result = await applyActionRoute(item, input);
-        if (result.success) {
-            // Only render the most recent campaign changes
-            if (resultNumber !== actionResultCount) return;
-
-            // Update the updated item in the previously loaded list if it exists
-            setItemInPagedList(result.item);
-
-            // Update the active item if it is the same as the updated item
-            if (activeItem.value?.id === result.item.id) {
-                activeItem.value = { ...activeItem.value, ...result.item };
-            }
-        }
-        isSavingItem.value = null;
-        return result;
-    }
-
     // The active ad for viewing / editing
     const activeItem = ref(null);
     // Controls the active panel (ie: tab) if rendering a panels drawer or similar
@@ -355,7 +325,6 @@ export function useListActions(name: string, {
         isLoadingSummary,
         pager,
         quasarPagination,
-        isSavingItem,
         activeItem,
         activePanel,
 
@@ -366,9 +335,9 @@ export function useListActions(name: string, {
         loadList,
         loadMore,
         refreshAll,
-        applyAction,
         getNextItem,
         openItemForm,
-        applyFilterFromUrl
+        applyFilterFromUrl,
+        setItemInPagedList
     };
 }

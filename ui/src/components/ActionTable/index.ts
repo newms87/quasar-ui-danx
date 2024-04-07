@@ -1,7 +1,7 @@
 export * from "./Filters";
 export * from "./Form";
 export * from "./Layouts";
-export * from "./listActions";
+export * from "./listControls";
 export * from "./listHelpers";
 export * from "./tableColumns";
 export { default as ActionMenu } from "./ActionMenu.vue";

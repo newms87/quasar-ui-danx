@@ -1,4 +1,4 @@
-import { useListActions } from "ui";
+import { useListControls } from "ui";
 import { applyActionCb, filterFieldOptionsCb, itemListCb, summaryCb } from "./demoTableCallbacks";
 
 export const {
@@ -16,7 +16,7 @@ export const {
   // Actions
   refreshAll,
   applyAction
-} = useListActions("items", {
+} = useListControls("items", {
   listRoute: itemListCb,
   summaryRoute: summaryCb,
   filterFieldOptionsRoute: filterFieldOptionsCb,

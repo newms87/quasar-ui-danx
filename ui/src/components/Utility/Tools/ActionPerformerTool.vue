@@ -20,13 +20,13 @@ const props = defineProps({
     type: Object,
     required: true
   },
-  targets: {
-    type: Array,
+  target: {
+    type: [Object, Array],
     required: true
   }
 });
 
-const confirmDialog = shallowRef(props.action.confirmDialog ? props.action.confirmDialog(props.targets) : null);
+const confirmDialog = shallowRef(props.action.confirmDialog ? props.action.confirmDialog(props.target) : null);
 const isSaving = ref(null);
 
 onMounted(async () => {
@@ -44,7 +44,11 @@ async function onConfirmAction(input) {
   isSaving.value = true;
   let result;
   try {
-    result = await props.action.onAction(props.targets, input);
+    if (Array.isArray(props.target)) {
+      result = await props.action.onBatchAction(props.action.name, props.target, input);
+    } else {
+      result = await props.action.onAction(props.action.name, props.target, input);
+    }
   } catch (e) {
     console.error(e);
     result = { error: `An error occurred while performing the action ${props.action.label}. Please try again later.` };

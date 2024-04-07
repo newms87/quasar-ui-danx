@@ -2,16 +2,15 @@
   <PopoverMenu
       class="px-2 flex action-button"
       :items="activeActions"
-      :disabled="targets.length === 0"
-      :tooltip="targets.length === 0 ? tooltip : null"
-      :loading="loading || isSaving"
+      :disabled="!hasTarget"
+      :tooltip="!hasTarget ? tooltip : null"
+      :loading="loading"
       :loading-component="loadingComponent"
-      @action-item="onAction"
+      @action-item="$emit('action', $event)"
   />
 </template>
 <script setup>
-import { computed, ref } from 'vue';
-import { performAction } from '../../helpers';
+import { computed } from 'vue';
 import { PopoverMenu } from '../Utility';
 
 const emit = defineEmits(['action']);
@@ -20,8 +19,8 @@ const props = defineProps({
     type: Array,
     required: true
   },
-  targets: {
-    type: Array,
+  target: {
+    type: [Array, Object],
     required: true
   },
   tooltip: {
@@ -35,16 +34,10 @@ const props = defineProps({
   }
 });
 
+const hasTarget = computed(() => !!props.target?.length);
+
 const activeActions = computed(() => props.actions.filter(action => {
   if (action.enabled === undefined) return true;
-  return typeof action.enabled === 'function' ? !!action.enabled(props.targets?.[0] ?? null, props.targets) : !!action.enabled;
+  return typeof action.enabled === 'function' ? !!action.enabled(props.target) : !!action.enabled;
 }));
-
-const isSaving = ref(false);
-async function onAction(action) {
-  emit('action', action);
-  isSaving.value = true;
-  await performAction(action, props.targets);
-  isSaving.value = false;
-}
 </script>

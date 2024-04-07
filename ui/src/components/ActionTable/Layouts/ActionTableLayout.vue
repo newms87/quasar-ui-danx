@@ -6,15 +6,5 @@
       <slot name="filters" />
       <slot />
     </div>
-    <ActionPerformerTool
-        v-if="activeAction"
-        :targets="actionTargets"
-        :action="activeAction"
-        @done="clearAction"
-    />
   </div>
 </template>
-<script setup>
-import { actionTargets, activeAction, clearAction } from '../../../helpers';
-import { ActionPerformerTool } from '../../Utility';
-</script>

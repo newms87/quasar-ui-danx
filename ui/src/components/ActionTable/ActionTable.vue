@@ -14,6 +14,14 @@
       @update:pagination="() => {}"
       @request="$emit('update:quasar-pagination', {...$event.pagination, __sort: mapSortBy($event.pagination, columns)})"
   >
+    <template #bottom>
+      <ActionPerformerTool
+          v-if="activeAction"
+          :target="activeTarget"
+          :action="activeAction"
+          @done="onActionDone"
+      />
+    </template>
     <template #no-data>
       <slot name="empty">
         <EmptyTableState :text="`There are no ${label.toLowerCase()} matching the applied filter`" />
@@ -76,9 +84,9 @@
           <div v-if="rowProps.col.actions" class="flex-grow flex justify-end pl-2">
             <ActionMenu
                 :actions="rowProps.col.actions"
-                :targets="[rowProps.row]"
+                :target="rowProps.row"
                 :loading="isSavingItem?.id === rowProps.row.id"
-                @action="(action) => $emit('action', {action: action, row: rowProps.row})"
+                @action="(action) => onAction(action, rowProps.row)"
             />
           </div>
         </component>
@@ -92,7 +100,7 @@ import { ref } from 'vue';
 import { getItem, setItem } from '../../helpers';
 import { DragHandleIcon as RowResizeIcon } from '../../svg';
 import { HandleDraggable } from '../DragAndDrop';
-import { mapSortBy, RenderComponent } from '../index';
+import { ActionPerformerTool, mapSortBy, RenderComponent } from '../index';
 import { ActionMenu, EmptyTableState, registerStickyScrolling, TableSummaryRow } from './index';
 
 defineEmits(['action', 'filter', 'update:quasar-pagination', 'update:selected-rows']);
@@ -127,6 +135,14 @@ const props = defineProps({
     type: Object,
     default: null
   },
+  activeAction: {
+    type: Object,
+    default: null
+  },
+  activeTarget: {
+    type: [Object, Array],
+    default: null
+  },
   columns: {
     type: Array,
     required: true
@@ -154,6 +170,16 @@ function getColumnStyle(column) {
     };
   }
   return null;
+}
+
+function onAction(action, target) {
+  emit('update:active-action', action);
+  emit('update:active-target', target);
+}
+
+function onActionDone() {
+  emit('update:active-action', null);
+  emit('update:active-target', null);
 }
 </script>
 

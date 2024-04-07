@@ -1,9 +1,16 @@
 <template>
   <Component
+      v-if="content"
       :is="resolvedComponent.is"
       v-bind="{...resolvedComponent.props, ...overrideProps}"
       @action="$emit('action', $event)"
-  >{{ resolvedComponent.value || resolvedComponent.props?.text || text }}</Component>
+  >{{ content }}</Component>
+  <Component
+      v-else
+      :is="resolvedComponent.is"
+      v-bind="{...resolvedComponent.props, ...overrideProps}"
+      @action="$emit('action', $event)"
+  />
 </template>
 <script setup>
 import { computed } from 'vue';
@@ -20,7 +27,7 @@ const props = defineProps({
   },
   text: {
     type: String,
-    default: ''
+    default: undefined
   },
   overrideProps: {
     type: Object,
@@ -28,6 +35,7 @@ const props = defineProps({
   }
 });
 
+const content = computed(() => resolvedComponent.value?.value || resolvedComponent.value?.props?.text || props.text);
 const resolvedComponent = computed(() => {
   if (typeof props.component === 'function') {
     return props.component(...props.params);

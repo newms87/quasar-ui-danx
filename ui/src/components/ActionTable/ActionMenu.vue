@@ -21,7 +21,7 @@ const props = defineProps({
   },
   target: {
     type: [Array, Object],
-    required: true
+    default: () => []
   },
   tooltip: {
     type: String,
@@ -34,10 +34,13 @@ const props = defineProps({
   }
 });
 
-const hasTarget = computed(() => !!props.target?.length);
+const hasTarget = computed(() => Array.isArray(props.target) ? props.target.length > 0 : !!props.target);
 
 const activeActions = computed(() => props.actions.filter(action => {
-  if (action.enabled === undefined) return true;
-  return typeof action.enabled === 'function' ? !!action.enabled(props.target) : !!action.enabled;
+  if (Array.isArray(props.target)) {
+    return action.batchEnabled ? action.batchEnabled(props.target) : true;
+  }
+
+  return action.enabled ? action.enabled(props.target) : true;
 }));
 </script>

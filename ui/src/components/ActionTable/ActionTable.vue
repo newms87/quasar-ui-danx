@@ -61,7 +61,7 @@
               :params="[rowProps.row]"
               :component="rowProps.col.component"
               :text="rowProps.value"
-              @action="$emit('action', $event)"
+              @action="action => $emit('action', {action,target: rowProps.row})"
           />
           <div v-else-if="rowProps.col.fieldList">
             <div v-for="field in rowProps.col.fieldList" :key="field">
@@ -77,8 +77,8 @@
             <ActionMenu
                 :actions="rowProps.col.actions"
                 :target="rowProps.row"
-                :loading="isSavingItem?.id === rowProps.row.id"
-                @action="(action) => $emit('action', {action, target: rowProps.row})"
+                :loading="isSavingRow(rowProps.row)"
+                @action="(action) => $emit('action', action, rowProps.row)"
             />
           </div>
         </component>
@@ -116,7 +116,7 @@ const props = defineProps({
     type: Object,
     required: true
   },
-  isSavingItem: {
+  isSavingTarget: {
     type: Object,
     default: null
   },
@@ -157,6 +157,15 @@ function getColumnStyle(column) {
     };
   }
   return null;
+}
+
+function isSavingRow(row) {
+  if (!props.isSavingTarget) return false;
+
+  if (Array.isArray(props.isSavingTarget)) {
+    return !!props.isSavingTarget.find(t => t.id === row.id);
+  }
+  return props.isSavingTarget.id === row.id;
 }
 </script>
 

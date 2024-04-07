@@ -2,12 +2,15 @@ import { shallowRef } from "vue";
 import { FlashMessages } from "./index";
 
 interface ActionOptions {
-    name: string;
-    label: string;
+    name?: string;
+    label?: string;
     menu?: boolean;
     batch?: boolean;
+    category?: string;
+    class?: string;
     inputComponent?: (target: object[] | object) => any;
     enabled?: (target: object) => boolean;
+    batchEnabled?: (targets: object[]) => boolean;
     onAction?: (action: string | null, target: object, input: any) => Promise<any>;
     onBatchAction?: (action: string | null, targets: object[], input: any) => Promise<any>;
     onSuccess?: (action: string | null, targets: object, input: any) => any;
@@ -69,8 +72,6 @@ export function useActions(actions: ActionOptions[], globalOptions: ActionOption
          * TODO: HOW TO INTEGRATE optimistic updates and single item updates?
          */
         async applyAction(item, input, itemData = {}) {
-            isSavingItem.value = item;
-
             setItemInPagedList({ ...item, ...input, ...itemData });
             const result = await applyActionRoute(item, input);
             if (result.success) {
@@ -85,7 +86,6 @@ export function useActions(actions: ActionOptions[], globalOptions: ActionOption
                     activeItem.value = { ...activeItem.value, ...result.item };
                 }
             }
-            isSavingItem.value = null;
             return result;
         },
 
@@ -112,10 +112,19 @@ export function useActions(actions: ActionOptions[], globalOptions: ActionOption
                 result = await new Promise((resolve, reject) => {
                     activeActionInput.value = {
                         component,
-                        confirm: async () => resolve(await onConfirmAction(action, target, input)),
-                        cancel: reject
+                        confirm: async input => {
+                            const result = await onConfirmAction(action, target, input);
+
+                            // Only resolve when we have a non-error response, so we can show the error message w/o
+                            // hiding the dialog / inputComponent
+                            if (result === undefined || result === true || result?.success) {
+                                resolve(result);
+                            }
+                        },
+                        cancel: resolve
                     };
                 });
+
                 activeActionInput.value = null;
             } else {
                 result = await onConfirmAction(action, target, input);
@@ -145,16 +154,14 @@ async function onConfirmAction(action: ActionOptions, target: object[] | object,
     }
 
     // If there is no return value or the result marks it as successful, we show a success message
-    if (result === undefined || result?.success) {
-
-        if (result?.success) {
-            FlashMessages.success(`The update was successful`);
+    if (result === undefined || result === true || result?.success) {
+        if (result?.success && Array.isArray(target)) {
+            FlashMessages.success(`Successfully performed action ${action.label} on ${target.length} items`);
         }
 
         if (action.onSuccess) {
             action.onSuccess(result, target, input);
         }
-
     } else {
         const errors = [];
         if (result.errors) {
@@ -176,5 +183,6 @@ async function onConfirmAction(action: ActionOptions, target: object[] | object,
         action.onFinish(result, target, input);
     }
 
+    console.log("onConrirm result", result);
     return result;
 }

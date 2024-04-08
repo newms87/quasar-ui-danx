@@ -1,4 +1,4 @@
-import { shallowRef } from "vue";
+import { shallowRef, VNode } from "vue";
 import { FlashMessages } from "./index";
 
 interface ActionOptions {
@@ -8,7 +8,7 @@ interface ActionOptions {
     batch?: boolean;
     category?: string;
     class?: string;
-    inputComponent?: (target: object[] | object) => any;
+    vnode?: (target: object[] | object) => VNode;
     enabled?: (target: object) => boolean;
     batchEnabled?: (targets: object[]) => boolean;
     onAction?: (action: string | null, target: object, input: any) => Promise<any>;
@@ -18,7 +18,7 @@ interface ActionOptions {
     onFinish?: (action: string | null, targets: object, input: any) => any;
 }
 
-export const activeActionInput = shallowRef(null);
+export const activeActionVnode = shallowRef(null);
 
 /**
  * Hook to perform an action on a set of targets
@@ -98,25 +98,25 @@ export function useActions(actions: ActionOptions[], globalOptions: ActionOption
          */
         async performAction(name: string | object, target: object[] | object, input: any = null) {
             const action = resolveAction(name);
-            const component = action.inputComponent && action.inputComponent(target);
+            const vnode = action.vnode && action.vnode(target);
             let result = null;
 
             isSavingTarget.value = target;
 
-            // If no component input is required, we can directly perform the action
-            if (component) {
-                // If the action requires an input, we set the activeActionInput to the input component.
-                // This will tell the ActionInputComponent to render the input component, and confirm or cancel the
+            // If additional input is required, first render the vnode and wait for the confirm or cancel action
+            if (vnode) {
+                // If the action requires an input, we set the activeActionVnode to the input component.
+                // This will tell the ActionVnode to render the input component, and confirm or cancel the
                 // action The confirm function has the input from the component passed and will resolve the promise
                 // with the result of the action
                 result = await new Promise((resolve, reject) => {
-                    activeActionInput.value = {
-                        component,
+                    activeActionVnode.value = {
+                        vnode,
                         confirm: async input => {
                             const result = await onConfirmAction(action, target, input);
 
                             // Only resolve when we have a non-error response, so we can show the error message w/o
-                            // hiding the dialog / inputComponent
+                            // hiding the dialog / vnode
                             if (result === undefined || result === true || result?.success) {
                                 resolve(result);
                             }
@@ -125,7 +125,7 @@ export function useActions(actions: ActionOptions[], globalOptions: ActionOption
                     };
                 });
 
-                activeActionInput.value = null;
+                activeActionVnode.value = null;
             } else {
                 result = await onConfirmAction(action, target, input);
             }

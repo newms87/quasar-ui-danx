@@ -9,7 +9,7 @@
           class="flex-grow"
           @click="column.onClick(row)"
       >
-        <RenderVNode
+        <RenderVnode
             v-if="column.vnode"
             :vnode="column.vnode(row)"
         />
@@ -18,7 +18,7 @@
         </slot>
       </a>
       <div v-else class="flex-grow">
-        <RenderVNode
+        <RenderVnode
             v-if="column.vnode"
             :vnode="column.vnode(row)"
         />
@@ -39,7 +39,7 @@
 </template>
 <script setup>
 import { computed } from 'vue';
-import { RenderVNode } from '../Utility';
+import { RenderVnode } from '../Utility';
 import { ActionMenu } from './index';
 
 defineEmits(['action']);

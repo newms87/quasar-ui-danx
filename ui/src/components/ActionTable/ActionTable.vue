@@ -58,7 +58,7 @@
       </ActionTableColumn>
     </template>
     <template #bottom>
-      <ActionInputComponent />
+      <ActionVnode />
     </template>
   </q-table>
 </template>
@@ -68,7 +68,7 @@ import { ref } from 'vue';
 import { getItem, setItem } from '../../helpers';
 import { DragHandleIcon as RowResizeIcon } from '../../svg';
 import { HandleDraggable } from '../DragAndDrop';
-import { ActionInputComponent, mapSortBy } from '../index';
+import { ActionVnode, mapSortBy } from '../index';
 import { ActionTableColumn, EmptyTableState, registerStickyScrolling, TableSummaryRow } from './index';
 
 defineEmits(['action', 'update:quasar-pagination', 'update:selected-rows']);

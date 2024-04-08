@@ -1,12 +1,12 @@
 <template>
-  <q-td :key="rowProps.key" :props="rowProps">
+  <q-td :key="rowProps.key" :props="rowProps" :style="columnStyle">
     <div
         class="flex items-center flex-nowrap"
         :class="columnClass"
-        :style="columnStyle"
     >
       <a
           v-if="column.onClick"
+          class="flex-grow"
           @click="column.onClick(row)"
       >
         <RenderVNode
@@ -17,7 +17,7 @@
           {{ value }}
         </slot>
       </a>
-      <template v-else>
+      <div v-else class="flex-grow">
         <RenderVNode
             v-if="column.vnode"
             :vnode="column.vnode(row)"
@@ -25,8 +25,8 @@
         <slot v-else v-bind="{name: column.name, row, value}">
           {{ value }}
         </slot>
-      </template>
-      <div v-if="column.actions" class="flex-grow flex justify-end pl-2">
+      </div>
+      <div v-if="column.actions" class="flex flex-shrink-0 pl-2">
         <ActionMenu
             :actions="column.actions"
             :target="row"
@@ -60,7 +60,7 @@ const column = computed(() => props.rowProps.col);
 const value = computed(() => props.rowProps.value);
 
 const columnStyle = computed(() => {
-  const width = props.settings || column.value.width;
+  const width = props.settings?.width || column.value.width;
   return width ? { width: `${width}px` } : null;
 });
 

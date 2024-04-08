@@ -118,8 +118,11 @@ registerStickyScrolling(actionTable);
 const COLUMN_SETTINGS_KEY = `column-settings-${props.name}`;
 const columnSettings = ref(getItem(COLUMN_SETTINGS_KEY) || {});
 function onResizeColumn(column, val) {
-  columnSettings.value[column.name] = {
-    width: Math.max(Math.min(val.distance + val.startDropZoneSize, column.maxWidth || 500), column.minWidth || 80)
+  columnSettings.value = {
+    ...columnSettings.value,
+    [column.name]: {
+      width: Math.max(Math.min(val.distance + val.startDropZoneSize, column.maxWidth || 500), column.minWidth || 80)
+    }
   };
   setItem(COLUMN_SETTINGS_KEY, columnSettings.value);
 }

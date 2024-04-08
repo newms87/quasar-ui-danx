@@ -26,10 +26,11 @@
           {{ value }}
         </slot>
       </div>
-      <div v-if="column.actions" class="flex flex-shrink-0 pl-2">
+      <div v-if="actionMenu" class="flex flex-shrink-0 pl-2">
         <ActionMenu
-            :actions="column.actions"
+            :actions="actionMenu"
             :target="row"
+            :loading="isSaving"
         />
       </div>
     </div>
@@ -54,6 +55,8 @@ const props = defineProps({
 const row = computed(() => props.rowProps.row);
 const column = computed(() => props.rowProps.col);
 const value = computed(() => props.rowProps.value);
+const actionMenu = computed(() => column.value.actionMenu);
+const isSaving = computed(() => column.value.isSaving && column.value.isSaving(row));
 
 const columnStyle = computed(() => {
   const width = props.settings?.width || column.value.width;
@@ -61,6 +64,7 @@ const columnStyle = computed(() => {
 });
 
 const columnClass = computed(() => ({
+  'is-saving': isSaving.value,
   'justify-end': column.value.align === 'right',
   'justify-center': column.value.align === 'center',
   'justify-start': column.value.align === 'left'

@@ -52,11 +52,12 @@ export const activeActionVnode = shallowRef(null);
  */
 export function useActions(actions: ActionOptions[], globalOptions: ActionOptions = null) {
     const mappedActions = actions.map(action => {
-        if (!action.trigger) {
-            action.trigger = (target, input) => performAction(action, target, input);
-            action.activeTarget = ref(null);
+        const mappedAction = { ...globalOptions, ...action };
+        if (!mappedAction.trigger) {
+            mappedAction.trigger = (target, input) => performAction(mappedAction, target, input);
+            mappedAction.activeTarget = ref(null);
         }
-        return { ...globalOptions, ...action };
+        return mappedAction;
     });
 
     /**
@@ -66,7 +67,7 @@ export function useActions(actions: ActionOptions[], globalOptions: ActionOption
         if (!target) return false;
 
         for (const action of mappedActions) {
-            const activeTargets = Array.isArray(action.activeTarget.value) ? action.activeTarget.value : [action.activeTarget.value];
+            const activeTargets = (Array.isArray(action.activeTarget.value) ? action.activeTarget.value : [action.activeTarget.value]).filter(t => t);
             if (activeTargets.length === 0) continue;
 
             for (const activeTarget of activeTargets) {

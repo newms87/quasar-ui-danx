@@ -1,5 +1,26 @@
-import { shallowRef, VNode } from "vue";
+import { ref, shallowRef, VNode } from "vue";
 import { FlashMessages } from "./index";
+
+/**
+ * TODO: HOW TO INTEGRATE optimistic updates and single item updates?
+ */
+async function applyAction(item, input, itemData = {}) {
+    setItemInPagedList({ ...item, ...input, ...itemData });
+    const result = await applyActionRoute(item, input);
+    if (result.success) {
+        // Only render the most recent campaign changes
+        if (resultNumber !== actionResultCount) return;
+
+        // Update the updated item in the previously loaded list if it exists
+        setItemInPagedList(result.item);
+
+        // Update the active item if it is the same as the updated item
+        if (activeItem.value?.id === result.item.id) {
+            activeItem.value = { ...activeItem.value, ...result.item };
+        }
+    }
+    return result;
+}
 
 interface ActionOptions {
     name?: string;
@@ -8,6 +29,8 @@ interface ActionOptions {
     batch?: boolean;
     category?: string;
     class?: string;
+    trigger?: (target: object[] | object, input: any) => Promise<any>;
+    activeTarget?: any;
     vnode?: (target: object[] | object) => VNode;
     enabled?: (target: object) => boolean;
     batchEnabled?: (targets: object[]) => boolean;
@@ -28,111 +51,105 @@ export const activeActionVnode = shallowRef(null);
  * @param {ActionOptions} globalOptions
  */
 export function useActions(actions: ActionOptions[], globalOptions: ActionOptions = null) {
-    const isSavingTarget = shallowRef(null);
+    const mappedActions = actions.map(action => {
+        if (!action.trigger) {
+            action.trigger = (target, input) => performAction(action, target, input);
+            action.activeTarget = ref(null);
+        }
+        return { ...globalOptions, ...action };
+    });
 
     /**
-     * Resolves an action by name or object, adds globalOptions and overrides any passes options
-     *
-     * @param name
-     * @param {any} options
-     * @returns {any}
+     * Check if the provided target is currently being saved by any of the actions
      */
-    function resolveAction(name, options = null) {
-        const action = typeof name === "string" ? actions.find(a => a.name === name) : name;
+    function isSavingTarget(target: any): boolean {
+        if (!target) return false;
+
+        for (const action of mappedActions) {
+            const activeTargets = Array.isArray(action.activeTarget.value) ? action.activeTarget.value : [action.activeTarget.value];
+            if (activeTargets.length === 0) continue;
+
+            for (const activeTarget of activeTargets) {
+                if (activeTarget === target || (activeTarget.id && activeTarget.id === target.id)) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Perform an action on a set of targets
+     *
+     * @param {string} name - can either be a string or an action object
+     * @param {object[]|object} target - an array of targets or a single target object
+     * @param {any} input - The input data to pass to the action handler
+     */
+    async function performAction(name: string | object, target: object[] | object, input: any = null) {
+        const action: ActionOptions = typeof name === "string" ? mappedActions.find(a => a.name === name) : name;
         if (!action) {
             throw new Error(`Unknown action: ${name}`);
         }
 
-        return { ...globalOptions, ...action, ...options };
+        const vnode = action.vnode && action.vnode(target);
+        let result: any;
+
+        action.activeTarget.value = target;
+
+        // If additional input is required, first render the vnode and wait for the confirm or cancel action
+        if (vnode) {
+            // If the action requires an input, we set the activeActionVnode to the input component.
+            // This will tell the ActionVnode to render the input component, and confirm or cancel the
+            // action The confirm function has the input from the component passed and will resolve the promise
+            // with the result of the action
+            result = await new Promise((resolve, reject) => {
+                activeActionVnode.value = {
+                    vnode,
+                    confirm: async (input: any) => {
+                        const result = await onConfirmAction(action, target, input);
+
+                        // Only resolve when we have a non-error response, so we can show the error message w/o
+                        // hiding the dialog / vnode
+                        if (result === undefined || result === true || result?.success) {
+                            resolve(result);
+                        }
+                    },
+                    cancel: resolve
+                };
+            });
+
+            activeActionVnode.value = null;
+        } else {
+            result = await onConfirmAction(action, target, input);
+        }
+
+        action.activeTarget.value = null;
+        return result;
+    }
+
+    /**
+     * Filter the list of actions based on the provided filters in key-value pairs
+     * You can filter on any ActionOptions property by matching the value exactly or by providing an array of values
+     *
+     * @param filters
+     * @returns {ActionOptions[]}
+     */
+    function filterActions(filters: object): ActionOptions[] {
+        let filteredActions = [...mappedActions];
+
+        for (const filter of Object.keys(filters)) {
+            const filterValue = filters[filter];
+            filteredActions = filteredActions.filter(a => a[filter] === filterValue || (Array.isArray(filterValue) && filterValue.includes(a[filter])));
+        }
+        return filteredActions;
     }
 
     return {
-        actions,
+        actions: mappedActions,
         isSavingTarget,
-        resolveAction,
-
-        /**
-         * Filter the list of actions based on the provided filters in key-value pairs
-         * You can filter on any ActionOptions property by matching the value exactly or by providing an array of values
-         *
-         * @param filters
-         * @returns {ActionOptions[]}
-         */
-        filterActions(filters: object) {
-            let filteredActions = [...actions];
-
-            for (const filter of Object.keys(filters)) {
-                const filterValue = filters[filter];
-                filteredActions = filteredActions.filter(a => a[filter] === filterValue || (Array.isArray(filterValue) && filterValue.includes(a[filter])));
-            }
-            return filteredActions;
-        },
-
-        /**
-         * TODO: HOW TO INTEGRATE optimistic updates and single item updates?
-         */
-        async applyAction(item, input, itemData = {}) {
-            setItemInPagedList({ ...item, ...input, ...itemData });
-            const result = await applyActionRoute(item, input);
-            if (result.success) {
-                // Only render the most recent campaign changes
-                if (resultNumber !== actionResultCount) return;
-
-                // Update the updated item in the previously loaded list if it exists
-                setItemInPagedList(result.item);
-
-                // Update the active item if it is the same as the updated item
-                if (activeItem.value?.id === result.item.id) {
-                    activeItem.value = { ...activeItem.value, ...result.item };
-                }
-            }
-            return result;
-        },
-
-        /**
-         * Perform an action on a set of targets
-         *
-         * @param {string} name - can either be a string or an action object
-         * @param {object[]|object} target - an array of targets or a single target object
-         * @param {any} input
-         */
-        async performAction(name: string | object, target: object[] | object, input: any = null) {
-            const action = resolveAction(name);
-            const vnode = action.vnode && action.vnode(target);
-            let result = null;
-
-            isSavingTarget.value = target;
-
-            // If additional input is required, first render the vnode and wait for the confirm or cancel action
-            if (vnode) {
-                // If the action requires an input, we set the activeActionVnode to the input component.
-                // This will tell the ActionVnode to render the input component, and confirm or cancel the
-                // action The confirm function has the input from the component passed and will resolve the promise
-                // with the result of the action
-                result = await new Promise((resolve, reject) => {
-                    activeActionVnode.value = {
-                        vnode,
-                        confirm: async input => {
-                            const result = await onConfirmAction(action, target, input);
-
-                            // Only resolve when we have a non-error response, so we can show the error message w/o
-                            // hiding the dialog / vnode
-                            if (result === undefined || result === true || result?.success) {
-                                resolve(result);
-                            }
-                        },
-                        cancel: resolve
-                    };
-                });
-
-                activeActionVnode.value = null;
-            } else {
-                result = await onConfirmAction(action, target, input);
-            }
-
-            isSavingTarget.value = null;
-            return result;
-        }
+        filterActions,
+        performAction
     };
 }
 

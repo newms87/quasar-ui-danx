@@ -30,8 +30,6 @@
         <ActionMenu
             :actions="column.actions"
             :target="row"
-            :loading="isSaving"
-            @action="$emit('action', $event)"
         />
       </div>
     </div>
@@ -42,7 +40,6 @@ import { computed } from 'vue';
 import { RenderVnode } from '../Utility';
 import { ActionMenu } from './index';
 
-defineEmits(['action']);
 const props = defineProps({
   rowProps: {
     type: Object,
@@ -51,8 +48,7 @@ const props = defineProps({
   settings: {
     type: Object,
     default: null
-  },
-  isSaving: Boolean
+  }
 });
 
 const row = computed(() => props.rowProps.row);

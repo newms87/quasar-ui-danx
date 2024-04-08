@@ -4,16 +4,15 @@
       :items="activeActions"
       :disabled="!hasTarget"
       :tooltip="!hasTarget ? tooltip : null"
-      :loading="loading"
+      :loading="isSaving || loading"
       :loading-component="loadingComponent"
-      @action-item="$emit('action', $event)"
+      @action-item="onAction"
   />
 </template>
 <script setup>
-import { computed } from 'vue';
+import { computed, ref } from 'vue';
 import { PopoverMenu } from '../Utility';
 
-const emit = defineEmits(['action']);
 const props = defineProps({
   actions: {
     type: Array,
@@ -43,4 +42,14 @@ const activeActions = computed(() => props.actions.filter(action => {
 
   return action.enabled ? action.enabled(props.target) : true;
 }));
+
+const isSaving = ref(false);
+async function onAction(action) {
+  if (!action.trigger) {
+    throw new Error('Action must have a trigger function! Make sure you are using useActions() or implement your own trigger function.');
+  }
+  isSaving.value = true;
+  await action.trigger(props.target);
+  isSaving.value = false;
+}
 </script>

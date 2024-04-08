@@ -51,8 +51,6 @@
       <ActionTableColumn
           :row-props="rowProps"
           :settings="columnSettings[rowProps.col.name]"
-          :is-saving="isSavingRow(rowProps.row)"
-          @action="$emit('action', $event, rowProps.row)"
       >
         <slot />
       </ActionTableColumn>
@@ -68,10 +66,10 @@ import { ref } from 'vue';
 import { getItem, setItem } from '../../helpers';
 import { DragHandleIcon as RowResizeIcon } from '../../svg';
 import { HandleDraggable } from '../DragAndDrop';
-import { ActionVnode, mapSortBy } from '../index';
+import { ActionVnode } from '../index';
 import { ActionTableColumn, EmptyTableState, registerStickyScrolling, TableSummaryRow } from './index';
 
-defineEmits(['action', 'update:quasar-pagination', 'update:selected-rows']);
+defineEmits(['update:quasar-pagination', 'update:selected-rows']);
 const props = defineProps({
   name: {
     type: String,
@@ -88,10 +86,6 @@ const props = defineProps({
   quasarPagination: {
     type: Object,
     required: true
-  },
-  isSavingTarget: {
-    type: Object,
-    default: null
   },
   isLoadingList: Boolean,
   pagedItems: {
@@ -125,15 +119,6 @@ function onResizeColumn(column, val) {
     }
   };
   setItem(COLUMN_SETTINGS_KEY, columnSettings.value);
-}
-
-function isSavingRow(row) {
-  if (!props.isSavingTarget) return false;
-
-  if (Array.isArray(props.isSavingTarget)) {
-    return !!props.isSavingTarget.find(t => t.id === row.id);
-  }
-  return props.isSavingTarget.id === row.id;
 }
 </script>
 

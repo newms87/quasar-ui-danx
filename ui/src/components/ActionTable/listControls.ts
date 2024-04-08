@@ -259,11 +259,11 @@ export function useListControls(name: string, {
      * Opens the item's form with the given item and tab
      *
      * @param item
-     * @param tab
+     * @param panel
      */
-    function openItemForm(item, tab) {
+    function activatePanel(item, panel) {
         activeItem.value = item;
-        activePanel.value = tab;
+        activePanel.value = panel;
     }
 
     /**
@@ -336,7 +336,7 @@ export function useListControls(name: string, {
         loadMore,
         refreshAll,
         getNextItem,
-        openItemForm,
+        activatePanel,
         applyFilterFromUrl,
         setItemInPagedList
     };

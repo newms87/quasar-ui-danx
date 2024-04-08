@@ -56,11 +56,14 @@
             :style="getColumnStyle(rowProps.col)"
             @click="() => rowProps.col.onClick && rowProps.col.onClick(rowProps.row)"
         >
+          <RenderVNode
+              v-if="rowProps.col.vnode"
+              :vnode="rowProps.col.vnode(rowProps.row)"
+          />
           <RenderComponent
-              v-if="rowProps.col.component"
+              v-else-if="rowProps.col.component"
               :params="[rowProps.row]"
               :component="rowProps.col.component"
-              @action="action => $emit('action', {action,target: rowProps.row})"
           />
           <div v-else-if="rowProps.col.fieldList">
             <div v-for="field in rowProps.col.fieldList" :key="field">
@@ -94,10 +97,10 @@ import { ref } from 'vue';
 import { getItem, setItem } from '../../helpers';
 import { DragHandleIcon as RowResizeIcon } from '../../svg';
 import { HandleDraggable } from '../DragAndDrop';
-import { ActionInputComponent, mapSortBy, RenderComponent } from '../index';
+import { ActionInputComponent, mapSortBy, RenderComponent, RenderVNode } from '../index';
 import { ActionMenu, EmptyTableState, registerStickyScrolling, TableSummaryRow } from './index';
 
-defineEmits(['action', 'filter', 'update:quasar-pagination', 'update:selected-rows']);
+defineEmits(['action', 'update:quasar-pagination', 'update:selected-rows']);
 const props = defineProps({
   name: {
     type: String,

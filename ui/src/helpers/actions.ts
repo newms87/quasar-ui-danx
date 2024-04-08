@@ -183,6 +183,5 @@ async function onConfirmAction(action: ActionOptions, target: object[] | object,
         action.onFinish(result, target, input);
     }
 
-    console.log("onConrirm result", result);
     return result;
 }

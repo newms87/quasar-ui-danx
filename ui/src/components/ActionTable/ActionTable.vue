@@ -60,7 +60,6 @@
               v-if="rowProps.col.component"
               :params="[rowProps.row]"
               :component="rowProps.col.component"
-              :text="rowProps.value"
               @action="action => $emit('action', {action,target: rowProps.row})"
           />
           <div v-else-if="rowProps.col.fieldList">

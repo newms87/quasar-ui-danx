@@ -25,17 +25,13 @@ const props = defineProps({
     type: Array,
     default: () => []
   },
-  text: {
-    type: String,
-    default: undefined
-  },
   overrideProps: {
     type: Object,
     default: () => ({})
   }
 });
 
-const content = computed(() => resolvedComponent.value?.value || resolvedComponent.value?.props?.text || props.text);
+const content = computed(() => resolvedComponent.value?.value || resolvedComponent.value?.props?.text);
 const resolvedComponent = computed(() => {
   if (typeof props.component === 'function') {
     return props.component(...props.params);

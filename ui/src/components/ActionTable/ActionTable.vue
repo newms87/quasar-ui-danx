@@ -48,43 +48,14 @@
       </q-th>
     </template>
     <template #body-cell="rowProps">
-      <q-td :key="rowProps.key" :props="rowProps">
-        <component
-            :is="rowProps.col.onClick ? 'a' : 'div'"
-            class="flex items-center flex-nowrap"
-            :class="{'justify-end': rowProps.col.align === 'right', 'justify-center': rowProps.col.align === 'center', 'justify-start': rowProps.col.align === 'left'}"
-            :style="getColumnStyle(rowProps.col)"
-            @click="() => rowProps.col.onClick && rowProps.col.onClick(rowProps.row)"
-        >
-          <RenderVNode
-              v-if="rowProps.col.vnode"
-              :vnode="rowProps.col.vnode(rowProps.row)"
-          />
-          <RenderComponent
-              v-else-if="rowProps.col.component"
-              :params="[rowProps.row]"
-              :component="rowProps.col.component"
-          />
-          <div v-else-if="rowProps.col.fieldList">
-            <div v-for="field in rowProps.col.fieldList" :key="field">
-              {{ rowProps.row[field] }}
-            </div>
-          </div>
-          <div v-else>
-            <slot v-bind="{name: rowProps.col.name, row: rowProps.row, value: rowProps.value}">
-              {{ rowProps.value }}
-            </slot>
-          </div>
-          <div v-if="rowProps.col.actions" class="flex-grow flex justify-end pl-2">
-            <ActionMenu
-                :actions="rowProps.col.actions"
-                :target="rowProps.row"
-                :loading="isSavingRow(rowProps.row)"
-                @action="(action) => $emit('action', action, rowProps.row)"
-            />
-          </div>
-        </component>
-      </q-td>
+      <ActionTableColumn
+          :row-props="rowProps"
+          :settings="columnSettings[rowProps.col.name]"
+          :is-saving="isSavingRow(rowProps.row)"
+          @action="$emit('action', $event, rowProps.row)"
+      >
+        <slot />
+      </ActionTableColumn>
     </template>
     <template #bottom>
       <ActionInputComponent />
@@ -97,8 +68,8 @@ import { ref } from 'vue';
 import { getItem, setItem } from '../../helpers';
 import { DragHandleIcon as RowResizeIcon } from '../../svg';
 import { HandleDraggable } from '../DragAndDrop';
-import { ActionInputComponent, mapSortBy, RenderComponent, RenderVNode } from '../index';
-import { ActionMenu, EmptyTableState, registerStickyScrolling, TableSummaryRow } from './index';
+import { ActionInputComponent, mapSortBy } from '../index';
+import { ActionTableColumn, EmptyTableState, registerStickyScrolling, TableSummaryRow } from './index';
 
 defineEmits(['action', 'update:quasar-pagination', 'update:selected-rows']);
 const props = defineProps({
@@ -147,18 +118,10 @@ registerStickyScrolling(actionTable);
 const COLUMN_SETTINGS_KEY = `column-settings-${props.name}`;
 const columnSettings = ref(getItem(COLUMN_SETTINGS_KEY) || {});
 function onResizeColumn(column, val) {
-  columnSettings.value[column.name] = Math.max(Math.min(val.distance + val.startDropZoneSize, column.maxWidth || 500), column.minWidth || 80);
+  columnSettings.value[column.name] = {
+    width: Math.max(Math.min(val.distance + val.startDropZoneSize, column.maxWidth || 500), column.minWidth || 80)
+  };
   setItem(COLUMN_SETTINGS_KEY, columnSettings.value);
-}
-function getColumnStyle(column) {
-  const width = columnSettings.value[column.name] || column.width;
-
-  if (width) {
-    return {
-      width: `${width}px`
-    };
-  }
-  return null;
 }
 
 function isSavingRow(row) {

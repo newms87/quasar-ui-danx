@@ -9,22 +9,12 @@
           class="flex-grow"
           @click="column.onClick(row)"
       >
-        <RenderVnode
-            v-if="column.vnode"
-            :vnode="column.vnode(row)"
-        />
-        <slot v-else v-bind="{name: column.name, row, value}">
-          {{ value }}
-        </slot>
+        <RenderVnode v-if="column.vnode" :vnode="column.vnode(row)" />
+        <slot v-else>{{ value }}</slot>
       </a>
       <div v-else class="flex-grow">
-        <RenderVnode
-            v-if="column.vnode"
-            :vnode="column.vnode(row)"
-        />
-        <slot v-else v-bind="{name: column.name, row, value}">
-          {{ value }}
-        </slot>
+        <RenderVnode v-if="column.vnode" :vnode="column.vnode(row)" />
+        <slot v-else>{{ value }}</slot>
       </div>
       <div v-if="actionMenu" class="flex flex-shrink-0 pl-2">
         <ActionMenu

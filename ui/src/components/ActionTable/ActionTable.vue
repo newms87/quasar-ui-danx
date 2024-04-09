@@ -52,7 +52,7 @@
           :row-props="rowProps"
           :settings="columnSettings[rowProps.col.name]"
       >
-        <slot />
+        <slot :column-name="rowProps.col.name" :row="rowProps.row" :value="rowProps.value" />
       </ActionTableColumn>
     </template>
     <template #bottom>

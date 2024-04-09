@@ -41,13 +41,13 @@
                 :key="'selected-' + chipOption.label"
                 class="!mr-1"
             >{{ chipOption.label }}
-              </q-chip>
-              <q-chip
-                  v-if="selectedOptions.length > chipOptions.length"
-                  class="!mr-1"
-              >
-                +{{ selectedOptions.length - chipOptions.length }}
-                </q-chip>
+            </q-chip>
+            <q-chip
+                v-if="selectedOptions.length > chipOptions.length"
+                class="!mr-1"
+            >
+              +{{ selectedOptions.length - chipOptions.length }}
+            </q-chip>
           </template>
           <template v-else>
             {{ placeholder }}
@@ -59,7 +59,7 @@
         >{{ selectedLabel }}
         </div>
       </template>
-      </q-select>
+    </q-select>
   </div>
 </template>
 <script setup>
@@ -257,7 +257,11 @@ function onUpdate(value) {
   if (Array.isArray(value)) {
     value = value.map((v) => v === '__null__' ? null : v);
   }
-  emit('update:model-value', value === '__null__' ? null : value);
+
+  value = value === '__null__' ? null : value;
+
+  emit('change', value);
+  emit('update:model-value', value);
 }
 
 /** XXX: This tells us when we should apply the filter. QSelect likes to trigger a new filter everytime you open the dropdown
@@ -292,6 +296,7 @@ async function onFilter(val, update) {
  */
 function onClear() {
   emit('update:model-value', undefined);
+  emit('change', undefined);
 }
 
 /**

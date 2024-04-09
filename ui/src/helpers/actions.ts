@@ -1,27 +1,6 @@
 import { ref, shallowRef, VNode } from "vue";
 import { FlashMessages } from "./index";
 
-/**
- * TODO: HOW TO INTEGRATE optimistic updates and single item updates?
- */
-async function applyAction(item, input, itemData = {}) {
-    setItemInPagedList({ ...item, ...input, ...itemData });
-    const result = await applyActionRoute(item, input);
-    if (result.success) {
-        // Only render the most recent campaign changes
-        if (resultNumber !== actionResultCount) return;
-
-        // Update the updated item in the previously loaded list if it exists
-        setItemInPagedList(result.item);
-
-        // Update the active item if it is the same as the updated item
-        if (activeItem.value?.id === result.item.id) {
-            activeItem.value = { ...activeItem.value, ...result.item };
-        }
-    }
-    return result;
-}
-
 interface ActionOptions {
     name?: string;
     label?: string;
@@ -34,8 +13,10 @@ interface ActionOptions {
     vnode?: (target: object[] | object) => VNode;
     enabled?: (target: object) => boolean;
     batchEnabled?: (targets: object[]) => boolean;
+    optimistic?: (action: ActionOptions, target: object, input: any) => void;
     onAction?: (action: string | null, target: object, input: any) => Promise<any>;
     onBatchAction?: (action: string | null, targets: object[], input: any) => Promise<any>;
+    onStart?: (action: ActionOptions | null, targets: object, input: any) => boolean;
     onSuccess?: (action: string | null, targets: object, input: any) => any;
     onError?: (action: string | null, targets: object, input: any) => any;
     onFinish?: (action: string | null, targets: object, input: any) => any;
@@ -88,6 +69,7 @@ export function useActions(actions: ActionOptions[], globalOptions: ActionOption
      * @param {any} input - The input data to pass to the action handler
      */
     async function performAction(name: string | object, target: object[] | object, input: any = null) {
+        console.log("performAction", name, target, input);
         const action: ActionOptions = typeof name === "string" ? mappedActions.find(a => a.name === name) : name;
         if (!action) {
             throw new Error(`Unknown action: ${name}`);
@@ -98,6 +80,13 @@ export function useActions(actions: ActionOptions[], globalOptions: ActionOption
 
         action.activeTarget.value = target;
 
+        // Run the onStart handler if it exists and quit the operation if it returns false
+        if (action.onStart) {
+            if (action.onStart(action, target, input) === false) {
+                return;
+            }
+        }
+
         // If additional input is required, first render the vnode and wait for the confirm or cancel action
         if (vnode) {
             // If the action requires an input, we set the activeActionVnode to the input component.
@@ -107,8 +96,8 @@ export function useActions(actions: ActionOptions[], globalOptions: ActionOption
             result = await new Promise((resolve, reject) => {
                 activeActionVnode.value = {
                     vnode,
-                    confirm: async (input: any) => {
-                        const result = await onConfirmAction(action, target, input);
+                    confirm: async (confirmInput: any) => {
+                        const result = await onConfirmAction(action, target, { ...input, ...confirmInput });
 
                         // Only resolve when we have a non-error response, so we can show the error message w/o
                         // hiding the dialog / vnode
@@ -155,6 +144,7 @@ export function useActions(actions: ActionOptions[], globalOptions: ActionOption
 }
 
 async function onConfirmAction(action: ActionOptions, target: object[] | object, input: any = null) {
+    console.log("onConfirmAction", action, target, input);
     if (!action.onAction) {
         throw new Error("No onAction handler found for the selected action:" + action.name);
     }
@@ -164,6 +154,12 @@ async function onConfirmAction(action: ActionOptions, target: object[] | object,
         if (Array.isArray(target)) {
             result = await action.onBatchAction(action.name, target, input);
         } else {
+            // If the action has an optimistic callback, we call it before the actual action to immediately
+            // update the UI
+            if (action.optimistic) {
+                action.optimistic(action, target, input);
+            }
+
             result = await action.onAction(action.name, target, input);
         }
     } catch (e) {

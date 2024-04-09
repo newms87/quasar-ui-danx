@@ -20,11 +20,12 @@
 </template>
 
 <script setup>
+import { useDebounceFn } from '@vueuse/core';
 import { computed, nextTick, ref, watch } from 'vue';
 import { fNumber } from '../../../../helpers';
 import FieldLabel from './FieldLabel';
 
-const emit = defineEmits(['update:model-value']);
+const emit = defineEmits(['update:model-value', 'update']);
 const props = defineProps({
   modelValue: {
     type: [String, Number],
@@ -45,6 +46,10 @@ const props = defineProps({
   inputClass: {
     type: String,
     default: ''
+  },
+  delay: {
+    type: Number,
+    default: 1000
   },
   hidePrependLabel: Boolean,
   currency: Boolean,
@@ -73,6 +78,9 @@ function format(number) {
   }
   return fNumber(number, options);
 }
+
+const onUpdateDebounced = useDebounceFn((val) => emit('update', val), props.delay);
+
 function onInput(value) {
   let number = '';
 
@@ -89,6 +97,11 @@ function onInput(value) {
     number = Number(value);
     numberVal.value = format(number);
   }
-  emit('update:model-value', number === '' ? undefined : number);
+
+  number = number === '' ? undefined : number;
+  emit('update:model-value', number);
+
+  // Delay the change event, so we only see the value after the user has finished
+  onUpdateDebounced(number);
 }
 </script>

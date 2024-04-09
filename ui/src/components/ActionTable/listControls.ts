@@ -147,6 +147,11 @@ export function useListControls(name: string, {
     function setItemInPagedList(updatedItem) {
         const data = pagedItems.value?.data?.map(item => (item.id === updatedItem.id && (item.updated_at === null || item.updated_at <= updatedItem.updated_at)) ? updatedItem : item);
         pagedItems.value = { ...pagedItems.value, data };
+
+        // Update the active item as well if it is set
+        if (activeItem.value?.id === updatedItem.id) {
+            activeItem.value = { ...activeItem.value, ...updatedItem };
+        }
     }
 
     /**

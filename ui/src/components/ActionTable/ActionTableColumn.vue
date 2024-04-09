@@ -24,11 +24,13 @@
         />
       </div>
     </div>
+    <TitleColumnFormat v-if="column.titleColumns" :row="row" :columns="column.titleColumns()" />
   </q-td>
 </template>
 <script setup>
 import { computed } from 'vue';
 import { RenderVnode } from '../Utility';
+import { TitleColumnFormat } from './Columns';
 import { ActionMenu } from './index';
 
 const props = defineProps({

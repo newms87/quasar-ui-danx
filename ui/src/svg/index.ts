@@ -1,3 +1,4 @@
+export { default as CaretDownIcon } from "./CaretDownIcon.svg";
 export { default as DragHandleDotsIcon } from "./DragHandleDotsIcon.svg";
 export { default as DragHandleIcon } from "./DragHandleIcon.svg";
 export { default as FilterIcon } from "./FilterIcon.svg";

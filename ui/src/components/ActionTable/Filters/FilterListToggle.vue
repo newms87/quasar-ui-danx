@@ -1,5 +1,5 @@
 <template>
-  <div class="flex items-center" :class="{'w-72': showFilters}">
+  <div class="flex items-center transition-all" :class="{'w-72': showFilters, 'w-[6.5rem]': !showFilters}">
     <div class="flex-grow">
       <q-btn
           class="btn-blue-highlight"

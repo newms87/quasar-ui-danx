@@ -1,5 +1,5 @@
 <template>
-  <q-td :key="rowProps.key" :props="rowProps">
+  <q-td :key="rowProps.key" :props="rowProps" :style="columnStyle">
     <div :style="columnStyle">
       <div
           class="flex items-center flex-nowrap"

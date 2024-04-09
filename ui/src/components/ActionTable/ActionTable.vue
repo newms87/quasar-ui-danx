@@ -1,7 +1,7 @@
 <template>
-  <div class="overflow-hidden">
+  <div class="overflow-hidden w-full">
     <ActionVnode />
-    <q-table
+    <QTable
         ref="actionTable"
         :selected="selectedRows"
         :pagination="quasarPagination"
@@ -10,7 +10,7 @@
         :rows="pagedItems?.data || []"
         selection="multiple"
         :rows-per-page-options="rowsPerPageOptions"
-        class="sticky-column sticky-header w-full !border-0"
+        class="sticky-column sticky-header w-full h-full !border-0"
         color="blue-base"
         @update:selected="$emit('update:selected-rows', $event)"
         @update:pagination="() => {}"
@@ -33,7 +33,7 @@
         />
       </template>
       <template #header-cell="rowProps">
-        <q-th
+        <QTh
             :key="rowProps.key"
             :props="rowProps"
             :data-drop-zone="`resize-column-` + rowProps.col.name"
@@ -47,7 +47,7 @@
           >
             <RowResizeIcon class="w-4 text-neutral-base" />
           </HandleDraggable>
-        </q-th>
+        </QTh>
       </template>
       <template #body-cell="rowProps">
         <ActionTableColumn
@@ -58,11 +58,12 @@
           <slot :column-name="rowProps.col.name" :row="rowProps.row" :value="rowProps.value" />
         </ActionTableColumn>
       </template>
-    </q-table>
+    </QTable>
   </div>
 </template>
 
 <script setup>
+import { QTable, QTh } from 'quasar';
 import { ref } from 'vue';
 import { getItem, setItem } from '../../helpers';
 import { DragHandleIcon as RowResizeIcon } from '../../svg';

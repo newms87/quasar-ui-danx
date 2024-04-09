@@ -16,9 +16,9 @@
         <RenderVnode v-if="column.vnode" :vnode="column.vnode(row)" />
         <slot v-else>{{ value }}</slot>
       </div>
-      <div v-if="actionMenu" class="flex flex-shrink-0 pl-2">
+      <div v-if="column.actionMenu" class="flex flex-shrink-0 pl-2">
         <ActionMenu
-            :actions="actionMenu"
+            :actions="column.actionMenu"
             :target="row"
             :loading="isSaving"
         />
@@ -45,8 +45,7 @@ const props = defineProps({
 const row = computed(() => props.rowProps.row);
 const column = computed(() => props.rowProps.col);
 const value = computed(() => props.rowProps.value);
-const actionMenu = computed(() => column.value.actionMenu);
-const isSaving = computed(() => column.value.isSaving && column.value.isSaving(row));
+const isSaving = computed(() => column.value.isSaving && column.value.isSaving(row.value));
 
 const columnStyle = computed(() => {
   const width = props.settings?.width || column.value.width;

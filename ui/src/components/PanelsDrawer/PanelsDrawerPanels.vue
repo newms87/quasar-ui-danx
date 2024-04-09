@@ -18,7 +18,7 @@ import { RenderVnode } from '../Utility';
 defineProps({
   activePanel: {
     type: String,
-    required: true
+    default: null
   },
   panels: {
     type: Array,

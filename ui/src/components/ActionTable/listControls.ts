@@ -115,6 +115,9 @@ export function useListControls(name: string, {
 
             if (Object.keys(urlFilter).length > 0) {
                 filter.value = urlFilter;
+                
+                // Override whatever is in local storage with this new filter
+                updateSettings("filter", filter.value);
             }
         }
     }
@@ -180,6 +183,17 @@ export function useListControls(name: string, {
      */
     async function refreshAll() {
         return Promise.all([loadList(), loadSummary(), loadFilterFieldOptions(), getActiveItemDetails()]);
+    }
+
+    /**
+     * Updates the settings in local storage
+     * @param key
+     * @param value
+     */
+    function updateSettings(key, value) {
+        const settings = getItem(PAGE_SETTINGS_KEY) || {};
+        settings[key] = value;
+        setItem(PAGE_SETTINGS_KEY, settings);
     }
 
     /**

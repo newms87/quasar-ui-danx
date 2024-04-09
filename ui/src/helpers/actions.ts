@@ -69,7 +69,6 @@ export function useActions(actions: ActionOptions[], globalOptions: ActionOption
      * @param {any} input - The input data to pass to the action handler
      */
     async function performAction(name: string | object, target: object[] | object, input: any = null) {
-        console.log("performAction", name, target, input);
         const action: ActionOptions = typeof name === "string" ? mappedActions.find(a => a.name === name) : name;
         if (!action) {
             throw new Error(`Unknown action: ${name}`);
@@ -144,7 +143,6 @@ export function useActions(actions: ActionOptions[], globalOptions: ActionOption
 }
 
 async function onConfirmAction(action: ActionOptions, target: object[] | object, input: any = null) {
-    console.log("onConfirmAction", action, target, input);
     if (!action.onAction) {
         throw new Error("No onAction handler found for the selected action:" + action.name);
     }

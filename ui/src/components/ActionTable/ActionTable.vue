@@ -66,7 +66,7 @@ import { ref } from 'vue';
 import { getItem, setItem } from '../../helpers';
 import { DragHandleIcon as RowResizeIcon } from '../../svg';
 import { HandleDraggable } from '../DragAndDrop';
-import { ActionVnode } from '../index';
+import { ActionVnode, mapSortBy } from '../index';
 import { ActionTableColumn, EmptyTableState, registerStickyScrolling, TableSummaryRow } from './index';
 
 defineEmits(['update:quasar-pagination', 'update:selected-rows']);

@@ -67,7 +67,7 @@ import { ChevronDownIcon as DropDownIcon } from '@heroicons/vue/outline';
 import { QSelect } from 'quasar';
 import { computed, isRef, nextTick, ref } from 'vue';
 
-const emit = defineEmits(['update:model-value', 'search']);
+const emit = defineEmits(['update:model-value', 'search', 'update']);
 const props = defineProps({
   ...QSelect.props,
   modelValue: {
@@ -260,7 +260,7 @@ function onUpdate(value) {
 
   value = value === '__null__' ? null : value;
 
-  emit('change', value);
+  emit('update', value);
   emit('update:model-value', value);
 }
 
@@ -296,7 +296,7 @@ async function onFilter(val, update) {
  */
 function onClear() {
   emit('update:model-value', undefined);
-  emit('change', undefined);
+  emit('update', undefined);
 }
 
 /**

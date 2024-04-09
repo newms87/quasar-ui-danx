@@ -1,21 +1,21 @@
 <template>
   <QTabs
-    :model-value="modelValue"
-    vertical
-    align="left"
-    class="panel-tabs p-4 h-auto"
-    no-caps
-    @update:model-value="$emit('update:model-value', $event)"
+      :model-value="modelValue"
+      vertical
+      align="left"
+      class="panel-tabs p-4 h-auto"
+      no-caps
+      @update:model-value="$emit('update:model-value', $event)"
   >
     <template v-for="panel in panels">
-      <template v-if="panel.enabled !== false">
+      <template v-if="panel.enabled === undefined || !!panel.enabled">
         <RenderVnode
-          v-if="panel.tabVnode"
-          :key="panel.name"
-          :vnode="panel.tabVnode"
-          :is-active="modelValue === panel.name"
-          :name="panel.name"
-          :label="panel.label"
+            v-if="panel.tabVnode"
+            :key="panel.name"
+            :vnode="panel.tabVnode"
+            :is-active="modelValue === panel.name"
+            :name="panel.name"
+            :label="panel.label"
         />
         <QTab v-else :key="panel.name" :name="panel.name" :label="panel.label" />
       </template>
@@ -23,14 +23,14 @@
   </QTabs>
 </template>
 <script setup>
-import { QTab } from "quasar";
-import { RenderVnode } from "quasar-ui-danx";
+import { QTab } from 'quasar';
+import { RenderVnode } from 'quasar-ui-danx';
 
-defineEmits(["update:model-value"]);
+defineEmits(['update:model-value']);
 defineProps({
   modelValue: {
     type: String,
-    default: "general"
+    default: 'general'
   },
   panels: {
     type: Array,
@@ -40,8 +40,8 @@ defineProps({
 </script>
 
 <style
-  lang="scss"
-  scoped
+    lang="scss"
+    scoped
 >
 .panel-tabs {
   :deep(.q-tab) {

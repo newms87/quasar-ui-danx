@@ -28,6 +28,8 @@ export function mapSortBy(pagination, columns) {
     if (!pagination.sortBy) return null;
 
     const column = columns.find(c => c.name === pagination.sortBy);
+    if (!column) return null;
+    
     return [
         {
             column: column.sortBy || column.name,

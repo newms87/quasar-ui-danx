@@ -74,6 +74,10 @@ export function useActions(actions: ActionOptions[], globalOptions: ActionOption
             throw new Error(`Unknown action: ${name}`);
         }
 
+        if (!action.activeTarget) {
+            throw new Error(`Action ${action.name} does not have an activeTarget ref. Please use useActions() or manually set the activeTarget ref`);
+        }
+
         const vnode = action.vnode && action.vnode(target);
         let result: any;
 

@@ -1,30 +1,33 @@
 <template>
-  <q-td :key="rowProps.key" :props="rowProps" :style="columnStyle">
-    <div
-        class="flex items-center flex-nowrap"
-        :class="columnClass"
-    >
-      <a
-          v-if="column.onClick"
-          class="flex-grow"
-          @click="column.onClick(row)"
+  <q-td :key="rowProps.key" :props="rowProps">
+    <div :style="columnStyle">
+      <div
+          class="flex items-center flex-nowrap"
+          :class="columnClass"
       >
-        <RenderVnode v-if="column.vnode" :vnode="column.vnode(row)" />
-        <slot v-else>{{ value }}</slot>
-      </a>
-      <div v-else class="flex-grow">
-        <RenderVnode v-if="column.vnode" :vnode="column.vnode(row)" />
-        <slot v-else>{{ value }}</slot>
-      </div>
-      <div v-if="column.actionMenu" class="flex flex-shrink-0 pl-2">
-        <ActionMenu
-            :actions="column.actionMenu"
-            :target="row"
-            :loading="isSaving"
-        />
+        <div class="flex-grow">
+          <a
+              v-if="column.onClick"
+              @click="column.onClick(row)"
+          >
+            <RenderVnode v-if="column.vnode" :vnode="column.vnode(row)" />
+            <slot v-else>{{ value }}</slot>
+          </a>
+          <div v-else>
+            <RenderVnode v-if="column.vnode" :vnode="column.vnode(row)" />
+            <slot v-else>{{ value }}</slot>
+          </div>
+          <TitleColumnFormat v-if="column.titleColumns" :row="row" :columns="column.titleColumns()" />
+        </div>
+        <div v-if="column.actionMenu" class="flex flex-shrink-0 pl-2">
+          <ActionMenu
+              :actions="column.actionMenu"
+              :target="row"
+              :loading="isSaving"
+          />
+        </div>
       </div>
     </div>
-    <TitleColumnFormat v-if="column.titleColumns" :row="row" :columns="column.titleColumns()" />
   </q-td>
 </template>
 <script setup>

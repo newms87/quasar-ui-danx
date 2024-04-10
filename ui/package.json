@@ -1,14 +1,14 @@
 {
   "name": "quasar-ui-danx",
-  "version": "0.2.4",
+  "version": "0.2.5",
   "author": "Dan <dan@flytedesk.com>",
   "description": "DanX Vue / Quasar component library",
   "license": "MIT",
   "type": "module",
-  "main": "dist/dan.es.js",
-  "module": "dist/dan.es.js",
+  "main": "dist/danx.es.js",
+  "module": "dist/danx.es.js",
   "scripts": {
-    "dev": "vite",
+    "dev": "cd dev && quasar dev && cd ..",
     "build": "vite build",
     "preview": "vite preview"
   },
@@ -33,7 +33,7 @@
     "typescript": "^5.4.4",
     "vite": "^5.2.8",
     "vite-svg-loader": "^5.1.0",
-    "vue": "^3.0.0",
+    "vue": "^3.4.21",
     "vue-router": "^4.0.0"
   },
   "dependencies": {

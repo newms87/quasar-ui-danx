@@ -33,7 +33,7 @@
 <script setup>
 import { computed } from 'vue';
 import { fLocalizedDateTime } from '../../helpers';
-import { AuditHistoryItemValue } from './index';
+import AuditHistoryItemValue from './AuditHistoryItemValue';
 
 const props = defineProps({
   item: {

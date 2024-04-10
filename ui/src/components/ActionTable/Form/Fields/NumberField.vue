@@ -23,7 +23,7 @@
 import { useDebounceFn } from '@vueuse/core';
 import { computed, nextTick, ref, watch } from 'vue';
 import { fNumber } from '../../../../helpers';
-import { FieldLabel } from './index';
+import FieldLabel from './FieldLabel';
 
 const emit = defineEmits(['update:model-value', 'update']);
 const props = defineProps({

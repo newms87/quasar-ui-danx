@@ -33,8 +33,8 @@
 <script setup>
 import { computed } from 'vue';
 import { RenderVnode } from '../Utility';
+import ActionMenu from './ActionMenu';
 import { TitleColumnFormat } from './Columns';
-import { ActionMenu } from './index';
 
 const props = defineProps({
   rowProps: {

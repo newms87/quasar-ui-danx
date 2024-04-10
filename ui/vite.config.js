@@ -5,6 +5,9 @@ import svgLoader from 'vite-svg-loader';
 
 export default defineConfig({
     plugins: [vue(), svgLoader()],
+    resolve: {
+        extensions: ['.mjs', '.js', '.ts', '.mts', '.jsx', '.tsx', '.json', '.vue', '.svg']
+    },
     build: {
         lib: {
             entry: resolve(__dirname, './src/index.esm.js'),

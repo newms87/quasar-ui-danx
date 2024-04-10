@@ -40,7 +40,7 @@ import { computed } from 'vue';
 import { FlashMessages, remove } from '../../../helpers';
 import { ListItemDraggable } from '../../DragAndDrop';
 import { InfoDialog, ListTransition } from '../../Utility';
-import { ColumnListItem } from './index';
+import ColumnListItem from './ColumnListItem';
 
 const emit = defineEmits(['close', 'update:hidden-column-names', 'update:title-column-names', 'update:sortable-columns']);
 const props = defineProps({

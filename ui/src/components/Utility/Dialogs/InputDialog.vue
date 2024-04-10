@@ -16,7 +16,7 @@
 </template>
 <script setup>
 import { ref } from 'vue';
-import { ConfirmDialog } from './index';
+import ConfirmDialog from './ConfirmDialog';
 
 defineEmits(['confirm', 'close', 'update:input']);
 const props = defineProps({

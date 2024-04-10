@@ -41,7 +41,8 @@
 import { ref, watch } from 'vue';
 import { XIcon as CloseIcon } from '../../svg';
 import { ContentDrawer } from '../Utility';
-import { PanelsDrawerPanels, PanelsDrawerTabs } from './index';
+import PanelsDrawerPanels from './PanelsDrawerPanels';
+import PanelsDrawerTabs from './PanelsDrawerTabs';
 
 defineEmits(['update:model-value', 'close']);
 const props = defineProps({

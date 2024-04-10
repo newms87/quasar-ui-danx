@@ -26,7 +26,7 @@
 <script setup>
 import { ref } from 'vue';
 import { fLocalizedDateTime } from '../../../../helpers';
-import { DateTimePicker } from './index';
+import DateTimePicker from './DateTimePicker';
 
 const emit = defineEmits(['update:model-value']);
 const props = defineProps({

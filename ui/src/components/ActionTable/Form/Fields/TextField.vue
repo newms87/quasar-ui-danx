@@ -37,7 +37,8 @@
 </template>
 
 <script setup>
-import { FieldLabel, LabelValueBlock } from './index';
+import FieldLabel from './FieldLabel';
+import LabelValueBlock from './LabelValueBlock';
 
 defineEmits(['update:model-value', 'submit']);
 defineProps({

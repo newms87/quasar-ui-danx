@@ -8,6 +8,7 @@
         :columns="columns"
         :loading="isLoadingList"
         :rows="pagedItems?.data || []"
+        binary-state-sort
         selection="multiple"
         :rows-per-page-options="rowsPerPageOptions"
         class="sticky-column sticky-header w-full h-full !border-0"
@@ -68,8 +69,11 @@ import { ref } from 'vue';
 import { getItem, setItem } from '../../helpers';
 import { DragHandleIcon as RowResizeIcon } from '../../svg';
 import { HandleDraggable } from '../DragAndDrop';
-import { ActionVnode, mapSortBy } from '../index';
-import { ActionTableColumn, EmptyTableState, registerStickyScrolling, TableSummaryRow } from './index';
+import { ActionVnode } from '../Utility';
+import ActionTableColumn from './ActionTableColumn.vue';
+import EmptyTableState from './EmptyTableState.vue';
+import { mapSortBy, registerStickyScrolling } from './listHelpers';
+import TableSummaryRow from './TableSummaryRow.vue';
 
 defineEmits(['update:quasar-pagination', 'update:selected-rows']);
 const props = defineProps({

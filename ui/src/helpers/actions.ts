@@ -1,5 +1,5 @@
 import { ref, shallowRef, VNode } from "vue";
-import { FlashMessages } from "./index";
+import { FlashMessages } from "./FlashMessages";
 
 interface ActionOptions {
     name?: string;

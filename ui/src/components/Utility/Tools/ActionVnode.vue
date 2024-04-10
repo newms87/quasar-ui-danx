@@ -12,7 +12,7 @@
 <script setup>
 import { ref } from 'vue';
 import { activeActionVnode } from '../../../helpers';
-import { RenderVnode } from './index';
+import RenderVnode from './RenderVnode';
 
 const isSaving = ref(false);
 async function onConfirm(input) {

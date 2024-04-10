@@ -9,7 +9,7 @@
 </template>
 
 <script setup>
-import { NumberField } from './index';
+import NumberField from './NumberField';
 
 defineEmits(['update:model-value']);
 defineProps({

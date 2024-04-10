@@ -43,7 +43,8 @@
 </template>
 <script setup>
 import { computed } from 'vue';
-import { FilterableField, FilterFieldItem } from './index';
+import FilterableField from './FilterableField';
+import FilterFieldItem from './FilterFieldItem';
 
 const emit = defineEmits(['update:filter']);
 const props = defineProps({

@@ -15,7 +15,7 @@
 </template>
 
 <script setup>
-import { FieldLabel } from './index';
+import FieldLabel from './FieldLabel';
 
 defineEmits(['update:model-value']);
 defineProps({

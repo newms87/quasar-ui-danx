@@ -26,7 +26,7 @@
 <script setup>
 import { default as TinyMceEditor } from '@tinymce/tinymce-vue';
 import { apiKey } from '../../../../vendor/tinymce-config';
-import { FieldLabel } from './index';
+import FieldLabel from './FieldLabel';
 
 defineEmits(['update:model-value']);
 defineProps({

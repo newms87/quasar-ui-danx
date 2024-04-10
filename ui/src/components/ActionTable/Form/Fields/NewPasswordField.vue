@@ -8,7 +8,7 @@
 </template>
 
 <script setup>
-import { LabeledInput } from './index';
+import LabeledInput from './LabeledInput';
 
 defineEmits(['update:model-value']);
 const props = defineProps({

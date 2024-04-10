@@ -52,7 +52,7 @@
 <script setup>
 import { DotsVerticalIcon as MenuIcon } from '@heroicons/vue/outline';
 import { QSpinner } from 'quasar';
-import { RenderComponent } from '../index';
+import { RenderComponent } from '../Tools';
 
 const emit = defineEmits(['action', 'action-item']);
 defineProps({

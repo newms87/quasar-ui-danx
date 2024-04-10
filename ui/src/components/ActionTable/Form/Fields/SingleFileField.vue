@@ -51,7 +51,7 @@
 import { onMounted } from 'vue';
 import { useSingleFileUpload } from '../../../../helpers';
 import { FilePreview } from '../../../Utility';
-import { FieldLabel } from './index';
+import FieldLabel from './FieldLabel';
 
 const emit = defineEmits(['update:model-value']);
 const props = defineProps({

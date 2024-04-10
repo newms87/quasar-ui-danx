@@ -42,7 +42,7 @@ import { useDebounceFn } from '@vueuse/core';
 import { computed, ref, watch } from 'vue';
 import { fCurrency, fNumber, fPercent } from '../../../../helpers';
 import { PercentIcon } from '../../../../svg';
-import NumberField from './NumberField';
+import { NumberField } from './index';
 
 const emit = defineEmits(['update:model-value']);
 const props = defineProps({

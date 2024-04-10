@@ -2,13 +2,15 @@
   <LabeledInput
       type="password"
       v-bind="props"
+      :name="name"
+      :model-value="modelValue"
       :rules="rules"
       @update:model-value="$emit('update:model-value', $event)"
   />
 </template>
 
 <script setup>
-import LabeledInput from './LabeledInput';
+import { LabeledInput } from './index';
 
 defineEmits(['update:model-value']);
 const props = defineProps({

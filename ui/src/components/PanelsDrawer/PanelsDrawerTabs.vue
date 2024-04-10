@@ -24,7 +24,7 @@
 </template>
 <script setup>
 import { QTab } from 'quasar';
-import { RenderVnode } from 'quasar-ui-danx';
+import { RenderVnode } from '../Utility';
 
 defineEmits(['update:model-value']);
 defineProps({

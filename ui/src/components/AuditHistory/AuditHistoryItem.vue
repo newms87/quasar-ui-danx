@@ -4,13 +4,13 @@
       <h5>{{ change.label }} ({{ change.name }})</h5>
       <div class="flex flex-nowrap items-center mt-4">
         <div class="bg-red-light line-through p-2">
-          <AdHistoryItemValue
+          <AuditHistoryItemValue
               :type="change.type"
               :value="change.oldValue"
           />
         </div>
         <div class="bg-green-plus-4 ml-2.5 p-2">
-          <AdHistoryItemValue
+          <AuditHistoryItemValue
               :type="change.type"
               :value="change.newValue"
           />
@@ -33,7 +33,7 @@
 <script setup>
 import { computed } from 'vue';
 import { fLocalizedDateTime } from '../../helpers';
-import AdHistoryItemValue from './AuditHistoryItemValue';
+import { AuditHistoryItemValue } from './index';
 
 const props = defineProps({
   item: {

@@ -24,8 +24,7 @@
 
 <script setup>
 import { computed, ref, watch } from 'vue';
-import SelectField from './SelectField';
-import TextField from './TextField';
+import { SelectField, TextField } from './index';
 
 const emit = defineEmits(['update:model-value']);
 const props = defineProps({

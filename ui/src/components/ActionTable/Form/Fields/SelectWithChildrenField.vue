@@ -30,7 +30,7 @@
 <script setup>
 import { ref, watch } from 'vue';
 import { remove } from '../../../../helpers';
-import SelectField from './SelectField';
+import { SelectField } from './index';
 
 const emit = defineEmits(['update:model-value']);
 const props = defineProps({

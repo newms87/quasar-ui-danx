@@ -25,7 +25,7 @@
 <script setup>
 import { PencilIcon as EditIcon } from '@heroicons/vue/solid';
 import { fLocalizedDateTime } from '../../../../helpers';
-import DateTimePicker from './DateTimePicker';
+import { DateTimePicker } from './index';
 
 const emit = defineEmits(['close', 'save', 'update:model-value']);
 defineProps({

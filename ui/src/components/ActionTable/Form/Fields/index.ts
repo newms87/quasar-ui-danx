@@ -10,6 +10,7 @@ export { default as FileUploadButton } from "./FileUploadButton.vue";
 export { default as InlineDateTimeField } from "./InlineDateTimeField.vue";
 export { default as IntegerField } from "./IntegerField.vue";
 export { default as LabeledInput } from "./LabeledInput.vue";
+export { default as LabelValueBlock } from "./LabelValueBlock.vue";
 export { default as MultiFileField } from "./MultiFileField.vue";
 export { default as MultiKeywordField } from "./MultiKeywordField.vue";
 export { default as NewPasswordField } from "./NewPasswordField.vue";

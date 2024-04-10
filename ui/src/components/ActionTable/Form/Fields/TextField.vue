@@ -26,19 +26,18 @@
             :class="labelClass"
         />
       </template>
-      </q-input>
-      <div v-if="readonly">
-        <LabelValueBlock
-            :label="label || field.label"
-            :value="modelValue"
-        />
-      </div>
+    </q-input>
+    <div v-if="readonly">
+      <LabelValueBlock
+          :label="label || field.label"
+          :value="modelValue"
+      />
+    </div>
   </div>
 </template>
 
 <script setup>
-import FieldLabel from './FieldLabel';
-import LabelValueBlock from './LabelValueBlock';
+import { FieldLabel, LabelValueBlock } from './index';
 
 defineEmits(['update:model-value', 'submit']);
 defineProps({

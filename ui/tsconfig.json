@@ -10,6 +10,7 @@
     "strict": false,
     // Enables compatibility with Babel-imported CommonJS modules
     "esModuleInterop": true,
+    "resolveJsonModule": true,
     // Resolve modules using Node.js style
     "moduleResolution": "node",
     // Allow default imports from modules with no default export
@@ -18,6 +19,7 @@
     "experimentalDecorators": true,
     // Skip type checking of all declaration files (*.d.ts)
     "skipLibCheck": true,
+    "sourceMap": true,
     // Disallow inconsistently-cased references to the same file.
     "forceConsistentCasingInFileNames": true,
     // Base directory to resolve non-relative module names,

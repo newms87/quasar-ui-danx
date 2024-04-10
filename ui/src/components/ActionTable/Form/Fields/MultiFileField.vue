@@ -64,7 +64,7 @@
 import { onMounted } from 'vue';
 import { useMultiFileUpload } from '../../../../helpers';
 import { FilePreview } from '../../../Utility';
-import FieldLabel from './FieldLabel';
+import { FieldLabel } from './index';
 
 const emit = defineEmits(['update:model-value']);
 const props = defineProps({

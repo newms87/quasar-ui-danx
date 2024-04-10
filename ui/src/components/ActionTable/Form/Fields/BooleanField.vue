@@ -11,11 +11,11 @@
         :show-name="showName"
         :class="labelClass"
     />
-    </q-toggle>
+  </q-toggle>
 </template>
 
 <script setup>
-import FieldLabel from './FieldLabel';
+import { FieldLabel } from './index';
 
 defineEmits(['update:model-value']);
 defineProps({

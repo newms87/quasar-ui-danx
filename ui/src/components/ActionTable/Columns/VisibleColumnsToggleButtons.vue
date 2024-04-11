@@ -147,7 +147,7 @@ function toggleColumn(columnName, showColumn) {
     scoped
 >
 .category-toggle {
-  @apply text-xs font-bold rounded-lg border border-solid border-neutral-plus-5 px-2 py-1 mx-1 cursor-pointer flex items-center;
+  @apply text-xs font-bold rounded-lg border border-solid border-gray-200 px-2 py-1 mx-1 cursor-pointer flex items-center;
 
   &.has-visible-columns {
     @apply text-white bg-blue-600;

@@ -21,7 +21,7 @@
         <slot />
       </div>
     </div>
-    </QDialog>
+  </QDialog>
 </template>
 
 <script setup>
@@ -58,7 +58,7 @@ const isShowing = computed({
     scoped
 >
 .dialog-title {
-  @apply bg-gray-very-light text-gray-default font-medium uppercase text-xs px-6 py-3 border-b border-neutral-plus-5 rounded-t-md;
+  @apply bg-slate-100 text-gray-default font-medium uppercase text-xs px-6 py-3 border-b border-gray-200 rounded-t-md;
   font-family: "Roboto", sans-serif;
   letter-spacing: 0.05em;
   box-shadow: 0px -4px 12px rgba(0, 0, 0, 0.25);

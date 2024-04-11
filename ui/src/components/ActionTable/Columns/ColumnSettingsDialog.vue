@@ -8,7 +8,7 @@
     </div>
     <ColumnListItem
         v-for="column in lockedColumns" :key="column.name" locked visible :column="column"
-        class="px-2.5 border border-neutral-plus-5 bg-white rounded-t-lg"
+        class="px-2.5 border border-gray-200 bg-white rounded-t-lg"
     />
     <ListTransition
         name="fade-down-list"
@@ -19,7 +19,7 @@
           :key="column.name"
           :list-items="sortableColumns"
           drop-zone="column-list"
-          class="px-2 border border-neutral-plus-5 bg-white"
+          class="px-2 border border-gray-200 bg-white"
           :class="{'rounded-b-lg': index === sortableColumns.length - 1}"
           show-handle
           @update:list-items="$emit('update:sortable-columns', $event)"

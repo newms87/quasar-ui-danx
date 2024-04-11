@@ -26,7 +26,7 @@
                 class="w-5 transition-all"
                 :class="{ 'rotate-180': rightSide ? !isCollapsed : isCollapsed }"
             />
-            </QBtn>
+          </QBtn>
         </slot>
       </div>
       <div
@@ -114,6 +114,6 @@ watch(() => props.collapse, () => {
     lang="scss"
 >
 .collapsable-sidebar {
-  @apply overflow-y-auto scroll-smooth flex-shrink-0 border-r border-neutral-plus-5 transition-all;
+  @apply overflow-y-auto scroll-smooth flex-shrink-0 border-r border-gray-200 transition-all;
 }
 </style>

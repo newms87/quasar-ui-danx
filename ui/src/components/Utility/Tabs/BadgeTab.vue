@@ -7,12 +7,12 @@
     <div class="flex items-center w-full">
       <div class="flex-grow text-sm">{{ label }}</div>
       <QBadge
-          color="gray-base"
+          class="bg-gray-base"
           :label="count"
           rounded
       />
     </div>
-    </QTab>
+  </QTab>
 </template>
 <script setup>
 defineProps({

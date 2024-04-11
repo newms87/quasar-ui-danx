@@ -9,7 +9,7 @@
     <div>
       <div
           v-if="title"
-          class="dialog-title"
+          class="dialog-title bg-slate-100 text-gray-500 border-gray-200"
           @click.stop.prevent
       >
         {{ title }}
@@ -58,7 +58,7 @@ const isShowing = computed({
     scoped
 >
 .dialog-title {
-  @apply bg-slate-100 text-gray-500 font-medium uppercase text-xs px-6 py-3 border-b border-gray-200 rounded-t-md;
+  @apply font-medium uppercase text-xs px-6 py-3 border-b rounded-t-md;
   font-family: "Roboto", sans-serif;
   letter-spacing: 0.05em;
   box-shadow: 0px -4px 12px rgba(0, 0, 0, 0.25);

@@ -3,8 +3,8 @@
     <div
         v-for="category in categories"
         :key="category"
-        class="category-toggle"
-        :class="{'has-visible-columns': categoryHasVisibleColumns(category)}"
+        class="category-toggle border-gray-200"
+        :class="{'has-visible-columns text-white bg-blue-600': categoryHasVisibleColumns(category)}"
     >
       <QCheckbox
           toggle-indeterminate
@@ -147,10 +147,6 @@ function toggleColumn(columnName, showColumn) {
     scoped
 >
 .category-toggle {
-  @apply text-xs font-bold rounded-lg border border-solid border-gray-200 px-2 py-1 mx-1 cursor-pointer flex items-center;
-
-  &.has-visible-columns {
-    @apply text-white bg-blue-600;
-  }
+  @apply text-xs font-bold rounded-lg border border-solid px-2 py-1 mx-1 cursor-pointer flex items-center;
 }
 </style>

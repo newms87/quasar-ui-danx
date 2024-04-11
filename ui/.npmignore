@@ -1,5 +1,6 @@
 /build
 /dev
+/demo
 umd-test.html
 
 .DS_Store

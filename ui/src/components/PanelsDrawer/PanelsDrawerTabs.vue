@@ -12,7 +12,7 @@
         <RenderVnode
             v-if="panel.tabVnode"
             :key="panel.name"
-            :vnode="panel.tabVnode"
+            :vnode="panel.tabVnode(modelValue)"
             :is-active="modelValue === panel.name"
             :name="panel.name"
             :label="panel.label"
@@ -47,7 +47,11 @@ defineProps({
   :deep(.q-tab) {
     justify-content: start !important;
     padding: 0;
-    @apply text-left py-2.5 px-2 rounded-lg hover:bg-slate-200;
+    @apply text-left py-2.5 px-2 rounded-lg;
+
+    &:hover {
+      background: var(--slate-200);
+    }
 
     .q-focus-helper, .q-tab__indicator {
       display: none;
@@ -59,7 +63,8 @@ defineProps({
   }
 
   :deep(.q-tab.q-tab--active) {
-    @apply text-white bg-blue-600;
+    background: var(--blue-600);
+    @apply text-white;
   }
 }
 </style>

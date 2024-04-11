@@ -34,7 +34,7 @@
                 :model-value="!hiddenColumnNames.includes(column.name)"
                 class="mr-3 cb-white-border"
                 size="20px"
-                :color="column.required ? 'gray-base': 'blue-base'"
+                :color="column.required ? 'gray-base': 'blue-600'"
                 :disable="column.required"
                 @click="toggleColumn(column.name)"
             />
@@ -150,7 +150,7 @@ function toggleColumn(columnName, showColumn) {
   @apply text-xs font-bold rounded-lg border border-solid border-neutral-plus-5 px-2 py-1 mx-1 cursor-pointer flex items-center;
 
   &.has-visible-columns {
-    @apply text-white bg-blue-base;
+    @apply text-white bg-blue-600;
   }
 }
 </style>

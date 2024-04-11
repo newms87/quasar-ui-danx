@@ -17,9 +17,9 @@
                 @save="onSave"
             />
           </QPopupProxy>
-          </QIcon>
+        </QIcon>
       </template>
-      </QInput>
+    </QInput>
   </div>
 </template>
 
@@ -36,7 +36,7 @@ const props = defineProps({
   },
   color: {
     type: String,
-    default: 'blue-base'
+    default: 'blue-600'
   }
 });
 

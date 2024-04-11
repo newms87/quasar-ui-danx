@@ -10,7 +10,7 @@
           :model-value="modelValue"
           touch-position
           :offset="[0, 20]"
-          class="bg-blue-base text-white !min-w-0"
+          class="bg-blue-600 text-white !min-w-0"
       >
         <DateTimePicker
             v-model="scope.value"

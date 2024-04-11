@@ -15,7 +15,7 @@
         class="text-sm mt-2"
     >
       <a
-          class="text-blue-base"
+          class="text-blue-600"
           @click="$refs.file.click()"
       >Upload</a>
       <a
@@ -34,7 +34,7 @@
     <FilePreview
         v-if="!readonly || uploadedFile"
         class="w-32 cursor-pointer mt-2"
-        :class="{'border border-dashed border-blue-base': !uploadedFile, 'mx-auto': !readonly}"
+        :class="{'border border-dashed border-blue-600': !uploadedFile, 'mx-auto': !readonly}"
         :image="uploadedFile"
         downloadable
         @click="!disable && $refs.file.click()"

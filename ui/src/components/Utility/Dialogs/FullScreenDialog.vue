@@ -16,7 +16,7 @@
       </div>
       <slot />
     </div>
-    </QDialog>
+  </QDialog>
 </template>
 
 <script setup>
@@ -33,7 +33,7 @@ const props = defineProps({
 
 let computedClass = computed(() => {
   return {
-    'bg-blue-base text-white': props.blue,
+    'bg-blue-600 text-white': props.blue,
     'bg-white text-gray-base': !props.blue,
     'items-center': props.center
   };

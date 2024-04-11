@@ -10,13 +10,13 @@
         <QBadge
             :label="'' + activeCount"
             rounded
-            :color="activeCount > 0 ? 'blue-base' : 'gray-base'"
+            :color="activeCount > 0 ? 'blue-600' : 'gray-base'"
         />
-        </QBtn>
+      </QBtn>
     </div>
     <a
         v-if="activeCount > 0"
-        class="text-blue-base hover:text-blue-plus-1 text-sm ml-4"
+        class="text-blue-600 hover:text-blue-plus-1 text-sm ml-4"
         @click="$emit('update:filter', {})"
     >Clear All</a>
   </div>

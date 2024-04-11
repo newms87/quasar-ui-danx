@@ -12,7 +12,7 @@
         selection="multiple"
         :rows-per-page-options="rowsPerPageOptions"
         class="sticky-column sticky-header w-full h-full !border-0"
-        color="blue-base"
+        color="blue-600"
         @update:selected="$emit('update:selected-rows', $event)"
         @update:pagination="() => {}"
         @request="$emit('update:quasar-pagination', {...$event.pagination, __sort: mapSortBy($event.pagination, columns)})"

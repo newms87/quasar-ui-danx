@@ -42,7 +42,7 @@
               @click="onClose"
           >
             <slot name="cancel-text" />
-            </QBtn>
+          </QBtn>
         </div>
         <slot name="actions" />
         <div v-if="!hideConfirm">
@@ -56,7 +56,7 @@
               @click="onConfirm"
           >
             <slot name="confirm-text" />
-            </QBtn>
+          </QBtn>
         </div>
       </div>
       <a
@@ -65,8 +65,8 @@
       >
         <CloseIcon class="w-5" />
       </a>
-      </QCard>
-      </QDialog>
+    </QCard>
+  </QDialog>
 </template>
 
 <script setup>
@@ -109,7 +109,7 @@ const props = defineProps({
   },
   confirmClass: {
     type: String,
-    default: 'bg-blue-base text-white'
+    default: 'bg-blue-600 text-white'
   },
   contentClass: {
     type: String,

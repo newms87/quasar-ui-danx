@@ -15,7 +15,7 @@
         class="text-sm my-2"
     >
       <a
-          class="text-blue-base"
+          class="text-blue-600"
           @click="$refs.file.click()"
       >Upload</a>
       <a
@@ -37,7 +37,7 @@
           v-for="file in uploadedFiles"
           :key="'file-upload-' + file.id"
           class="w-32 m-2 cursor-pointer bg-neutral-plus-5"
-          :class="{'border border-dashed border-blue-base': !uploadedFiles.length}"
+          :class="{'border border-dashed border-blue-600': !uploadedFiles.length}"
           :image="file"
           :related-files="uploadedFiles"
           downloadable
@@ -46,7 +46,7 @@
       />
       <FilePreview
           v-if="!disable && !readonly"
-          class="w-32 m-2 cursor-pointer border border-dashed border-blue-base"
+          class="w-32 m-2 cursor-pointer border border-dashed border-blue-600"
           disabled
           @click="$refs.file.click()"
       />

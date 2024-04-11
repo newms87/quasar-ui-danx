@@ -9,9 +9,9 @@
     <div class="flex items-center flex-nowrap cursor-pointer">
       <component
           :is="previewIcon"
-          class="w-5 text-blue-base"
+          class="w-5 text-blue-600"
       />
-      <div class="text-sm ml-3 hover:text-blue-base whitespace-nowrap">
+      <div class="text-sm ml-3 hover:text-blue-600 whitespace-nowrap">
         <template v-if="range">
           {{ formatNum(range.from || 0) }} - {{ formatNum(range.to) }}
         </template>

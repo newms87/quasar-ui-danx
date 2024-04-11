@@ -75,17 +75,17 @@
           @click.stop="download(computedImage.url)"
       >
         <DownloadIcon class="w-4 h-5" />
-        </QBtn>
+      </QBtn>
 
-        <QBtn
-            v-if="removable"
-            size="sm"
-            class="bg-red-dark text-white !p-1 opacity-50 hover:opacity-100"
-            @click.stop="onRemove"
-        >
-          <div v-if="isConfirmingRemove" class="font-bold text-[1rem] leading-[1.2rem]">?</div>
-          <RemoveIcon v-else class="w-3" />
-          </QBtn>
+      <QBtn
+          v-if="removable"
+          size="sm"
+          class="bg-red-dark text-white !p-1 opacity-50 hover:opacity-100"
+          @click.stop="onRemove"
+      >
+        <div v-if="isConfirmingRemove" class="font-bold text-[1rem] leading-[1.2rem]">?</div>
+        <RemoveIcon v-else class="w-3" />
+      </QBtn>
     </div>
 
     <FullScreenCarouselDialog
@@ -124,7 +124,7 @@ const props = defineProps({
   },
   downloadButtonClass: {
     type: String,
-    default: 'bg-blue-base text-white'
+    default: 'bg-blue-600 text-white'
   },
   downloadable: Boolean,
   removable: Boolean,

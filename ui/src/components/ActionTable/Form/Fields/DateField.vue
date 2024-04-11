@@ -7,8 +7,8 @@
       {{ label }}
     </div>
     <div class="flex items-center cursor-pointer">
-      <DateIcon class="w-5 text-blue-base" />
-      <div class="font-bold ml-3 hover:text-blue-base">
+      <DateIcon class="w-5 text-blue-600" />
+      <div class="font-bold ml-3 hover:text-blue-600">
         <template v-if="date">
           {{ formattedDate }}
         </template>

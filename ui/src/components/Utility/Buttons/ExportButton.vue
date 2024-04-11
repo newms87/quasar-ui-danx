@@ -1,5 +1,5 @@
 <template>
-  <QBtn class="bg-neutral-plus-6" :loading="isExporting" @click="onExport">
+  <QBtn class="bg-slate-200" :loading="isExporting" @click="onExport">
     <ExportIcon class="w-5" />
   </QBtn>
 </template>

@@ -9,20 +9,20 @@
     <QDate v-model="dateTime" :mask="mask" :color="color">
       <div class="flex items-center justify-center">
         <div v-if="nullable" class="flex-grow">
-          <QBtn label="Clear" color="blue-base" flat @click="dateTime = null" />
+          <QBtn label="Clear" color="blue-600" flat @click="dateTime = null" />
         </div>
         <div>
           <QBtn
               label="Cancel"
-              color="blue-base"
+              color="blue-600"
               flat
               @click="$emit('cancel')"
           />
-          <QBtn label="Set" color="blue-base" flat @click="$emit('save')" />
+          <QBtn label="Set" color="blue-600" flat @click="$emit('save')" />
         </div>
       </div>
-      </QDate>
-      <QTime v-model="dateTime" :mask="mask" :color="color" class="ml-3" />
+    </QDate>
+    <QTime v-model="dateTime" :mask="mask" :color="color" class="ml-3" />
   </QPopupProxy>
 </template>
 <script setup>
@@ -41,7 +41,7 @@ const props = defineProps({
   },
   color: {
     type: String,
-    default: 'blue-base'
+    default: 'blue-600'
   },
   nullable: Boolean
 });

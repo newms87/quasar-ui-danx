@@ -5,12 +5,14 @@ import dts from 'vite-plugin-dts';
 import svgLoader from 'vite-svg-loader';
 
 export default defineConfig({
-    plugins: [vue(), svgLoader(), dts({
-        compilerOptions: {
-            noImplicitAny: false,
-            suppressImplicitAnyIndexErrors: true
-        }
-    })],
+    plugins: [vue(), svgLoader(),
+        // dts({
+        //     compilerOptions: {
+        //         noImplicitAny: false,
+        //         suppressImplicitAnyIndexErrors: true
+        //     }
+        // })
+    ],
     resolve: {
         extensions: ['.mjs', '.js', '.ts', '.mts', '.jsx', '.tsx', '.json', '.vue', '.svg']
     },

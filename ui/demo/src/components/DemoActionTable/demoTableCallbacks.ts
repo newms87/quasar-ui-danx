@@ -20,6 +20,7 @@ const listItems = (() => {
             status
         });
     }
+
     return items;
 })();
 

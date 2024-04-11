@@ -16,7 +16,7 @@
   "dependencies": {
     "@quasar/extras": "^1.16.11",
     "quasar": "^2.15.2",
-    "quasar-ui-danx": "^0.2.6",
+    "quasar-ui-danx": "^0.2.7",
     "vue": "^3.4.21",
     "vue-router": "^4.3.0"
   },

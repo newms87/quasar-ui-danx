@@ -14,6 +14,8 @@
   </div>
 </template>
 <script setup>
+import { QSpinnerBall } from 'quasar';
+
 defineProps({
   loading: Boolean,
   saving: Boolean,

@@ -15,7 +15,8 @@ export const {
 
     // Actions
     refreshAll,
-    applyAction
+    applyAction,
+    initialize
 } = useListControls("items", {
     listRoute: itemListCb,
     summaryRoute: summaryCb,

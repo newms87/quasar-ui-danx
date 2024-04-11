@@ -28,9 +28,10 @@
         </div>
       </div>
     </div>
-    </QTd>
+  </QTd>
 </template>
 <script setup>
+import { QTd } from 'quasar';
 import { computed } from 'vue';
 import { RenderVnode } from '../Utility';
 import ActionMenu from './ActionMenu';

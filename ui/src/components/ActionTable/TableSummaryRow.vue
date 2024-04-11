@@ -42,6 +42,7 @@
 </template>
 <script setup>
 import { XCircleIcon as ClearIcon } from '@heroicons/vue/solid';
+import { QSpinner, QTd, QTr } from 'quasar';
 import { computed } from 'vue';
 import { fNumber } from '../../helpers';
 

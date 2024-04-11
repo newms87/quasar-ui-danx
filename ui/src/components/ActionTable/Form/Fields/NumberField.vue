@@ -1,5 +1,5 @@
 <template>
-  <q-input
+  <QInput
       :model-value="numberVal"
       :data-testid="'number-field-' + fieldOptions.id"
       :placeholder="fieldOptions.placeholder"
@@ -16,7 +16,7 @@
           :show-name="showName"
       />
     </template>
-  </q-input>
+    </QInput>
 </template>
 
 <script setup>

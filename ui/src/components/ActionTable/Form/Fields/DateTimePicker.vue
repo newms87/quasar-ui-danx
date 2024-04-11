@@ -1,29 +1,29 @@
 <template>
-  <q-popup-proxy
+  <QPopupProxy
       :model-value="true"
       cover
       transition-show="scale"
       transition-hide="scale"
       class="bg-transparent shadow-none flex items-stretch"
   >
-    <q-date v-model="dateTime" :mask="mask" :color="color">
+    <QDate v-model="dateTime" :mask="mask" :color="color">
       <div class="flex items-center justify-center">
         <div v-if="nullable" class="flex-grow">
-          <q-btn label="Clear" color="blue-base" flat @click="dateTime = null" />
+          <QBtn label="Clear" color="blue-base" flat @click="dateTime = null" />
         </div>
         <div>
-          <q-btn
+          <QBtn
               label="Cancel"
               color="blue-base"
               flat
               @click="$emit('cancel')"
           />
-          <q-btn label="Set" color="blue-base" flat @click="$emit('save')" />
+          <QBtn label="Set" color="blue-base" flat @click="$emit('save')" />
         </div>
       </div>
-    </q-date>
-    <q-time v-model="dateTime" :mask="mask" :color="color" class="ml-3" />
-  </q-popup-proxy>
+      </QDate>
+      <QTime v-model="dateTime" :mask="mask" :color="color" class="ml-3" />
+  </QPopupProxy>
 </template>
 <script setup>
 import { computed } from 'vue';

@@ -1,5 +1,5 @@
 <template>
-  <q-toggle
+  <QToggle
       :data-testid="'boolean-field-' + field.id"
       :model-value="modelValue"
       :toggle-indeterminate="toggleIndeterminate"
@@ -11,7 +11,7 @@
         :show-name="showName"
         :class="labelClass"
     />
-  </q-toggle>
+    </QToggle>
 </template>
 
 <script setup>

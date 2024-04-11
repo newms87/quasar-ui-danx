@@ -23,7 +23,7 @@
             <PlayIcon class="w-16" />
           </button>
         </div>
-        <q-img
+        <QImg
             v-if="thumbUrl || isPreviewable"
             fit="scale-down"
             class="non-selectable max-h-full max-w-full h-full"
@@ -49,7 +49,7 @@
           v-if="image && image.progress !== undefined"
           class="absolute-bottom w-full"
       >
-        <q-linear-progress
+        <QLinearProgress
             :value="image.progress"
             size="15px"
             color="green-base"
@@ -67,7 +67,7 @@
     </template>
 
     <div class="absolute top-1 right-1 flex items-center justify-between space-x-1">
-      <q-btn
+      <QBtn
           v-if="downloadable && computedImage?.url"
           size="sm"
           class="!p-1 opacity-70 hover:opacity-100"
@@ -75,17 +75,17 @@
           @click.stop="download(computedImage.url)"
       >
         <DownloadIcon class="w-4 h-5" />
-      </q-btn>
+        </QBtn>
 
-      <q-btn
-          v-if="removable"
-          size="sm"
-          class="bg-red-dark text-white !p-1 opacity-50 hover:opacity-100"
-          @click.stop="onRemove"
-      >
-        <div v-if="isConfirmingRemove" class="font-bold text-[1rem] leading-[1.2rem]">?</div>
-        <RemoveIcon v-else class="w-3" />
-      </q-btn>
+        <QBtn
+            v-if="removable"
+            size="sm"
+            class="bg-red-dark text-white !p-1 opacity-50 hover:opacity-100"
+            @click.stop="onRemove"
+        >
+          <div v-if="isConfirmingRemove" class="font-bold text-[1rem] leading-[1.2rem]">?</div>
+          <RemoveIcon v-else class="w-3" />
+          </QBtn>
     </div>
 
     <FullScreenCarouselDialog

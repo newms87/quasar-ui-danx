@@ -1,5 +1,5 @@
 <template>
-  <q-dialog
+  <QDialog
       v-model="isShowing"
       maximized
       :position="position"
@@ -21,7 +21,7 @@
         <slot />
       </div>
     </div>
-    </q-dialog>
+    </QDialog>
 </template>
 
 <script setup>

@@ -13,7 +13,7 @@
         @update:model-value="onSelectOption"
     />
     <div v-if="selectedOption">
-      <q-checkbox
+      <QCheckbox
           v-for="child in selectedOption.children"
           :key="child.id"
           :model-value="selectedChildren.includes(child.id)"
@@ -23,7 +23,7 @@
       >
         <div>{{ child.label }}</div>
         <div class="text-xs text-gray-silver">{{ child.name }}</div>
-      </q-checkbox>
+        </QCheckbox>
     </div>
   </div>
 </template>

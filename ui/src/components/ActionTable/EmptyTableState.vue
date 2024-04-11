@@ -2,12 +2,12 @@
   <div class="flex items-center justify-center text-sm py-14 w-full">
     <div v-if="loading">
       <slot name="loading">{{ loadingText }}
-        <q-spinner-ball class="w-4 ml-2" />
+        <QSpinnerBall class="w-4 ml-2" />
       </slot>
     </div>
     <div v-if="saving">
       <slot name="saving">{{ savingText }}
-        <q-spinner-ball class="w-4 ml-2" />
+        <QSpinnerBall class="w-4 ml-2" />
       </slot>
     </div>
     <slot>{{ text }}</slot>

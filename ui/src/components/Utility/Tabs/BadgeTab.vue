@@ -1,18 +1,18 @@
 <template>
-  <q-tab
+  <QTab
       :name="name"
       class="w-full"
       content-class="w-full"
   >
     <div class="flex items-center w-full">
       <div class="flex-grow text-sm">{{ label }}</div>
-      <q-badge
+      <QBadge
           color="gray-base"
           :label="count"
           rounded
       />
     </div>
-  </q-tab>
+    </QTab>
 </template>
 <script setup>
 defineProps({

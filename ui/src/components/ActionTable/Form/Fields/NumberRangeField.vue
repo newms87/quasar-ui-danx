@@ -20,7 +20,7 @@
         </template>
       </div>
     </div>
-    <q-popup-proxy>
+    <QPopupProxy>
       <NumberField
           v-model="range.from"
           :field="minField"
@@ -32,7 +32,7 @@
           :field="maxField"
           @update:model-value="onSave"
       />
-    </q-popup-proxy>
+    </QPopupProxy>
   </div>
 </template>
 

@@ -1,5 +1,5 @@
 <template>
-  <q-td :key="rowProps.key" :props="rowProps" :style="columnStyle">
+  <QTd :key="rowProps.key" :props="rowProps" :style="columnStyle">
     <div :style="columnStyle">
       <div
           class="flex items-center flex-nowrap"
@@ -28,7 +28,7 @@
         </div>
       </div>
     </div>
-  </q-td>
+    </QTd>
 </template>
 <script setup>
 import { computed } from 'vue';

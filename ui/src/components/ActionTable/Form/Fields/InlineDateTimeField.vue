@@ -5,7 +5,7 @@
     >
       {{ fLocalizedDateTime(modelValue, { empty: 'Never' }) }}
       <EditIcon class="w-4 font-bold ml-2 text-gray-base" />
-      <q-popup-edit
+      <QPopupEdit
           v-slot="scope"
           :model-value="modelValue"
           touch-position
@@ -18,7 +18,7 @@
             @save="onSave(scope)"
             @cancel="scope.cancel"
         />
-      </q-popup-edit>
+      </QPopupEdit>
     </div>
   </div>
 </template>

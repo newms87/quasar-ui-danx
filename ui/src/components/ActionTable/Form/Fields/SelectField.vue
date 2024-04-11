@@ -1,6 +1,6 @@
 <template>
   <div>
-    <q-select
+    <QSelect
         ref="selectField"
         v-bind="$props"
         :model-value="selectedValue"
@@ -36,18 +36,18 @@
             :class="{'flex-nowrap gap-y-0': chipLimit === 1, [selectionClass]: true}"
         >
           <template v-if="chipOptions.length > 0">
-            <q-chip
+            <QChip
                 v-for="chipOption in chipOptions"
                 :key="'selected-' + chipOption.label"
                 class="!mr-1"
             >{{ chipOption.label }}
-            </q-chip>
-            <q-chip
-                v-if="selectedOptions.length > chipOptions.length"
-                class="!mr-1"
-            >
-              +{{ selectedOptions.length - chipOptions.length }}
-            </q-chip>
+              </QChip>
+              <QChip
+                  v-if="selectedOptions.length > chipOptions.length"
+                  class="!mr-1"
+              >
+                +{{ selectedOptions.length - chipOptions.length }}
+                </QChip>
           </template>
           <template v-else>
             {{ placeholder }}
@@ -59,7 +59,7 @@
         >{{ selectedLabel }}
         </div>
       </template>
-    </q-select>
+      </QSelect>
   </div>
 </template>
 <script setup>

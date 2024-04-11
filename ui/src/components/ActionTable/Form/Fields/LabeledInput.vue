@@ -4,7 +4,7 @@
       <slot name="label">{{ label }}</slot>
     </label>
     <div class="mt-1">
-      <q-input
+      <QInput
           :model-value="modelValue"
           :error-message="error"
           :error="!!error"

@@ -1,5 +1,5 @@
 <template>
-  <q-tab
+  <QTab
       :name="name"
       class="w-full"
       content-class="w-full"
@@ -18,7 +18,7 @@
         />
       </div>
     </div>
-  </q-tab>
+    </QTab>
 </template>
 <script setup>
 import { ExclamationCircleIcon as OverdueIcon } from '@heroicons/vue/solid';

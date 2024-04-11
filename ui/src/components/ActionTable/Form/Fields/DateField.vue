@@ -17,12 +17,12 @@
         </template>
       </div>
     </div>
-    <q-popup-proxy>
-      <q-date
+    <QPopupProxy>
+      <QDate
           v-model="date"
           @update:model-value="onSave"
       />
-    </q-popup-proxy>
+    </QPopupProxy>
   </div>
 </template>
 

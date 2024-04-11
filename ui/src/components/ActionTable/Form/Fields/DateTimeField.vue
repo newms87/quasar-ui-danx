@@ -1,6 +1,6 @@
 <template>
   <div>
-    <q-input
+    <QInput
         :model-value="fLocalizedDateTime(modelValue)"
         :color="color"
         class="bg-white rounded overflow-hidden px-2 w-48"
@@ -9,17 +9,17 @@
         @click="isShowing = true"
     >
       <template #append>
-        <q-icon name="event" class="cursor-pointer">
-          <q-popup-proxy v-model="isShowing">
+        <QIcon name="event" class="cursor-pointer">
+          <QPopupProxy v-model="isShowing">
             <DateTimePicker
                 v-model="dateTime"
                 @cancel="isShowing = false"
                 @save="onSave"
             />
-          </q-popup-proxy>
-        </q-icon>
+          </QPopupProxy>
+          </QIcon>
       </template>
-    </q-input>
+      </QInput>
   </div>
 </template>
 

@@ -7,7 +7,7 @@
       {{ label }}
     </div>
     <template v-if="inline">
-      <q-date
+      <QDate
           v-model="dateRange"
           range
           class="reactive"
@@ -26,13 +26,13 @@
           </template>
         </div>
       </div>
-      <q-popup-proxy>
-        <q-date
+      <QPopupProxy>
+        <QDate
             v-model="dateRange"
             range
             @update:model-value="onSave"
         />
-      </q-popup-proxy>
+      </QPopupProxy>
     </template>
   </div>
 </template>

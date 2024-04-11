@@ -4,21 +4,31 @@ import { resolveFileLocation } from "./files";
 import { FlashMessages } from "./FlashMessages";
 
 export type FileUploadOptions = {
-    directory: string,
-    presignedUploadUrl: (...params) => "",
-    uploadCompletedUrl: (...params) => "",
+    directory?: string,
+    presignedUploadUrl?: (...params: any) => "",
+    uploadCompletedUrl?: (...params: any) => "",
 };
 
+export type UploadedFile = {
+    id: string,
+    name: string,
+    size: number,
+    type: string,
+    progress: number,
+    location: string,
+    blobUrl: string
+}
+
 export class FileUpload {
-    files: { id: string, blobUrl: string }[] = [];
+    files: UploadedFile[] = [];
     fileUploads = [];
     onErrorCb = null;
     onProgressCb = null;
     onCompleteCb = null;
     onAllCompleteCb = null;
-    options: FileUploadOptions = null;
+    options: FileUploadOptions = {};
 
-    constructor(files, options: FileUploadOptions = null) {
+    constructor(files: UploadedFile[] | UploadedFile, options: FileUploadOptions = {}) {
         if (!Array.isArray(files) && !(files instanceof FileList)) {
             files = [files];
         }
@@ -31,7 +41,6 @@ export class FileUpload {
 
         this.options = {
             ...danxOptions.fileUpload,
-            ...this.options,
             ...options
         };
 

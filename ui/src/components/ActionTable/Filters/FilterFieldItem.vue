@@ -1,9 +1,9 @@
 <template>
-  <q-expansion-item>
+  <QExpansionItem>
     <template #header>
       <div class="flex items-center flex-nowrap flex-grow">
         <div class="whitespace-nowrap flex-grow text-left text-sm font-bold">{{ name }}</div>
-        <q-badge
+        <QBadge
             :label="count"
             rounded
             class="ml-2 transition-all"
@@ -12,7 +12,7 @@
       </div>
     </template>
     <slot />
-  </q-expansion-item>
+  </QExpansionItem>
 </template>
 <script setup>
 defineProps({

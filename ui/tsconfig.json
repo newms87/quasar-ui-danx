@@ -1,32 +1,41 @@
 {
   "compilerOptions": {
-    "outDir": "./dist",
-    "declaration": true,
-    // Specify ECMAScript target version
+    // Compile down to ESNext (or choose your target version)
     "target": "esnext",
-    // Specify module code generation
+    // Use ES modules
     "module": "esnext",
+    // Library files to be included in the compilation
+    "lib": [
+      "dom",
+      "esnext"
+    ],
+    // Generate corresponding '.d.ts' file
+    "declaration": true,
+    // Output directory for the compiled files
+    "outDir": "./dist",
+    // Root directory of your source files
+    "rootDir": "./src",
     // Enable all strict type-checking options
-    "strict": false,
-    // Enables compatibility with Babel-imported CommonJS modules
+    "strict": true,
+    // Enables compatibility with Babel-style module imports
     "esModuleInterop": true,
-    "resolveJsonModule": true,
+    // Skip type checking of all declaration files (*.d.ts)
+    "skipLibCheck": true,
+    // Disallow inconsistently-cased references to the same file
+    "forceConsistentCasingInFileNames": true,
     // Resolve modules using Node.js style
     "moduleResolution": "node",
     // Allow default imports from modules with no default export
     "allowSyntheticDefaultImports": true,
     // Enables experimental support for decorators
     "experimentalDecorators": true,
-    // Skip type checking of all declaration files (*.d.ts)
-    "skipLibCheck": true,
+    // Enables source map generation for the compiled files (useful for debugging)
     "sourceMap": true,
-    // Disallow inconsistently-cased references to the same file.
-    "forceConsistentCasingInFileNames": true,
     // Base directory to resolve non-relative module names,
     "baseUrl": "./",
     "paths": {
       "@/*": [
-        "./dev/src/*"
+        "./src/*"
       ]
     }
   },
@@ -38,6 +47,8 @@
   ],
   "exclude": [
     "node_modules",
-    "dist"
+    "dist",
+    "demo",
+    "**/*.spec.ts"
   ]
 }

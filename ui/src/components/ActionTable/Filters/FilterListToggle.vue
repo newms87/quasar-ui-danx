@@ -1,18 +1,18 @@
 <template>
   <div class="flex items-center transition-all" :class="{'w-72': showFilters, 'w-[6.5rem]': !showFilters}">
     <div class="flex-grow">
-      <q-btn
+      <QBtn
           class="btn-blue-highlight"
           :class="{'highlighted': showFilters}"
           @click="$emit('update:show-filters', !showFilters)"
       >
         <FilterIcon class="w-5 mr-2" />
-        <q-badge
+        <QBadge
             :label="'' + activeCount"
             rounded
             :color="activeCount > 0 ? 'blue-base' : 'gray-base'"
         />
-      </q-btn>
+        </QBtn>
     </div>
     <a
         v-if="activeCount > 0"

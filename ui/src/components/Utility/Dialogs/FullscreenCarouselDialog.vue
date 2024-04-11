@@ -1,5 +1,5 @@
 <template>
-  <q-dialog
+  <QDialog
       :model-value="true"
       maximized
       @update:model-value="$emit('close')"
@@ -7,7 +7,7 @@
       @keyup.right="carousel.next()"
   >
     <div class="absolute top-0 left-0 w-full h-full">
-      <q-carousel
+      <QCarousel
           ref="carousel"
           v-model="currentSlide"
           height="100%"
@@ -17,7 +17,7 @@
           infinite
           class="carousel"
       >
-        <q-carousel-slide
+        <QCarouselSlide
             v-for="file in files"
             :key="'file-' + file.id"
             :name="file.id"
@@ -37,14 +37,14 @@
             </template>
             <img v-else :alt="file.filename" :src="file.url" />
           </div>
-        </q-carousel-slide>
-      </q-carousel>
-      <CloseIcon
-          class="absolute top-4 right-4 cursor-pointer text-white w-8 h-8"
-          @click="$emit('close')"
-      />
+        </QCarouselSlide>
+        </QCarousel>
+        <CloseIcon
+            class="absolute top-4 right-4 cursor-pointer text-white w-8 h-8"
+            @click="$emit('close')"
+        />
     </div>
-  </q-dialog>
+    </QDialog>
 </template>
 <script setup>
 import { ref } from 'vue';

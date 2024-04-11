@@ -3,50 +3,50 @@
       class="p-3 actionable"
       :class="{'opacity-50 cursor-not-allowed': disabled}"
   >
-    <q-tooltip v-if="$slots.tooltip || tooltip">
+    <QTooltip v-if="$slots.tooltip || tooltip">
       <slot name="tooltip">{{ tooltip }}</slot>
-    </q-tooltip>
-    <Transition
-        mode="out-in"
-        :duration="150"
-    >
-      <RenderComponent
-          v-if="loading"
-          :component="loadingComponent"
-      />
-      <MenuIcon
-          v-else
-          class="w-4 text-black"
-      />
-    </Transition>
-    <q-menu
-        v-if="!disabled"
-        auto-close
-    >
-      <q-list>
-        <template v-for="item in items">
-          <a
-              v-if="item.url"
-              :key="item.url"
-              class="q-item"
-              target="_blank"
-              :href="item.url"
-              :class="item.class"
-          >
-            {{ item.label }}
-          </a>
-          <q-item
-              v-else
-              :key="item.name || item.action"
-              clickable
-              :class="item.class"
-              @click="onAction(item)"
-          >
-            {{ item.label }}
-          </q-item>
-        </template>
-      </q-list>
-    </q-menu>
+      </QTooltip>
+      <Transition
+          mode="out-in"
+          :duration="150"
+      >
+        <RenderComponent
+            v-if="loading"
+            :component="loadingComponent"
+        />
+        <MenuIcon
+            v-else
+            class="w-4 text-black"
+        />
+      </Transition>
+      <QMenu
+          v-if="!disabled"
+          auto-close
+      >
+        <QList>
+          <template v-for="item in items">
+            <a
+                v-if="item.url"
+                :key="item.url"
+                class="q-item"
+                target="_blank"
+                :href="item.url"
+                :class="item.class"
+            >
+              {{ item.label }}
+            </a>
+            <QItem
+                v-else
+                :key="item.name || item.action"
+                clickable
+                :class="item.class"
+                @click="onAction(item)"
+            >
+              {{ item.label }}
+              </QItem>
+          </template>
+          </QList>
+          </QMenu>
   </a>
 </template>
 <script setup>

@@ -1,5 +1,5 @@
 <template>
-  <q-dialog
+  <QDialog
       :full-height="fullHeight"
       :full-width="fullWidth"
       :model-value="!!modelValue"
@@ -7,8 +7,8 @@
       :maximized="maximized"
       @update:model-value="onClose"
   >
-    <q-card class="flex flex-col flex-nowrap">
-      <q-card-section
+    <QCard class="flex flex-col flex-nowrap">
+      <QCardSection
           v-if="title || $slots.title"
           class="pl-6 pr-10 border-b border-gray-medium"
       >
@@ -23,30 +23,30 @@
             class="mt-1 text-sm"
         >{{ subtitle }}
         </div>
-      </q-card-section>
-      <q-card-section v-if="$slots.toolbar">
+      </QCardSection>
+      <QCardSection v-if="$slots.toolbar">
         <slot name="toolbar" />
-      </q-card-section>
-      <q-card-section
+      </QCardSection>
+      <QCardSection
           v-if="content || $slots.default"
           class="px-6 bg-neutral-plus-7 flex-grow max-h-full overflow-y-auto"
           :class="contentClass"
       >
         <slot>{{ content }}</slot>
-      </q-card-section>
+      </QCardSection>
       <div class="flex px-6 py-4 border-t border-gray-medium">
         <div class="flex-grow">
-          <q-btn
+          <QBtn
               :label="cancelText"
               class="action-btn btn-white-gray"
               @click="onClose"
           >
             <slot name="cancel-text" />
-            </q-btn>
+            </QBtn>
         </div>
         <slot name="actions" />
         <div v-if="!hideConfirm">
-          <q-btn
+          <QBtn
               :label="$slots['confirm-text'] ? '' : confirmText"
               class="action-btn ml-4"
               :class="confirmClass"
@@ -56,7 +56,7 @@
               @click="onConfirm"
           >
             <slot name="confirm-text" />
-          </q-btn>
+            </QBtn>
         </div>
       </div>
       <a
@@ -65,8 +65,8 @@
       >
         <CloseIcon class="w-5" />
       </a>
-    </q-card>
-  </q-dialog>
+      </QCard>
+      </QDialog>
 </template>
 
 <script setup>

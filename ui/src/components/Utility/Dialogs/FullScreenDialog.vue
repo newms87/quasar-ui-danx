@@ -1,5 +1,5 @@
 <template>
-  <q-dialog
+  <QDialog
       :model-value="modelValue"
       maximized
       transition-show="slide-up"
@@ -16,7 +16,7 @@
       </div>
       <slot />
     </div>
-  </q-dialog>
+    </QDialog>
 </template>
 
 <script setup>

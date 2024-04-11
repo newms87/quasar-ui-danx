@@ -18,7 +18,7 @@
           :class="rightSide ? 'justify-start' : 'justify-end'"
       >
         <slot name="toggle">
-          <q-btn
+          <QBtn
               class="btn-secondary"
               @click="toggleCollapse"
           >
@@ -26,7 +26,7 @@
                 class="w-5 transition-all"
                 :class="{ 'rotate-180': rightSide ? !isCollapsed : isCollapsed }"
             />
-          </q-btn>
+            </QBtn>
         </slot>
       </div>
       <div

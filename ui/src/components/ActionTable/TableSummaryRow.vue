@@ -1,9 +1,9 @@
 <template>
-  <q-tr
+  <QTr
       class="sticky-column-1 transition-all sticky-row"
       :class="{'!bg-neutral-plus-7': !selectedCount, '!bg-blue-base text-white selected': selectedCount, 'opacity-50': loading}"
   >
-    <q-td
+    <QTd
         :colspan="stickyColspan"
         class="font-bold transition-all"
         :class="{'!bg-neutral-plus-7 !pl-5': !selectedCount, '!bg-blue-base text-white !pl-4': selectedCount}"
@@ -22,14 +22,14 @@
         <div v-else-if="itemCount">
           {{ fNumber(itemCount) }} {{ label }}
         </div>
-        <q-spinner
+        <QSpinner
             v-if="loading"
             class="ml-3"
             size="18"
         />
       </div>
-    </q-td>
-    <q-td
+    </QTd>
+    <QTd
         v-for="column in summaryColumns"
         :key="column.name"
         :align="column.align || 'left'"
@@ -37,8 +37,8 @@
       <template v-if="summary">
         {{ formatValue(column) }}
       </template>
-    </q-td>
-  </q-tr>
+    </QTd>
+  </QTr>
 </template>
 <script setup>
 import { XCircleIcon as ClearIcon } from '@heroicons/vue/solid';

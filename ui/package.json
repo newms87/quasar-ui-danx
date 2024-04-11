@@ -1,6 +1,6 @@
 {
   "name": "quasar-ui-danx",
-  "version": "0.2.5",
+  "version": "0.2.6",
   "author": "Dan <dan@flytedesk.com>",
   "description": "DanX Vue / Quasar component library",
   "license": "MIT",
@@ -32,6 +32,7 @@
     "ts-node": "^10.9.2",
     "typescript": "^5.4.4",
     "vite": "^5.2.8",
+    "vite-plugin-dts": "^3.8.1",
     "vite-svg-loader": "^5.1.0",
     "vue": "^3.4.21",
     "vue-router": "^4.0.0"

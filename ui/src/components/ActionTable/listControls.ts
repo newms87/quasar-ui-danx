@@ -115,7 +115,7 @@ export function useListControls(name: string, {
 
             if (Object.keys(urlFilter).length > 0) {
                 filter.value = urlFilter;
-                
+
                 // Override whatever is in local storage with this new filter
                 updateSettings("filter", filter.value);
             }
@@ -252,7 +252,7 @@ export function useListControls(name: string, {
      * @returns {Promise<void>}
      */
     async function getActiveItemDetails() {
-        if (!activeItem.value) return;
+        if (!activeItem.value || !itemDetailsRoute) return;
 
         const result = await itemDetailsRoute(activeItem.value);
 

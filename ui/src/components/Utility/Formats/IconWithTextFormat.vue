@@ -1,5 +1,5 @@
 <template>
-  <div class="flex items-center">
+  <div class="flex items-center flex-nowrap">
     <component :is="icon" :class="iconClass" />
     <div :class="textClass">
       <slot>{{ text }}</slot>

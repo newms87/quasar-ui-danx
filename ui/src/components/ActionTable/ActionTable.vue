@@ -38,12 +38,13 @@
             :key="rowProps.key"
             :props="rowProps"
             :data-drop-zone="`resize-column-` + rowProps.col.name"
+            :class="cls['handle-drop-zone']"
         >
           {{ rowProps.col.label }}
           <HandleDraggable
               v-if="rowProps.col.resizeable"
               :drop-zone="`resize-column-` + rowProps.col.name"
-              class="resize-handle"
+              :class="cls['resize-handle']"
               @resize="onResizeColumn(rowProps.col, $event)"
           >
             <RowResizeIcon class="w-4 text-neutral-base" />
@@ -72,7 +73,7 @@ import { HandleDraggable } from "../DragAndDrop";
 import { ActionVnode } from "../Utility";
 import ActionTableColumn from "./ActionTableColumn.vue";
 import EmptyTableState from "./EmptyTableState.vue";
-import { mapSortBy, registerStickyScrolling } from "./listHelpers";
+import { registerStickyScrolling } from "./listHelpers";
 import TableSummaryRow from "./TableSummaryRow.vue";
 
 defineEmits(["update:quasar-pagination", "update:selected-rows"]);
@@ -128,8 +129,8 @@ function onResizeColumn(column, val) {
 }
 </script>
 
-<style lang="scss" scoped>
-[data-drop-zone] {
+<style lang="scss" module="cls">
+.handle-drop-zone {
   .resize-handle {
     position: absolute;
     top: 0;

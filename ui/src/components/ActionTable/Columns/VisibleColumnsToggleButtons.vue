@@ -3,8 +3,7 @@
     <div
         v-for="category in categories"
         :key="category"
-        class="category-toggle border-gray-200"
-        :class="{'has-visible-columns text-white bg-blue-600': categoryHasVisibleColumns(category)}"
+        :class="getCategoryClass(category)"
     >
       <QCheckbox
           toggle-indeterminate
@@ -46,7 +45,7 @@
   </div>
 </template>
 <script setup>
-import { computed, ref } from "vue";
+import { computed, ref, useCssModule } from "vue";
 import { remove } from "../../../helpers";
 import { CaretDownIcon } from "../../../svg";
 
@@ -141,12 +140,18 @@ function toggleColumn(columnName, showColumn) {
 
   emit("update:hidden-column-names", hiddenColumnNames);
 }
+
+const cls = useCssModule();
+function getCategoryClass(category) {
+  return cls["category-toggle"] + (categoryHasVisibleColumns(category) ? (" " + cls["has-visible-columns"]) : "");
+}
 </script>
-<style
-    lang="scss"
-    scoped
->
+<style lang="scss" module>
 .category-toggle {
-  @apply text-xs font-bold rounded-lg border border-solid px-2 py-1 mx-1 cursor-pointer flex items-center;
+  @apply text-xs font-bold rounded-lg border border-solid px-2 py-1 mx-1 cursor-pointer flex items-center border-gray-200;
+
+  &.has-visible-columns {
+    @apply text-white bg-blue-600;
+  }
 }
 </style>

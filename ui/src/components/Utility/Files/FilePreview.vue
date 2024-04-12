@@ -19,7 +19,7 @@
                 :type="mimeType"
             />
           </video>
-          <button class="play-button text-blue-lighter">
+          <button :class="cls['play-button']">
             <PlayIcon class="w-16" />
           </button>
         </div>
@@ -41,7 +41,7 @@
       </div>
       <div
           v-if="$slots['action-button']"
-          class="action-button"
+          :class="cls['action-button']"
       >
         <slot name="action-button" />
       </div>
@@ -173,7 +173,7 @@ function onRemove() {
 }
 </script>
 
-<style scoped lang="scss">
+<style module="cls" lang="scss">
 .action-button {
   position: absolute;
   bottom: 1.5em;
@@ -191,5 +191,6 @@ function onRemove() {
   width: 100%;
   height: 100%;
   pointer-events: none;
+  @apply text-blue-200;
 }
 </style>

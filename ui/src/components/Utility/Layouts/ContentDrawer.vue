@@ -9,15 +9,12 @@
     <div>
       <div
           v-if="title"
-          class="dialog-title bg-slate-100 text-gray-500 border-gray-200"
+          :class="cls['dialog-title']"
           @click.stop.prevent
       >
         {{ title }}
       </div>
-      <div
-          class="dialog-content bg-white"
-          :class="{ [contentClass]: true }"
-      >
+      <div :class="{[cls['dialog-content']]: true, [contentClass]: true}">
         <slot />
       </div>
     </div>
@@ -53,18 +50,16 @@ const isShowing = computed({
 });
 </script>
 
-<style
-    lang="scss"
-    scoped
->
+<style lang="scss" module="cls">
 .dialog-title {
-  @apply font-medium uppercase text-xs px-6 py-3 border-b rounded-t-md;
+  @apply font-medium uppercase text-xs px-6 py-3 border-b rounded-t-md bg-slate-100 text-gray-500 border-gray-200;
   font-family: "Roboto", sans-serif;
   letter-spacing: 0.05em;
   box-shadow: 0px -4px 12px rgba(0, 0, 0, 0.25);
 }
 
 .dialog-content {
+  @apply bg-white;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.06);
 }
 </style>

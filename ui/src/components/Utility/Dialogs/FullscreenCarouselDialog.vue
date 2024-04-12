@@ -15,7 +15,7 @@
           animated
           :thumbnails="files.length > 1"
           infinite
-          class="carousel"
+          :class="cls['carousel']"
       >
         <QCarouselSlide
             v-for="file in files"
@@ -23,7 +23,7 @@
             :name="file.id"
             :img-src="getThumbUrl(file)"
         >
-          <div class="slide-image">
+          <div :class="cls['slide-image']">
             <template v-if="isVideo(file)">
               <video
                   class="max-h-full w-full"
@@ -80,7 +80,7 @@ function getThumbUrl(file) {
   }
 }
 </script>
-<style scoped lang="scss">
+<style module="cls" lang="scss">
 .slide-image {
   width: 100%;
   height: 100%;

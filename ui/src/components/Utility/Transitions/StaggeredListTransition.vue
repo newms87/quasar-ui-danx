@@ -76,7 +76,7 @@ function onLeave(el, onComplete) {
 }
 </script>
 
-<style scoped lang="scss">
+<style lang="scss">
 .list-move,
 .list-enter-active,
 .list-leave-active {

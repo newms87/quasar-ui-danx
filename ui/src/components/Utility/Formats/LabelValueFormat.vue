@@ -2,7 +2,10 @@
   <div>
     <div class="text-xs font-bold">{{ label }}</div>
     <div :class="{'mt-2': !dense, 'mt-1': dense, 'text-no-wrap': nowrap}">
-      <slot>{{ value || "-" }}</slot>
+      <template v-if="loading">
+        <QSpinnerTail />
+      </template>
+      <slot v-else>{{ value || '-' }}</slot>
     </div>
   </div>
 </template>
@@ -14,9 +17,10 @@ defineProps({
   },
   value: {
     type: [String, Number],
-    default: "-"
+    default: '-'
   },
   dense: Boolean,
-  nowrap: Boolean
+  nowrap: Boolean,
+  loading: Boolean
 });
 </script>

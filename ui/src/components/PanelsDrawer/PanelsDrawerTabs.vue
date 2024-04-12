@@ -47,11 +47,7 @@ defineProps({
   :deep(.q-tab) {
     justify-content: start !important;
     padding: 0;
-    @apply text-left py-2.5 px-2 rounded-lg;
-
-    &:hover {
-      background: var(--slate-200);
-    }
+    @apply text-left py-2.5 px-2 rounded-lg hover:bg-slate-200;
 
     .q-focus-helper, .q-tab__indicator {
       display: none;
@@ -63,8 +59,7 @@ defineProps({
   }
 
   :deep(.q-tab.q-tab--active) {
-    background: var(--blue-600);
-    @apply text-white;
+    @apply text-white bg-blue-600;
   }
 }
 </style>

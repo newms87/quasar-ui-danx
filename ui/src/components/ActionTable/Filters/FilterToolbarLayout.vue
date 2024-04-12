@@ -13,8 +13,7 @@
     </div>
 
     <div v-if="$slots['right-side']" class="flex justify-end items-stretch flex-nowrap p-4">
-      <QSeparator vertical class="mx-4 h-10 self-center" />
-
+      <QSeparator v-if="$slots['default']" vertical class="mx-4 h-10 self-center" />
       <slot name="right-side" />
     </div>
   </div>

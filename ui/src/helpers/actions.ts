@@ -1,6 +1,8 @@
 import { ref, shallowRef, VNode } from "vue";
 import { FlashMessages } from "./FlashMessages";
 
+type ActionTarget = object[] | object;
+
 interface ActionOptions {
     name?: string;
     label?: string;
@@ -8,32 +10,32 @@ interface ActionOptions {
     batch?: boolean;
     category?: string;
     class?: string;
-    trigger?: (target: object[] | object, input: any) => Promise<any>;
+    trigger?: (target: ActionTarget, input: any) => Promise<any>;
     activeTarget?: any;
-    vnode?: (target: object[] | object) => VNode;
+    vnode?: (target: ActionTarget) => VNode;
     enabled?: (target: object) => boolean;
     batchEnabled?: (targets: object[]) => boolean;
     optimistic?: (action: ActionOptions, target: object, input: any) => void;
-    onAction?: (action: string | null, target: object, input: any) => Promise<any>;
-    onBatchAction?: (action: string | null, targets: object[], input: any) => Promise<any>;
-    onStart?: (action: ActionOptions | null, targets: object, input: any) => boolean;
-    onSuccess?: (action: string | null, targets: object, input: any) => any;
-    onError?: (action: string | null, targets: object, input: any) => any;
-    onFinish?: (action: string | null, targets: object, input: any) => any;
+    onAction?: (action: string | null | undefined, target: object, input: any) => Promise<any>;
+    onBatchAction?: (action: string | null | undefined, targets: object[], input: any) => Promise<any>;
+    onStart?: (action: ActionOptions | null, targets: ActionTarget, input: any) => boolean;
+    onSuccess?: (result: any, targets: ActionTarget, input: any) => any;
+    onError?: (result: any, targets: ActionTarget, input: any) => any;
+    onFinish?: (result: any, targets: ActionTarget, input: any) => any;
 }
 
-export const activeActionVnode = shallowRef(null);
+export const activeActionVnode: object = shallowRef(null);
 
 /**
  * Hook to perform an action on a set of targets
  * This helper allows you to perform actions by name on a set of targets using a provided list of actions
  *
  * @param actions
- * @param {ActionOptions} globalOptions
+ * @param {ActionOptions | null} globalOptions
  */
-export function useActions(actions: ActionOptions[], globalOptions: ActionOptions = null) {
+export function useActions(actions: ActionOptions[], globalOptions: ActionOptions | null = null) {
     const mappedActions = actions.map(action => {
-        const mappedAction = { ...globalOptions, ...action };
+        const mappedAction: ActionOptions = { ...globalOptions, ...action };
         if (!mappedAction.trigger) {
             mappedAction.trigger = (target, input) => performAction(mappedAction, target, input);
             mappedAction.activeTarget = ref(null);
@@ -68,7 +70,7 @@ export function useActions(actions: ActionOptions[], globalOptions: ActionOption
      * @param {object[]|object} target - an array of targets or a single target object
      * @param {any} input - The input data to pass to the action handler
      */
-    async function performAction(name: string | object, target: object[] | object, input: any = null) {
+    async function performAction(name: string | object, target: ActionTarget, input: any = null) {
         const action: ActionOptions = typeof name === "string" ? mappedActions.find(a => a.name === name) : name;
         if (!action) {
             throw new Error(`Unknown action: ${name}`);
@@ -85,7 +87,7 @@ export function useActions(actions: ActionOptions[], globalOptions: ActionOption
 
         // Run the onStart handler if it exists and quit the operation if it returns false
         if (action.onStart) {
-            if (action.onStart(action, target, input) === false) {
+            if (!action.onStart(action, target, input)) {
                 return;
             }
         }
@@ -146,7 +148,7 @@ export function useActions(actions: ActionOptions[], globalOptions: ActionOption
     };
 }
 
-async function onConfirmAction(action: ActionOptions, target: object[] | object, input: any = null) {
+async function onConfirmAction(action: ActionOptions, target: ActionTarget, input: any = null) {
     if (!action.onAction) {
         throw new Error("No onAction handler found for the selected action:" + action.name);
     }
@@ -154,7 +156,11 @@ async function onConfirmAction(action: ActionOptions, target: object[] | object,
     let result: any;
     try {
         if (Array.isArray(target)) {
-            result = await action.onBatchAction(action.name, target, input);
+            if (action.onBatchAction) {
+                result = await action.onBatchAction(action.name, target, input);
+            } else {
+                result = { error: `Action ${action.name} does not support batch actions` };
+            }
         } else {
             // If the action has an optimistic callback, we call it before the actual action to immediately
             // update the UI

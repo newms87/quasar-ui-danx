@@ -9,6 +9,7 @@ export default defineConfig({
         extensions: ['.mjs', '.js', '.ts', '.mts', '.jsx', '.tsx', '.json', '.vue', '.svg']
     },
     build: {
+        sourcemap: true,
         lib: {
             entry: resolve(__dirname, './src/index.esm.js'),
             name: 'Danx',

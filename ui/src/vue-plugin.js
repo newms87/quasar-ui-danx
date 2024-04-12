@@ -3,8 +3,6 @@ export * from './helpers';
 export * from './components';
 export * from './svg';
 
-import './styles/index.scss';
-
 import packageJson from '../package.json';
 
 const { version } = packageJson;

@@ -1,3 +1,4 @@
+export * from "./actions";
 export * from "./array";
 export * from "./compatibility";
 export * from "./date";
@@ -9,7 +10,7 @@ export * from "./FlashMessages";
 export * from "./formats";
 export * from "./http";
 export * from "./multiFileUpload";
-export * from "./actions";
 export * from "./singleFileUpload";
 export * from "./storage";
+export * from "./styles";
 export * from "./utils";

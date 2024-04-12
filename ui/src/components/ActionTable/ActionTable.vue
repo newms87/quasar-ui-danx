@@ -73,7 +73,7 @@ import { HandleDraggable } from "../DragAndDrop";
 import { ActionVnode } from "../Utility";
 import ActionTableColumn from "./ActionTableColumn.vue";
 import EmptyTableState from "./EmptyTableState.vue";
-import { registerStickyScrolling } from "./listHelpers";
+import { mapSortBy, registerStickyScrolling } from "./listHelpers";
 import TableSummaryRow from "./TableSummaryRow.vue";
 
 defineEmits(["update:quasar-pagination", "update:selected-rows"]);

@@ -21,7 +21,7 @@
       </div>
       <div class="flex-grow overflow-hidden h-full">
         <div class="flex items-stretch flex-nowrap h-full">
-          <div class="border-r w-[13.5em] overflow-y-auto">
+          <div class="border-r w-[13.5rem] overflow-y-auto">
             <PanelsDrawerTabs
                 v-model="activePanel"
                 :panels="panels"

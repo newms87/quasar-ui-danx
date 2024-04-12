@@ -106,7 +106,7 @@ export function useListControls(name: string, {
     /**
      * Watches for a filter URL parameter and applies the filter if it is set.
      */
-    function applyFilterFromUrl(url, filterFields = null) {
+    function applyFilterFromUrl(url: string, filterFields = null) {
         if (url.match(urlPattern)) {
             // A flat list of valid filterable field names
             const validFilterKeys = filterFields?.value?.map(group => group.fields.map(field => field.name)).flat();

@@ -9,11 +9,12 @@
           <a
               v-if="column.onClick"
               @click="column.onClick(row)"
+              :class="column.innerClass"
           >
             <RenderVnode v-if="column.vnode" :vnode="column.vnode(row)" />
             <slot v-else>{{ value }}</slot>
           </a>
-          <div v-else>
+          <div v-else :class="column.innerClass">
             <RenderVnode v-if="column.vnode" :vnode="column.vnode(row)" />
             <slot v-else>{{ value }}</slot>
           </div>
@@ -59,6 +60,7 @@ const columnStyle = computed(() => {
 });
 
 const columnClass = computed(() => ({
+  [column.value.class || '']: true,
   'is-saving': isSaving.value,
   'justify-end': column.value.align === 'right',
   'justify-center': column.value.align === 'center',

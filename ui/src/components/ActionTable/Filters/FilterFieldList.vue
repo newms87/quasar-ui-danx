@@ -39,14 +39,14 @@
         />
       </template>
     </div>
-    </QList>
+  </QList>
 </template>
 <script setup>
-import { computed } from 'vue';
-import FilterableField from './FilterableField';
-import FilterFieldItem from './FilterFieldItem';
+import { computed } from "vue";
+import FilterableField from "./FilterableField";
+import FilterFieldItem from "./FilterFieldItem";
 
-const emit = defineEmits(['update:filter']);
+const emit = defineEmits(["update:filter"]);
 const props = defineProps({
   filterFields: {
     type: Array,
@@ -71,6 +71,6 @@ function updateFilter(field, value) {
   if (field.filterBy) {
     fieldFilter = field.filterBy(value);
   }
-  emit('update:filter', { ...props.filter, ...fieldFilter });
+  emit("update:filter", { ...props.filter, ...fieldFilter });
 }
 </script>

@@ -25,9 +25,9 @@
 </template>
 
 <script setup>
-import { computed } from 'vue';
+import { computed } from "vue";
 
-const emit = defineEmits(['update:show']);
+const emit = defineEmits(["update:show"]);
 
 const props = defineProps({
   show: Boolean,
@@ -35,21 +35,21 @@ const props = defineProps({
   overlay: Boolean,
   position: {
     type: String,
-    default: 'bottom'
+    default: "bottom"
   },
   contentClass: {
     type: String,
-    default: 'py-8 px-12'
+    default: "py-8 px-12"
   },
   title: {
     type: String,
-    default: 'Edit'
+    default: "Edit"
   }
 });
 
 const isShowing = computed({
   get: () => props.show,
-  set: (value) => emit('update:show', value)
+  set: (value) => emit("update:show", value)
 });
 </script>
 

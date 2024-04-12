@@ -23,16 +23,16 @@
       >
         <div>{{ child.label }}</div>
         <div class="text-xs text-gray-silver">{{ child.name }}</div>
-        </QCheckbox>
+      </QCheckbox>
     </div>
   </div>
 </template>
 <script setup>
-import { ref, watch } from 'vue';
-import { remove } from '../../../../helpers';
-import SelectField from './SelectField';
+import { ref, watch } from "vue";
+import { remove } from "../../../../helpers";
+import SelectField from "./SelectField";
 
-const emit = defineEmits(['update:model-value']);
+const emit = defineEmits(["update:model-value"]);
 const props = defineProps({
   modelValue: {
     type: Array,
@@ -40,11 +40,11 @@ const props = defineProps({
   },
   label: {
     type: String,
-    default: 'Selection'
+    default: "Selection"
   },
   placeholder: {
     type: String,
-    default: 'Select an option'
+    default: "Select an option"
   },
   options: {
     type: Array,
@@ -68,11 +68,11 @@ function onSelectChild(child) {
   } else {
     selectedChildren.value.push(child.id);
   }
-  emit('update:model-value', selectedChildren.value.length > 0 ? selectedChildren.value : undefined);
+  emit("update:model-value", selectedChildren.value.length > 0 ? selectedChildren.value : undefined);
 }
 function onSelectOption() {
   selectedChildren.value = [];
-  emit('update:model-value', undefined);
+  emit("update:model-value", undefined);
 }
 watch(() => props.modelValue, (value) => {
   selectedOption.value = resolveSelectedOption();

@@ -10,8 +10,8 @@
   />
 </template>
 <script setup>
-import { computed, ref } from 'vue';
-import { PopoverMenu } from '../Utility';
+import { computed, ref } from "vue";
+import { PopoverMenu } from "../Utility";
 
 const props = defineProps({
   actions: {
@@ -24,7 +24,7 @@ const props = defineProps({
   },
   tooltip: {
     type: String,
-    default: 'First select records to perform a batch action'
+    default: "First select records to perform a batch action"
   },
   loading: Boolean,
   loadingComponent: {
@@ -46,7 +46,7 @@ const activeActions = computed(() => props.actions.filter(action => {
 const isSaving = ref(false);
 async function onAction(action) {
   if (!action.trigger) {
-    throw new Error('Action must have a trigger function! Make sure you are using useActions() or implement your own trigger function.');
+    throw new Error("Action must have a trigger function! Make sure you are using useActions() or implement your own trigger function.");
   }
   isSaving.value = true;
   await action.trigger(props.target);

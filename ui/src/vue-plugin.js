@@ -1,9 +1,9 @@
-export * from './config';
-export * from './helpers';
-export * from './components';
-export * from './svg';
+export * from "./config";
+export * from "./helpers";
+export * from "./components";
+export * from "./svg";
 
-import packageJson from '../package.json';
+import packageJson from "../package.json";
 
 const { version } = packageJson;
 

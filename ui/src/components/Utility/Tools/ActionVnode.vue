@@ -10,9 +10,9 @@
   </div>
 </template>
 <script setup>
-import { ref } from 'vue';
-import { activeActionVnode } from '../../../helpers';
-import RenderVnode from './RenderVnode';
+import { ref } from "vue";
+import { activeActionVnode } from "../../../helpers";
+import RenderVnode from "./RenderVnode";
 
 const isSaving = ref(false);
 async function onConfirm(input) {

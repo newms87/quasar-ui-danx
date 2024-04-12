@@ -18,11 +18,11 @@
         />
       </div>
     </div>
-    </QTab>
+  </QTab>
 </template>
 <script setup>
-import { ExclamationCircleIcon as OverdueIcon } from '@heroicons/vue/solid';
-import { WarningIcon } from '../../../svg';
+import { ExclamationCircleIcon as OverdueIcon } from "@heroicons/vue/solid";
+import { WarningIcon } from "../../../svg";
 
 defineProps({
   name: {

@@ -14,7 +14,7 @@ defineProps({
   },
   iconClass: {
     type: String,
-    default: 'w-6'
+    default: "w-6"
   },
   text: {
     type: String,
@@ -22,7 +22,7 @@ defineProps({
   },
   textClass: {
     type: String,
-    default: 'ml-2'
+    default: "ml-2"
   }
 });
 </script>

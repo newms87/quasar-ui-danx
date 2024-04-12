@@ -98,17 +98,17 @@
 </template>
 
 <script setup>
-import { DocumentTextIcon as TextFileIcon, DownloadIcon, PlayIcon } from '@heroicons/vue/outline';
-import { computed, ref } from 'vue';
-import { download } from '../../../helpers';
-import { ImageIcon, PdfIcon, TrashIcon as RemoveIcon } from '../../../svg';
-import { FullScreenCarouselDialog } from '../Dialogs';
+import { DocumentTextIcon as TextFileIcon, DownloadIcon, PlayIcon } from "@heroicons/vue/outline";
+import { computed, ref } from "vue";
+import { download } from "../../../helpers";
+import { ImageIcon, PdfIcon, TrashIcon as RemoveIcon } from "../../../svg";
+import { FullScreenCarouselDialog } from "../Dialogs";
 
-const emit = defineEmits(['remove']);
+const emit = defineEmits(["remove"]);
 const props = defineProps({
   src: {
     type: String,
-    default: ''
+    default: ""
   },
   image: {
     type: Object,
@@ -124,7 +124,7 @@ const props = defineProps({
   },
   downloadButtonClass: {
     type: String,
-    default: 'bg-blue-600 text-white'
+    default: "bg-blue-600 text-white"
   },
   downloadable: Boolean,
   removable: Boolean,
@@ -140,7 +140,7 @@ const computedImage = computed(() => {
     return {
       id: props.src,
       url: props.src,
-      type: 'image/' + props.src.split('.').pop().toLowerCase()
+      type: "image/" + props.src.split(".").pop().toLowerCase()
     };
   }
   return null;
@@ -168,7 +168,7 @@ function onRemove() {
       isConfirmingRemove.value = false;
     }, 2000);
   } else {
-    emit('remove');
+    emit("remove");
   }
 }
 </script>

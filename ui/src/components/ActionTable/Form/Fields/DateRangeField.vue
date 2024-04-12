@@ -38,11 +38,11 @@
 </template>
 
 <script setup>
-import { CalendarIcon as DateIcon } from '@heroicons/vue/outline';
-import { computed, ref, watch } from 'vue';
-import { fDate, parseQDate, parseQDateTime } from '../../../../helpers';
+import { CalendarIcon as DateIcon } from "@heroicons/vue/outline";
+import { computed, ref, watch } from "vue";
+import { fDate, parseQDate, parseQDateTime } from "../../../../helpers";
 
-const emit = defineEmits(['update:model-value']);
+const emit = defineEmits(["update:model-value"]);
 const props = defineProps({
   modelValue: {
     type: Object,
@@ -60,14 +60,14 @@ const formattedDates = computed(() => {
   if (dateRangeValue.value) {
     if (props.withTime) {
       return {
-        from: fDate(parseQDateTime(dateRangeValue.value.from || '0000-00-00')),
-        to: fDate(parseQDateTime(dateRangeValue.value.to || '9999-12-31'))
+        from: fDate(parseQDateTime(dateRangeValue.value.from || "0000-00-00")),
+        to: fDate(parseQDateTime(dateRangeValue.value.to || "9999-12-31"))
       };
     }
 
     return {
-      from: fDate(parseQDate(dateRangeValue.value.from || '0000-00-00')),
-      to: fDate(parseQDate(dateRangeValue.value.to || '9999-12-31'))
+      from: fDate(parseQDate(dateRangeValue.value.from || "0000-00-00")),
+      to: fDate(parseQDate(dateRangeValue.value.to || "9999-12-31"))
     };
   }
   return {
@@ -89,7 +89,7 @@ function toQDateValue(val) {
 const dateRangeValue = computed(() => {
   let range;
 
-  if (typeof dateRange.value === 'string') {
+  if (typeof dateRange.value === "string") {
     range = {
       from: dateRange.value,
       to: dateRange.value
@@ -101,15 +101,15 @@ const dateRangeValue = computed(() => {
     };
   }
 
-  if (range?.from && range?.to && props.withTime && !range.from.includes('00:00:00')) {
-    range.from += ' 00:00:00';
-    range.to += ' 23:59:59';
+  if (range?.from && range?.to && props.withTime && !range.from.includes("00:00:00")) {
+    range.from += " 00:00:00";
+    range.to += " 23:59:59";
   }
 
   return range;
 });
 
 function onSave() {
-  emit('update:model-value', dateRangeValue.value);
+  emit("update:model-value", dateRangeValue.value);
 }
 </script>

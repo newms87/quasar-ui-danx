@@ -19,10 +19,10 @@
   </div>
 </template>
 <script setup>
-import { QSeparator } from 'quasar';
-import { FilterListToggle } from '../Filters';
+import { QSeparator } from "quasar";
+import { FilterListToggle } from "../Filters";
 
-defineEmits(['update:show-filters', 'update:filter']);
+defineEmits(["update:show-filters", "update:filter"]);
 defineProps({
   filter: {
     type: Object,

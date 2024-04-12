@@ -15,30 +15,30 @@
         multiple
         @change="onAttachFiles"
     />
-    </QBtn>
+  </QBtn>
 </template>
 <script setup>
-import { PlusIcon } from '@heroicons/vue/outline';
-import { QBtn } from 'quasar';
-import { ref } from 'vue';
-import { FileUpload } from '../../../../helpers';
+import { PlusIcon } from "@heroicons/vue/outline";
+import { QBtn } from "quasar";
+import { ref } from "vue";
+import { FileUpload } from "../../../../helpers";
 
 defineExpose({ upload });
 const emit = defineEmits([
-  'uploading',
-  'file-progress',
-  'file-complete',
-  'complete'
+  "uploading",
+  "file-progress",
+  "file-complete",
+  "complete"
 ]);
 const props = defineProps({
   ...QBtn.props,
   text: {
     type: String,
-    default: 'Add File'
+    default: "Add File"
   },
   locationWaitMessage: {
     type: String,
-    default: 'Waiting for location...'
+    default: "Waiting for location..."
   },
   geolocation: Boolean
 });
@@ -56,17 +56,17 @@ function upload() {
  * @returns {Promise<void>}
  */
 async function onAttachFiles({ target: { files } }) {
-  emit('uploading', files);
+  emit("uploading", files);
   let fileUpload = new FileUpload(files)
       .onProgress(({ file, progress }) => {
         file.progress = progress;
-        emit('file-progress', file);
+        emit("file-progress", file);
       })
       .onComplete(({ file, uploadedFile }) => {
-        emit('file-complete', { file, uploadedFile });
+        emit("file-complete", { file, uploadedFile });
       })
       .onAllComplete(() => {
-        emit('complete', fileUpload.files);
+        emit("complete", fileUpload.files);
       });
 
   if (props.geolocation) {

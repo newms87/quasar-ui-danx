@@ -14,22 +14,22 @@
   </div>
 </template>
 <script setup>
-import { QSpinnerBall } from 'quasar';
+import { QSpinnerBall } from "quasar";
 
 defineProps({
   loading: Boolean,
   saving: Boolean,
   text: {
     type: String,
-    default: 'No records found'
+    default: "No records found"
   },
   loadingText: {
     type: String,
-    default: 'Loading...'
+    default: "Loading..."
   },
   savingText: {
     type: String,
-    default: 'Saving...'
+    default: "Saving..."
   }
 });
 </script>

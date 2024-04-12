@@ -1,7 +1,7 @@
 <template>
   <div
-    class="flex items-center w-full"
-    :class="{'cursor-not-allowed': locked}"
+      class="flex items-center w-full"
+      :class="{'cursor-not-allowed': locked}"
   >
     <a v-if="locked" class="text-neutral-on-plus-3 cursor-not-allowed">
       <LockedIcon class="w-4" />

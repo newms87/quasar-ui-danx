@@ -15,19 +15,19 @@
   </ConfirmDialog>
 </template>
 <script setup>
-import { ref } from 'vue';
-import ConfirmDialog from './ConfirmDialog';
+import { ref } from "vue";
+import ConfirmDialog from "./ConfirmDialog";
 
-defineEmits(['confirm', 'close', 'update:input']);
+defineEmits(["confirm", "close", "update:input"]);
 const props = defineProps({
   ...ConfirmDialog.props,
   title: {
     type: String,
-    default: 'Enter Value'
+    default: "Enter Value"
   },
   input: {
     type: [Number, String],
-    default: ''
+    default: ""
   }
 });
 

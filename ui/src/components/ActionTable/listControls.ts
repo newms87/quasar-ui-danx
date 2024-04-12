@@ -4,11 +4,11 @@ import { getFilterFromUrl } from "./listHelpers";
 
 interface ListActionsOptions {
     listRoute: Function;
-    summaryRoute?: Function;
-    filterFieldOptionsRoute?: Function;
-    moreRoute?: Function;
-    itemDetailsRoute?: Function;
-    urlPattern?: RegExp;
+    summaryRoute?: Function | null;
+    filterFieldOptionsRoute?: Function | null;
+    moreRoute?: Function | null;
+    itemDetailsRoute?: Function | null;
+    urlPattern?: RegExp | null;
     filterDefaults?: Record<string, any>;
     refreshFilters?: boolean;
 }

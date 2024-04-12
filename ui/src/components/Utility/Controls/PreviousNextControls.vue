@@ -19,9 +19,9 @@
   </div>
 </template>
 <script setup>
-import { SkipNextIcon, SkipPreviousIcon } from '../../../svg';
+import { SkipNextIcon, SkipPreviousIcon } from "../../../svg";
 
-defineEmits(['next']);
+defineEmits(["next"]);
 defineProps({
   isLoading: Boolean
 });

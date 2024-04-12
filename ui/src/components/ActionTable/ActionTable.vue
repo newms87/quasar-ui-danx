@@ -8,7 +8,7 @@
         :columns="columns"
         :loading="isLoadingList"
         :rows="pagedItems?.data || []"
-        binary-state-sort
+        :binary-state-sort="false"
         selection="multiple"
         :rows-per-page-options="rowsPerPageOptions"
         class="sticky-column sticky-header w-full h-full !border-0"
@@ -64,18 +64,18 @@
 </template>
 
 <script setup>
-import { QTable, QTh } from 'quasar';
-import { ref } from 'vue';
-import { getItem, setItem } from '../../helpers';
-import { DragHandleIcon as RowResizeIcon } from '../../svg';
-import { HandleDraggable } from '../DragAndDrop';
-import { ActionVnode } from '../Utility';
-import ActionTableColumn from './ActionTableColumn.vue';
-import EmptyTableState from './EmptyTableState.vue';
-import { mapSortBy, registerStickyScrolling } from './listHelpers';
-import TableSummaryRow from './TableSummaryRow.vue';
+import { QTable, QTh } from "quasar";
+import { ref } from "vue";
+import { getItem, setItem } from "../../helpers";
+import { DragHandleIcon as RowResizeIcon } from "../../svg";
+import { HandleDraggable } from "../DragAndDrop";
+import { ActionVnode } from "../Utility";
+import ActionTableColumn from "./ActionTableColumn.vue";
+import EmptyTableState from "./EmptyTableState.vue";
+import { mapSortBy, registerStickyScrolling } from "./listHelpers";
+import TableSummaryRow from "./TableSummaryRow.vue";
 
-defineEmits(['update:quasar-pagination', 'update:selected-rows']);
+defineEmits(["update:quasar-pagination", "update:selected-rows"]);
 const props = defineProps({
   name: {
     type: String,

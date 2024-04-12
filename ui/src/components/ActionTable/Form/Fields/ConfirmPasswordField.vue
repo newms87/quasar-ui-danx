@@ -10,21 +10,21 @@
 </template>
 
 <script setup>
-import LabeledInput from './LabeledInput';
+import LabeledInput from "./LabeledInput";
 
-defineEmits(['update:model-value']);
+defineEmits(["update:model-value"]);
 const props = defineProps({
   name: {
     type: String,
-    default: 'password_confirmation'
+    default: "password_confirmation"
   },
   label: {
     type: String,
-    default: 'Confirm Password'
+    default: "Confirm Password"
   },
   placeholder: {
     type: String,
-    default: 'Confirm Password'
+    default: "Confirm Password"
   },
   modelValue: {
     type: [String, Number],
@@ -36,13 +36,13 @@ const props = defineProps({
   },
   password: {
     type: String,
-    default: ''
+    default: ""
   },
   disabled: Boolean
 });
 
 const rules = [
   (val) =>
-      val === props.password || 'The password and confirmation do not match'
+      val === props.password || "The password and confirmation do not match"
 ];
 </script>

@@ -13,9 +13,9 @@
   />
 </template>
 <script setup>
-import { computed } from 'vue';
+import { computed } from "vue";
 
-defineEmits(['action']);
+defineEmits(["action"]);
 const props = defineProps({
   component: {
     type: [Function, Object],
@@ -33,7 +33,7 @@ const props = defineProps({
 
 const content = computed(() => resolvedComponent.value?.value || resolvedComponent.value?.props?.text);
 const resolvedComponent = computed(() => {
-  if (typeof props.component === 'function') {
+  if (typeof props.component === "function") {
     return props.component(...props.params);
   }
   return props.component;

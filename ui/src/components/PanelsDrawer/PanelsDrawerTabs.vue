@@ -23,14 +23,14 @@
   </QTabs>
 </template>
 <script setup>
-import { QTab } from 'quasar';
-import { RenderVnode } from '../Utility';
+import { QTab } from "quasar";
+import { RenderVnode } from "../Utility";
 
-defineEmits(['update:model-value']);
+defineEmits(["update:model-value"]);
 defineProps({
   modelValue: {
     type: String,
-    default: 'general'
+    default: "general"
   },
   panels: {
     type: Array,

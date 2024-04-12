@@ -5,8 +5,8 @@
       <template v-if="showName">({{ field?.name }})</template>
     </slot>
     <span
-      v-if="requiredLabel"
-      class="text-red-dark ml-1 text-xs bottom-1 relative"
+        v-if="requiredLabel"
+        class="text-red-dark ml-1 text-xs bottom-1 relative"
     >{{ requiredLabel }}</span>
   </span>
 </template>

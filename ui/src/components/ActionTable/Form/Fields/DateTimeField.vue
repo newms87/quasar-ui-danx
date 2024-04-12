@@ -24,11 +24,11 @@
 </template>
 
 <script setup>
-import { ref } from 'vue';
-import { fLocalizedDateTime } from '../../../../helpers';
-import DateTimePicker from './DateTimePicker';
+import { ref } from "vue";
+import { fLocalizedDateTime } from "../../../../helpers";
+import DateTimePicker from "./DateTimePicker";
 
-const emit = defineEmits(['update:model-value']);
+const emit = defineEmits(["update:model-value"]);
 const props = defineProps({
   modelValue: {
     type: String,
@@ -36,7 +36,7 @@ const props = defineProps({
   },
   color: {
     type: String,
-    default: 'blue-600'
+    default: "blue-600"
   }
 });
 
@@ -44,7 +44,7 @@ const isShowing = ref(false);
 const dateTime = ref(props.modelValue);
 
 function onSave() {
-  emit('update:model-value', dateTime.value);
+  emit("update:model-value", dateTime.value);
   isShowing.value = false;
 }
 </script>

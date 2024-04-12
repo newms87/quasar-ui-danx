@@ -73,7 +73,7 @@ export function parseCoords(location) {
         if (!isNaN(lat) && !isNaN(lng)) {
             return {
                 lat,
-                lng,
+                lng
             };
         }
     }

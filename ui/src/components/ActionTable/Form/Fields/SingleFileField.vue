@@ -48,12 +48,12 @@
 </template>
 
 <script setup>
-import { onMounted } from 'vue';
-import { useSingleFileUpload } from '../../../../helpers';
-import { FilePreview } from '../../../Utility';
-import FieldLabel from './FieldLabel';
+import { onMounted } from "vue";
+import { useSingleFileUpload } from "../../../../helpers";
+import { FilePreview } from "../../../Utility";
+import FieldLabel from "./FieldLabel";
 
-const emit = defineEmits(['update:model-value']);
+const emit = defineEmits(["update:model-value"]);
 const props = defineProps({
   modelValue: {
     type: [Object, String],
@@ -68,7 +68,7 @@ const props = defineProps({
   readonly: Boolean
 });
 const { onComplete, onDrop, onFileSelected, uploadedFile, onClear } = useSingleFileUpload();
-onComplete(() => emit('update:model-value', uploadedFile.value));
+onComplete(() => emit("update:model-value", uploadedFile.value));
 
 onMounted(() => {
   if (props.modelValue) {

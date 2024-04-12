@@ -12,17 +12,17 @@
   </QTooltip>
 </template>
 <script setup>
-import { onMounted, ref } from 'vue';
+import { onMounted, ref } from "vue";
 
-defineProps({ tooltip: { type: String, default: '' } });
+defineProps({ tooltip: { type: String, default: "" } });
 const show = ref(false);
 const tooltipBox = ref(null);
 const isHovering = ref(false);
 const isHoveringParent = ref(false);
 let timeout = null;
 onMounted(() => {
-  tooltipBox.value.$el.parentNode.addEventListener('mouseover', onEnterParent);
-  tooltipBox.value.$el.parentNode.addEventListener('mouseleave', onLeaveParent);
+  tooltipBox.value.$el.parentNode.addEventListener("mouseover", onEnterParent);
+  tooltipBox.value.$el.parentNode.addEventListener("mouseleave", onLeaveParent);
 });
 function onEnterParent() {
   show.value = true;

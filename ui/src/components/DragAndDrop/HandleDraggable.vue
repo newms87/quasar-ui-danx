@@ -13,10 +13,10 @@
   </div>
 </template>
 <script setup>
-import { useDebounceFn } from '@vueuse/core';
-import { DragAndDrop } from './dragAndDrop';
+import { useDebounceFn } from "@vueuse/core";
+import { DragAndDrop } from "./dragAndDrop";
 
-const emit = defineEmits(['start', 'end', 'resize']);
+const emit = defineEmits(["start", "end", "resize"]);
 const props = defineProps({
   initialValue: {
     type: Number,
@@ -28,8 +28,8 @@ const props = defineProps({
   },
   direction: {
     type: String,
-    default: 'horizontal',
-    validator: (value) => ['vertical', 'horizontal'].includes(value)
+    default: "horizontal",
+    validator: (value) => ["vertical", "horizontal"].includes(value)
   }
 });
 
@@ -41,13 +41,13 @@ const dragAndDrop = new DragAndDrop()
       hideDragImage: true
     })
     .onDragging(useDebounceFn(() => {
-      emit('resize', {
+      emit("resize", {
         distance: dragAndDrop.getDistance(),
         percent: dragAndDrop.getPercentChange(),
         startDropZoneSize: dragAndDrop.startSize,
         dropZoneSize: dragAndDrop.getDropZoneSize()
       });
     }, 20, { maxWait: 30 }))
-    .onStart(() => emit('start'))
-    .onEnd(() => emit('end'));
+    .onStart(() => emit("start"))
+    .onEnd(() => emit("end"));
 </script>

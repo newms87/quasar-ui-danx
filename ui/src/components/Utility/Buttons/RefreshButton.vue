@@ -7,9 +7,9 @@
   </QBtn>
 </template>
 <script setup>
-import { RefreshIcon } from '@heroicons/vue/solid';
+import { RefreshIcon } from "@heroicons/vue/solid";
 
-defineEmits(['refresh']);
+defineEmits(["refresh"]);
 defineProps({
   loading: Boolean
 });

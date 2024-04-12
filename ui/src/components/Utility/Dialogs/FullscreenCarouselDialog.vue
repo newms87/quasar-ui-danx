@@ -38,19 +38,19 @@
             <img v-else :alt="file.filename" :src="file.url" />
           </div>
         </QCarouselSlide>
-        </QCarousel>
-        <CloseIcon
-            class="absolute top-4 right-4 cursor-pointer text-white w-8 h-8"
-            @click="$emit('close')"
-        />
+      </QCarousel>
+      <CloseIcon
+          class="absolute top-4 right-4 cursor-pointer text-white w-8 h-8"
+          @click="$emit('close')"
+      />
     </div>
-    </QDialog>
+  </QDialog>
 </template>
 <script setup>
-import { ref } from 'vue';
-import { XIcon as CloseIcon } from '../../../svg';
+import { ref } from "vue";
+import { XIcon as CloseIcon } from "../../../svg";
 
-defineEmits(['close']);
+defineEmits(["close"]);
 const props = defineProps({
   files: {
     type: Array,
@@ -58,14 +58,14 @@ const props = defineProps({
   },
   defaultSlide: {
     type: String,
-    default: ''
+    default: ""
   }
 });
 
 const carousel = ref(null);
 const currentSlide = ref(props.defaultSlide);
 function isVideo(file) {
-  return file.mime?.startsWith('video');
+  return file.mime?.startsWith("video");
 }
 function getThumbUrl(file) {
   if (file.thumb) {

@@ -20,7 +20,7 @@
   </div>
 </template>
 <script setup>
-import { reactive } from 'vue';
+import { reactive } from "vue";
 import {
   BooleanField,
   DateField,
@@ -31,9 +31,9 @@ import {
   SingleFileField,
   TextField,
   WysiwygField
-} from './Fields';
+} from "./Fields";
 
-const emit = defineEmits(['update:values']);
+const emit = defineEmits(["update:values"]);
 const props = defineProps({
   values: {
     type: Object,
@@ -65,12 +65,12 @@ const mappedFields = props.fields.map((field) => ({
   placeholder: `Enter ${field.label}`,
   ...field,
   component: FORM_FIELD_MAP[field.type],
-  default: field.type === 'BOOLEAN' ? false : ''
+  default: field.type === "BOOLEAN" ? false : ""
 }));
 
 const fieldValues = reactive(props.values || {});
 
 function onInput(key, value) {
-  emit('update:values', { ...fieldValues, [key]: value });
+  emit("update:values", { ...fieldValues, [key]: value });
 }
 </script>

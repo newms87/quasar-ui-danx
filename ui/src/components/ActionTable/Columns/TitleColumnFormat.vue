@@ -20,7 +20,7 @@ defineProps({
 });
 
 function format(value, format) {
-  if (typeof format === 'function') {
+  if (typeof format === "function") {
     return format(value);
   }
   return value;

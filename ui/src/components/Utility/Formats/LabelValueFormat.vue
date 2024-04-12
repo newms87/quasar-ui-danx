@@ -5,7 +5,7 @@
       <template v-if="loading">
         <QSpinnerTail />
       </template>
-      <slot v-else>{{ value || '-' }}</slot>
+      <slot v-else>{{ value || "-" }}</slot>
     </div>
   </div>
 </template>
@@ -17,7 +17,7 @@ defineProps({
   },
   value: {
     type: [String, Number],
-    default: '-'
+    default: "-"
   },
   dense: Boolean,
   nowrap: Boolean,

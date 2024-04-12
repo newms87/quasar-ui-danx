@@ -53,15 +53,15 @@
           <slot name="placeholder">{{ placeholder }}</slot>
         </template>
       </slot>
-      </QChip>
+    </QChip>
   </div>
 </template>
 
 <script setup>
-import { computed, ref } from 'vue';
-import { ContentDrawer } from '../../../Utility';
+import { computed, ref } from "vue";
+import { ContentDrawer } from "../../../Utility";
 
-const emit = defineEmits(['update:modelValue']);
+const emit = defineEmits(["update:modelValue"]);
 const props = defineProps({
   modelValue: {
     type: [Object, String, Array, null],
@@ -74,18 +74,18 @@ const props = defineProps({
   multiple: Boolean,
   label: {
     type: String,
-    default: 'Select'
+    default: "Select"
   },
   placeholder: {
     type: String,
-    default: 'All'
+    default: "All"
   }
 });
 
 const showDrawer = ref(false);
 const formattedOptions = computed(() =>
     props.options.map((opt) =>
-        typeof opt === 'string'
+        typeof opt === "string"
             ? {
               label: opt,
               value: opt
@@ -131,6 +131,6 @@ function toggleSelect(option) {
     }
   }
 
-  emit('update:modelValue', selection);
+  emit("update:modelValue", selection);
 }
 </script>

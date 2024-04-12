@@ -70,26 +70,26 @@
 </template>
 
 <script setup>
-import { XIcon as CloseIcon } from '@heroicons/vue/outline';
+import { XIcon as CloseIcon } from "@heroicons/vue/outline";
 
-const emit = defineEmits(['update:model-value', 'confirm', 'close']);
+const emit = defineEmits(["update:model-value", "confirm", "close"]);
 const props = defineProps({
   modelValue: { type: [String, Boolean, Object], default: true },
   title: {
     type: String,
-    default: ''
+    default: ""
   },
   titleClass: {
     type: String,
-    default: ''
+    default: ""
   },
   subtitle: {
     type: String,
-    default: ''
+    default: ""
   },
   content: {
     type: String,
-    default: ''
+    default: ""
   },
   backdropDismiss: Boolean,
   maximized: Boolean,
@@ -101,32 +101,32 @@ const props = defineProps({
   hideConfirm: Boolean,
   confirmText: {
     type: String,
-    default: 'Confirm'
+    default: "Confirm"
   },
   cancelText: {
     type: String,
-    default: 'Cancel'
+    default: "Cancel"
   },
   confirmClass: {
     type: String,
-    default: 'bg-blue-600 text-white'
+    default: "bg-blue-600 text-white"
   },
   contentClass: {
     type: String,
-    default: ''
+    default: ""
   }
 });
 
 function onConfirm() {
-  emit('confirm');
+  emit("confirm");
 
   if (props.closeOnConfirm) {
-    emit('close');
+    emit("close");
   }
 }
 
 function onClose() {
-  emit('update:model-value', false);
-  emit('close');
+  emit("update:model-value", false);
+  emit("close");
 }
 </script>

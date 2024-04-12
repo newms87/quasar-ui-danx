@@ -26,25 +26,25 @@
             :class="labelClass"
         />
       </template>
-      </QInput>
-      <div v-if="readonly">
-        <LabelValueBlock
-            :label="label || field.label"
-            :value="modelValue"
-        />
-      </div>
+    </QInput>
+    <div v-if="readonly">
+      <LabelValueBlock
+          :label="label || field.label"
+          :value="modelValue"
+      />
+    </div>
   </div>
 </template>
 
 <script setup>
-import FieldLabel from './FieldLabel';
-import LabelValueBlock from './LabelValueBlock';
+import FieldLabel from "./FieldLabel";
+import LabelValueBlock from "./LabelValueBlock";
 
-defineEmits(['update:model-value', 'submit']);
+defineEmits(["update:model-value", "submit"]);
 defineProps({
   modelValue: {
     type: [String, Number],
-    default: ''
+    default: ""
   },
   field: {
     type: Object,
@@ -52,7 +52,7 @@ defineProps({
   },
   type: {
     type: String,
-    default: 'text'
+    default: "text"
   },
   label: {
     type: String,
@@ -60,15 +60,15 @@ defineProps({
   },
   labelClass: {
     type: String,
-    default: 'text-sm text-gray-shadow'
+    default: "text-sm text-gray-shadow"
   },
   parentClass: {
     type: String,
-    default: ''
+    default: ""
   },
   inputClass: {
     type: String,
-    default: ''
+    default: ""
   },
   noLabel: Boolean,
   showName: Boolean,

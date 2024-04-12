@@ -13,7 +13,7 @@
 </template>
 
 <script setup>
-import { RenderVnode } from '../Utility';
+import { RenderVnode } from "../Utility";
 
 defineProps({
   activePanel: {

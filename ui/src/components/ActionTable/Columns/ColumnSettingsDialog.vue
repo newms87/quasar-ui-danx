@@ -36,13 +36,13 @@
   </InfoDialog>
 </template>
 <script setup>
-import { computed } from 'vue';
-import { FlashMessages, remove } from '../../../helpers';
-import { ListItemDraggable } from '../../DragAndDrop';
-import { InfoDialog, ListTransition } from '../../Utility';
-import ColumnListItem from './ColumnListItem';
+import { computed } from "vue";
+import { FlashMessages, remove } from "../../../helpers";
+import { ListItemDraggable } from "../../DragAndDrop";
+import { InfoDialog, ListTransition } from "../../Utility";
+import ColumnListItem from "./ColumnListItem";
 
-const emit = defineEmits(['close', 'update:hidden-column-names', 'update:title-column-names', 'update:sortable-columns']);
+const emit = defineEmits(["close", "update:hidden-column-names", "update:title-column-names", "update:sortable-columns"]);
 const props = defineProps({
   hiddenColumnNames: {
     type: Array,
@@ -80,7 +80,7 @@ function onVisibilityChange(column, visible) {
   } else {
     hiddenColumnNames.push(column.name);
   }
-  emit('update:hidden-column-names', [...new Set(hiddenColumnNames)]);
+  emit("update:hidden-column-names", [...new Set(hiddenColumnNames)]);
 }
 
 function isTitleColumn(column) {
@@ -97,6 +97,6 @@ function onTitleColumnChange(column, isTitle) {
   } else {
     titleColumnNames = remove(titleColumnNames, column.name);
   }
-  emit('update:title-column-names', [...new Set(titleColumnNames)]);
+  emit("update:title-column-names", [...new Set(titleColumnNames)]);
 }
 </script>

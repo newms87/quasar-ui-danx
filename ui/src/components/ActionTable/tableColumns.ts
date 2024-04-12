@@ -1,7 +1,30 @@
 import { computed, ref, watch } from "vue";
 import { getItem, setItem } from "../../helpers";
 
-export function useTableColumns(name, columns) {
+export interface TableColumn {
+    actionMenu?: object,
+    align?: string,
+    category?: string,
+    class?: string | object,
+    field: string,
+    format?: Function,
+    innerClass?: string | object,
+    isSaving?: boolean,
+    label: string,
+    maxWidth?: number,
+    minWidth?: number,
+    name: string,
+    onClick?: Function,
+    required?: boolean,
+    resizeable?: boolean,
+    sortable?: boolean,
+    sortBy?: string,
+    sortByExpression?: string,
+    titleColumns?: string[]
+    vnode?: Function,
+}
+
+export function useTableColumns(name: string, columns: TableColumn[]) {
     const COLUMN_ORDER_KEY = `${name}-column-order`;
     const VISIBLE_COLUMNS_KEY = `${name}-visible-columns`;
     const TITLE_COLUMNS_KEY = `${name}-title-columns`;

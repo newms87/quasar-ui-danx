@@ -4,9 +4,9 @@
   </QBtn>
 </template>
 <script setup>
-import { DownloadIcon as ExportIcon } from '@heroicons/vue/solid';
-import { ref } from 'vue';
-import { FlashMessages } from '../../../helpers';
+import { DownloadIcon as ExportIcon } from "@heroicons/vue/solid";
+import { ref } from "vue";
+import { FlashMessages } from "../../../helpers";
 
 const props = defineProps({
   exporter: {
@@ -21,7 +21,7 @@ async function onExport() {
     await props.exporter();
   } catch (error) {
     console.error(error);
-    FlashMessages.error('Failed to export data');
+    FlashMessages.error("Failed to export data");
   }
   isExporting.value = false;
 }

@@ -41,13 +41,13 @@
                 :key="'selected-' + chipOption.label"
                 class="!mr-1"
             >{{ chipOption.label }}
-              </QChip>
-              <QChip
-                  v-if="selectedOptions.length > chipOptions.length"
-                  class="!mr-1"
-              >
-                +{{ selectedOptions.length - chipOptions.length }}
-                </QChip>
+            </QChip>
+            <QChip
+                v-if="selectedOptions.length > chipOptions.length"
+                class="!mr-1"
+            >
+              +{{ selectedOptions.length - chipOptions.length }}
+            </QChip>
           </template>
           <template v-else>
             {{ placeholder }}
@@ -59,15 +59,15 @@
         >{{ selectedLabel }}
         </div>
       </template>
-      </QSelect>
+    </QSelect>
   </div>
 </template>
 <script setup>
-import { ChevronDownIcon as DropDownIcon } from '@heroicons/vue/outline';
-import { QSelect } from 'quasar';
-import { computed, isRef, nextTick, ref } from 'vue';
+import { ChevronDownIcon as DropDownIcon } from "@heroicons/vue/outline";
+import { QSelect } from "quasar";
+import { computed, isRef, nextTick, ref } from "vue";
 
-const emit = defineEmits(['update:model-value', 'search', 'update']);
+const emit = defineEmits(["update:model-value", "search", "update"]);
 const props = defineProps({
   ...QSelect.props,
   modelValue: {
@@ -76,7 +76,7 @@ const props = defineProps({
   },
   placeholder: {
     type: String,
-    default: ''
+    default: ""
   },
   selectionLabel: {
     type: String,
@@ -88,11 +88,11 @@ const props = defineProps({
   },
   inputClass: {
     type: String,
-    default: ''
+    default: ""
   },
   selectionClass: {
     type: String,
-    default: ''
+    default: ""
   },
   options: {
     type: Array,
@@ -148,10 +148,10 @@ const selectedValue = computed(() => {
   if (props.multiple) {
     const arrVal = Array.isArray(props.modelValue) ? props.modelValue : [];
     return arrVal.map((v) => {
-      return v === null ? '__null__' : v;
+      return v === null ? "__null__" : v;
     }) || [];
   } else {
-    return props.modelValue === null ? '__null__' : props.modelValue;
+    return props.modelValue === null ? "__null__" : props.modelValue;
   }
 });
 
@@ -165,7 +165,7 @@ const selectedOptions = computed(() => {
     values = (values || values === 0) ? [values] : [];
   }
   return computedOptions.value.filter((o) => {
-    return values.includes(o.value) || values.map(v => typeof v === 'object' && v.id).includes(o.value?.id);
+    return values.includes(o.value) || values.map(v => typeof v === "object" && v.id).includes(o.value?.id);
   });
 });
 
@@ -175,10 +175,10 @@ const selectedOptions = computed(() => {
  * @type {ComputedRef<unknown>}
  */
 const selectedLabel = computed(() => {
-  if (props.filterable && isShowing.value) return '';
+  if (props.filterable && isShowing.value) return "";
 
   if (!selectedOptions.value || selectedOptions.value.length === 0) {
-    return props.placeholder || '(Select Option)';
+    return props.placeholder || "(Select Option)";
   }
   return selectedOptions.value[0].selectionLabel;
 });
@@ -197,13 +197,13 @@ const chipOptions = computed(() => {
  * @returns {*|string}
  */
 function resolveLabel(option) {
-  if (typeof option === 'string') {
+  if (typeof option === "string") {
     return option;
   }
-  if (typeof props.optionLabel === 'string') {
+  if (typeof props.optionLabel === "string") {
     return option[props.optionLabel];
   }
-  if (typeof props.optionLabel === 'function') {
+  if (typeof props.optionLabel === "function") {
     return props.optionLabel(option);
   }
   return option?.label;
@@ -216,13 +216,13 @@ function resolveLabel(option) {
  * @returns {*|{default: null, type: String | StringConstructor}|string}
  */
 function resolveSelectionLabel(option) {
-  if (typeof option === 'string') {
+  if (typeof option === "string") {
     return option;
   }
-  if (typeof props.selectionLabel === 'string') {
+  if (typeof props.selectionLabel === "string") {
     return option[props.selectionLabel];
   }
-  if (typeof props.selectionLabel === 'function') {
+  if (typeof props.selectionLabel === "function") {
     return props.selectionLabel(option);
   }
   return option?.selectionLabel || option?.label;
@@ -234,17 +234,17 @@ function resolveSelectionLabel(option) {
  * @returns {string|*|string}
  */
 function resolveValue(option) {
-  if (typeof option === 'string') {
+  if (typeof option === "string") {
     return option;
   }
   let value = option.value;
-  if (typeof props.optionValue === 'string') {
+  if (typeof props.optionValue === "string") {
     value = option[props.optionValue];
-  } else if (typeof props.optionValue === 'function') {
+  } else if (typeof props.optionValue === "function") {
     value = props.optionValue(option);
   }
   // Note the __null__ special case here. See the onUpdate function for more details
-  return value === null ? '__null__' : value;
+  return value === null ? "__null__" : value;
 }
 
 /**
@@ -255,13 +255,13 @@ function resolveValue(option) {
  */
 function onUpdate(value) {
   if (Array.isArray(value)) {
-    value = value.map((v) => v === '__null__' ? null : v);
+    value = value.map((v) => v === "__null__" ? null : v);
   }
 
-  value = value === '__null__' ? null : value;
+  value = value === "__null__" ? null : value;
 
-  emit('update', value);
-  emit('update:model-value', value);
+  emit("update", value);
+  emit("update:model-value", value);
 }
 
 /** XXX: This tells us when we should apply the filter. QSelect likes to trigger a new filter everytime you open the dropdown
@@ -295,8 +295,8 @@ async function onFilter(val, update) {
  * See the onUpdate function for more details
  */
 function onClear() {
-  emit('update:model-value', undefined);
-  emit('update', undefined);
+  emit("update:model-value", undefined);
+  emit("update", undefined);
 }
 
 /**

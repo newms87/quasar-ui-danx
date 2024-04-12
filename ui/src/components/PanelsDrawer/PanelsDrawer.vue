@@ -38,13 +38,13 @@
   </ContentDrawer>
 </template>
 <script setup>
-import { ref, watch } from 'vue';
-import { XIcon as CloseIcon } from '../../svg';
-import { ContentDrawer } from '../Utility';
-import PanelsDrawerPanels from './PanelsDrawerPanels';
-import PanelsDrawerTabs from './PanelsDrawerTabs';
+import { ref, watch } from "vue";
+import { XIcon as CloseIcon } from "../../svg";
+import { ContentDrawer } from "../Utility";
+import PanelsDrawerPanels from "./PanelsDrawerPanels";
+import PanelsDrawerTabs from "./PanelsDrawerTabs";
 
-defineEmits(['update:model-value', 'close']);
+defineEmits(["update:model-value", "close"]);
 const props = defineProps({
   modelValue: {
     type: String,
@@ -52,7 +52,7 @@ const props = defineProps({
   },
   panelsClass: {
     type: [Object, String],
-    default: 'w-[35.5rem]'
+    default: "w-[35.5rem]"
   },
   panels: {
     type: Array,

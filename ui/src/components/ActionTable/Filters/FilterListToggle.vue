@@ -22,10 +22,10 @@
   </div>
 </template>
 <script setup>
-import { computed } from 'vue';
-import { FilterIcon } from '../../../svg';
+import { computed } from "vue";
+import { FilterIcon } from "../../../svg";
 
-defineEmits(['update:show-filters', 'update:filter']);
+defineEmits(["update:show-filters", "update:filter"]);
 const props = defineProps({
   filter: {
     type: Object,

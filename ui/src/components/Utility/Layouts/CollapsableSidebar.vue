@@ -44,59 +44,59 @@
   </div>
 </template>
 <script setup>
-import { ChevronLeftIcon as ToggleIcon } from '@heroicons/vue/outline';
-import { computed, onMounted, ref, watch } from 'vue';
+import { ChevronLeftIcon as ToggleIcon } from "@heroicons/vue/outline";
+import { computed, onMounted, ref, watch } from "vue";
 
-const emit = defineEmits(['collapse', 'update:collapse']);
+const emit = defineEmits(["collapse", "update:collapse"]);
 const props = defineProps({
   rightSide: Boolean,
   displayClass: {
     type: String,
-    default: 'flex flex-col'
+    default: "flex flex-col"
   },
   maxWidth: {
     type: String,
-    default: '13.5rem'
+    default: "13.5rem"
   },
   minWidth: {
     type: String,
-    default: '5.5rem'
+    default: "5.5rem"
   },
   disabled: Boolean,
   collapse: Boolean,
   name: {
     type: String,
-    default: 'sidebar'
+    default: "sidebar"
   },
   toggleAtTop: Boolean,
   toggleClass: {
     type: String,
-    default: ''
+    default: ""
   },
   hideToggleOnCollapse: Boolean
 });
 
 const isCollapsed = ref(props.collapse);
 
-const stored = localStorage.getItem(props.name + '-is-collapsed');
+const stored = localStorage.getItem(props.name + "-is-collapsed");
 
 if (stored !== null) {
-  isCollapsed.value = stored === '1';
+  isCollapsed.value = stored === "1";
 }
 function toggleCollapse() {
   setCollapse(!isCollapsed.value);
-  emit('collapse', isCollapsed.value);
-  emit('update:collapse', isCollapsed.value);
+  emit("collapse", isCollapsed.value);
+  emit("update:collapse", isCollapsed.value);
 }
 
 function setCollapse(state) {
   isCollapsed.value = state;
-  localStorage.setItem(props.name + '-is-collapsed', isCollapsed.value ? '1' : '');
+  localStorage.setItem(props.name + "-is-collapsed", isCollapsed.value ? "1" : "");
 }
 
 onMounted(() => {
-  emit('collapse', isCollapsed.value);
-  emit('update:collapse', isCollapsed.value);
+  emit("collapse", isCollapsed.value);
+  emit("update:collapse", isCollapsed.value);
 });
 const style = computed(() => {
   return {

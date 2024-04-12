@@ -23,8 +23,8 @@
   </div>
 </template>
 <script setup>
-import { fCurrency, fDate, fLocalizedDateTime, fNumber } from '../../helpers';
-import { FilePreview } from '../Utility';
+import { fCurrency, fDate, fLocalizedDateTime, fNumber } from "../../helpers";
+import { FilePreview } from "../Utility";
 
 const props = defineProps({
   type: {
@@ -38,21 +38,21 @@ const props = defineProps({
 });
 
 function format(value) {
-  if (value === null || value === '' || value === undefined) {
-    return '';
+  if (value === null || value === "" || value === undefined) {
+    return "";
   }
 
   switch (props.type) {
-    case 'NUMBER':
+    case "NUMBER":
       return fNumber(value);
-    case 'CURRENCY':
+    case "CURRENCY":
       return fCurrency(value);
-    case 'DATE':
+    case "DATE":
       return fDate(value);
-    case 'DATETIME':
+    case "DATETIME":
       return fLocalizedDateTime(value);
-    case 'BOOLEAN':
-      return value ? 'Yes' : 'No';
+    case "BOOLEAN":
+      return value ? "Yes" : "No";
   }
 
   return value;

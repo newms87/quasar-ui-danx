@@ -110,9 +110,9 @@ import {
   NumberRangeField,
   SelectField,
   SelectWithChildrenField
-} from '../Form/Fields';
+} from "../Form/Fields";
 
-const emit = defineEmits(['update:model-value']);
+const emit = defineEmits(["update:model-value"]);
 const props = defineProps({
   field: {
     type: Object,
@@ -129,15 +129,15 @@ function onUpdate(val) {
   let newVal = val || undefined;
 
   switch (props.field.type) {
-    case 'multi-select':
+    case "multi-select":
       newVal = val.length > 0 ? val : undefined;
       break;
-    case 'single-select':
-    case 'boolean':
+    case "single-select":
+    case "boolean":
       newVal = val === null ? undefined : val;
       break;
   }
 
-  emit('update:model-value', newVal);
+  emit("update:model-value", newVal);
 }
 </script>

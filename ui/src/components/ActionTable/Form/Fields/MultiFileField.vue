@@ -61,12 +61,12 @@
 </template>
 
 <script setup>
-import { onMounted } from 'vue';
-import { useMultiFileUpload } from '../../../../helpers';
-import { FilePreview } from '../../../Utility';
-import FieldLabel from './FieldLabel';
+import { onMounted } from "vue";
+import { useMultiFileUpload } from "../../../../helpers";
+import { FilePreview } from "../../../Utility";
+import FieldLabel from "./FieldLabel";
 
-const emit = defineEmits(['update:model-value']);
+const emit = defineEmits(["update:model-value"]);
 const props = defineProps({
   modelValue: {
     type: [Object, String],
@@ -87,5 +87,5 @@ onMounted(() => {
     uploadedFiles.value = props.modelValue;
   }
 });
-onComplete(() => emit('update:model-value', uploadedFiles.value));
+onComplete(() => emit("update:model-value", uploadedFiles.value));
 </script>

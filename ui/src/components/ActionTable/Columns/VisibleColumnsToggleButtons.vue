@@ -46,11 +46,11 @@
   </div>
 </template>
 <script setup>
-import { computed, ref } from 'vue';
-import { remove } from '../../../helpers';
-import { CaretDownIcon } from '../../../svg';
+import { computed, ref } from "vue";
+import { remove } from "../../../helpers";
+import { CaretDownIcon } from "../../../svg";
 
-const emit = defineEmits(['update:hidden-column-names']);
+const emit = defineEmits(["update:hidden-column-names"]);
 const props = defineProps({
   columns: {
     type: Array,
@@ -62,7 +62,7 @@ const props = defineProps({
   }
 });
 
-const isShowingColumnToggle = ref('');
+const isShowingColumnToggle = ref("");
 const categories = computed(() => [...new Set(props.columns.map(c => c.category)).values()]);
 
 /**
@@ -114,7 +114,7 @@ function toggleColumns(columns, showColumns) {
   } else {
     hiddenColumnNames = [...new Set([...hiddenColumnNames, ...columns.map(c => c.name)])];
   }
-  emit('update:hidden-column-names', hiddenColumnNames);
+  emit("update:hidden-column-names", hiddenColumnNames);
 }
 
 /**
@@ -139,7 +139,7 @@ function toggleColumn(columnName, showColumn) {
     hiddenColumnNames = [...new Set(hiddenColumnNames)];
   }
 
-  emit('update:hidden-column-names', hiddenColumnNames);
+  emit("update:hidden-column-names", hiddenColumnNames);
 }
 </script>
 <style

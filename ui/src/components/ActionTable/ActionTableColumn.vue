@@ -5,7 +5,7 @@
           class="flex items-center flex-nowrap"
           :class="columnClass"
       >
-        <div class="flex-grow">
+        <div class="flex-grow overflow-hidden">
           <a
               v-if="column.onClick"
               @click="column.onClick(row)"
@@ -32,11 +32,11 @@
   </QTd>
 </template>
 <script setup>
-import { QTd } from 'quasar';
-import { computed } from 'vue';
-import { RenderVnode } from '../Utility';
-import ActionMenu from './ActionMenu';
-import { TitleColumnFormat } from './Columns';
+import { QTd } from "quasar";
+import { computed } from "vue";
+import { RenderVnode } from "../Utility";
+import ActionMenu from "./ActionMenu";
+import { TitleColumnFormat } from "./Columns";
 
 const props = defineProps({
   rowProps: {
@@ -60,10 +60,10 @@ const columnStyle = computed(() => {
 });
 
 const columnClass = computed(() => ({
-  [column.value.class || '']: true,
-  'is-saving': isSaving.value,
-  'justify-end': column.value.align === 'right',
-  'justify-center': column.value.align === 'center',
-  'justify-start': column.value.align === 'left'
+  [column.value.class || ""]: true,
+  "is-saving": isSaving.value,
+  "justify-end": column.value.align === "right",
+  "justify-center": column.value.align === "center",
+  "justify-start": column.value.align === "left"
 }));
 </script>

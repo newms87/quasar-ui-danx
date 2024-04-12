@@ -26,7 +26,7 @@ defineProps({
   },
   count: {
     type: [String, Number],
-    default: ''
+    default: ""
   }
 });
 </script>

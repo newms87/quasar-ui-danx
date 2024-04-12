@@ -16,20 +16,20 @@
           :show-name="showName"
       />
     </template>
-    </QInput>
+  </QInput>
 </template>
 
 <script setup>
-import { useDebounceFn } from '@vueuse/core';
-import { computed, nextTick, ref, watch } from 'vue';
-import { fNumber } from '../../../../helpers';
-import FieldLabel from './FieldLabel';
+import { useDebounceFn } from "@vueuse/core";
+import { computed, nextTick, ref, watch } from "vue";
+import { fNumber } from "../../../../helpers";
+import FieldLabel from "./FieldLabel";
 
-const emit = defineEmits(['update:model-value', 'update']);
+const emit = defineEmits(["update:model-value", "update"]);
 const props = defineProps({
   modelValue: {
     type: [String, Number],
-    default: ''
+    default: ""
   },
   precision: {
     type: Number,
@@ -45,7 +45,7 @@ const props = defineProps({
   },
   inputClass: {
     type: String,
-    default: ''
+    default: ""
   },
   delay: {
     type: Number,
@@ -59,47 +59,47 @@ const props = defineProps({
 const numberVal = ref(format(props.modelValue));
 watch(() => props.modelValue, () => numberVal.value = format(props.modelValue));
 
-const fieldOptions = computed(() => props.field || { label: props.label || '', placeholder: '', id: '' });
+const fieldOptions = computed(() => props.field || { label: props.label || "", placeholder: "", id: "" });
 
 function format(number) {
-  if (!number && number !== 0 && number !== '0') return number;
+  if (!number && number !== 0 && number !== "0") return number;
 
-  const minimumFractionDigits = Math.min(props.precision, ('' + number).split('.')[1]?.length || 0);
+  const minimumFractionDigits = Math.min(props.precision, ("" + number).split(".")[1]?.length || 0);
   let options = {
     minimumFractionDigits
   };
 
   if (props.currency) {
     options = {
-      style: 'currency',
-      currency: 'USD',
+      style: "currency",
+      currency: "USD",
       minimumFractionDigits
     };
   }
   return fNumber(number, options);
 }
 
-const onUpdateDebounced = useDebounceFn((val) => emit('update', val), props.delay);
+const onUpdateDebounced = useDebounceFn((val) => emit("update", val), props.delay);
 
 function onInput(value) {
-  let number = '';
+  let number = "";
 
   // Prevent invalid characters
   if (value.match(/[^\d.,$]/)) {
     const oldVal = numberVal.value;
     // XXX: To get QInput to show only the value we want
-    numberVal.value += ' ';
+    numberVal.value += " ";
     return nextTick(() => numberVal.value = oldVal);
   }
 
-  if (value !== '') {
-    value = value.replace(/[^\d.]/g, '');
+  if (value !== "") {
+    value = value.replace(/[^\d.]/g, "");
     number = Number(value);
     numberVal.value = format(number);
   }
 
-  number = number === '' ? undefined : number;
-  emit('update:model-value', number);
+  number = number === "" ? undefined : number;
+  emit("update:model-value", number);
 
   // Delay the change event, so we only see the value after the user has finished
   onUpdateDebounced(number);

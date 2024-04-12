@@ -37,14 +37,14 @@
 </template>
 
 <script setup>
-import { CurrencyDollarIcon as CurrencyIcon, HashtagIcon as NumberIcon } from '@heroicons/vue/outline';
-import { useDebounceFn } from '@vueuse/core';
-import { computed, ref, watch } from 'vue';
-import { fCurrency, fNumber, fPercent } from '../../../../helpers';
-import { PercentIcon } from '../../../../svg';
-import NumberField from './NumberField';
+import { CurrencyDollarIcon as CurrencyIcon, HashtagIcon as NumberIcon } from "@heroicons/vue/outline";
+import { useDebounceFn } from "@vueuse/core";
+import { computed, ref, watch } from "vue";
+import { fCurrency, fNumber, fPercent } from "../../../../helpers";
+import { PercentIcon } from "../../../../svg";
+import NumberField from "./NumberField";
 
-const emit = defineEmits(['update:model-value']);
+const emit = defineEmits(["update:model-value"]);
 const props = defineProps({
   modelValue: {
     type: Object,
@@ -68,28 +68,28 @@ const props = defineProps({
 
 const symbol = computed(() => {
   if (props.currency) {
-    return '$';
+    return "$";
   } else if (props.percent) {
-    return '%';
+    return "%";
   } else {
-    return '';
+    return "";
   }
 });
 const minField = computed(() => {
   return {
-    id: 'min-field',
-    name: 'from',
-    label: 'Min' + symbol.value,
-    placeholder: '0'
+    id: "min-field",
+    name: "from",
+    label: "Min" + symbol.value,
+    placeholder: "0"
   };
 });
 
 const maxField = computed(() => {
   return {
-    id: 'max-field',
-    name: 'to',
-    label: 'Max' + symbol.value,
-    placeholder: 'No Limit'
+    id: "max-field",
+    name: "to",
+    label: "Max" + symbol.value,
+    placeholder: "No Limit"
   };
 });
 
@@ -112,7 +112,7 @@ setRange(props.modelValue || { from: undefined, to: undefined });
  * @returns {string}
  */
 function formatNum(num) {
-  if (num === undefined) return 'No Limit';
+  if (num === undefined) return "No Limit";
   if (props.currency) {
     return fCurrency(num);
   }
@@ -134,7 +134,7 @@ const onSave = useDebounceFn(() => {
       from: (range.value.from ? range.value.from * multiplier : undefined),
       to: (range.value.to ? range.value.to * multiplier : undefined)
     };
-    emit('update:model-value', newVal);
+    emit("update:model-value", newVal);
   }
 }, props.debounce);
 </script>

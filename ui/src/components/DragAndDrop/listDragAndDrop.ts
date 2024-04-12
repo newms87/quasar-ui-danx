@@ -17,7 +17,7 @@ export class ListDragAndDrop extends DragAndDrop {
     constructor(options = {}) {
         super({
             showPlaceholder: true,
-            ...options,
+            ...options
         });
     }
 
@@ -88,7 +88,7 @@ export class ListDragAndDrop extends DragAndDrop {
         const prevPosition = this.listPosition;
         const newPosition = this.getListPositionOfPoint({
             x: e.clientX,
-            y: e.clientY,
+            y: e.clientY
         });
 
         // If the cursor position has changed, we should update the rendering and see if our actual list position has
@@ -189,12 +189,12 @@ export class ListDragAndDrop extends DragAndDrop {
                 if (this.isVertical()) {
                     this.currentDropZone.scrollTo({
                         top: this.currentDropZone.scrollTop + velocity,
-                        behavior: "smooth",
+                        behavior: "smooth"
                     });
                 } else {
                     this.currentDropZone.scrollTo({
                         left: this.currentDropZone.scrollLeft + velocity,
-                        behavior: "smooth",
+                        behavior: "smooth"
                     });
                 }
             }

@@ -31,9 +31,9 @@
   </div>
 </template>
 <script setup>
-import { computed } from 'vue';
-import { fLocalizedDateTime } from '../../helpers';
-import AuditHistoryItemValue from './AuditHistoryItemValue';
+import { computed } from "vue";
+import { fLocalizedDateTime } from "../../helpers";
+import AuditHistoryItemValue from "./AuditHistoryItemValue";
 
 const props = defineProps({
   item: {
@@ -46,7 +46,7 @@ const props = defineProps({
   },
   novaUrl: {
     type: String,
-    default: '/nova'
+    default: "/nova"
   }
 });
 

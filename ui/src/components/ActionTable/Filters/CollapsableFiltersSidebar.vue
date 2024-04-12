@@ -15,10 +15,10 @@
   </CollapsableSidebar>
 </template>
 <script setup>
-import { FilterFieldList } from '.';
-import { CollapsableSidebar } from '../../Utility';
+import { FilterFieldList } from ".";
+import { CollapsableSidebar } from "../../Utility";
 
-defineEmits(['update:filter', 'update:show-filters']);
+defineEmits(["update:filter", "update:show-filters"]);
 defineProps({
   name: {
     type: String,

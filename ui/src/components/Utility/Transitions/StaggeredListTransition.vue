@@ -13,13 +13,13 @@
 </template>
 
 <script setup>
-import gsap from 'gsap';
-import { computed, ref } from 'vue';
+import gsap from "gsap";
+import { computed, ref } from "vue";
 
 const props = defineProps({
   height: {
     type: [String, Number],
-    default: 'auto'
+    default: "auto"
   },
   duration: {
     type: Number,

@@ -40,7 +40,7 @@
               @click="onClose"
           >
             <slot name="done-text" />
-            </QBtn>
+          </QBtn>
         </div>
       </div>
       <a
@@ -49,31 +49,31 @@
       >
         <CloseIcon class="w-5" />
       </a>
-      </QCard>
-      </QDialog>
+    </QCard>
+  </QDialog>
 </template>
 
 <script setup>
-import { XIcon as CloseIcon } from '@heroicons/vue/outline';
+import { XIcon as CloseIcon } from "@heroicons/vue/outline";
 
-const emit = defineEmits(['update:model-value', 'close']);
+const emit = defineEmits(["update:model-value", "close"]);
 defineProps({
   modelValue: { type: [Boolean, Object], default: true },
   title: {
     type: String,
-    default: ''
+    default: ""
   },
   titleClass: {
     type: String,
-    default: ''
+    default: ""
   },
   subtitle: {
     type: String,
-    default: ''
+    default: ""
   },
   content: {
     type: String,
-    default: ''
+    default: ""
   },
   backdropDismiss: Boolean,
   maximized: Boolean,
@@ -81,12 +81,12 @@ defineProps({
   fullHeight: Boolean,
   doneText: {
     type: String,
-    default: 'Done'
+    default: "Done"
   }
 });
 
 function onClose() {
-  emit('update:model-value', false);
-  emit('close');
+  emit("update:model-value", false);
+  emit("close");
 }
 </script>

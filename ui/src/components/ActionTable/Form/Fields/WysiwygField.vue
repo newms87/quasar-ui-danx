@@ -24,11 +24,11 @@
 </template>
 
 <script setup>
-import { default as TinyMceEditor } from '@tinymce/tinymce-vue';
-import { apiKey } from '../../../../vendor/tinymce-config';
-import FieldLabel from './FieldLabel';
+import { default as TinyMceEditor } from "@tinymce/tinymce-vue";
+import { apiKey } from "../../../../vendor/tinymce-config";
+import FieldLabel from "./FieldLabel";
 
-defineEmits(['update:model-value']);
+defineEmits(["update:model-value"]);
 defineProps({
   modelValue: {
     type: [String, Number],

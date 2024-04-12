@@ -41,21 +41,21 @@
   </QTr>
 </template>
 <script setup>
-import { XCircleIcon as ClearIcon } from '@heroicons/vue/solid';
-import { QSpinner, QTd, QTr } from 'quasar';
-import { computed } from 'vue';
-import { fNumber } from '../../helpers';
+import { XCircleIcon as ClearIcon } from "@heroicons/vue/solid";
+import { QSpinner, QTd, QTr } from "quasar";
+import { computed } from "vue";
+import { fNumber } from "../../helpers";
 
-defineEmits(['clear']);
+defineEmits(["clear"]);
 const props = defineProps({
   loading: Boolean,
   label: {
     type: String,
-    default: 'Rows'
+    default: "Rows"
   },
   selectedLabel: {
     type: String,
-    default: 'Selected'
+    default: "Selected"
   },
   selectedCount: {
     type: Number,
@@ -86,7 +86,7 @@ const summaryColumns = computed(() => {
 
 function formatValue(column) {
   const value = props.summary[column.name];
-  if (value === undefined) return '';
+  if (value === undefined) return "";
 
   if (column.format) {
     return column.format(value);

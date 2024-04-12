@@ -27,11 +27,11 @@
 </template>
 
 <script setup>
-defineEmits(['update:model-value']);
+defineEmits(["update:model-value"]);
 defineProps({
   type: {
     type: String,
-    default: 'text'
+    default: "text"
   },
   name: {
     type: String,

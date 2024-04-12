@@ -14,15 +14,15 @@ import { LocationMarkerIcon as LocationIcon } from "@heroicons/vue/solid";
 defineProps({
   location: {
     type: Object,
-    default: null,
+    default: null
   },
   decimals: {
     type: Number,
-    default: 6,
+    default: 6
   },
   iconClass: {
     type: String,
-    default: "w-7",
-  },
+    default: "w-7"
+  }
 });
 </script>

@@ -26,10 +26,10 @@
   </QPopupProxy>
 </template>
 <script setup>
-import { computed } from 'vue';
-import { dbDateTime, localizedDateTime, remoteDateTime } from '../../../../helpers';
+import { computed } from "vue";
+import { dbDateTime, localizedDateTime, remoteDateTime } from "../../../../helpers";
 
-const emit = defineEmits(['update:modelValue', 'save', 'cancel', 'clear']);
+const emit = defineEmits(["update:modelValue", "save", "cancel", "clear"]);
 const props = defineProps({
   modelValue: {
     type: String,
@@ -37,11 +37,11 @@ const props = defineProps({
   },
   mask: {
     type: String,
-    default: 'YYYY-MM-DD HH:mm'
+    default: "YYYY-MM-DD HH:mm"
   },
   color: {
     type: String,
-    default: 'blue-600'
+    default: "blue-600"
   },
   nullable: Boolean
 });
@@ -52,7 +52,7 @@ const dateTime = computed({
     const newValue = value ? dbDateTime(remoteDateTime(value)) : null;
 
     if (newValue || props.nullable) {
-      emit('update:modelValue', newValue);
+      emit("update:modelValue", newValue);
     }
   }
 });

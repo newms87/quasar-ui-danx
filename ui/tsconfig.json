@@ -33,11 +33,7 @@
     "sourceMap": true,
     // Base directory to resolve non-relative module names,
     "baseUrl": "./",
-    "paths": {
-      "@/*": [
-        "./src/*"
-      ]
-    }
+    "paths": {}
   },
   "include": [
     "src/**/*.ts",

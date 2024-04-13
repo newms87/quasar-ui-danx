@@ -4,7 +4,7 @@
       disabled
       min-width="0"
       max-width="18rem"
-      name="admin-ads"
+      :name="name"
       @update:collapse="$emit('update:show-filters', !$event)"
   >
     <FilterFieldList

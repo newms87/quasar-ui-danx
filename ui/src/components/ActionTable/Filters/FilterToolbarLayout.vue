@@ -4,7 +4,7 @@
         :show-filters="showFilters"
         :filter="filter"
         class="border-r p-4 flex-shrink-0"
-        @update:show-filters="$emit('update:show-filters', $event)"
+        @update:show-filters="onFilter"
         @update:filter="$emit('update:filter', $event)"
     />
 
@@ -22,12 +22,15 @@
 import { QSeparator } from "quasar";
 import { FilterListToggle } from "../Filters";
 
-defineEmits(["update:show-filters", "update:filter"]);
-defineProps({
+const emit = defineEmits(["update:show-filters", "update:filter"]);
+const props = defineProps({
   filter: {
     type: Object,
     default: null
   },
   showFilters: Boolean
 });
+function onFilter() {
+  emit("update:show-filters", !props.showFilters);
+}
 </script>

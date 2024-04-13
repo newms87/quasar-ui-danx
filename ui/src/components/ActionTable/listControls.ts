@@ -28,11 +28,16 @@ export function useListControls(name: string, {
     const pagedItems = ref(null);
     const filter = ref({});
     const globalFilter = ref({});
-    const showFilters = ref(getItem(`${name}-show-filters`, true));
+    const showFilters = ref(false);
     const selectedRows = ref([]);
     const isLoadingList = ref(false);
     const isLoadingSummary = ref(false);
     const summary = ref(null);
+
+    // Filter fields are the field values available for the currently applied filter on Creative Groups
+    // (ie: all states available under the current filter)
+    const filterFieldOptions = ref({});
+    const isLoadingFilters = ref(false);
 
     const filterActiveCount = computed(() => Object.keys(filter.value).filter(key => filter.value[key] !== undefined).length);
 
@@ -87,15 +92,11 @@ export function useListControls(name: string, {
         isLoadingSummary.value = false;
     }
 
-    // Filter fields are the field values available for the currently applied filter on Creative Groups
-    // (ie: all states available under the current filter)
-    const filterFieldOptions = ref({});
-    const isLoadingFilters = ref(false);
-
-    watch(() => showFilters.value, (show) => {
-        setItem(`${name}-show-filters`, show);
-    });
-
+    /**
+     * Loads the filter field options for the current filter.
+     *
+     * @returns {Promise<void>}
+     */
     async function loadFilterFieldOptions() {
         if (!filterFieldOptionsRoute || !isInitialized) return;
         isLoadingFilters.value = true;

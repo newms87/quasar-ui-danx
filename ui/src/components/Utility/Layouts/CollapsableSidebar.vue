@@ -46,6 +46,7 @@
 <script setup>
 import { ChevronLeftIcon as ToggleIcon } from "@heroicons/vue/outline";
 import { computed, onMounted, ref, watch } from "vue";
+import { getItem, setItem } from "../../../helpers";
 
 const emit = defineEmits(["collapse", "update:collapse"]);
 const props = defineProps({
@@ -76,22 +77,17 @@ const props = defineProps({
   hideToggleOnCollapse: Boolean
 });
 
-const isCollapsed = ref(props.collapse);
+const isCollapsed = ref(getItem(props.name + "-is-collapsed", props.collapse));
 
-const stored = localStorage.getItem(props.name + "-is-collapsed");
-
-if (stored !== null) {
-  isCollapsed.value = stored === "1";
+function setCollapse(state) {
+  isCollapsed.value = state;
+  setItem(props.name + "-is-collapsed", isCollapsed.value ? "1" : "");
 }
+
 function toggleCollapse() {
   setCollapse(!isCollapsed.value);
   emit("collapse", isCollapsed.value);
   emit("update:collapse", isCollapsed.value);
-}
-
-function setCollapse(state) {
-  isCollapsed.value = state;
-  localStorage.setItem(props.name + "-is-collapsed", isCollapsed.value ? "1" : "");
 }
 
 onMounted(() => {

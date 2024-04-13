@@ -15,7 +15,7 @@
       </QBtn>
     </div>
     <a
-        v-if="activeCount > 0"
+        v-if="activeCount > 0 && showFilters"
         class="text-blue-600 hover:text-blue-plus-1 text-sm ml-4"
         @click="$emit('update:filter', {})"
     >Clear All</a>

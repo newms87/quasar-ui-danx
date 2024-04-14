@@ -34,6 +34,7 @@
 # Setup
 
 ```bash
+$ yarn add -D sass vite-svg-loader quasar quasar-ui-danx
 $ yarn
 ```
 

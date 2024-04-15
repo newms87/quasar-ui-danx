@@ -34,8 +34,37 @@
 # Setup
 
 ```bash
-$ yarn add -D sass vite-svg-loader quasar quasar-ui-danx
-$ yarn
+yarn create vue # Follow instructions for settings up new Vue App
+yarn add quasar-ui-danx quasar
+yarn add -D sass vite-svg-loader tailwindcss eslint eslint-plugin-import autoprefixer
+```
+
+### Setup Tailwind
+
+Initialize config files for tailwind
+NOTE: vite will automatically pick up the postcss.config.js file, no need to manually configure anything
+
+```
+npx tailwindcss init -p
+```
+
+* Rename tailwind.config.js to tailwind.config.ts
+* Setup your tailwind.config.ts:
+    * Make any changes to the colors object
+
+```ts
+/** @type {import('tailwindcss').Config} */
+export const colors = {}
+
+export default {
+    content: [],
+    theme: {
+        extend: {
+            colors
+        }
+    },
+    plugins: []
+}
 ```
 
 # Developing

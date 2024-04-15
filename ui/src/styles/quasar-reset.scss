@@ -1,0 +1,32 @@
+.q-tab-panels {
+  overflow: visible;
+
+  .q-panel {
+    overflow: visible;
+
+    &.scroll {
+      overflow: auto;
+    }
+
+    .q-tab-panel {
+      padding: 0;
+    }
+  }
+
+  &.overflow-y-auto {
+    overflow-y: auto;
+  }
+}
+
+.q-toolbar {
+  min-height: 0;
+  padding: 0;
+}
+
+.q-notification {
+  .q-notification__actions {
+    .q-btn--actionable {
+      color: white;
+    }
+  }
+}

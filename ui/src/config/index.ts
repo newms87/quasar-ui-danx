@@ -2,8 +2,8 @@ import { QNotifyCreateOptions } from "quasar";
 
 export interface DanxFileUploadOptions {
     directory?: string;
-    presignedUploadUrl?: string | null;
-    uploadCompletedUrl?: string | null;
+    presignedUploadUrl?: Function | null;
+    uploadCompletedUrl?: Function | null;
 }
 
 export interface DanxOptions {

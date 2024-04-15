@@ -39,6 +39,66 @@ yarn add quasar-ui-danx quasar
 yarn add -D sass vite-svg-loader tailwindcss eslint eslint-plugin-import autoprefixer
 ```
 
+### Setup PHPStorm
+
+* Disable Typescript language service
+* Setup node_modules directory as a library
+* Configure `tsconfig.json`
+
+```json
+{
+  "include": [
+    "node_modules/quasar-ui-danx/**/*"
+  ]
+}
+```
+
+* Configure `vite.config.ts`
+
+```ts
+export default ({ command }) => {
+    // For development w/ HMR, load the danx library + styles directly from the directory
+    // NOTE: These are the paths relative to the mounted quasar-ui-danx directory inside the mva docker container
+    const danx = (command === "serve" ? {
+        "quasar-ui-danx": resolve(__dirname, "../quasar-ui-danx/ui/src"),
+        "quasar-ui-danx-styles": resolve(__dirname, "../quasar-ui-danx/src/styles/index.scss")
+    } : {
+        // Import from quasar-ui-danx module for production
+        "quasar-ui-danx-styles": "quasar-ui-danx/dist/style.css"
+    });
+
+    return defineConfig({
+        resolve: {
+            alias: {
+                ...danx
+            }
+        },
+    });
+}
+```
+
+* Add node_modules as a library in PHPStorm
+    * Settings -> Directories -> Add
+    * Create a new directory w/ name node_modules and set the directory to the node_modules directory in your project
+* Symlink Danx UI library
+    * copy/paste and run `./danx-local.sh`
+        * (or manually symlink node_modules/quasar-ui-danx to ../../quasar-ui-danx/ui/src)
+            * Directory structure of your project relative to quasar-ui-danx:
+
+```
+- parent-directory
+  - your-app
+    - tsconfig.json
+    - vite.config.ts
+    - src
+    - node_modules
+      - quasar-ui-danx -> (symlink) ../../quasar-ui-danx/ui/src
+  - quasar-ui-danx
+    - ui
+      - src
+      - tests
+```
+
 ### Setup Tailwind
 
 Initialize config files for tailwind

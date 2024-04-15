@@ -37,8 +37,8 @@ export class FlashMessages {
                 classes: "bg-gray-500 text-white",
                 position: "top",
                 closeBtn: "X",
-                ...options,
-                ...danxOptions.flashMessages.default
+                ...danxOptions.flashMessages.default,
+                ...options
             });
         }
     }

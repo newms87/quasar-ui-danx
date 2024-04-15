@@ -1,10 +1,10 @@
-import { ref, Ref, UnwrapRef } from "vue";
+import { ref, Ref } from "vue";
 
 interface RequestOptions {
     baseUrl: string;
 }
 
-const requestOptions: Ref<UnwrapRef<RequestOptions>> = ref({
+const requestOptions: Ref<RequestOptions> = ref({
     baseUrl: ""
 });
 /**

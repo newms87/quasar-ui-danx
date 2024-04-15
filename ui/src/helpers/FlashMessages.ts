@@ -1,8 +1,9 @@
+import { QNotifyCreateOptions } from "quasar";
 import { watch } from "vue";
-import { DanxFlashMessageOptions, danxOptions } from "../config";
+import { danxOptions } from "../config";
 
 export class FlashMessages {
-    static notify: (options: DanxFlashMessageOptions) => void;
+    static notify: (options: QNotifyCreateOptions) => void;
 
     static PROP_DEFINITIONS = {
         successMsg: {
@@ -28,7 +29,7 @@ export class FlashMessages {
         watch(() => msgProps.warningMsg, msg => FlashMessages.warning(msg));
     }
 
-    static send(message?: string, options: DanxFlashMessageOptions = {}) {
+    static send(message?: string, options: QNotifyCreateOptions = {}) {
         if (message) {
             FlashMessages.notify({
                 message,
@@ -42,27 +43,27 @@ export class FlashMessages {
         }
     }
 
-    static success(message?: string, options: DanxFlashMessageOptions = {}) {
+    static success(message?: string, options: QNotifyCreateOptions = {}) {
         FlashMessages.send(message, {
-            classes: "bg-blue-500 text-white",
+            classes: "bg-green-300 !text-green-900",
             icon: "check",
             ...options,
             ...danxOptions.flashMessages.success
         });
     }
 
-    static error(message?: string, options: DanxFlashMessageOptions = {}) {
+    static error(message?: string, options: QNotifyCreateOptions = {}) {
         FlashMessages.send(message, {
-            classes: "bg-red-500 text-white",
+            classes: "bg-red-300 !text-red-900",
             icon: "error",
             ...options,
             ...danxOptions.flashMessages.error
         });
     }
 
-    static warning(message?: string, options: DanxFlashMessageOptions = {}) {
+    static warning(message?: string, options: QNotifyCreateOptions = {}) {
         FlashMessages.send(message, {
-            classes: "bg-yellow-500 text-yellow-900",
+            classes: "bg-yellow-300 !text-yellow-900",
             icon: "warning",
             ...options,
             ...danxOptions.flashMessages.warning
@@ -70,11 +71,14 @@ export class FlashMessages {
     }
 
     static combine(type: string, messages: string[] | { message: string, Message: string }[], options = {}) {
-        if (typeof FlashMessages[type] !== "function") {
+        // @ts-ignore
+        const messageType = FlashMessages[type];
+
+        if (typeof messageType !== "function") {
             throw new Error(`FlashMessages.${type} is not a function`);
         }
 
-        FlashMessages[type](messages.map(m => typeof m === "string" ? m : (m.message || m.Message)).join("<br/>"), {
+        messageType(messages.map(m => typeof m === "string" ? m : (m.message || m.Message)).join("<br/>"), {
             ...options,
             html: true
         });

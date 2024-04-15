@@ -23,10 +23,6 @@
   padding: 0;
 }
 
-.q-notification {
-  .q-notification__actions {
-    .q-btn--actionable {
-      color: white;
-    }
-  }
+.q-notification__actions {
+  color: inherit;
 }

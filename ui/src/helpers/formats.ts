@@ -166,20 +166,28 @@ export function centerTruncate(str, maxLength) {
     }
 }
 
+interface FPercentOptions {
+    multiplier?: number,
+    maximumFractionDigits?: number,
+    NaN?: string
+}
+
 /**
  * Formats a number into a percentage
  * @param num
  * @param options
  * @returns {string}
  */
-export function fPercent(num, options = { multiplier: 100, maximumFractionDigits: 1, NaN: "N/A" }) {
-    num = parseFloat(num);
+export function fPercent(num: string | number, options: FPercentOptions = {}) {
+    options = { multiplier: 100, maximumFractionDigits: 1, NaN: "N/A", ...options };
+
+    num = parseFloat("" + num);
 
     if (isNaN(num)) {
         return options.NaN;
     }
 
-    return fNumber(num * options.multiplier, options) + "%";
+    return fNumber(num * (options.multiplier || 100), options) + "%";
 }
 
 

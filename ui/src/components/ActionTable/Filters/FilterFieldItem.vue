@@ -7,7 +7,7 @@
             :label="count"
             rounded
             class="ml-2 transition-all"
-            :class="{'bg-gray-base': !count, 'bg-blue-600': count}"
+            :class="{'bg-gray-400': !count, 'bg-blue-600': count}"
         />
       </div>
     </template>

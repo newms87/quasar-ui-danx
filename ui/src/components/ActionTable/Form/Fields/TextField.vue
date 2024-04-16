@@ -60,7 +60,7 @@ defineProps({
   },
   labelClass: {
     type: String,
-    default: "text-sm text-gray-shadow"
+    default: "text-sm text-gray-700"
   },
   parentClass: {
     type: String,

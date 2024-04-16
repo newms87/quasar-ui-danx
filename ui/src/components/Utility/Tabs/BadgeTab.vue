@@ -7,7 +7,7 @@
     <div class="flex items-center w-full">
       <div class="flex-grow text-sm">{{ label }}</div>
       <QBadge
-          class="bg-gray-base"
+          class="bg-gray-400"
           :label="count"
           rounded
       />

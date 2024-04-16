@@ -10,7 +10,7 @@
           v-for="option in formattedOptions"
           :key="'select-drawer-' + option.value"
           :data-dusk="'drawer-opt-' + option.value"
-          class="cursor-pointer hover:bg-gray-light px-8 py-3 flex items-center border-b border-gray-light"
+          class="cursor-pointer hover:bg-slate-200 px-8 py-3 flex items-center border-b border-slate-200"
           @click="toggleSelect(option)"
       >
         <QCheckbox

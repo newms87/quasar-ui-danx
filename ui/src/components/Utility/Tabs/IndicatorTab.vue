@@ -10,11 +10,11 @@
         <OverdueIcon
             v-if="overdue"
             class="w-5 ml-2"
-            :class="isActive ? 'text-white' : 'text-red-danger'"
+            :class="isActive ? 'text-white' : 'text-red-400'"
         />
         <WarningIcon
             v-else-if="warning"
-            class="text-yellow-warning w-5"
+            class="text-yellow-600 w-5"
         />
       </div>
     </div>

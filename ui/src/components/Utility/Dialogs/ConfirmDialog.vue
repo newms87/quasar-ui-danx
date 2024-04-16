@@ -10,7 +10,7 @@
     <QCard class="flex flex-col flex-nowrap">
       <QCardSection
           v-if="title || $slots.title"
-          class="pl-6 pr-10 border-b border-gray-medium"
+          class="pl-6 pr-10 border-b border-gray-300"
       >
         <h3
             class="font-normal flex items-center"
@@ -29,12 +29,12 @@
       </QCardSection>
       <QCardSection
           v-if="content || $slots.default"
-          class="px-6 bg-neutral-plus-7 flex-grow max-h-full overflow-y-auto"
+          class="px-6 bg-gray-100 flex-grow max-h-full overflow-y-auto"
           :class="contentClass"
       >
         <slot>{{ content }}</slot>
       </QCardSection>
-      <div class="flex px-6 py-4 border-t border-gray-medium">
+      <div class="flex px-6 py-4 border-t border-gray-300">
         <div class="flex-grow">
           <QBtn
               :label="cancelText"

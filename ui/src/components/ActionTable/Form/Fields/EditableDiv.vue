@@ -1,7 +1,7 @@
 <template>
   <div
       contenteditable
-      class="inline-block hover:bg-blue-light focus:bg-blue-light transition duration-300 outline-none"
+      class="inline-block hover:bg-blue-200 focus:bg-blue-200 transition duration-300 outline-none"
       @input="onInput"
   >
     {{ text }}

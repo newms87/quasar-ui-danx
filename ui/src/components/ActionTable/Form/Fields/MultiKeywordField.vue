@@ -11,7 +11,7 @@
         v-model="textInput"
         :field="field"
         :no-label="!field.label"
-        label-class="text-xs font-bold text-gray-dark"
+        label-class="text-xs font-bold text-zinc-800"
         parent-class="tight-label"
         input-class="!py-0"
         dense

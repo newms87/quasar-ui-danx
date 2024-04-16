@@ -47,7 +47,7 @@
               :class="cls['resize-handle']"
               @resize="onResizeColumn(rowProps.col, $event)"
           >
-            <RowResizeIcon class="w-4 text-neutral-base" />
+            <RowResizeIcon class="w-4 text-gray-600" />
           </HandleDraggable>
         </QTh>
       </template>

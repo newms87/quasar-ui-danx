@@ -6,7 +6,7 @@
     </slot>
     <span
         v-if="requiredLabel"
-        class="text-red-dark ml-1 text-xs bottom-1 relative"
+        class="text-red-900 ml-1 text-xs bottom-1 relative"
     >{{ requiredLabel }}</span>
   </span>
 </template>

@@ -1,12 +1,12 @@
 <template>
   <QTr
       class="sticky-column-1 transition-all sticky-row"
-      :class="{'!bg-neutral-plus-7': !selectedCount, '!bg-blue-600 text-white selected': selectedCount, 'opacity-50': loading}"
+      :class="{'!bg-gray-100': !selectedCount, '!bg-blue-600 text-white selected': selectedCount, 'opacity-50': loading}"
   >
     <QTd
         :colspan="stickyColspan"
         class="font-bold transition-all"
-        :class="{'!bg-neutral-plus-7 !pl-5': !selectedCount, '!bg-blue-600 text-white !pl-4': selectedCount}"
+        :class="{'!bg-gray-100 !pl-5': !selectedCount, '!bg-blue-600 text-white !pl-4': selectedCount}"
     >
       <div class="flex flex-nowrap items-center">
         <div

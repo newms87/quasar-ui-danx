@@ -1,7 +1,7 @@
 <template>
   <div>
     <template v-if="!loading && !options.length">
-      <div class="text-gray-silver">No options available</div>
+      <div class="text-zinc-500">No options available</div>
     </template>
     <SelectField
         v-model="selectedOption"
@@ -22,7 +22,7 @@
           @update:model-value="onSelectChild(child)"
       >
         <div>{{ child.label }}</div>
-        <div class="text-xs text-gray-silver">{{ child.name }}</div>
+        <div class="text-xs text-zinc-500">{{ child.name }}</div>
       </QCheckbox>
     </div>
   </div>

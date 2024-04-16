@@ -1,7 +1,7 @@
 <template>
   <div
       class="max-w-full relative overflow-auto"
-      :class="{'p-4 border rounded border-gray-medium text-center': !readonly}"
+      :class="{'p-4 border rounded border-gray-300 text-center': !readonly}"
       @dragover.prevent
       @drop.prevent="onDrop"
   >
@@ -20,7 +20,7 @@
       >Upload</a>
       <a
           v-if="uploadedFile"
-          class="ml-3 text-red-dark"
+          class="ml-3 text-red-900"
           @click="onClear"
       >Clear</a>
       <input

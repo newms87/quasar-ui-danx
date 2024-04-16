@@ -4,7 +4,7 @@
         v-if="!noLabel"
         :field="field"
         :show-name="showName"
-        class="text-sm font-semibold text-gray-shadow block mb-2"
+        class="text-sm font-semibold text-gray-700 block mb-2"
     />
     <template v-if="readonly">
       <div

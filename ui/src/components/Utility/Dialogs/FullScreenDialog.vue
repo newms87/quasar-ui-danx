@@ -34,7 +34,7 @@ const props = defineProps({
 let computedClass = computed(() => {
   return {
     "bg-blue-600 text-white": props.blue,
-    "bg-white text-gray-base": !props.blue,
+    "bg-white text-gray-400": !props.blue,
     "items-center": props.center
   };
 });

@@ -33,7 +33,7 @@
                 :model-value="!hiddenColumnNames.includes(column.name)"
                 class="mr-3 cb-white-border"
                 size="20px"
-                :color="column.required ? 'gray-base': 'blue-600'"
+                :color="column.required ? 'gray-400': 'blue-600'"
                 :disable="column.required"
                 @click="toggleColumn(column.name)"
             />

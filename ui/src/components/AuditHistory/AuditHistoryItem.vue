@@ -1,15 +1,15 @@
 <template>
-  <div class="text-gray-shadow flex items-stretch flex-nowrap p-4">
+  <div class="text-gray-700 flex items-stretch flex-nowrap p-4">
     <div class="flex-grow text-sm w-3/5 overflow-auto">
       <h5>{{ change.label }} ({{ change.name }})</h5>
       <div class="flex flex-nowrap items-center mt-4">
-        <div class="bg-red-light line-through p-2">
+        <div class="bg-red-200 line-through p-2">
           <AuditHistoryItemValue
               :type="change.type"
               :value="change.oldValue"
           />
         </div>
-        <div class="bg-green-plus-4 ml-2.5 p-2">
+        <div class="bg-emerald-200 ml-2.5 p-2">
           <AuditHistoryItemValue
               :type="change.type"
               :value="change.newValue"

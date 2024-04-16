@@ -1,5 +1,5 @@
 <template>
-  <div class="relative flex justify-center bg-neutral-plus-7" :class="{'rounded-2xl': !square}">
+  <div class="relative flex justify-center bg-gray-100" :class="{'rounded-2xl': !square}">
     <template v-if="computedImage">
       <div
           class="grow h-full overflow-hidden"
@@ -52,7 +52,7 @@
         <QLinearProgress
             :value="image.progress"
             size="15px"
-            color="green-base"
+            color="green-600"
             stripe
         />
       </div>
@@ -61,7 +61,7 @@
       <slot name="missing">
         <component
             :is="missingIcon"
-            class="w-full h-full p-2 text-gray-medium"
+            class="w-full h-full p-2 text-gray-300"
         />
       </slot>
     </template>
@@ -80,7 +80,7 @@
       <QBtn
           v-if="removable"
           size="sm"
-          class="bg-red-dark text-white !p-1 opacity-50 hover:opacity-100"
+          class="bg-red-900 text-white !p-1 opacity-50 hover:opacity-100"
           @click.stop="onRemove"
       >
         <div v-if="isConfirmingRemove" class="font-bold text-[1rem] leading-[1.2rem]">?</div>

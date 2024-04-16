@@ -1,10 +1,10 @@
 <template>
   <div class="inline-block">
     <div
-        class="cursor-pointer py-2 hover:bg-blue-light flex items-center justify-end"
+        class="cursor-pointer py-2 hover:bg-blue-200 flex items-center justify-end"
     >
       {{ fLocalizedDateTime(modelValue, { empty: "Never" }) }}
-      <EditIcon class="w-4 font-bold ml-2 text-gray-base" />
+      <EditIcon class="w-4 font-bold ml-2 text-gray-400" />
       <QPopupEdit
           v-slot="scope"
           :model-value="modelValue"

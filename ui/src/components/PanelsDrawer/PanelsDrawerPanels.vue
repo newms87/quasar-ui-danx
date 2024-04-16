@@ -1,7 +1,7 @@
 <template>
   <QTabPanels
       :model-value="activePanel"
-      class="overflow-y-auto bg-neutral-plus-7 h-full transition-all"
+      class="overflow-y-auto bg-gray-100 h-full transition-all"
   >
     <QTabPanel v-for="panel in panels" :key="panel.name" :name="panel.name">
       <RenderVnode

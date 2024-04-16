@@ -3,14 +3,14 @@
       class="flex items-center w-full"
       :class="{'cursor-not-allowed': locked}"
   >
-    <a v-if="locked" class="text-neutral-on-plus-3 cursor-not-allowed">
+    <a v-if="locked" class="text-zinc-800 cursor-not-allowed">
       <LockedIcon class="w-4" />
     </a>
     <div class="font-semibold text-sm ml-5 py-3 flex-grow">{{ column.label }}</div>
     <div v-if="!locked" class="flex items-center">
       <a class="py-2 px-1" @click="$emit('visible', !visible)">
         <VisibleIcon v-if="visible" class="w-4" />
-        <HiddenIcon v-else class="w-4 text-neutral-on-plus-3" />
+        <HiddenIcon v-else class="w-4 text-zinc-800" />
       </a>
       <a class="py-2 px-1" @click="$emit('is-title', !isTitle)">
         <IsTitleIcon class="w-4" :class="isTitle ? '' : 'text-neutral-plus-3'" />

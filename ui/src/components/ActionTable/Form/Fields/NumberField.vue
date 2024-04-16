@@ -7,7 +7,7 @@
       dense
       inputmode="numeric"
       :input-class="{[inputClass]: true, 'text-right bg-white': !hidePrependLabel, 'text-right !text-xs text-black font-normal': hidePrependLabel}"
-      :class="{'no-prepend-icon w-32': hidePrependLabel, 'prepend-label': !hidePrependLabel}"
+      :class="{'no-prepend-icon w-32 max-w-full': hidePrependLabel, 'prepend-label': !hidePrependLabel}"
       @update:model-value="onInput"
   >
     <template #prepend>

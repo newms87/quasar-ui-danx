@@ -81,9 +81,14 @@ export default ({ command }) => {
     * Settings -> Directories -> Add
     * Create a new directory w/ name node_modules and set the directory to the node_modules directory in your project
 * Symlink Danx UI library
+    * FOR LOCAL DEVELOPMENT ONLY: if you plan on updating Danx UI
+        * Symlinking the danx UI library allows for better integration w/ PHPStorm + tailwindcss + HMR w/ vite.
+            * NOTE: Setting this up w/ `npm link` or trying to modify tsconfig.json / vite.config.ts only can be quite
+              challenging to get everything configured correctly. I found this to be the best solution.
     * copy/paste and run `./danx-local.sh`
-        * (or manually symlink node_modules/quasar-ui-danx to ../../quasar-ui-danx/ui/src)
-            * Directory structure of your project relative to quasar-ui-danx:
+        * (recommended) if using docker, add this to your entrypoint script
+    * (or manually symlink node_modules/quasar-ui-danx to ../../quasar-ui-danx/ui/src)
+        * Directory structure of your project relative to quasar-ui-danx:
 
 ```
 - parent-directory

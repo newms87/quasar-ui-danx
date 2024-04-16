@@ -9,7 +9,9 @@ export interface TableColumn {
     field: string,
     format?: Function,
     innerClass?: string | object,
-    isSaving?: boolean,
+    style?: string,
+    headerStyle?: string,
+    isSaving?: boolean | Function,
     label: string,
     maxWidth?: number,
     minWidth?: number,
@@ -20,7 +22,7 @@ export interface TableColumn {
     sortable?: boolean,
     sortBy?: string,
     sortByExpression?: string,
-    titleColumns?: string[]
+    titleColumns?: Function,
     vnode?: Function,
 }
 

@@ -13,7 +13,7 @@
         <HiddenIcon v-else class="w-4 text-zinc-800" />
       </a>
       <a class="py-2 px-1" @click="$emit('is-title', !isTitle)">
-        <IsTitleIcon class="w-4" :class="isTitle ? '' : 'text-neutral-plus-3'" />
+        <IsTitleIcon class="w-4" :class="isTitle ? '' : 'text-gray-400'" />
         <QTooltip>
           <template v-if="!isTitle">Add to priority list</template>
           <template v-else>Remove from priority list</template>

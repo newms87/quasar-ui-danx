@@ -7,7 +7,7 @@
       @update:model-value="$emit('update:model-value', $event)"
   >
     <FieldLabel
-        :field="field"
+        :field="{...field, label}"
         :show-name="showName"
         :class="labelClass"
     />
@@ -19,6 +19,10 @@ import FieldLabel from "./FieldLabel";
 
 defineEmits(["update:model-value"]);
 defineProps({
+  label: {
+    type: String,
+    default: null
+  },
   modelValue: {
     type: [Boolean],
     default: undefined

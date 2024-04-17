@@ -56,7 +56,10 @@ const isSaving = computed(() => column.value.isSaving && column.value.isSaving(r
 
 const columnStyle = computed(() => {
   const width = props.settings?.width || column.value.width;
-  return width ? { width: `${width}px` } : null;
+  return {
+    width: width ? `${width}px` : undefined,
+    minWidth: column.value.minWidth ? `${column.value.minWidth}px` : undefined
+  };
 });
 
 const columnClass = computed(() => ({

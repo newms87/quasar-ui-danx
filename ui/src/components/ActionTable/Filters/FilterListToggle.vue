@@ -2,7 +2,7 @@
   <div class="flex items-center transition-all" :class="{'w-72': showFilters, 'w-[6.5rem]': !showFilters}">
     <div class="flex-grow">
       <QBtn
-          class="toggle-button border-blue-700"
+          class="btn-blue-highlight border-blue-700"
           :class="{'highlighted': showFilters}"
           @click="$emit('update:show-filters', !showFilters)"
       >
@@ -38,7 +38,6 @@ const props = defineProps({
 const activeCount = computed(() => Object.keys(props.filter).filter(key => props.filter[key] !== undefined).length);
 </script>
 <style lang="scss" scoped>
-
 .btn-blue-highlight {
   @apply rounded-lg border border-solid;
 

@@ -34,22 +34,12 @@
         />
       </template>
       <template #header-cell="rowProps">
-        <QTh
-            :key="rowProps.key"
-            :props="rowProps"
-            :data-drop-zone="`resize-column-` + rowProps.col.name"
-            :class="cls['handle-drop-zone']"
-        >
-          {{ rowProps.col.label }}
-          <HandleDraggable
-              v-if="rowProps.col.resizeable"
-              :drop-zone="`resize-column-` + rowProps.col.name"
-              :class="cls['resize-handle']"
-              @resize="onResizeColumn(rowProps.col, $event)"
-          >
-            <RowResizeIcon class="w-4 text-gray-600" />
-          </HandleDraggable>
-        </QTh>
+        <ActionTableHeaderColumn
+            v-model="columnSettings"
+            :row-props="rowProps"
+            :name="name"
+            @update:model-value="onUpdateColumnSettings"
+        />
       </template>
       <template #body-cell="rowProps">
         <ActionTableColumn
@@ -65,13 +55,12 @@
 </template>
 
 <script setup>
-import { QTable, QTh } from "quasar";
+import { QTable } from "quasar";
 import { ref } from "vue";
 import { getItem, setItem } from "../../helpers";
-import { DragHandleIcon as RowResizeIcon } from "../../svg";
-import { HandleDraggable } from "../DragAndDrop";
 import { ActionVnode } from "../Utility";
 import ActionTableColumn from "./ActionTableColumn.vue";
+import ActionTableHeaderColumn from "./ActionTableHeaderColumn";
 import EmptyTableState from "./EmptyTableState.vue";
 import { mapSortBy, registerStickyScrolling } from "./listHelpers";
 import TableSummaryRow from "./TableSummaryRow.vue";
@@ -118,32 +107,7 @@ registerStickyScrolling(actionTable);
 
 const COLUMN_SETTINGS_KEY = `column-settings-${props.name}`;
 const columnSettings = ref(getItem(COLUMN_SETTINGS_KEY) || {});
-function onResizeColumn(column, val) {
-  columnSettings.value = {
-    ...columnSettings.value,
-    [column.name]: {
-      width: Math.max(Math.min(val.distance + val.startDropZoneSize, column.maxWidth || 500), column.minWidth || 80)
-    }
-  };
+function onUpdateColumnSettings() {
   setItem(COLUMN_SETTINGS_KEY, columnSettings.value);
 }
 </script>
-
-<style lang="scss" module="cls">
-.handle-drop-zone {
-  .resize-handle {
-    position: absolute;
-    top: 0;
-    right: -.45em;
-    width: .9em;
-    opacity: 0;
-    transition: all .3s;
-  }
-
-  &:hover {
-    .resize-handle {
-      opacity: 1;
-    }
-  }
-}
-</style>

@@ -9,7 +9,7 @@
             class="p-0"
         >
           <div class="flex flex-nowrap items-center text-sm">
-            <div>{{ name }}</div>
+            <div>{{ name || "(Default)" }}</div>
             <template v-if="!disable && !readonly">
               <a
                   @click="() => (variationToEdit = name) && (newVariationName = name)"
@@ -60,10 +60,10 @@
       />
     </div>
     <ConfirmDialog
-        v-if="variationToEdit"
+        v-if="variationToEdit !== false"
         title="Change variation name"
         @confirm="onChangeVariationName"
-        @close="variationToEdit = null"
+        @close="variationToEdit = false"
     >
       <TextField
           v-model="newVariationName"
@@ -143,7 +143,7 @@ const variationNames = computed(() => {
 
 const currentVariation = ref(variationNames.value[0] || "");
 const newVariationName = ref("");
-const variationToEdit = ref("");
+const variationToEdit = ref(false);
 const variationToDelete = ref("");
 const canAddVariation = computed(() => variationNames.value.length < props.form.variations && !props.readonly && !props.disable);
 
@@ -196,7 +196,7 @@ function onChangeVariationName() {
   emit("update:values", newValues);
 
   currentVariation.value = newVariationName.value;
-  variationToEdit.value = "";
+  variationToEdit.value = false;
   newVariationName.value = "";
 }
 

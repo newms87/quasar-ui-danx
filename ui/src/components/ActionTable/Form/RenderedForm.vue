@@ -141,7 +141,7 @@ const variationNames = computed(() => {
   return [...new Set(props.values.map(v => v.variation))].sort();
 });
 
-const currentVariation = ref(variationNames.value[0] || "default");
+const currentVariation = ref(variationNames.value[0] || "");
 const newVariationName = ref("");
 const variationToEdit = ref("");
 const variationToDelete = ref("");
@@ -149,7 +149,7 @@ const canAddVariation = computed(() => variationNames.value.length < props.form.
 
 function getFieldResponse(name) {
   if (!props.values) return undefined;
-  return props.values.find((v) => v.variation === currentVariation.value && v.name === name);
+  return props.values.find((v) => (!v.variation || v.variation === currentVariation.value) && v.name === name);
 }
 function getFieldValue(name) {
   return getFieldResponse(name)?.value;
@@ -158,7 +158,7 @@ function onInput(name, value) {
   const fieldResponse = getFieldResponse(name);
   const newFieldResponse = {
     name,
-    variation: currentVariation.value,
+    variation: currentVariation.value || null,
     value
   };
   const newValues = replace(props.values, fieldResponse, newFieldResponse, true);
@@ -169,7 +169,7 @@ function onAddVariation() {
   if (props.saving) return;
 
   const previousName = variationNames.value[variationNames.value.length - 1];
-  const newName = incrementName(previousName === "default" ? "Variation" : previousName);
+  const newName = incrementName(!previousName ? "Variation 1" : previousName);
 
   const newVariation = props.form.fields.map((field) => ({
     variation: newName,
@@ -201,6 +201,8 @@ function onChangeVariationName() {
 }
 
 function onRemoveVariation(name) {
+  if (!name) return;
+
   const newValues = props.values.filter((v) => v.variation !== name);
   emit("update:values", newValues);
 

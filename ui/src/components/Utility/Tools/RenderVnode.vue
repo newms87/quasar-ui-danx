@@ -1,10 +1,12 @@
 <script>
+import { isRef, isVNode } from "vue";
+
 const RenderVnode = (props) => {
-  if (props.vnode.__v_isVNode) {
+  if (isVNode(props.vnode)) {
     return props.vnode;
   }
 
-  if (props.vnode.__v_isRef) {
+  if (isRef(props.vnode)) {
     return props.vnode.value;
   }
 

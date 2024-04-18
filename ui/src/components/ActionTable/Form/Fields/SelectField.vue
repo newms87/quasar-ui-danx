@@ -234,7 +234,7 @@ function resolveSelectionLabel(option) {
  * @returns {string|*|string}
  */
 function resolveValue(option) {
-  if (typeof option === "string") {
+  if (!option || typeof option === "string") {
     return option;
   }
   let value = option.value;

@@ -1,6 +1,6 @@
 <template>
   <div class="rendered-form">
-    <div v-if="(form.variations > 1) && !disable && !readonly" class="mb-4">
+    <div v-if="form.variations > 1" class="mb-4">
       <QTabs v-model="currentVariation" class="text-xs">
         <QTab
             v-for="(name, index) in variationNames"
@@ -10,19 +10,21 @@
         >
           <div class="flex flex-nowrap items-center text-sm">
             <div>{{ name }}</div>
-            <a
-                @click="() => (variationToEdit = name) && (newVariationName = name)"
-                class="ml-1 p-1 hover:opacity-100 opacity-20 hover:bg-blue-200 rounded"
-            >
-              <EditIcon class="w-3 text-blue-900" />
-            </a>
-            <a
-                v-if="index > 0"
-                @click="variationToDelete = name"
-                class="ml-1 p-1 hover:opacity-100 opacity-20 hover:bg-red-200 rounded"
-            >
-              <RemoveIcon class="w-3 text-red-900" />
-            </a>
+            <template v-if="!disable && !readonly">
+              <a
+                  @click="() => (variationToEdit = name) && (newVariationName = name)"
+                  class="ml-1 p-1 hover:opacity-100 opacity-20 hover:bg-blue-200 rounded"
+              >
+                <EditIcon class="w-3 text-blue-900" />
+              </a>
+              <a
+                  v-if="index > 0"
+                  @click="variationToDelete = name"
+                  class="ml-1 p-1 hover:opacity-100 opacity-20 hover:bg-red-200 rounded"
+              >
+                <RemoveIcon class="w-3 text-red-900" />
+              </a>
+            </template>
           </div>
         </QTab>
         <QTab

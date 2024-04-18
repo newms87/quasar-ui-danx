@@ -68,6 +68,7 @@ export function parseCoords(location: string) {
  * Increment a name by adding a number to the end of it or incrementing the number if it already exists
  */
 export function incrementName(name: string) {
+    name = (name || "New Item").trim();
     const match = name.match(/(\d+)$/);
     if (match) {
         return name.replace(/\d+$/, (match: string) => "" + (parseInt(match) + 1));

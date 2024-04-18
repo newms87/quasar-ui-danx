@@ -1,6 +1,6 @@
 <template>
   <div class="rendered-form">
-    <div v-if="form.variations > 1" class="mb-4">
+    <div v-if="(form.variations > 1) && !disable && !readonly" class="mb-4">
       <QTabs v-model="currentVariation" class="text-xs">
         <QTab
             v-for="(name, index) in variationNames"
@@ -10,6 +10,12 @@
         >
           <div class="flex flex-nowrap items-center text-sm">
             <div>{{ name }}</div>
+            <a
+                @click="() => (variationToEdit = name) && (newVariationName = name)"
+                class="ml-1 p-1 hover:opacity-100 opacity-20 hover:bg-blue-200 rounded"
+            >
+              <EditIcon class="w-3 text-blue-900" />
+            </a>
             <a
                 v-if="index > 0"
                 @click="variationToDelete = name"
@@ -52,6 +58,19 @@
       />
     </div>
     <ConfirmDialog
+        v-if="variationToEdit"
+        title="Change variation name"
+        @confirm="onChangeVariationName"
+        @close="variationToEdit = null"
+    >
+      <TextField
+          v-model="newVariationName"
+          label="Enter name"
+          placeholder="Variation Name"
+          input-class="bg-white"
+      />
+    </ConfirmDialog>
+    <ConfirmDialog
         v-if="variationToDelete"
         :title="`Remove variation ${variationToDelete}?`"
         content="You cannot undo this action. If there was any analytics collected for this variation, it will still be attributed to the ad."
@@ -63,6 +82,7 @@
   </div>
 </template>
 <script setup>
+import { PencilIcon as EditIcon } from "@heroicons/vue/solid";
 import { computed, ref } from "vue";
 import { incrementName, replace } from "../../../helpers";
 import { TrashIcon as RemoveIcon } from "../../../svg";
@@ -82,7 +102,7 @@ import {
 const emit = defineEmits(["update:values"]);
 const props = defineProps({
   values: {
-    type: Object,
+    type: Array,
     default: null
   },
   form: {
@@ -120,6 +140,8 @@ const variationNames = computed(() => {
 });
 
 const currentVariation = ref(variationNames.value[0] || "default");
+const newVariationName = ref("");
+const variationToEdit = ref("");
 const variationToDelete = ref("");
 
 function getFieldResponse(name) {
@@ -154,6 +176,20 @@ function onAddVariation() {
   const newValues = [...props.values, ...newVariation];
   emit("update:values", newValues);
   currentVariation.value = newName;
+}
+
+function onChangeVariationName() {
+  const newValues = props.values.map((v) => {
+    if (v.variation === variationToEdit.value) {
+      return { ...v, variation: newVariationName.value };
+    }
+    return v;
+  });
+  emit("update:values", newValues);
+
+  currentVariation.value = newVariationName.value;
+  variationToEdit.value = "";
+  newVariationName.value = "";
 }
 
 function onRemoveVariation(name) {

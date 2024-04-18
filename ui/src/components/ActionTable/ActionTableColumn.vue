@@ -52,7 +52,7 @@ const props = defineProps({
 const row = computed(() => props.rowProps.row);
 const column = computed(() => props.rowProps.col);
 const value = computed(() => props.rowProps.value);
-const isSaving = computed(() => column.value.isSaving && column.value.isSaving(row.value));
+const isSaving = computed(() => row.value.isSaving?.value);
 
 const columnStyle = computed(() => {
   const width = props.settings?.width || column.value.width;

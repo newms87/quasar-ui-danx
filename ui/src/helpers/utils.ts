@@ -1,25 +1,18 @@
-import { watch } from "vue";
+import { Ref, watch } from "vue";
 
 /**
- * Sleep function to be used in conjuction with async await:
+ * Sleep function to be used in conjunction with async await:
  *
  * eg: await sleep(5000);
- *
- * @param delay
- * @returns {Promise<any>}
  */
-export function sleep(delay) {
+export function sleep(delay: number) {
     return new Promise((resolve) => setTimeout(resolve, delay));
 }
 
 /**
  * Wait for a ref to have a value and then resolve the promise
- *
- * @param ref
- * @param value
- * @returns {Promise<void>}
  */
-export function waitForRef(ref, value) {
+export function waitForRef(ref: Ref, value: any) {
     return new Promise<void>((resolve) => {
         watch(ref, (newValue) => {
             if (newValue === value) {
@@ -31,39 +24,29 @@ export function waitForRef(ref, value) {
 
 /**
  * Returns a number that is constrained to the given range.
- * @param min
- * @param max
- * @param value
- * @returns {number}
  */
-export function minmax(min, max, value) {
+export function minmax(min: number, max: number, value: number) {
     return Math.max(min, Math.min(max, value));
 }
 
 /**
  * Convert meters to miles
- * @param meters
- * @returns {number}
  */
-export function metersToMiles(meters) {
+export function metersToMiles(meters: number) {
     return meters * 0.000621371;
 }
 
 /**
  * Convert miles to meters
- * @param miles
- * @returns {number}
  */
-export function milesToMeters(miles) {
+export function milesToMeters(miles: number) {
     return miles / 0.000621371;
 }
 
 /**
  * Parses a string for Lat and Long coords
- * @param location
- * @returns {null|{lng: number, lat: number}}
  */
-export function parseCoords(location) {
+export function parseCoords(location: string) {
     const latLong = location.split(",");
 
     if (latLong.length === 2) {
@@ -79,4 +62,15 @@ export function parseCoords(location) {
     }
 
     return null;
+}
+
+/**
+ * Increment a name by adding a number to the end of it or incrementing the number if it already exists
+ */
+export function incrementName(name: string) {
+    const match = name.match(/(\d+)$/);
+    if (match) {
+        return name.replace(/\d+$/, (match: string) => "" + (parseInt(match) + 1));
+    }
+    return `${name} 1`;
 }

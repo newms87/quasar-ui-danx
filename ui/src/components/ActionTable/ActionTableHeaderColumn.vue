@@ -46,7 +46,8 @@ const columnStyle = computed(() => {
   const width = props.settings?.width || column.value.width;
   return {
     width: width ? `${width}px` : undefined,
-    minWidth: column.value.minWidth ? `${column.value.minWidth}px` : undefined
+    minWidth: column.value.minWidth ? `${column.value.minWidth}px` : undefined,
+    ...(column.value.headerStyle || {})
   };
 });
 

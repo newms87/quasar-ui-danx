@@ -1,8 +1,8 @@
-import { computed, ref, watch } from "vue";
-import { getItem, setItem, waitForRef } from "../../helpers";
+import { computed, Ref, ref, ShallowRef, shallowRef, watch } from "vue";
+import { ActionTargetItem, getItem, setItem, waitForRef } from "../../helpers";
 import { getFilterFromUrl } from "./listHelpers";
 
-interface ListActionsOptions {
+export interface ListActionsOptions {
     listRoute: Function;
     summaryRoute?: Function | null;
     filterFieldOptionsRoute?: Function | null;
@@ -11,6 +11,14 @@ interface ListActionsOptions {
     urlPattern?: RegExp | null;
     filterDefaults?: Record<string, any>;
     refreshFilters?: boolean;
+}
+
+export interface PagedItems {
+    data: any[] | undefined;
+    meta: {
+        total: number;
+        last_page?: number;
+    } | undefined;
 }
 
 export function useListControls(name: string, {
@@ -25,14 +33,19 @@ export function useListControls(name: string, {
 }: ListActionsOptions) {
     let isInitialized = false;
     const PAGE_SETTINGS_KEY = `${name}-pagination-settings`;
-    const pagedItems = ref(null);
-    const filter = ref({});
+    const pagedItems: Ref<PagedItems | null> = shallowRef(null);
+    const filter: Ref<object | any> = ref({});
     const globalFilter = ref({});
     const showFilters = ref(false);
-    const selectedRows = ref([]);
+    const selectedRows = shallowRef([]);
     const isLoadingList = ref(false);
     const isLoadingSummary = ref(false);
-    const summary = ref(null);
+    const summary = shallowRef(null);
+
+    // The active ad for viewing / editing
+    const activeItem: ShallowRef<ActionTargetItem | null> = shallowRef(null);
+    // Controls the active panel (ie: tab) if rendering a panels drawer or similar
+    const activePanel = shallowRef(null);
 
     // Filter fields are the field values available for the currently applied filter on Creative Groups
     // (ie: all states available under the current filter)
@@ -86,7 +99,7 @@ export function useListControls(name: string, {
         isLoadingSummary.value = true;
         const summaryFilter = { id: null, ...filter.value, ...globalFilter.value };
         if (selectedRows.value.length) {
-            summaryFilter.id = selectedRows.value.map((row) => row.id);
+            summaryFilter.id = selectedRows.value.map((row: { id: string }) => row.id);
         }
         summary.value = await summaryRoute(summaryFilter);
         isLoadingSummary.value = false;
@@ -108,7 +121,7 @@ export function useListControls(name: string, {
      * Watches for a filter URL parameter and applies the filter if it is set.
      */
     function applyFilterFromUrl(url: string, filterFields = null) {
-        if (url.match(urlPattern)) {
+        if (urlPattern && url.match(urlPattern)) {
             // A flat list of valid filterable field names
             const validFilterKeys = filterFields?.value?.map(group => group.fields.map(field => field.name)).flat();
 
@@ -125,15 +138,32 @@ export function useListControls(name: string, {
 
     // Set the reactive pager to map from the Laravel pagination to Quasar pagination
     // and automatically update the list of ads
-    function setPagedItems(items) {
+    function setPagedItems(items: any[] | PagedItems) {
+        let data, meta;
+
         if (Array.isArray(items)) {
-            pagedItems.value = { data: items, meta: { total: items.length } };
+            data = items;
+            meta = { total: items.length };
+
         } else {
-            pagedItems.value = items;
-            if (items?.meta && items.meta.total !== quasarPagination.value.rowsNumber) {
-                quasarPagination.value.rowsNumber = items.meta.total;
-            }
+            data = items.data;
+            meta = items.meta;
         }
+
+        // Update the Quasar pagination rows number if it is different from the total
+        if (meta && meta.total !== quasarPagination.value.rowsNumber) {
+            quasarPagination.value.rowsNumber = meta.total;
+        }
+
+        // Add a reactive isSaving property to each item (for performance reasons in checking saving state)
+        data = data.map((item: any) => {
+            // We want to keep the isSaving state if it is already set, as optimizations prevent reloading the
+            // components, and therefore reactivity is not responding to the new isSaving state
+            const oldItem = pagedItems.value?.data?.find(i => i.id === item.id);
+            return { ...item, isSaving: oldItem?.isSaving || ref(false) };
+        });
+
+        pagedItems.value = { data, meta };
     }
 
     /**
@@ -148,9 +178,12 @@ export function useListControls(name: string, {
      *
      * @param updatedItem
      */
-    function setItemInPagedList(updatedItem) {
+    function setItemInList(updatedItem: any) {
         const data = pagedItems.value?.data?.map(item => (item.id === updatedItem.id && (item.updated_at === null || item.updated_at <= updatedItem.updated_at)) ? updatedItem : item);
-        pagedItems.value = { ...pagedItems.value, data };
+        setPagedItems({
+            data,
+            meta: { total: pagedItems.value.meta.total }
+        });
 
         // Update the active item as well if it is set
         if (activeItem.value?.id === updatedItem.id) {
@@ -160,10 +193,10 @@ export function useListControls(name: string, {
 
     /**
      * Loads more items into the list.
-     * @param index
-     * @param perPage
      */
-    async function loadMore(index, perPage = undefined) {
+    async function loadMore(index: number, perPage = undefined) {
+        if (!moreRoute) return;
+
         const newItems = await moreRoute({
             page: index + 1,
             perPage,
@@ -171,7 +204,10 @@ export function useListControls(name: string, {
         });
 
         if (newItems && newItems.length > 0) {
-            pagedItems.value.data = [...pagedItems.value.data, ...newItems];
+            setPagedItems({
+                data: [...pagedItems.value.data, ...newItems],
+                meta: { total: pagedItems.value.meta.total }
+            });
             return true;
         }
 
@@ -180,7 +216,6 @@ export function useListControls(name: string, {
 
     /**
      * Refreshes the list, summary, and filter field options.
-     * @returns {Promise<Awaited<void>[]>}
      */
     async function refreshAll() {
         return Promise.all([loadList(), loadSummary(), loadFilterFieldOptions(), getActiveItemDetails()]);
@@ -188,10 +223,8 @@ export function useListControls(name: string, {
 
     /**
      * Updates the settings in local storage
-     * @param key
-     * @param value
      */
-    function updateSettings(key, value) {
+    function updateSettings(key: string, value: any) {
         const settings = getItem(PAGE_SETTINGS_KEY) || {};
         settings[key] = value;
         setItem(PAGE_SETTINGS_KEY, settings);
@@ -242,11 +275,6 @@ export function useListControls(name: string, {
         setItem(PAGE_SETTINGS_KEY, settings);
     }
 
-    // The active ad for viewing / editing
-    const activeItem = ref(null);
-    // Controls the active panel (ie: tab) if rendering a panels drawer or similar
-    const activePanel = ref(null);
-
     /**
      * Gets the additional details for the currently active item.
      * (ie: data that is not normally loaded in the list because it is not needed for the list view)
@@ -261,7 +289,8 @@ export function useListControls(name: string, {
         // NOTE: race conditions might allow the finished loading item to be different to the currently
         // requested item
         if (result?.id === activeItem.value?.id) {
-            activeItem.value = result;
+            const loadedItem = pagedItems.value?.data.find((i: { id: string }) => i.id === result.id);
+            activeItem.value = { ...result, isSaving: loadedItem.isSaving || ref(false) };
         }
     }
 
@@ -289,12 +318,13 @@ export function useListControls(name: string, {
     /**
      * Gets the next item in the list at the given offset (ie: 1 or -1) from the current position in the list of the
      * selected item. If the next item is on a previous or next page, it will load the page first then select the item
-     * @param offset
-     * @returns {Promise<void>}
      */
-    async function getNextItem(offset) {
-        const index = pagedItems.value?.data.findIndex(i => i.id === activeItem.value.id);
-        if (index === undefined) return;
+    async function getNextItem(offset: number) {
+        if (!pagedItems.value) return;
+
+        const index = pagedItems.value.data.findIndex((i: { id: string }) => i.id === activeItem.value?.id);
+        if (index === undefined || index === null) return;
+
         let nextIndex = index + offset;
 
         // Load the previous page if the offset is before index 0
@@ -321,7 +351,7 @@ export function useListControls(name: string, {
             }
         }
 
-        activeItem.value = pagedItems.value.data[nextIndex];
+        activeItem.value = pagedItems.value?.data[nextIndex];
     }
 
     // Initialize the list actions and load settings, lists, summaries, filter fields, etc.
@@ -358,6 +388,6 @@ export function useListControls(name: string, {
         getNextItem,
         activatePanel,
         applyFilterFromUrl,
-        setItemInPagedList
+        setItemInList
     };
 }

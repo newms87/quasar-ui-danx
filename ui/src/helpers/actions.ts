@@ -1,9 +1,14 @@
-import { ref, shallowRef, VNode } from "vue";
+import { Ref, shallowRef, VNode } from "vue";
 import { FlashMessages } from "./FlashMessages";
 
-type ActionTarget = object[] | object;
+export type ActionTargetItem = {
+    id: number | string;
+    isSaving: Ref<boolean>;
+    [key: string]: any;
+};
+export type ActionTarget = ActionTargetItem[] | ActionTargetItem;
 
-interface ActionOptions {
+export interface ActionOptions {
     name?: string;
     label?: string;
     menu?: boolean;
@@ -11,7 +16,6 @@ interface ActionOptions {
     category?: string;
     class?: string;
     trigger?: (target: ActionTarget, input: any) => Promise<any>;
-    activeTarget?: any;
     vnode?: (target: ActionTarget) => VNode;
     enabled?: (target: object) => boolean;
     batchEnabled?: (targets: object[]) => boolean;
@@ -24,7 +28,7 @@ interface ActionOptions {
     onFinish?: (result: any, targets: ActionTarget, input: any) => any;
 }
 
-export const activeActionVnode: object = shallowRef(null);
+export const activeActionVnode: Ref = shallowRef(null);
 
 /**
  * Hook to perform an action on a set of targets
@@ -38,29 +42,21 @@ export function useActions(actions: ActionOptions[], globalOptions: ActionOption
         const mappedAction: ActionOptions = { ...globalOptions, ...action };
         if (!mappedAction.trigger) {
             mappedAction.trigger = (target, input) => performAction(mappedAction, target, input);
-            mappedAction.activeTarget = ref(null);
         }
         return mappedAction;
     });
 
     /**
-     * Check if the provided target is currently being saved by any of the actions
+     * Set the reactive saving state of a target
      */
-    function isSavingTarget(target: any): boolean {
-        if (!target) return false;
-
-        for (const action of mappedActions) {
-            const activeTargets = (Array.isArray(action.activeTarget.value) ? action.activeTarget.value : [action.activeTarget.value]).filter(t => t);
-            if (activeTargets.length === 0) continue;
-
-            for (const activeTarget of activeTargets) {
-                if (activeTarget === target || (activeTarget.id && activeTarget.id === target.id)) {
-                    return true;
-                }
+    function setTargetSavingState(target: ActionTarget, saving: boolean) {
+        if (Array.isArray(target)) {
+            for (const t of target) {
+                t.isSaving.value = saving;
             }
+        } else {
+            target.isSaving.value = saving;
         }
-
-        return false;
     }
 
     /**
@@ -71,19 +67,13 @@ export function useActions(actions: ActionOptions[], globalOptions: ActionOption
      * @param {any} input - The input data to pass to the action handler
      */
     async function performAction(name: string | object, target: ActionTarget, input: any = null) {
-        const action: ActionOptions = typeof name === "string" ? mappedActions.find(a => a.name === name) : name;
+        const action: ActionOptions | null | undefined = typeof name === "string" ? mappedActions.find(a => a.name === name) : name;
         if (!action) {
             throw new Error(`Unknown action: ${name}`);
         }
 
-        if (!action.activeTarget) {
-            throw new Error(`Action ${action.name} does not have an activeTarget ref. Please use useActions() or manually set the activeTarget ref`);
-        }
-
         const vnode = action.vnode && action.vnode(target);
         let result: any;
-
-        action.activeTarget.value = target;
 
         // Run the onStart handler if it exists and quit the operation if it returns false
         if (action.onStart) {
@@ -91,6 +81,8 @@ export function useActions(actions: ActionOptions[], globalOptions: ActionOption
                 return;
             }
         }
+
+        setTargetSavingState(target, true);
 
         // If additional input is required, first render the vnode and wait for the confirm or cancel action
         if (vnode) {
@@ -119,7 +111,8 @@ export function useActions(actions: ActionOptions[], globalOptions: ActionOption
             result = await onConfirmAction(action, target, input);
         }
 
-        action.activeTarget.value = null;
+        setTargetSavingState(target, false);
+
         return result;
     }
 
@@ -135,14 +128,13 @@ export function useActions(actions: ActionOptions[], globalOptions: ActionOption
 
         for (const filter of Object.keys(filters)) {
             const filterValue = filters[filter];
-            filteredActions = filteredActions.filter(a => a[filter] === filterValue || (Array.isArray(filterValue) && filterValue.includes(a[filter])));
+            filteredActions = filteredActions.filter((a: object) => a[filter] === filterValue || (Array.isArray(filterValue) && filterValue.includes(a[filter])));
         }
         return filteredActions;
     }
 
     return {
         actions: mappedActions,
-        isSavingTarget,
         filterActions,
         performAction
     };

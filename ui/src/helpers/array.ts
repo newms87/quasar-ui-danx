@@ -1,17 +1,12 @@
 /**
- *
- * @param array
- * @param item
- * @param newItem
- * @returns {*[]}
+ * Replace an item in an array with a new item
  */
-export function replace(array, item, newItem = undefined) {
-    const index =
-        typeof item === "function" ? array.findIndex(item) : array.indexOf(item);
-    if (index === false) {
-        console.error("Item not found in array", item, array);
-        throw new Error("Item not found in array");
+export function replace(array: any[], item: any, newItem = undefined, appendIfMissing = false) {
+    const index: any = typeof item === "function" ? array.findIndex(item) : array.indexOf(item);
+    if (index === false || index === -1) {
+        return appendIfMissing ? [...array, newItem] : array;
     }
+
     const newArray = [...array];
     newItem !== undefined
         ? newArray.splice(index, 1, newItem)
@@ -19,17 +14,17 @@ export function replace(array, item, newItem = undefined) {
     return newArray;
 }
 
-export function remove(array, item) {
+/**
+ * Remove an item from an array
+ */
+export function remove(array: any[], item: any) {
     return replace(array, item);
 }
 
 /**
  * Remove duplicate items from an array using a callback to compare 2 elements
- * @param array
- * @param cb
- * @returns {*}
  */
-export function uniqueBy(array, cb) {
+export function uniqueBy(array: any[], cb: Function) {
     return array.filter((a, index, self) => {
         // Check if the current element 'a' is the first occurrence in the array
         return index === self.findIndex((b) => cb(a, b));

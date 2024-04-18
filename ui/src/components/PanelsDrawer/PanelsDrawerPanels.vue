@@ -6,7 +6,7 @@
     <QTabPanel v-for="panel in panels" :key="panel.name" :name="panel.name">
       <RenderVnode
           v-if="panel.vnode"
-          :vnode="panel.vnode()"
+          :vnode="panel.vnode"
       />
     </QTabPanel>
   </QTabPanels>

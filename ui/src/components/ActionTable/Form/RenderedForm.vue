@@ -28,7 +28,7 @@
           </div>
         </QTab>
         <QTab
-            v-if="variationNames.length < form.variations"
+            v-if="canAddVariation"
             name="add"
             key="add-new-variation"
             @click="onAddVariation"
@@ -86,7 +86,7 @@
 <script setup>
 import { PencilIcon as EditIcon } from "@heroicons/vue/solid";
 import { computed, ref } from "vue";
-import { incrementName, replace } from "../../../helpers";
+import { FlashMessages, incrementName, replace } from "../../../helpers";
 import { TrashIcon as RemoveIcon } from "../../../svg";
 import { ConfirmDialog } from "../../Utility";
 import {
@@ -138,13 +138,14 @@ const mappedFields = props.form.fields.map((field) => ({
 }));
 
 const variationNames = computed(() => {
-  return [...new Set(props.values.map(v => v.variation))];
+  return [...new Set(props.values.map(v => v.variation))].sort();
 });
 
 const currentVariation = ref(variationNames.value[0] || "default");
 const newVariationName = ref("");
 const variationToEdit = ref("");
 const variationToDelete = ref("");
+const canAddVariation = computed(() => variationNames.value.length < props.form.variations && !props.readonly && !props.disable);
 
 function getFieldResponse(name) {
   if (!props.values) return undefined;
@@ -181,6 +182,11 @@ function onAddVariation() {
 }
 
 function onChangeVariationName() {
+  if (!newVariationName.value) return;
+  if (variationNames.value.includes(newVariationName.value)) {
+    FlashMessages.error("Variation name already exists");
+    return;
+  }
   const newValues = props.values.map((v) => {
     if (v.variation === variationToEdit.value) {
       return { ...v, variation: newVariationName.value };

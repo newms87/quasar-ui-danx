@@ -1,3 +1,4 @@
+import { useDebounceFn } from "@vueuse/core";
 import { Ref, shallowRef, VNode } from "vue";
 import { FlashMessages } from "./FlashMessages";
 
@@ -15,6 +16,7 @@ export interface ActionOptions {
     batch?: boolean;
     category?: string;
     class?: string;
+    debounce?: number;
     trigger?: (target: ActionTarget, input: any) => Promise<any>;
     vnode?: (target: ActionTarget) => VNode;
     enabled?: (target: object) => boolean;
@@ -40,8 +42,10 @@ export const activeActionVnode: Ref = shallowRef(null);
 export function useActions(actions: ActionOptions[], globalOptions: ActionOptions | null = null) {
     const mappedActions = actions.map(action => {
         const mappedAction: ActionOptions = { ...globalOptions, ...action };
-        if (!mappedAction.trigger) {
-            mappedAction.trigger = (target, input) => performAction(mappedAction, target, input);
+        if (mappedAction.debounce) {
+            mappedAction.trigger = useDebounceFn((target, input) => performAction(mappedAction, target, input, true), mappedAction.debounce);
+        } else if (!mappedAction.trigger) {
+            mappedAction.trigger = (target, input) => performAction(mappedAction, target, input, true);
         }
         return mappedAction;
     });
@@ -65,11 +69,18 @@ export function useActions(actions: ActionOptions[], globalOptions: ActionOption
      * @param {string} name - can either be a string or an action object
      * @param {object[]|object} target - an array of targets or a single target object
      * @param {any} input - The input data to pass to the action handler
+     * @param isTriggered - Whether the action was triggered by a trigger function
      */
-    async function performAction(name: string | object, target: ActionTarget, input: any = null) {
+    async function performAction(name: string | object, target: ActionTarget, input: any = null, isTriggered = false) {
         const action: ActionOptions | null | undefined = typeof name === "string" ? mappedActions.find(a => a.name === name) : name;
         if (!action) {
             throw new Error(`Unknown action: ${name}`);
+        }
+
+        // We always want to call the trigger function if it exists, unless it's already been triggered
+        // This provides behavior like debounce and custom action resolution
+        if (action.trigger && !isTriggered) {
+            return action.trigger(target, input);
         }
 
         const vnode = action.vnode && action.vnode(target);

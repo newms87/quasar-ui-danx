@@ -1,13 +1,8 @@
 import { QNotifyCreateOptions } from "quasar";
-
-export interface DanxFileUploadOptions {
-    directory?: string;
-    presignedUploadUrl?: Function | null;
-    uploadCompletedUrl?: Function | null;
-}
+import { FileUploadOptions } from "../helpers";
 
 export interface DanxOptions {
-    fileUpload: DanxFileUploadOptions;
+    fileUpload: FileUploadOptions;
     flashMessages: {
         default: QNotifyCreateOptions;
         success: QNotifyCreateOptions;

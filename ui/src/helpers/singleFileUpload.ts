@@ -1,19 +1,24 @@
 import { computed, Ref, ref } from "vue";
 import { FileUpload, FileUploadOptions, UploadedFile } from "./FileUpload";
 
+interface FileUploadCallbackParams {
+    file: UploadedFile;
+    uploadedFile: UploadedFile;
+}
+
 export function useSingleFileUpload(options: FileUploadOptions | null = null) {
     const uploadedFile: Ref<UploadedFile | null> = ref(null);
     const onCompleteCb: Ref<Function | null> = ref(null);
     const onFileChangeCb: Ref<Function | null> = ref(null);
 
-    const onFileSelected = (e: InputEvent) => {
+    const onFileSelected = (e: any) => {
         uploadedFile.value = null;
         new FileUpload(e.target?.files[0], options)
-            .onProgress(({ file }) => {
+            .onProgress(({ file }: FileUploadCallbackParams) => {
                 uploadedFile.value = file;
                 onFileChangeCb.value && onFileChangeCb.value(uploadedFile.value);
             })
-            .onComplete(({ uploadedFile: completedFile }) => {
+            .onComplete(({ uploadedFile: completedFile }: FileUploadCallbackParams) => {
                 uploadedFile.value = completedFile;
                 onCompleteCb.value && onCompleteCb.value(uploadedFile.value);
                 onFileChangeCb.value && onFileChangeCb.value(uploadedFile.value);

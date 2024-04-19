@@ -5,8 +5,8 @@ import { FlashMessages } from "./FlashMessages";
 
 export type FileUploadOptions = {
     directory?: string,
-    presignedUploadUrl?: (...params: any) => "",
-    uploadCompletedUrl?: (...params: any) => "",
+    presignedUploadUrl?: Function | null;
+    uploadCompletedUrl?: Function | null;
 };
 
 export type UploadedFile = {
@@ -22,14 +22,14 @@ export type UploadedFile = {
 
 export class FileUpload {
     files: UploadedFile[] = [];
-    fileUploads = [];
-    onErrorCb = null;
-    onProgressCb = null;
-    onCompleteCb = null;
-    onAllCompleteCb = null;
+    fileUploads: UploadedFile[] = [];
+    onErrorCb: Function | null = null;
+    onProgressCb: Function | null = null;
+    onCompleteCb: Function | null = null;
+    onAllCompleteCb: Function | null = null;
     options: FileUploadOptions | null = {};
 
-    constructor(files: UploadedFile[] | UploadedFile, options: FileUploadOptions = {}) {
+    constructor(files: UploadedFile[] | UploadedFile, options: FileUploadOptions | null = {}) {
         this.files = !Array.isArray(files) && !(files instanceof FileList) ? [files] : files;
         this.fileUploads = [];
         this.onErrorCb = null;
@@ -79,7 +79,7 @@ export class FileUpload {
     /**
      * Callback for when all files have been uploaded
      */
-    onAllComplete(cb) {
+    onAllComplete(cb: Function) {
         this.onAllCompleteCb = cb;
         return this;
     }
@@ -89,7 +89,7 @@ export class FileUpload {
      * @param cb
      * @returns {FileUpload}
      */
-    onComplete(cb) {
+    onComplete(cb: Function) {
         this.onCompleteCb = cb;
         return this;
     }
@@ -99,7 +99,7 @@ export class FileUpload {
      * @param cb
      * @returns {FileUpload}
      */
-    onProgress(cb) {
+    onProgress(cb: Function) {
         this.onProgressCb = cb;
         return this;
     }
@@ -109,7 +109,7 @@ export class FileUpload {
      * @param cb
      * @returns {FileUpload}
      */
-    onError(cb) {
+    onError(cb: Function) {
         this.onErrorCb = cb;
         return this;
     }
@@ -120,7 +120,7 @@ export class FileUpload {
      * @param file
      * @param error
      */
-    errorHandler(e, file, error = null) {
+    errorHandler(e: InputEvent, file: UploadedFile, error = null) {
         if (this.onErrorCb) {
             this.onErrorCb({ e, file, error });
         }

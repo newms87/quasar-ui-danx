@@ -21,7 +21,7 @@
       <a
           v-if="uploadedFiles.length > 0"
           class="ml-3 text-red-900"
-          @click="onClear"
+          @click="clearUploadedFiles"
       >Clear</a>
       <input
           ref="file"
@@ -81,7 +81,7 @@ const props = defineProps({
   readonly: Boolean
 });
 
-const { onComplete, onDrop, onFilesSelected, uploadedFiles, onClear, onRemove } = useMultiFileUpload();
+const { onComplete, onDrop, onFilesSelected, uploadedFiles, clearUploadedFiles, onRemove } = useMultiFileUpload();
 onMounted(() => {
   if (props.modelValue) {
     uploadedFiles.value = props.modelValue;

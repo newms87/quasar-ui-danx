@@ -149,7 +149,7 @@ const canAddVariation = computed(() => variationNames.value.length < props.form.
 
 function getFieldResponse(name) {
   if (!props.values) return undefined;
-  return props.values.find((v) => (!v.variation || v.variation === currentVariation.value) && v.name === name);
+  return props.values.find((v) => v.variation === currentVariation.value && v.name === name);
 }
 function getFieldValue(name) {
   return getFieldResponse(name)?.value;
@@ -158,7 +158,7 @@ function onInput(name, value) {
   const fieldResponse = getFieldResponse(name);
   const newFieldResponse = {
     name,
-    variation: currentVariation.value || null,
+    variation: currentVariation.value || "",
     value
   };
   const newValues = replace(props.values, fieldResponse, newFieldResponse, true);

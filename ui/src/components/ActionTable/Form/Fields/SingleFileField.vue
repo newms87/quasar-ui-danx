@@ -21,7 +21,7 @@
       <a
           v-if="uploadedFile"
           class="ml-3 text-red-900"
-          @click="onClear"
+          @click="clearUploadedFile"
       >Clear</a>
       <input
           ref="file"
@@ -67,7 +67,7 @@ const props = defineProps({
   disable: Boolean,
   readonly: Boolean
 });
-const { onComplete, onDrop, onFileSelected, uploadedFile, onClear } = useSingleFileUpload();
+const { onComplete, onDrop, onFileSelected, uploadedFile, clearUploadedFile } = useSingleFileUpload();
 onComplete(() => emit("update:model-value", uploadedFile.value));
 
 onMounted(() => {

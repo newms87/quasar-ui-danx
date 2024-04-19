@@ -16,7 +16,8 @@ export type UploadedFile = {
     type: string,
     progress: number,
     location: string,
-    blobUrl: string
+    blobUrl: string,
+    url: string,
 }
 
 export class FileUpload {
@@ -26,13 +27,10 @@ export class FileUpload {
     onProgressCb = null;
     onCompleteCb = null;
     onAllCompleteCb = null;
-    options: FileUploadOptions = {};
+    options: FileUploadOptions | null = {};
 
     constructor(files: UploadedFile[] | UploadedFile, options: FileUploadOptions = {}) {
-        if (!Array.isArray(files) && !(files instanceof FileList)) {
-            files = [files];
-        }
-        this.files = files;
+        this.files = !Array.isArray(files) && !(files instanceof FileList) ? [files] : files;
         this.fileUploads = [];
         this.onErrorCb = null;
         this.onProgressCb = null;

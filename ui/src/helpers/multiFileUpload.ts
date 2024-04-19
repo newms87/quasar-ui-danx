@@ -1,17 +1,17 @@
-import { ref } from "vue";
-import { FileUpload, FileUploadOptions } from "./FileUpload";
+import { Ref, ref } from "vue";
+import { FileUpload, FileUploadOptions, UploadedFile } from "./FileUpload";
 
 export function useMultiFileUpload(options: FileUploadOptions) {
-    const uploadedFiles = ref([]);
-    const onCompleteCb = ref(null);
-    const onFilesChangeCb = ref(null);
-    const onFilesSelected = (e) => {
+    const uploadedFiles: Ref<UploadedFile[]> = ref([]);
+    const onCompleteCb: Ref<Function | null> = ref(null);
+    const onFilesChangeCb: Ref<Function | null> = ref(null);
+    const onFilesSelected = (e: any) => {
         uploadedFiles.value = [...uploadedFiles.value, ...e.target.files];
         new FileUpload(e.target.files, options)
-            .onProgress(({ file }) => {
+            .onProgress(({ file }: { file: UploadedFile }) => {
                 updateFileInList(file);
             })
-            .onComplete(({ file, uploadedFile }) => {
+            .onComplete(({ file, uploadedFile }: { file: UploadedFile, uploadedFile: UploadedFile }) => {
                 updateFileInList(file, uploadedFile);
             })
             .onAllComplete(() => {
@@ -21,7 +21,7 @@ export function useMultiFileUpload(options: FileUploadOptions) {
             .upload();
     };
 
-    function updateFileInList(file, replace = null) {
+    function updateFileInList(file: UploadedFile, replace: UploadedFile | null = null) {
         const index = uploadedFiles.value.findIndex(f => f.id === file.id);
         if (index !== -1) {
             uploadedFiles.value.splice(index, 1, replace || file);
@@ -29,25 +29,25 @@ export function useMultiFileUpload(options: FileUploadOptions) {
         onFilesChangeCb.value && onFilesChangeCb.value(uploadedFiles.value);
     }
 
-    const onDrop = (e) => {
-        onFilesSelected({ target: { files: e.dataTransfer.files } });
+    const onDrop = (e: InputEvent) => {
+        onFilesSelected({ target: { files: e.dataTransfer?.files } });
     };
 
-    const onFilesChange = (cb) => {
+    const onFilesChange = (cb: Function) => {
         onFilesChangeCb.value = cb;
     };
 
-    const onComplete = (cb) => {
+    const onComplete = (cb: Function) => {
         onCompleteCb.value = cb;
     };
 
-    const onClear = () => {
+    const clearUploadedFiles = () => {
         uploadedFiles.value = [];
         onFilesChangeCb.value && onFilesChangeCb.value(uploadedFiles.value);
         onCompleteCb.value && onCompleteCb.value();
     };
 
-    const onRemove = (file) => {
+    const onRemove = (file: UploadedFile) => {
         const index = uploadedFiles.value.findIndex(f => f.id === file.id);
         if (index !== -1) {
             uploadedFiles.value.splice(index, 1);
@@ -57,7 +57,7 @@ export function useMultiFileUpload(options: FileUploadOptions) {
     };
 
     return {
-        onClear,
+        clearUploadedFiles,
         onRemove,
         onComplete,
         onFilesChange,

@@ -14,6 +14,7 @@
           @click="toggleSelect(option)"
       >
         <QCheckbox
+            @click.stop="toggleSelect(option)"
             :model-value="isSelected(option)"
             class="mr-2"
         />

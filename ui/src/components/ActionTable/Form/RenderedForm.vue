@@ -7,10 +7,11 @@
             :key="name"
             :name="name"
             class="p-0"
+            content-class="w-full"
         >
-          <div class="flex flex-nowrap items-center text-sm">
-            <div>{{ name || "(Default)" }}</div>
-            <template v-if="!disable && !readonly">
+          <div class="flex flex-nowrap items-center text-sm w-full">
+            <div class="flex-grow">{{ name || "1" }}</div>
+            <div v-if="!disable && !readonly && canModifyVariations" class="flex flex-nowrap items-center mr-2">
               <a
                   @click="() => (variationToEdit = name) && (newVariationName = name)"
                   class="ml-1 p-1 hover:opacity-100 opacity-20 hover:bg-blue-200 rounded"
@@ -24,7 +25,7 @@
               >
                 <RemoveIcon class="w-3 text-red-900" />
               </a>
-            </template>
+            </div>
           </div>
         </QTab>
         <QTab
@@ -115,7 +116,8 @@ const props = defineProps({
   showName: Boolean,
   disable: Boolean,
   readonly: Boolean,
-  saving: Boolean
+  saving: Boolean,
+  canModifyVariations: Boolean
 });
 
 const FORM_FIELD_MAP = {
@@ -138,14 +140,19 @@ const mappedFields = props.form.fields.map((field) => ({
 }));
 
 const variationNames = computed(() => {
-  return [...new Set(props.values.map(v => v.variation))].sort();
+  const names = [...new Set(props.values.map(v => v.variation))].sort();
+  // Always guarantee that we show the default variation
+  if (names.length === 0) {
+    names.push("");
+  }
+  return names;
 });
 
 const currentVariation = ref(variationNames.value[0] || "");
 const newVariationName = ref("");
 const variationToEdit = ref(false);
 const variationToDelete = ref("");
-const canAddVariation = computed(() => variationNames.value.length < props.form.variations && !props.readonly && !props.disable);
+const canAddVariation = computed(() => props.canModifyVariations && !props.readonly && !props.disable && variationNames.value.length < props.form.variations);
 
 function getFieldResponse(name) {
   if (!props.values) return undefined;
@@ -165,19 +172,25 @@ function onInput(name, value) {
   emit("update:values", newValues);
 }
 
-function onAddVariation() {
-  if (props.saving) return;
-
-  const previousName = variationNames.value[variationNames.value.length - 1];
-  const newName = incrementName(!previousName ? "Variation 1" : previousName);
-
-  const newVariation = props.form.fields.map((field) => ({
-    variation: newName,
+function createVariation(variation) {
+  return props.form.fields.map((field) => ({
+    variation,
     name: field.name,
     value: field.type === "BOOLEAN" ? false : null
   }));
-  const newValues = [...props.values, ...newVariation];
-  emit("update:values", newValues);
+}
+
+function onAddVariation() {
+  if (props.saving) return;
+  let newValues = [...props.values];
+
+  if (newValues.length === 0) {
+    newValues = createVariation("");
+  }
+  const previousName = variationNames.value[variationNames.value.length - 1];
+  const newName = incrementName(!previousName ? "1" : previousName);
+  const newVariation = createVariation(newName);
+  emit("update:values", [...newValues, ...newVariation]);
   currentVariation.value = newName;
 }
 

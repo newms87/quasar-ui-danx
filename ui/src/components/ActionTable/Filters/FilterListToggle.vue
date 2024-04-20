@@ -39,10 +39,14 @@ const activeCount = computed(() => Object.keys(props.filter).filter(key => props
 </script>
 <style lang="scss" scoped>
 .btn-blue-highlight {
-  @apply rounded-lg border border-solid;
+  @apply rounded-lg border border-solid p-3 whitespace-nowrap;
 
   &.highlighted {
     box-shadow: 0 0 0 3px #B8E1FF;
+  }
+
+  :deep(.q-btn__content) {
+    @apply flex items-center flex-nowrap;
   }
 }
 </style>

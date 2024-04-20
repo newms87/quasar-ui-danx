@@ -1,9 +1,8 @@
 <template>
-  <div class="relative flex justify-center bg-gray-100" :class="{'rounded-2xl': !square}">
+  <div class="relative flex justify-center bg-gray-100 overflow-hidden" :class="{'rounded-2xl': !square}">
     <template v-if="computedImage">
       <div
-          class="grow h-full overflow-hidden"
-          :class="{'rounded-2xl': !square}"
+          class="grow h-full"
           @click="showPreview = true"
       >
         <div

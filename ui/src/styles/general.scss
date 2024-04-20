@@ -1,0 +1,18 @@
+body {
+  height: 100vh;
+
+  #app,
+  #main-layout,
+  main {
+    height: 100%;
+  }
+}
+
+a {
+  cursor: pointer;
+
+  &.is-disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}

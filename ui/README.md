@@ -86,7 +86,8 @@ export default ({ command }) => {
             * NOTE: Setting this up w/ `npm link` or trying to modify tsconfig.json / vite.config.ts only can be quite
               challenging to get everything configured correctly. I found this to be the best solution.
     * copy/paste and run `./danx-local.sh`
-        * (recommended) if using docker, add this to your entrypoint script
+        * (recommended) Configure yarn / npm to always run this after updating packages
+            * Add `{"scripts: {..., "postinstall": "./danx-local.sh"}}` to your package.json
     * (or manually symlink node_modules/quasar-ui-danx to ../../quasar-ui-danx/ui/src)
         * Directory structure of your project relative to quasar-ui-danx:
 

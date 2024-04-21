@@ -1,29 +1,46 @@
 <template>
   <div
-      class="p-4"
-      :class="{ 'is-collapsed': collapsed }"
+    class="p-4"
+    :class="{ 'is-collapsed': collapsed }"
   >
     <div
-        v-for="item in allowedItems"
-        :key="'nav-item-' + item.label"
-        class="nav-menu-item"
-        :class="item.class || itemClass"
+      v-for="item in allowedItems"
+      :key="'nav-item-' + item.label"
+      class="nav-menu-item-box"
     >
-      <div class="flex flex-nowrap" @click="item.onClick">
-        <div v-if="item.icon">
+      <div
+        class="nav-menu-item flex flex-nowrap"
+        :class="item.class || itemClass"
+        @click="item.onClick"
+      >
+        <div
+          v-if="item.icon"
+          class="flex-shrink-0"
+        >
           <component
-              :is="item.icon"
-              class="nav-icon"
-              :class="item.iconClass"
+            :is="item.icon"
+            class="nav-icon"
+            :class="item.iconClass"
           />
         </div>
-        <div class="label ml-2" :class="item.labelClass">{{ item.label }}</div>
-        <QTooltip v-if="collapsed" v-bind="item.tooltip">{{ item.tooltip?.text || item.label }}</QTooltip>
+        <div
+          v-if="!collapsed"
+          class="label ml-2"
+          :class="item.labelClass"
+        >
+          {{ item.label }}
+        </div>
+        <QTooltip
+          v-if="collapsed"
+          v-bind="item.tooltip"
+        >
+          {{ item.tooltip?.text || item.label }}
+        </QTooltip>
       </div>
       <QSeparator
-          v-if="item.separator"
-          :key="'separator-' + item.label"
-          class="my-2"
+        v-if="item.separator"
+        :key="'separator-' + item.label"
+        class="my-2"
       />
     </div>
   </div>
@@ -52,12 +69,10 @@ const allowedItems = computed(() => props.items.filter((item) => !item.hidden));
 
 <style lang="scss">
 .nav-menu-item {
-  padding: 1.2em;
+  padding: 1em;
   border-radius: 0.5em;
   font-weight: bold;
   font-size: 14px;
-  height: 3.8em;
-  width: 13em;
   transition: all 150ms, color 0ms;
   cursor: pointer;
 

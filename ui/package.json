@@ -1,6 +1,6 @@
 {
   "name": "quasar-ui-danx",
-  "version": "0.3.6",
+  "version": "0.3.7",
   "author": "Dan <dan@flytedesk.com>",
   "description": "DanX Vue / Quasar component library",
   "license": "MIT",
@@ -11,7 +11,7 @@
     "dev": "cd dev && quasar dev && cd ..",
     "build": "vite build",
     "preview": "vite preview",
-    "postversion": "yarn build && cd .. && git add ui && git commit -m \"v$npm_package_version\" && git tag \"v$npm_package_version\" && git push && npm publish"
+    "postversion": "yarn build && npm publish && cd .. && git add ui && git commit -m \"v$npm_package_version\" && git tag \"v$npm_package_version\" && git push"
   },
   "repository": {
     "type": "git",

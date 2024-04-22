@@ -1,20 +1,22 @@
 <template>
   <QTab
-      :name="name"
-      class="w-full"
-      content-class="w-full"
+    :name="name"
+    class="w-full"
+    content-class="w-full"
   >
     <div class="flex items-center w-full">
-      <div class="flex-grow text-sm">{{ label }}</div>
+      <div class="flex-grow text-sm">
+        {{ label }}
+      </div>
       <div>
         <OverdueIcon
-            v-if="overdue"
-            class="w-5 ml-2"
-            :class="isActive ? 'text-white' : 'text-red-400'"
+          v-if="overdue"
+          class="w-5 ml-2"
+          :class="isActive ? 'text-white' : 'text-red-400'"
         />
         <WarningIcon
-            v-else-if="warning"
-            class="text-yellow-600 w-5"
+          v-else-if="warning"
+          class="text-yellow-600 w-5"
         />
       </div>
     </div>

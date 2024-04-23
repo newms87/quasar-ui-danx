@@ -38,7 +38,7 @@ export class FileUpload {
         this.onAllCompleteCb = null;
 
         this.options = {
-            ...danxOptions.fileUpload,
+            ...danxOptions.value.fileUpload,
             ...options
         };
 

@@ -37,7 +37,7 @@ export class FlashMessages {
                 classes: "bg-gray-500 text-white",
                 position: "top",
                 closeBtn: "X",
-                ...danxOptions.flashMessages.default,
+                ...danxOptions.value.flashMessages.default,
                 ...options
             });
         }
@@ -48,7 +48,7 @@ export class FlashMessages {
             classes: "bg-green-300 !text-green-900",
             icon: "check",
             ...options,
-            ...danxOptions.flashMessages.success
+            ...danxOptions.value.flashMessages.success
         });
     }
 
@@ -57,7 +57,7 @@ export class FlashMessages {
             classes: "bg-red-300 !text-red-900",
             icon: "error",
             ...options,
-            ...danxOptions.flashMessages.error
+            ...danxOptions.value.flashMessages.error
         });
     }
 
@@ -66,12 +66,12 @@ export class FlashMessages {
             classes: "bg-yellow-300 !text-yellow-900",
             icon: "warning",
             ...options,
-            ...danxOptions.flashMessages.warning
+            ...danxOptions.value.flashMessages.warning
         });
     }
 
     static combine(type: string, messages: string[] | { message: string, Message: string }[], options = {}) {
-        // @ts-ignore
+        // @ts-expect-error - type is a string
         const messageType = FlashMessages[type];
 
         if (typeof messageType !== "function") {

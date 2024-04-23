@@ -1,7 +1,9 @@
 import { QNotifyCreateOptions } from "quasar";
+import { Ref, shallowRef } from "vue";
 import { FileUploadOptions } from "../helpers";
 
 export interface DanxOptions {
+    tinyMceApiKey: string;
     fileUpload: FileUploadOptions;
     flashMessages: {
         default: QNotifyCreateOptions;
@@ -11,7 +13,8 @@ export interface DanxOptions {
     };
 }
 
-export let danxOptions: DanxOptions = {
+export const danxOptions: Ref<DanxOptions> = shallowRef({
+    tinyMceApiKey: "set-api-key-in-danx-options",
     fileUpload: {
         directory: "file-upload",
         presignedUploadUrl: null,
@@ -23,11 +26,11 @@ export let danxOptions: DanxOptions = {
         warning: {},
         error: {}
     }
-};
+});
 
 export function configure(options: DanxOptions) {
-    danxOptions = {
-        ...danxOptions,
+    danxOptions.value = {
+        ...danxOptions.value,
         ...options
     };
 }

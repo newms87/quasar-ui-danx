@@ -137,6 +137,10 @@ const props = defineProps({
   disable: Boolean,
   readonly: Boolean,
   saving: Boolean,
+  emptyValue: {
+    type: [String, Number, Boolean],
+    default: undefined
+  },
   canModifyVariations: Boolean
 });
 
@@ -186,7 +190,7 @@ function onInput(name, value) {
   const newFieldResponse = {
     name,
     variation: currentVariation.value || "",
-    value
+    value: value === undefined ? props.emptyValue : value
   };
   const newValues = replace(props.values, fieldResponse, newFieldResponse, true);
   emit("update:values", newValues);

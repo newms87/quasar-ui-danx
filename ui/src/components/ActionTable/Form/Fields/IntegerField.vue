@@ -15,7 +15,7 @@ defineEmits(["update:model-value"]);
 defineProps({
   modelValue: {
     type: [String, Number],
-    required: true
+    default: null
   },
   field: {
     type: Object,

@@ -1,8 +1,8 @@
 <template>
   <div>
     <div
-        v-if="label"
-        class="font-bold text-xs mb-2"
+      v-if="label"
+      class="font-bold text-xs mb-2"
     >
       {{ label }}
     </div>
@@ -19,8 +19,8 @@
     </div>
     <QPopupProxy>
       <QDate
-          v-model="date"
-          @update:model-value="onSave"
+        v-model="date"
+        @update:model-value="onSave"
       />
     </QPopupProxy>
   </div>

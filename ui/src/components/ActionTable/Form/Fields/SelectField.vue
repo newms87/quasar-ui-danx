@@ -1,50 +1,51 @@
 <template>
   <div>
     <QSelect
-        ref="selectField"
-        v-bind="$props"
-        :model-value="selectedValue"
-        outlined
-        hide-dropdown-icon
-        dense
-        emit-value
-        :use-input="filterable"
-        :hide-selected="filterable && isShowing && !$props.multiple"
-        :input-debounce="100"
-        :options="filteredOptions"
-        option-label="label"
-        option-value="value"
-        placeholder=""
-        :input-class="{'is-hidden': !isShowing, [inputClass]: true}"
-        class="max-w-full"
-        @filter="onFilter"
-        @clear="onClear"
-        @popup-show="onShow"
-        @popup-hide="onHide"
-        @update:model-value="onUpdate"
+      ref="selectField"
+      v-bind="$props"
+      :model-value="selectedValue"
+      outlined
+      hide-dropdown-icon
+      dense
+      emit-value
+      :use-input="filterable"
+      :hide-selected="filterable && isShowing && !$props.multiple"
+      :input-debounce="100"
+      :options="filteredOptions"
+      option-label="label"
+      option-value="value"
+      placeholder=""
+      :input-class="{'is-hidden': !isShowing, [inputClass]: true}"
+      class="max-w-full"
+      @filter="onFilter"
+      @clear="onClear"
+      @popup-show="onShow"
+      @popup-hide="onHide"
+      @update:model-value="onUpdate"
     >
       <template #append>
         <DropDownIcon
-            class="w-4 transition"
-            :class="isShowing ? 'rotate-180' : ''"
+          class="w-4 transition"
+          :class="isShowing ? 'rotate-180' : ''"
         />
       </template>
       <template #selected>
         <div
-            v-if="$props.multiple"
-            class="flex gap-y-1 overflow-hidden"
-            :class="{'flex-nowrap gap-y-0': chipLimit === 1, [selectionClass]: true}"
+          v-if="$props.multiple"
+          class="flex gap-y-1 overflow-hidden"
+          :class="{'flex-nowrap gap-y-0': chipLimit === 1, [selectionClass]: true}"
         >
           <template v-if="chipOptions.length > 0">
             <QChip
-                v-for="chipOption in chipOptions"
-                :key="'selected-' + chipOption.label"
-                class="!mr-1"
-            >{{ chipOption.label }}
+              v-for="chipOption in chipOptions"
+              :key="'selected-' + chipOption.label"
+              class="!mr-1"
+            >
+              {{ chipOption.label }}
             </QChip>
             <QChip
-                v-if="selectedOptions.length > chipOptions.length"
-                class="!mr-1"
+              v-if="selectedOptions.length > chipOptions.length"
+              class="!mr-1"
             >
               +{{ selectedOptions.length - chipOptions.length }}
             </QChip>
@@ -54,9 +55,10 @@
           </template>
         </div>
         <div
-            v-else
-            :class="selectionClass"
-        >{{ selectedLabel }}
+          v-else
+          :class="selectionClass"
+        >
+          {{ selectedLabel }}
         </div>
       </template>
     </QSelect>

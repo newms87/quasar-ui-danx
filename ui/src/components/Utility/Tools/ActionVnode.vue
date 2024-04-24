@@ -1,11 +1,11 @@
 <template>
   <div>
     <RenderVnode
-        v-if="activeActionVnode"
-        :vnode="activeActionVnode.vnode"
-        :is-saving="isSaving"
-        @confirm="onConfirm"
-        @close="activeActionVnode.cancel"
+      v-if="activeActionVnode"
+      :vnode="activeActionVnode.vnode"
+      :is-saving="isSaving"
+      @confirm="onConfirm"
+      @close="activeActionVnode.cancel"
     />
   </div>
 </template>

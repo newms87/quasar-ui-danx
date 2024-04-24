@@ -1,10 +1,13 @@
 <template>
   <img
-      v-if="isString"
-      :src="resolvedSvg"
-      :alt="alt"
+    v-if="isString"
+    :src="resolvedSvg"
+    :alt="alt"
+  >
+  <component
+    :is="resolvedSvg"
+    v-else
   />
-  <component :is="resolvedSvg" v-else />
 </template>
 <script setup>
 import { computed } from "vue";

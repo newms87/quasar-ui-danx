@@ -1,17 +1,17 @@
 <template>
   <QTh
-      :key="rowProps.key"
-      :props="rowProps"
-      :data-drop-zone="isResizeable && `resize-column-` + column.name"
-      :class="isResizeable && cls['handle-drop-zone']"
-      :style="columnStyle"
+    :key="rowProps.key"
+    :props="rowProps"
+    :data-drop-zone="isResizeable && `resize-column-` + column.name"
+    :class="isResizeable && cls['handle-drop-zone']"
+    :style="columnStyle"
   >
     {{ column.label }}
     <HandleDraggable
-        v-if="isResizeable"
-        :drop-zone="`resize-column-` + column.name"
-        :class="cls['resize-handle']"
-        @resize="onResizeColumn"
+      v-if="isResizeable"
+      :drop-zone="`resize-column-` + column.name"
+      :class="cls['resize-handle']"
+      @resize="onResizeColumn"
     >
       <RowResizeIcon class="w-4 text-gray-600" />
     </HandleDraggable>

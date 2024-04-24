@@ -1,16 +1,19 @@
 <template>
   <QDialog
-      :model-value="modelValue"
-      maximized
-      transition-show="slide-up"
-      transition-hide="slide-down"
-      @update:model-value="onClose"
+    :model-value="modelValue"
+    maximized
+    transition-show="slide-up"
+    transition-hide="slide-down"
+    @update:model-value="onClose"
   >
-    <div class="flex justify-center min-w-xs" :class="computedClass">
+    <div
+      class="flex justify-center min-w-xs"
+      :class="computedClass"
+    >
       <div
-          v-if="closeable"
-          v-close-popup
-          class="p-4 m-4 absolute-top-right top right cursor-pointer"
+        v-if="closeable"
+        v-close-popup
+        class="p-4 m-4 absolute-top-right top right cursor-pointer"
       >
         <XIcon class="w-5 h-5" />
       </div>

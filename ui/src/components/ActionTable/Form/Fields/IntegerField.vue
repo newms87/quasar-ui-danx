@@ -1,10 +1,10 @@
 <template>
   <NumberField
-      :field="field"
-      :precision="0"
-      :model-value="modelValue"
-      :show-name="showName"
-      @update:model-value="$emit('update:model-value', $event)"
+    :field="field"
+    :precision="0"
+    :model-value="modelValue"
+    :show-name="showName"
+    @update:model-value="$emit('update:model-value', $event)"
   />
 </template>
 

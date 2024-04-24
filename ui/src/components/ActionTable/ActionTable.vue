@@ -2,20 +2,20 @@
   <div class="overflow-hidden w-full">
     <ActionVnode />
     <QTable
-        ref="actionTable"
-        :selected="selectedRows"
-        :pagination="quasarPagination"
-        :columns="columns"
-        :loading="isLoadingList"
-        :rows="pagedItems?.data || []"
-        :binary-state-sort="false"
-        selection="multiple"
-        :rows-per-page-options="rowsPerPageOptions"
-        class="sticky-column sticky-header w-full h-full !border-0"
-        color="blue-600"
-        @update:selected="$emit('update:selected-rows', $event)"
-        @update:pagination="() => {}"
-        @request="$emit('update:quasar-pagination', {...$event.pagination, __sort: mapSortBy($event.pagination, columns)})"
+      ref="actionTable"
+      :selected="selectedRows"
+      :pagination="quasarPagination"
+      :columns="columns"
+      :loading="isLoadingList"
+      :rows="pagedItems?.data || []"
+      :binary-state-sort="false"
+      selection="multiple"
+      :rows-per-page-options="rowsPerPageOptions"
+      class="sticky-column sticky-header w-full h-full !border-0"
+      color="blue-600"
+      @update:selected="$emit('update:selected-rows', $event)"
+      @update:pagination="() => {}"
+      @request="$emit('update:quasar-pagination', {...$event.pagination, __sort: mapSortBy($event.pagination, columns)})"
     >
       <template #no-data>
         <slot name="empty">
@@ -24,30 +24,34 @@
       </template>
       <template #top-row>
         <TableSummaryRow
-            :label="label"
-            :item-count="summary?.count || 0"
-            :selected-count="selectedRows.length"
-            :loading="isLoadingSummary"
-            :summary="summary"
-            :columns="columns"
-            @clear="$emit('update:selected-rows',  [])"
+          :label="label"
+          :item-count="summary?.count || 0"
+          :selected-count="selectedRows.length"
+          :loading="isLoadingSummary"
+          :summary="summary"
+          :columns="columns"
+          @clear="$emit('update:selected-rows', [])"
         />
       </template>
       <template #header-cell="rowProps">
         <ActionTableHeaderColumn
-            v-model="columnSettings"
-            :row-props="rowProps"
-            :name="name"
-            @update:model-value="onUpdateColumnSettings"
+          v-model="columnSettings"
+          :row-props="rowProps"
+          :name="name"
+          @update:model-value="onUpdateColumnSettings"
         />
       </template>
       <template #body-cell="rowProps">
         <ActionTableColumn
-            :key="rowProps.key"
-            :row-props="rowProps"
-            :settings="columnSettings[rowProps.col.name]"
+          :key="rowProps.key"
+          :row-props="rowProps"
+          :settings="columnSettings[rowProps.col.name]"
         >
-          <slot :column-name="rowProps.col.name" :row="rowProps.row" :value="rowProps.value" />
+          <slot
+            :column-name="rowProps.col.name"
+            :row="rowProps.row"
+            :value="rowProps.value"
+          />
         </ActionTableColumn>
       </template>
     </QTable>

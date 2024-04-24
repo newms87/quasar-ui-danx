@@ -1,7 +1,7 @@
 <template>
   <QBtn
-      class="bg-slate-200"
-      :loading="loading"
+    class="bg-slate-200"
+    :loading="loading"
   >
     <RefreshIcon class="w-5" />
   </QBtn>

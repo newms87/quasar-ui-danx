@@ -1,15 +1,15 @@
 <template>
   <div>
     <div
-        v-if="label"
-        class="font-bold text-xs mb-2"
+      v-if="label"
+      class="font-bold text-xs mb-2"
     >
       {{ label }}
     </div>
     <div class="flex items-center flex-nowrap cursor-pointer">
       <component
-          :is="previewIcon"
-          class="w-5 text-blue-600"
+        :is="previewIcon"
+        class="w-5 text-blue-600"
       />
       <div class="text-sm ml-3 hover:text-blue-600 whitespace-nowrap">
         <template v-if="range">
@@ -22,15 +22,15 @@
     </div>
     <QPopupProxy>
       <NumberField
-          v-model="range.from"
-          :field="minField"
-          @update:model-value="onSave"
+        v-model="range.from"
+        :field="minField"
+        @update:model-value="onSave"
       />
       <NumberField
-          v-model="range.to"
-          class="mt-2"
-          :field="maxField"
-          @update:model-value="onSave"
+        v-model="range.to"
+        class="mt-2"
+        :field="maxField"
+        @update:model-value="onSave"
       />
     </QPopupProxy>
   </div>

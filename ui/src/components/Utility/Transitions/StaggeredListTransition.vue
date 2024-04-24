@@ -1,12 +1,12 @@
 <template>
   <TransitionGroup
-      ref="list"
-      tag="div"
-      appear
-      :css="false"
-      @before-enter="onBeforeEnter"
-      @enter="onEnter"
-      @leave="onLeave"
+    ref="list"
+    tag="div"
+    appear
+    :css="false"
+    @before-enter="onBeforeEnter"
+    @enter="onEnter"
+    @leave="onLeave"
   >
     <slot />
   </TransitionGroup>

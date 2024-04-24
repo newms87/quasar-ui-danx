@@ -1,21 +1,21 @@
 <template>
   <QTr
-      class="sticky-column-1 transition-all sticky-row"
-      :class="{'!bg-gray-100': !selectedCount, '!bg-blue-600 text-white selected': selectedCount, 'opacity-50': loading}"
+    class="sticky-column-1 transition-all sticky-row"
+    :class="{'!bg-gray-100': !selectedCount, '!bg-blue-600 text-white selected': selectedCount, 'opacity-50': loading}"
   >
     <QTd
-        :colspan="stickyColspan"
-        class="font-bold transition-all"
-        :class="{'!bg-gray-100 !pl-5': !selectedCount, '!bg-blue-600 text-white !pl-4': selectedCount}"
+      :colspan="stickyColspan"
+      class="font-bold transition-all"
+      :class="{'!bg-gray-100 !pl-5': !selectedCount, '!bg-blue-600 text-white !pl-4': selectedCount}"
     >
       <div class="flex flex-nowrap items-center">
         <div
-            v-if="selectedCount"
-            class="flex items-center"
+          v-if="selectedCount"
+          class="flex items-center"
         >
           <ClearIcon
-              class="w-6 mr-3"
-              @click="$emit('clear')"
+            class="w-6 mr-3"
+            @click="$emit('clear')"
           />
           {{ fNumber(selectedCount) }} {{ selectedLabel }}
         </div>
@@ -23,16 +23,16 @@
           {{ fNumber(itemCount) }} {{ label }}
         </div>
         <QSpinner
-            v-if="loading"
-            class="ml-3"
-            size="18"
+          v-if="loading"
+          class="ml-3"
+          size="18"
         />
       </div>
     </QTd>
     <QTd
-        v-for="column in summaryColumns"
-        :key="column.name"
-        :align="column.align || 'left'"
+      v-for="column in summaryColumns"
+      :key="column.name"
+      :align="column.align || 'left'"
     >
       <template v-if="summary">
         {{ formatValue(column) }}

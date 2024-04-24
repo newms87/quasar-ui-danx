@@ -5,14 +5,14 @@
       <div class="flex flex-nowrap items-center mt-4">
         <div class="bg-red-200 line-through p-2">
           <AuditHistoryItemValue
-              :type="change.type"
-              :value="change.oldValue"
+            :type="change.type"
+            :value="change.oldValue"
           />
         </div>
         <div class="bg-emerald-200 ml-2.5 p-2">
           <AuditHistoryItemValue
-              :type="change.type"
-              :value="change.newValue"
+            :type="change.type"
+            :value="change.newValue"
           />
         </div>
       </div>
@@ -24,8 +24,14 @@
       </template>
       <div>{{ item.account }}</div>
       <div>
-        <a v-if="item.audit_request_id" :href="novaUrl" target="_blank">{{ fLocalizedDateTime(item.timestamp) }}</a>
-        <template v-else>{{ fLocalizedDateTime(item.timestamp) }}</template>
+        <a
+          v-if="item.audit_request_id"
+          :href="novaUrl"
+          target="_blank"
+        >{{ fLocalizedDateTime(item.timestamp) }}</a>
+        <template v-else>
+          {{ fLocalizedDateTime(item.timestamp) }}
+        </template>
       </div>
     </div>
   </div>

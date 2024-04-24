@@ -1,9 +1,11 @@
 <template>
   <div>
     <div
-        v-for="column in columns" :key="column.name"
-        class="overflow-hidden overflow-ellipsis text-xs text-gray-400"
-    >{{ format(row[column.name], column.format) }}
+      v-for="column in columns"
+      :key="column.name"
+      class="overflow-hidden overflow-ellipsis text-xs text-gray-400"
+    >
+      {{ format(row[column.name], column.format) }}
     </div>
   </div>
 </template>

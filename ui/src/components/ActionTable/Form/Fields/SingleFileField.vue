@@ -1,48 +1,49 @@
 <template>
   <div
-      class="max-w-full relative overflow-auto"
-      :class="{'p-4 border rounded border-gray-300 text-center': !readonly}"
-      @dragover.prevent
-      @drop.prevent="onDrop"
+    class="max-w-full relative overflow-auto"
+    :class="{'p-4 border rounded border-gray-300 text-center': !readonly}"
+    @dragover.prevent
+    @drop.prevent="onDrop"
   >
     <FieldLabel
-        :field="field"
-        :show-name="showName"
-        class="text-sm font-semibold"
+      :field="field"
+      :show-name="showName"
+      class="text-sm font-semibold"
     />
     <div
-        v-if="!disable && !readonly"
-        class="text-sm mt-2"
+      v-if="!disable && !readonly"
+      class="text-sm mt-2"
     >
       <a
-          class="text-blue-600"
-          @click="$refs.file.click()"
+        class="text-blue-600"
+        @click="$refs.file.click()"
       >Upload</a>
       <a
-          v-if="uploadedFile"
-          class="ml-3 text-red-900"
-          @click="clearUploadedFile"
+        v-if="uploadedFile"
+        class="ml-3 text-red-900"
+        @click="clearUploadedFile"
       >Clear</a>
       <input
-          ref="file"
-          class="hidden"
-          type="file"
-          @change="onFileSelected"
-      />
+        ref="file"
+        class="hidden"
+        type="file"
+        @change="onFileSelected"
+      >
     </div>
 
     <FilePreview
-        v-if="!readonly || uploadedFile"
-        class="w-32 cursor-pointer mt-2"
-        :class="{'border border-dashed border-blue-600': !uploadedFile, 'mx-auto': !readonly}"
-        :image="uploadedFile"
-        downloadable
-        @click="!disable && $refs.file.click()"
+      v-if="!readonly || uploadedFile"
+      class="w-32 cursor-pointer mt-2"
+      :class="{'border border-dashed border-blue-600': !uploadedFile, 'mx-auto': !readonly}"
+      :image="uploadedFile"
+      downloadable
+      @click="!disable && $refs.file.click()"
     />
     <div
-        v-else-if="readonly"
-        class="py-1"
-    >--
+      v-else-if="readonly"
+      class="py-1"
+    >
+      --
     </div>
   </div>
 </template>

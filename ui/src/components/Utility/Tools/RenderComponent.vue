@@ -1,15 +1,17 @@
 <template>
   <Component
-      v-if="content"
-      :is="resolvedComponent.is"
-      v-bind="{...resolvedComponent.props, ...overrideProps}"
-      @action="$emit('action', $event)"
-  >{{ content }}</Component>
+    :is="resolvedComponent.is"
+    v-if="content"
+    v-bind="{...resolvedComponent.props, ...overrideProps}"
+    @action="$emit('action', $event)"
+  >
+    {{ content }}
+  </Component>
   <Component
-      v-else
-      :is="resolvedComponent.is"
-      v-bind="{...resolvedComponent.props, ...overrideProps}"
-      @action="$emit('action', $event)"
+    :is="resolvedComponent.is"
+    v-else
+    v-bind="{...resolvedComponent.props, ...overrideProps}"
+    @action="$emit('action', $event)"
   />
 </template>
 <script setup>

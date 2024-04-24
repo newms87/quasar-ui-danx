@@ -1,49 +1,52 @@
 <template>
   <div>
     <ContentDrawer
-        v-model:show="showDrawer"
-        content-class=""
-        position="bottom"
-        :title="'Filter ' + label"
+      v-model:show="showDrawer"
+      content-class=""
+      position="bottom"
+      :title="'Filter ' + label"
     >
       <div
-          v-for="option in formattedOptions"
-          :key="'select-drawer-' + option.value"
-          :data-dusk="'drawer-opt-' + option.value"
-          class="cursor-pointer hover:bg-slate-200 px-8 py-3 flex items-center border-b border-slate-200"
-          @click="toggleSelect(option)"
+        v-for="option in formattedOptions"
+        :key="'select-drawer-' + option.value"
+        :data-dusk="'drawer-opt-' + option.value"
+        class="cursor-pointer hover:bg-slate-200 px-8 py-3 flex items-center border-b border-slate-200"
+        @click="toggleSelect(option)"
       >
         <QCheckbox
-            @click.stop="toggleSelect(option)"
-            :model-value="isSelected(option)"
-            class="mr-2"
+          :model-value="isSelected(option)"
+          class="mr-2"
+          @click.stop="toggleSelect(option)"
         />
         <slot
-            name="option"
-            :opt="option"
-        >{{ option.label }}
+          name="option"
+          :opt="option"
+        >
+          {{ option.label }}
         </slot>
       </div>
     </ContentDrawer>
 
     <QChip
-        ref="select"
-        outline
-        clickable
-        size="16px"
-        @click="showDrawer = true"
+      ref="select"
+      outline
+      clickable
+      size="16px"
+      @click="showDrawer = true"
     >
       <slot name="selected">
-        <slot name="label">{{ label }}:&nbsp;</slot>
+        <slot name="label">
+          {{ label }}:&nbsp;
+        </slot>
         <template v-if="modelValue && modelValue.length > 0">
           <slot name="selection">
             <template v-if="multiple">
               {{ getOptionLabel(modelValue[0]) }}
               <template
-                  v-if="modelValue.length > 1"
-              >+ {{ modelValue.length - 1 }}
-              </template
+                v-if="modelValue.length > 1"
               >
+                + {{ modelValue.length - 1 }}
+              </template>
             </template>
             <template v-else>
               {{ getOptionLabel(modelValue) }}
@@ -51,7 +54,9 @@
           </slot>
         </template>
         <template v-else>
-          <slot name="placeholder">{{ placeholder }}</slot>
+          <slot name="placeholder">
+            {{ placeholder }}
+          </slot>
         </template>
       </slot>
     </QChip>
@@ -85,14 +90,14 @@ const props = defineProps({
 
 const showDrawer = ref(false);
 const formattedOptions = computed(() =>
-    props.options.map((opt) =>
-        typeof opt === "string"
-            ? {
-              label: opt,
-              value: opt
-            }
-            : opt
-    )
+  props.options.map((opt) =>
+    typeof opt === "string"
+      ? {
+        label: opt,
+        value: opt
+      }
+      : opt
+  )
 );
 
 function getOptionValue(option) {

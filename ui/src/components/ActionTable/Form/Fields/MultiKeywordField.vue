@@ -1,23 +1,23 @@
 <template>
   <div>
     <SelectField
-        v-model="selectedFieldName"
-        :label="undefined"
-        :options="field.options"
-        class="mb-2"
-        @update:model-value="onChange"
+      v-model="selectedFieldName"
+      :label="undefined"
+      :options="field.options"
+      class="mb-2"
+      @update:model-value="onChange"
     />
     <TextField
-        v-model="textInput"
-        :field="field"
-        :no-label="!field.label"
-        label-class="text-xs font-bold text-zinc-800"
-        parent-class="tight-label"
-        input-class="!py-0"
-        dense
-        type="textarea"
-        :debounce="500"
-        @update:model-value="onChange"
+      v-model="textInput"
+      :field="field"
+      :no-label="!field.label"
+      label-class="text-xs font-bold text-zinc-800"
+      parent-class="tight-label"
+      input-class="!py-0"
+      dense
+      type="textarea"
+      :debounce="500"
+      @update:model-value="onChange"
     />
   </div>
 </template>

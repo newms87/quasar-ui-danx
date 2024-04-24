@@ -1,23 +1,28 @@
 <template>
   <QTabs
-      :model-value="modelValue"
-      vertical
-      align="left"
-      :class="cls['panel-tabs']"
-      no-caps
-      @update:model-value="$emit('update:model-value', $event)"
+    :model-value="modelValue"
+    vertical
+    align="left"
+    :class="cls['panel-tabs']"
+    no-caps
+    @update:model-value="$emit('update:model-value', $event)"
   >
     <template v-for="panel in panels">
       <template v-if="panel.enabled === undefined || !!panel.enabled">
         <RenderVnode
-            v-if="panel.tabVnode"
-            :key="panel.name"
-            :vnode="panel.tabVnode(modelValue)"
-            :is-active="modelValue === panel.name"
-            :name="panel.name"
-            :label="panel.label"
+          v-if="panel.tabVnode"
+          :key="panel.name"
+          :vnode="panel.tabVnode(modelValue)"
+          :is-active="modelValue === panel.name"
+          :name="panel.name"
+          :label="panel.label"
         />
-        <QTab v-else :key="panel.name" :name="panel.name" :label="panel.label" />
+        <QTab
+          v-else
+          :key="panel.name"
+          :name="panel.name"
+          :label="panel.label"
+        />
       </template>
     </template>
   </QTabs>

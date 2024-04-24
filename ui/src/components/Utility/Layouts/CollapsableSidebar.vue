@@ -1,43 +1,43 @@
 <template>
   <div
-      :class="{
+    :class="{
       [cls['collapsable-sidebar']]: true,
       'is-collapsed': isCollapsed,
       'is-right-side': rightSide,
       [displayClass]: true,
     }"
-      :style="style"
+    :style="style"
   >
     <div class="flex-grow max-w-full">
       <slot :is-collapsed="isCollapsed" />
     </div>
     <template v-if="!disabled && (!hideToggleOnCollapse || !isCollapsed)">
       <div
-          v-if="!toggleAtTop"
-          class="flex w-full p-4"
-          :class="rightSide ? 'justify-start' : 'justify-end'"
+        v-if="!toggleAtTop"
+        class="flex w-full p-4"
+        :class="rightSide ? 'justify-start' : 'justify-end'"
       >
         <slot name="toggle">
           <QBtn
-              class="btn-secondary"
-              @click="toggleCollapse"
+            class="btn-secondary"
+            @click="toggleCollapse"
           >
             <ToggleIcon
-                class="w-5 transition-all"
-                :class="{ 'rotate-180': rightSide ? !isCollapsed : isCollapsed }"
+              class="w-5 transition-all"
+              :class="{ 'rotate-180': rightSide ? !isCollapsed : isCollapsed }"
             />
           </QBtn>
         </slot>
       </div>
       <div
-          v-else
-          class="absolute top-0 right-0 cursor-pointer p-2"
-          :class="toggleClass"
-          @click="toggleCollapse"
+        v-else
+        class="absolute top-0 right-0 cursor-pointer p-2"
+        :class="toggleClass"
+        @click="toggleCollapse"
       >
         <ToggleIcon
-            class="w-5 transition-all"
-            :class="{ 'rotate-180': rightSide ? !isCollapsed : isCollapsed }"
+          class="w-5 transition-all"
+          :class="{ 'rotate-180': rightSide ? !isCollapsed : isCollapsed }"
         />
       </div>
     </template>

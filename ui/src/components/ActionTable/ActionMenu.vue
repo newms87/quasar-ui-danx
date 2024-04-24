@@ -1,12 +1,12 @@
 <template>
   <PopoverMenu
-      class="px-2 flex action-button"
-      :items="activeActions"
-      :disabled="!hasTarget"
-      :tooltip="!hasTarget ? tooltip : null"
-      :loading="isSaving || loading"
-      :loading-component="loadingComponent"
-      @action-item="onAction"
+    class="px-2 flex action-button"
+    :items="activeActions"
+    :disabled="!hasTarget"
+    :tooltip="!hasTarget ? tooltip : null"
+    :loading="isSaving || loading"
+    :loading-component="loadingComponent"
+    @action-item="onAction"
   />
 </template>
 <script setup>

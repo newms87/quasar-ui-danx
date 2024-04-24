@@ -1,30 +1,52 @@
 <template>
-  <QTd :key="rowProps.key" :props="rowProps" :style="columnStyle">
+  <QTd
+    :key="rowProps.key"
+    :props="rowProps"
+    :style="columnStyle"
+  >
     <div :style="columnStyle">
       <div
-          class="flex items-center flex-nowrap"
-          :class="columnClass"
+        class="flex items-center flex-nowrap"
+        :class="columnClass"
       >
         <div class="flex-grow overflow-hidden">
           <a
-              v-if="column.onClick"
-              @click="column.onClick(row)"
-              :class="column.innerClass"
+            v-if="column.onClick"
+            :class="column.innerClass"
+            @click="column.onClick(row)"
           >
-            <RenderVnode v-if="column.vnode" :vnode="column.vnode(row)" />
+            <RenderVnode
+              v-if="column.vnode"
+              :vnode="column.vnode(row)"
+            />
             <slot v-else>{{ value }}</slot>
           </a>
-          <div v-else :class="column.innerClass">
-            <RenderVnode v-if="column.vnode" :vnode="column.vnode(row)" />
-            <slot v-else>{{ value }}</slot>
+          <div
+            v-else
+            :class="column.innerClass"
+          >
+            <RenderVnode
+              v-if="column.vnode"
+              :vnode="column.vnode(row)"
+            />
+            <slot v-else>
+              {{ value }}
+            </slot>
           </div>
-          <TitleColumnFormat v-if="column.titleColumns" :row="row" :columns="column.titleColumns()" />
+          <TitleColumnFormat
+            v-if="column.titleColumns"
+            :row="row"
+            :columns="column.titleColumns()"
+          />
         </div>
-        <div v-if="column.actionMenu" class="flex flex-shrink-0 pl-2">
+        <div
+          v-if="column.actionMenu"
+          class="flex flex-shrink-0 pl-2"
+        >
           <ActionMenu
-              :actions="column.actionMenu"
-              :target="row"
-              :loading="isSaving"
+            :actions="column.actionMenu"
+            :target="row"
+            :loading="isSaving"
           />
         </div>
       </div>

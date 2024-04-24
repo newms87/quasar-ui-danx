@@ -1,97 +1,114 @@
 <template>
-  <div class="relative flex justify-center bg-gray-100 overflow-hidden" :class="{'rounded-2xl': !square}">
+  <div
+    class="relative flex justify-center bg-gray-100 overflow-hidden"
+    :class="{'rounded-2xl': !square}"
+  >
     <template v-if="computedImage">
       <div
-          class="grow h-full"
-          @click="showPreview = true"
+        class="grow h-full"
+        @click="showPreview = true"
       >
         <div
-            v-if="isVideo"
-            class="relative max-h-full max-w-full w-full flex justify-center"
+          v-if="isVideo"
+          class="relative max-h-full max-w-full w-full flex justify-center"
         >
           <video
-              class="max-h-full"
-              preload="auto"
+            class="max-h-full"
+            preload="auto"
           >
             <source
-                :src="previewUrl + '#t=0.1'"
-                :type="mimeType"
-            />
+              :src="previewUrl + '#t=0.1'"
+              :type="mimeType"
+            >
           </video>
           <button :class="cls['play-button']">
             <PlayIcon class="w-16" />
           </button>
         </div>
         <QImg
-            v-if="thumbUrl || isPreviewable"
-            fit="scale-down"
-            class="non-selectable max-h-full max-w-full h-full"
-            :src="(thumbUrl || previewUrl) + '#t=0.1'"
-            preload="auto"
-            data-testid="previewed-image"
+          v-if="thumbUrl || isPreviewable"
+          fit="scale-down"
+          class="non-selectable max-h-full max-w-full h-full"
+          :src="(thumbUrl || previewUrl) + '#t=0.1'"
+          preload="auto"
+          data-testid="previewed-image"
         />
         <div
-            v-else
-            class="flex items-center justify-center h-full"
+          v-else
+          class="flex items-center justify-center h-full"
         >
-          <PdfIcon v-if="isPdf" class="w-24" />
-          <TextFileIcon v-else class="w-24" />
+          <PdfIcon
+            v-if="isPdf"
+            class="w-24"
+          />
+          <TextFileIcon
+            v-else
+            class="w-24"
+          />
         </div>
       </div>
       <div
-          v-if="$slots['action-button']"
-          :class="cls['action-button']"
+        v-if="$slots['action-button']"
+        :class="cls['action-button']"
       >
         <slot name="action-button" />
       </div>
       <div
-          v-if="image && image.progress !== undefined"
-          class="absolute-bottom w-full"
+        v-if="image && image.progress !== undefined"
+        class="absolute-bottom w-full"
       >
         <QLinearProgress
-            :value="image.progress"
-            size="15px"
-            color="green-600"
-            stripe
+          :value="image.progress"
+          size="15px"
+          color="green-600"
+          stripe
         />
       </div>
     </template>
     <template v-else>
       <slot name="missing">
         <component
-            :is="missingIcon"
-            class="w-full h-full p-2 text-gray-300"
+          :is="missingIcon"
+          class="w-full h-full p-2 text-gray-300"
         />
       </slot>
     </template>
 
     <div class="absolute top-1 right-1 flex items-center justify-between space-x-1">
       <QBtn
-          v-if="downloadable && computedImage?.url"
-          size="sm"
-          class="!p-1 opacity-70 hover:opacity-100"
-          :class="downloadButtonClass"
-          @click.stop="download(computedImage.url)"
+        v-if="downloadable && computedImage?.url"
+        size="sm"
+        class="!p-1 opacity-70 hover:opacity-100"
+        :class="downloadButtonClass"
+        @click.stop="download(computedImage.url)"
       >
         <DownloadIcon class="w-4 h-5" />
       </QBtn>
 
       <QBtn
-          v-if="removable"
-          size="sm"
-          class="bg-red-900 text-white !p-1 opacity-50 hover:opacity-100"
-          @click.stop="onRemove"
+        v-if="removable"
+        size="sm"
+        class="bg-red-900 text-white !p-1 opacity-50 hover:opacity-100"
+        @click.stop="onRemove"
       >
-        <div v-if="isConfirmingRemove" class="font-bold text-[1rem] leading-[1.2rem]">?</div>
-        <RemoveIcon v-else class="w-3" />
+        <div
+          v-if="isConfirmingRemove"
+          class="font-bold text-[1rem] leading-[1.2rem]"
+        >
+          ?
+        </div>
+        <RemoveIcon
+          v-else
+          class="w-3"
+        />
       </QBtn>
     </div>
 
     <FullScreenCarouselDialog
-        v-if="showPreview && !disabled"
-        :files="relatedFiles || [computedImage]"
-        :default-slide="computedImage.id"
-        @close="showPreview = false"
+      v-if="showPreview && !disabled"
+      :files="relatedFiles || [computedImage]"
+      :default-slide="computedImage.id"
+      @close="showPreview = false"
     />
   </div>
 </template>
@@ -145,13 +162,13 @@ const computedImage = computed(() => {
   return null;
 });
 const mimeType = computed(
-    () => computedImage.value.type || computedImage.value.mime
+  () => computedImage.value.type || computedImage.value.mime
 );
 const isImage = computed(() => mimeType.value.match(/^image\//));
 const isVideo = computed(() => mimeType.value.match(/^video\//));
 const isPdf = computed(() => mimeType.value.match(/^application\/pdf/));
 const previewUrl = computed(
-    () => computedImage.value.transcodes?.compress?.url || computedImage.value.blobUrl || computedImage.value.url
+  () => computedImage.value.transcodes?.compress?.url || computedImage.value.blobUrl || computedImage.value.url
 );
 const thumbUrl = computed(() => {
   return computedImage.value.transcodes?.thumb?.url;

@@ -2,16 +2,16 @@
   <div class="flex space-x-2">
     <template v-if="type === 'SINGLE_FILE'">
       <FilePreview
-          :image="value"
-          class="w-24"
+        :image="value"
+        class="w-24"
       />
     </template>
     <template v-else-if="type === 'MULTI_FILE'">
       <FilePreview
-          v-for="file in value"
-          :key="'file-' + file.id"
-          :image="file"
-          class="w-24 mb-2"
+        v-for="file in value"
+        :key="'file-' + file.id"
+        :image="file"
+        class="w-24 mb-2"
       />
     </template>
     <template v-else-if="type === 'WYSIWYG'">

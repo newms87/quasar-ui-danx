@@ -1,15 +1,15 @@
 <template>
   <ConfirmDialog
-      v-bind="$props"
-      @confirm="$emit('confirm', newInput)"
-      @close="$emit('close', $event)"
+    v-bind="$props"
+    @confirm="$emit('confirm', newInput)"
+    @close="$emit('close', $event)"
   >
     <slot>
       <QInput
-          v-model="newInput"
-          type="number"
-          class="w-full"
-          @input="$emit('update:input', $event)"
+        v-model="newInput"
+        type="number"
+        class="w-full"
+        @input="$emit('update:input', $event)"
       />
     </slot>
   </ConfirmDialog>

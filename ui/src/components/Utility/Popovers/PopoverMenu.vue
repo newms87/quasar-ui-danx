@@ -1,46 +1,46 @@
 <template>
   <a
-      class="p-3 actionable"
-      :class="{'opacity-50 cursor-not-allowed': disabled}"
+    class="p-3 actionable"
+    :class="{'opacity-50 cursor-not-allowed': disabled}"
   >
     <QTooltip v-if="$slots.tooltip || tooltip">
       <slot name="tooltip">{{ tooltip }}</slot>
     </QTooltip>
     <Transition
-        mode="out-in"
-        :duration="150"
+      mode="out-in"
+      :duration="150"
     >
       <RenderComponent
-          v-if="loading"
-          :component="loadingComponent"
+        v-if="loading"
+        :component="loadingComponent"
       />
       <MenuIcon
-          v-else
-          class="w-4 text-black"
+        v-else
+        class="w-4 text-black"
       />
     </Transition>
     <QMenu
-        v-if="!disabled"
-        auto-close
+      v-if="!disabled"
+      auto-close
     >
       <QList>
         <template v-for="item in items">
           <a
-              v-if="item.url"
-              :key="item.url"
-              class="q-item"
-              target="_blank"
-              :href="item.url"
-              :class="item.class"
+            v-if="item.url"
+            :key="item.url"
+            class="q-item"
+            target="_blank"
+            :href="item.url"
+            :class="item.class"
           >
             {{ item.label }}
           </a>
           <QItem
-              v-else
-              :key="item.name || item.action"
-              clickable
-              :class="item.class"
-              @click="onAction(item)"
+            v-else
+            :key="item.name || item.action"
+            clickable
+            :class="item.class"
+            @click="onAction(item)"
           >
             {{ item.label }}
           </QItem>

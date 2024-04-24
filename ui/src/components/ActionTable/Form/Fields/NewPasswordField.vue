@@ -1,9 +1,9 @@
 <template>
   <LabeledInput
-      type="password"
-      v-bind="props"
-      :rules="rules"
-      @update:model-value="$emit('update:model-value', $event)"
+    type="password"
+    v-bind="props"
+    :rules="rules"
+    @update:model-value="$emit('update:model-value', $event)"
   />
 </template>
 

@@ -1,16 +1,16 @@
 <template>
   <CollapsableSidebar
-      :collapse="!showFilters"
-      disabled
-      min-width="0"
-      max-width="18rem"
-      :name="name"
-      @update:collapse="$emit('update:show-filters', !$event)"
+    :collapse="!showFilters"
+    disabled
+    min-width="0"
+    max-width="18rem"
+    :name="name"
+    @update:collapse="$emit('update:show-filters', !$event)"
   >
     <FilterFieldList
-        :filter="filter"
-        :filter-fields="filterFields"
-        @update:filter="$emit('update:filter', $event)"
+      :filter="filter"
+      :filter-fields="filterFields"
+      @update:filter="$emit('update:filter', $event)"
     />
   </CollapsableSidebar>
 </template>

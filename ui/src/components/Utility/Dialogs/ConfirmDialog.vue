@@ -1,45 +1,48 @@
 <template>
   <QDialog
-      :full-height="fullHeight"
-      :full-width="fullWidth"
-      :model-value="!!modelValue"
-      :no-backdrop-dismiss="!backdropDismiss"
-      :maximized="maximized"
-      @update:model-value="onClose"
+    :full-height="fullHeight"
+    :full-width="fullWidth"
+    :model-value="!!modelValue"
+    :no-backdrop-dismiss="!backdropDismiss"
+    :maximized="maximized"
+    @update:model-value="onClose"
   >
     <QCard class="flex flex-col flex-nowrap">
       <QCardSection
-          v-if="title || $slots.title"
-          class="pl-6 pr-10 border-b border-gray-300"
+        v-if="title || $slots.title"
+        class="pl-6 pr-10 border-b border-gray-300"
       >
         <h3
-            class="font-normal flex items-center"
-            :class="titleClass"
+          class="font-normal flex items-center"
+          :class="titleClass"
         >
-          <slot name="title">{{ title }}</slot>
+          <slot name="title">
+            {{ title }}
+          </slot>
         </h3>
         <div
-            v-if="subtitle"
-            class="mt-1 text-sm"
-        >{{ subtitle }}
+          v-if="subtitle"
+          class="mt-1 text-sm"
+        >
+          {{ subtitle }}
         </div>
       </QCardSection>
       <QCardSection v-if="$slots.toolbar">
         <slot name="toolbar" />
       </QCardSection>
       <QCardSection
-          v-if="content || $slots.default"
-          class="px-6 bg-gray-100 flex-grow max-h-full overflow-y-auto"
-          :class="contentClass"
+        v-if="content || $slots.default"
+        class="px-6 bg-gray-100 flex-grow max-h-full overflow-y-auto"
+        :class="contentClass"
       >
         <slot>{{ content }}</slot>
       </QCardSection>
       <div class="flex px-6 py-4 border-t border-gray-300">
         <div class="flex-grow">
           <QBtn
-              :label="cancelText"
-              class="action-btn btn-white-gray"
-              @click="onClose"
+            :label="cancelText"
+            class="action-btn btn-white-gray"
+            @click="onClose"
           >
             <slot name="cancel-text" />
           </QBtn>
@@ -47,21 +50,21 @@
         <slot name="actions" />
         <div v-if="!hideConfirm">
           <QBtn
-              :label="$slots['confirm-text'] ? '' : confirmText"
-              class="action-btn ml-4"
-              :class="confirmClass"
-              :loading="isSaving"
-              :disable="disabled"
-              data-testid="confirm-button"
-              @click="onConfirm"
+            :label="$slots['confirm-text'] ? '' : confirmText"
+            class="action-btn ml-4"
+            :class="confirmClass"
+            :loading="isSaving"
+            :disable="disabled"
+            data-testid="confirm-button"
+            @click="onConfirm"
           >
             <slot name="confirm-text" />
           </QBtn>
         </div>
       </div>
       <a
-          class="absolute top-0 right-0 p-4 text-black"
-          @click="onClose"
+        class="absolute top-0 right-0 p-4 text-black"
+        @click="onClose"
       >
         <CloseIcon class="w-5" />
       </a>

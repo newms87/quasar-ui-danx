@@ -1,19 +1,19 @@
 <template>
   <QInput
-      :model-value="numberVal"
-      :data-testid="'number-field-' + fieldOptions.id"
-      :placeholder="fieldOptions.placeholder"
-      outlined
-      dense
-      inputmode="numeric"
-      :input-class="{[inputClass]: true, 'text-right bg-white': !hidePrependLabel, 'text-right !text-xs text-black font-normal': hidePrependLabel}"
-      :class="{'no-prepend-icon w-32 max-w-full': hidePrependLabel, 'prepend-label': !hidePrependLabel}"
-      @update:model-value="onInput"
+    :model-value="numberVal"
+    :data-testid="'number-field-' + fieldOptions.id"
+    :placeholder="fieldOptions.placeholder"
+    outlined
+    dense
+    inputmode="numeric"
+    :input-class="{[inputClass]: true, 'text-right bg-white': !hidePrependLabel, 'text-right !text-xs text-black font-normal': hidePrependLabel}"
+    :class="{'no-prepend-icon w-32 max-w-full': hidePrependLabel, 'prepend-label': !hidePrependLabel}"
+    @update:model-value="onInput"
   >
     <template #prepend>
       <FieldLabel
-          :field="fieldOptions"
-          :show-name="showName"
+        :field="fieldOptions"
+        :show-name="showName"
       />
     </template>
   </QInput>

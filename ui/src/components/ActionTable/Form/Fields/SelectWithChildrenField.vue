@@ -1,28 +1,32 @@
 <template>
   <div>
     <template v-if="!loading && !options.length">
-      <div class="text-zinc-500">No options available</div>
+      <div class="text-zinc-500">
+        No options available
+      </div>
     </template>
     <SelectField
-        v-model="selectedOption"
-        :options="options"
-        :label="label"
-        :placeholder="placeholder"
-        :option-value="opt => opt"
-        :loading="loading"
-        @update:model-value="onSelectOption"
+      v-model="selectedOption"
+      :options="options"
+      :label="label"
+      :placeholder="placeholder"
+      :option-value="opt => opt"
+      :loading="loading"
+      @update:model-value="onSelectOption"
     />
     <div v-if="selectedOption">
       <QCheckbox
-          v-for="child in selectedOption.children"
-          :key="child.id"
-          :model-value="selectedChildren.includes(child.id)"
-          :field="child"
-          class="mt-3"
-          @update:model-value="onSelectChild(child)"
+        v-for="child in selectedOption.children"
+        :key="child.id"
+        :model-value="selectedChildren.includes(child.id)"
+        :field="child"
+        class="mt-3"
+        @update:model-value="onSelectChild(child)"
       >
         <div>{{ child.label }}</div>
-        <div class="text-xs text-zinc-500">{{ child.name }}</div>
+        <div class="text-xs text-zinc-500">
+          {{ child.name }}
+        </div>
       </QCheckbox>
     </div>
   </div>

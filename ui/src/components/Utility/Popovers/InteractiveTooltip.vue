@@ -1,12 +1,12 @@
 <template>
   <QTooltip
-      class="interactive-tooltip"
-      ref="tooltipBox"
-      v-model="show"
-      no-parent-event
-      @mouseenter="onEnterTooltip"
-      @mouseleave="onLeaveTooltip"
-      :transition-duration="200"
+    ref="tooltipBox"
+    v-model="show"
+    class="interactive-tooltip"
+    no-parent-event
+    :transition-duration="200"
+    @mouseenter="onEnterTooltip"
+    @mouseleave="onLeaveTooltip"
   >
     <slot>{{ tooltip }}</slot>
   </QTooltip>

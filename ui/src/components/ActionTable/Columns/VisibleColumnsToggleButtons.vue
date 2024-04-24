@@ -1,43 +1,45 @@
 <template>
   <div class="flex items-center flex-nowrap">
     <div
-        v-for="category in categories"
-        :key="category"
-        :class="getCategoryClass(category)"
+      v-for="category in categories"
+      :key="category"
+      :class="getCategoryClass(category)"
     >
       <QCheckbox
-          toggle-indeterminate
-          size="20px"
-          :model-value="getCategoryCheckboxState(category)"
-          class="mr-2 cb-white-border"
-          @click="toggleColumns(columnsInCategory(category), !categoryHasVisibleColumns(category))"
+        toggle-indeterminate
+        size="20px"
+        :model-value="getCategoryCheckboxState(category)"
+        class="mr-2 cb-white-border"
+        @click="toggleColumns(columnsInCategory(category), !categoryHasVisibleColumns(category))"
       />
       <div>
         {{ category }}
       </div>
       <CaretDownIcon
-          class="ml-2 w-5 transition-all"
-          :class="{'rotate-180' : isShowingColumnToggle === category}"
+        class="ml-2 w-5 transition-all"
+        :class="{'rotate-180' : isShowingColumnToggle === category}"
       />
       <QMenu
-          @update:model-value="isShowingColumnToggle = $event ? category : ''"
+        @update:model-value="isShowingColumnToggle = $event ? category : ''"
       >
         <QList>
           <div
-              v-for="column in columnsInCategory(category)"
-              :key="column"
-              class="flex items-center flex-nowrap px-2 py-3 cursor-pointer"
-              @click="toggleColumn(column.name)"
+            v-for="column in columnsInCategory(category)"
+            :key="column"
+            class="flex items-center flex-nowrap px-2 py-3 cursor-pointer"
+            @click="toggleColumn(column.name)"
           >
             <QCheckbox
-                :model-value="!hiddenColumnNames.includes(column.name)"
-                class="mr-3 cb-white-border"
-                size="20px"
-                :color="column.required ? 'gray-400': 'blue-600'"
-                :disable="column.required"
-                @click="toggleColumn(column.name)"
+              :model-value="!hiddenColumnNames.includes(column.name)"
+              class="mr-3 cb-white-border"
+              size="20px"
+              :color="column.required ? 'gray-400': 'blue-600'"
+              :disable="column.required"
+              @click="toggleColumn(column.name)"
             />
-            <div class="text-xs">{{ column.label }}</div>
+            <div class="text-xs">
+              {{ column.label }}
+            </div>
           </div>
         </QList>
       </QMenu>

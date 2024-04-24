@@ -1,8 +1,8 @@
 <template>
   <div
-      contenteditable
-      class="inline-block hover:bg-blue-200 focus:bg-blue-200 transition duration-300 outline-none"
-      @input="onInput"
+    contenteditable
+    class="inline-block hover:bg-blue-200 focus:bg-blue-200 transition duration-300 outline-none"
+    @input="onInput"
   >
     {{ text }}
   </div>

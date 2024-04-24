@@ -1,22 +1,22 @@
 <template>
   <div class="inline-block">
     <div
-        class="cursor-pointer py-2 hover:bg-blue-200 flex items-center justify-end"
+      class="cursor-pointer py-2 hover:bg-blue-200 flex items-center justify-end"
     >
       {{ fLocalizedDateTime(modelValue, { empty: "Never" }) }}
       <EditIcon class="w-4 font-bold ml-2 text-gray-400" />
       <QPopupEdit
-          v-slot="scope"
-          :model-value="modelValue"
-          touch-position
-          :offset="[0, 20]"
-          class="bg-blue-600 text-white !min-w-0"
+        v-slot="scope"
+        :model-value="modelValue"
+        touch-position
+        :offset="[0, 20]"
+        class="bg-blue-600 text-white !min-w-0"
       >
         <DateTimePicker
-            v-model="scope.value"
-            :nullable="nullable"
-            @save="onSave(scope)"
-            @cancel="scope.cancel"
+          v-model="scope.value"
+          :nullable="nullable"
+          @save="onSave(scope)"
+          @cancel="scope.cancel"
         />
       </QPopupEdit>
     </div>

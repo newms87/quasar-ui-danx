@@ -1,12 +1,16 @@
 <template>
   <QTabPanels
-      :model-value="activePanel"
-      class="overflow-y-auto bg-gray-100 h-full transition-all"
+    :model-value="activePanel"
+    class="overflow-y-auto bg-gray-100 h-full transition-all"
   >
-    <QTabPanel v-for="panel in panels" :key="panel.name" :name="panel.name">
+    <QTabPanel
+      v-for="panel in panels"
+      :key="panel.name"
+      :name="panel.name"
+    >
       <RenderVnode
-          v-if="panel.vnode"
-          :vnode="panel.vnode"
+        v-if="panel.vnode"
+        :vnode="panel.vnode"
       />
     </QTabPanel>
   </QTabPanels>

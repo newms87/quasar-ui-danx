@@ -1,11 +1,11 @@
 <template>
   <LabeledInput
-      type="password"
-      v-bind="props"
-      :name="name"
-      :model-value="modelValue"
-      :rules="rules"
-      @update:model-value="$emit('update:model-value', $event)"
+    type="password"
+    v-bind="props"
+    :name="name"
+    :model-value="modelValue"
+    :rules="rules"
+    @update:model-value="$emit('update:model-value', $event)"
   />
 </template>
 
@@ -43,6 +43,6 @@ const props = defineProps({
 
 const rules = [
   (val) =>
-      val === props.password || "The password and confirmation do not match"
+    val === props.password || "The password and confirmation do not match"
 ];
 </script>

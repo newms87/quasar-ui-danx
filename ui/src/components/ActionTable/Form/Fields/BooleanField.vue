@@ -1,16 +1,16 @@
 <template>
   <QToggle
-      :data-testid="'boolean-field-' + field.id"
-      :model-value="modelValue"
-      :disable="disable || readonly"
-      :toggle-indeterminate="toggleIndeterminate"
-      :indeterminate-value="undefined"
-      @update:model-value="$emit('update:model-value', $event)"
+    :data-testid="'boolean-field-' + field.id"
+    :model-value="modelValue || (toggleIndeterminate ? modelValue : false)"
+    :disable="disable || readonly"
+    :toggle-indeterminate="toggleIndeterminate"
+    :indeterminate-value="undefined"
+    @update:model-value="$emit('update:model-value', $event)"
   >
     <FieldLabel
-        :field="{...field, label}"
-        :show-name="showName"
-        :class="labelClass"
+      :field="{...field, label: label || field.label}"
+      :show-name="showName"
+      :class="labelClass"
     />
   </QToggle>
 </template>

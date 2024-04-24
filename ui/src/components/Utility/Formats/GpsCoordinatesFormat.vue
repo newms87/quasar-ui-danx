@@ -1,11 +1,19 @@
 <template>
   <div class="flex flex-nowrap items-center">
-    <LocationIcon class="mr-1 ml-[-.2em]" :class="iconClass" />
-    <div v-if="location?.latitude" class="whitespace-nowrap">
+    <LocationIcon
+      class="mr-1 ml-[-.2em]"
+      :class="iconClass"
+    />
+    <div
+      v-if="location?.latitude"
+      class="whitespace-nowrap"
+    >
       {{ location.latitude.toFixed(decimals) }},
       {{ location.longitude.toFixed(decimals) }}
     </div>
-    <template v-else>Unknown</template>
+    <template v-else>
+      Unknown
+    </template>
   </div>
 </template>
 <script setup>

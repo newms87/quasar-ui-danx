@@ -1,17 +1,17 @@
 <template>
   <div>
     <div
-        v-if="label"
-        class="font-bold text-xs mb-2"
+      v-if="label"
+      class="font-bold text-xs mb-2"
     >
       {{ label }}
     </div>
     <template v-if="inline">
       <QDate
-          v-model="dateRange"
-          range
-          class="reactive"
-          @update:model-value="onSave"
+        v-model="dateRange"
+        range
+        class="reactive"
+        @update:model-value="onSave"
       />
     </template>
     <template v-else>
@@ -28,9 +28,9 @@
       </div>
       <QPopupProxy>
         <QDate
-            v-model="dateRange"
-            range
-            @update:model-value="onSave"
+          v-model="dateRange"
+          range
+          @update:model-value="onSave"
         />
       </QPopupProxy>
     </template>

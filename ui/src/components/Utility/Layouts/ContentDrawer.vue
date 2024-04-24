@@ -1,16 +1,16 @@
 <template>
   <QDialog
-      v-model="isShowing"
-      maximized
-      :position="position"
-      :seamless="seamless"
-      :class="{'hide-backdrop': !overlay}"
+    v-model="isShowing"
+    maximized
+    :position="position"
+    :seamless="seamless"
+    :class="{'hide-backdrop': !overlay}"
   >
     <div>
       <div
-          v-if="title"
-          :class="cls['dialog-title']"
-          @click.stop.prevent
+        v-if="title"
+        :class="cls['dialog-title']"
+        @click.stop.prevent
       >
         {{ title }}
       </div>

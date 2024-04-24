@@ -1,35 +1,39 @@
 <template>
   <InfoDialog
-      title="Column Settings"
-      @close="$emit('close')"
+    title="Column Settings"
+    @close="$emit('close')"
   >
     <div class="mb-4 text-sm">
       Customize columns by visibility, order, or priority (maximum 3 additional).
     </div>
     <ColumnListItem
-        v-for="column in lockedColumns" :key="column.name" locked visible :column="column"
-        class="px-2.5 border border-gray-200 bg-white rounded-t-lg"
+      v-for="column in lockedColumns"
+      :key="column.name"
+      locked
+      visible
+      :column="column"
+      class="px-2.5 border border-gray-200 bg-white rounded-t-lg"
     />
     <ListTransition
-        name="fade-down-list"
-        data-drop-zone="column-list"
+      name="fade-down-list"
+      data-drop-zone="column-list"
     >
       <ListItemDraggable
-          v-for="(column, index) in sortableColumns"
-          :key="column.name"
-          :list-items="sortableColumns"
-          drop-zone="column-list"
-          class="px-2 border border-gray-200 bg-white"
-          :class="{'rounded-b-lg': index === sortableColumns.length - 1}"
-          show-handle
-          @update:list-items="$emit('update:sortable-columns', $event)"
+        v-for="(column, index) in sortableColumns"
+        :key="column.name"
+        :list-items="sortableColumns"
+        drop-zone="column-list"
+        class="px-2 border border-gray-200 bg-white"
+        :class="{'rounded-b-lg': index === sortableColumns.length - 1}"
+        show-handle
+        @update:list-items="$emit('update:sortable-columns', $event)"
       >
         <ColumnListItem
-            :column="column"
-            :visible="isVisible(column)"
-            :is-title="isTitleColumn(column)"
-            @visible="onVisibilityChange(column, $event)"
-            @is-title="onTitleColumnChange(column, $event)"
+          :column="column"
+          :visible="isVisible(column)"
+          :is-title="isTitleColumn(column)"
+          @visible="onVisibilityChange(column, $event)"
+          @is-title="onTitleColumnChange(column, $event)"
         />
       </ListItemDraggable>
     </ListTransition>

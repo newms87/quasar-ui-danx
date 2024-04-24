@@ -2,40 +2,40 @@
   <QList>
     <div class="px-4 py-2 max-w-full">
       <template
-          v-for="(group, index) in filterFields"
-          :key="'group-' + group.name"
+        v-for="(group, index) in filterFields"
+        :key="'group-' + group.name"
       >
         <template v-if="group.flat">
           <FilterableField
-              v-for="field in group.fields"
-              :key="'field-' + field.name"
-              :model-value="field.calcValue ? field.calcValue(filter) : filter[field.name]"
-              :field="field"
-              :loading="loading"
-              class="mb-4"
-              @update:model-value="updateFilter(field, $event)"
+            v-for="field in group.fields"
+            :key="'field-' + field.name"
+            :model-value="field.calcValue ? field.calcValue(filter) : filter[field.name]"
+            :field="field"
+            :loading="loading"
+            class="mb-4"
+            @update:model-value="updateFilter(field, $event)"
           />
         </template>
 
         <FilterFieldItem
-            v-else
-            :name="group.name"
-            :count="activeCountByGroup[group.name]"
+          v-else
+          :name="group.name"
+          :count="activeCountByGroup[group.name]"
         >
           <FilterableField
-              v-for="field in group.fields"
-              :key="'field-' + field.name"
-              :model-value="field.calcValue ? field.calcValue(filter) : filter[field.name]"
-              :field="field"
-              :loading="loading"
-              class="mb-4"
-              @update:model-value="updateFilter(field, $event)"
+            v-for="field in group.fields"
+            :key="'field-' + field.name"
+            :model-value="field.calcValue ? field.calcValue(filter) : filter[field.name]"
+            :field="field"
+            :loading="loading"
+            class="mb-4"
+            @update:model-value="updateFilter(field, $event)"
           />
         </FilterFieldItem>
 
         <QSeparator
-            v-if="index < (filterFields.length - 1)"
-            class="my-2"
+          v-if="index < (filterFields.length - 1)"
+          class="my-2"
         />
       </template>
     </div>

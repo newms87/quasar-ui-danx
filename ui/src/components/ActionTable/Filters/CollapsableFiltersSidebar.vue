@@ -14,32 +14,25 @@
     />
   </CollapsableSidebar>
 </template>
-<script setup>
+<script setup lang="ts">
+import { FilterField, ListControlsFilter } from "src/components/ActionTable/listControls";
 import { FilterFieldList } from ".";
 import { CollapsableSidebar } from "../../Utility";
 
 defineEmits(["update:filter", "update:show-filters"]);
-defineProps({
-  name: {
-    type: String,
-    required: true
-  },
-  showFilters: Boolean,
-  filter: {
-    type: Object,
-    default: null
-  },
-  minWidth: {
-    type: String,
-    default: "5rem"
-  },
-  maxWidth: {
-    type: String,
-    default: "18rem"
-  },
-  filterFields: {
-    type: Array,
-    default: () => []
-  }
+
+export interface Props {
+  name: string,
+  showFilters?: boolean,
+  filter: ListControlsFilter,
+  minWidth?: string,
+  maxWidth?: string,
+  filterFields?: FilterField[]
+}
+
+withDefaults(defineProps<Props>(), {
+  minWidth: "5rem",
+  maxWidth: "18rem",
+  filterFields: () => []
 });
 </script>

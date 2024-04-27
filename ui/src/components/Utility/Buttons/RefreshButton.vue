@@ -6,11 +6,11 @@
     <RefreshIcon class="w-5" />
   </QBtn>
 </template>
-<script setup>
+<script setup lang="ts">
 import { RefreshIcon } from "@heroicons/vue/solid";
 
 defineEmits(["refresh"]);
-defineProps({
-  loading: Boolean
-});
+defineProps<{
+  loading?: boolean
+}>();
 </script>

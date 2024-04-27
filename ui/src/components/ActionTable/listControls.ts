@@ -1,6 +1,48 @@
-import { computed, Ref, ref, ShallowRef, shallowRef, VNode, watch } from "vue";
-import { ActionTargetItem, getItem, setItem, waitForRef } from "../../helpers";
+import { computed, ComputedRef, Ref, ref, ShallowRef, shallowRef, VNode, watch } from "vue";
+import { ActionTargetItem, AnyObject, getItem, setItem, waitForRef } from "../../helpers";
 import { getFilterFromUrl } from "./listHelpers";
+
+export interface ActionController {
+	name: string;
+	label: string;
+	pagedItems: Ref<PagedItems | null>;
+	activeFilter: Ref<ListControlsFilter>;
+	globalFilter: Ref<ListControlsFilter>;
+	filterActiveCount: ComputedRef<number>;
+	showFilters: Ref<boolean>;
+	summary: ShallowRef<object | null>;
+	filterFieldOptions: Ref<AnyObject>;
+	selectedRows: ShallowRef<ActionTargetItem[]>;
+	isLoadingList: Ref<boolean>;
+	isLoadingFilters: Ref<boolean>;
+	isLoadingSummary: Ref<boolean>;
+	pager: ComputedRef<{
+		perPage: number;
+		page: number;
+		filter: ListControlsFilter;
+		sort: object[] | undefined;
+	}>;
+	pagination: ShallowRef<ListControlsPagination>;
+	activeItem: ShallowRef<ActionTargetItem | null>;
+	activePanel: ShallowRef<string | null>;
+
+	// Actions
+	initialize: () => void;
+	loadSummary: () => Promise<void>;
+	resetPaging: () => void;
+	setPagination: (updated: ListControlsPagination) => void;
+	setSelectedRows: (selection: ActionTargetItem[]) => void;
+	loadList: () => Promise<void>;
+	loadMore: (index: number, perPage?: number) => Promise<boolean>;
+	refreshAll: () => Promise<void[]>;
+	exportList: () => Promise<void>;
+	setActiveItem: (item: ActionTargetItem | null) => void;
+	getNextItem: (offset: number) => Promise<void>;
+	activatePanel: (item: ActionTargetItem | null, panel: string | null) => void;
+	setActiveFilter: (filter: ListControlsFilter) => void;
+	applyFilterFromUrl: (url: string, filterFields: Ref<FilterGroup[]> | null) => void;
+	setItemInList: (updatedItem: ActionTargetItem) => void;
+}
 
 export interface LabelValueItem {
 	label: string;
@@ -40,9 +82,11 @@ export interface ListControlsRoutes {
 	summary?: (filter: object | null) => Promise<object> | null;
 	filterFieldOptions?: (filter: object | null) => Promise<object> | null;
 	more?: (pager: object) => Promise<ActionTargetItem[]> | null;
+	export: (filter: object) => Promise<void>;
 }
 
 export interface ListControlsOptions {
+	label?: string,
 	routes: ListControlsRoutes;
 	urlPattern?: RegExp | null;
 	filterDefaults?: Record<string, object>;
@@ -50,7 +94,7 @@ export interface ListControlsOptions {
 }
 
 export interface ListControlsPagination {
-	__sort: object[];
+	__sort: object[] | null;
 	sortBy: string | null;
 	descending: boolean;
 	page: number;
@@ -68,9 +112,9 @@ export interface PagedItems {
 
 export function useListControls(name: string, options: ListControlsOptions) {
 	let isInitialized = false;
-	const PAGE_SETTINGS_KEY = `${name}-pagination-settings`;
+	const PAGE_SETTINGS_KEY = `dx-${name}-pager`;
 	const pagedItems: Ref<PagedItems | null> = shallowRef(null);
-	const filter: Ref<ListControlsFilter> = ref({});
+	const activeFilter: Ref<ListControlsFilter> = ref({});
 	const globalFilter = ref({});
 	const showFilters = ref(false);
 	const selectedRows: ShallowRef<ActionTargetItem[]> = shallowRef([]);
@@ -81,30 +125,30 @@ export function useListControls(name: string, options: ListControlsOptions) {
 	// The active ad for viewing / editing
 	const activeItem: ShallowRef<ActionTargetItem | null> = shallowRef(null);
 	// Controls the active panel (ie: tab) if rendering a panels drawer or similar
-	const activePanel: ShallowRef<string | null> = shallowRef(null);
+	const activePanel: ShallowRef<string> = shallowRef("");
 
 	// Filter fields are the field values available for the currently applied filter on Creative Groups
 	// (ie: all states available under the current filter)
-	const filterFieldOptions: Ref<object> = ref({});
+	const filterFieldOptions: Ref<AnyObject> = ref({});
 	const isLoadingFilters = ref(false);
 
-	const filterActiveCount = computed(() => Object.keys(filter.value).filter(key => filter.value[key] !== undefined).length);
+	const filterActiveCount = computed(() => Object.keys(activeFilter.value).filter(key => activeFilter.value[key] !== undefined).length);
 
 	const PAGING_DEFAULT = {
 		__sort: null,
 		sortBy: null,
 		descending: false,
-		page: 1,
+		page: 0,
 		rowsNumber: 0,
 		rowsPerPage: 50
 	};
-	const quasarPagination = ref(PAGING_DEFAULT);
+	const pagination = shallowRef(PAGING_DEFAULT);
 
 	const pager = computed(() => ({
-		perPage: quasarPagination.value.rowsPerPage,
-		page: quasarPagination.value.page,
-		filter: { ...filter.value, ...globalFilter.value },
-		sort: quasarPagination.value.__sort || undefined
+		perPage: pagination.value.rowsPerPage,
+		page: pagination.value.page,
+		filter: { ...activeFilter.value, ...globalFilter.value },
+		sort: pagination.value.__sort || undefined
 	}));
 
 	// When any part of the filter changes, get the new list of creatives
@@ -112,14 +156,14 @@ export function useListControls(name: string, options: ListControlsOptions) {
 		saveSettings();
 		loadList();
 	});
-	watch(filter, () => {
+	watch(activeFilter, () => {
 		saveSettings();
 		loadSummary();
 	});
 	watch(selectedRows, loadSummary);
 
 	if (options.refreshFilters) {
-		watch(filter, loadFilterFieldOptions);
+		watch(activeFilter, loadFilterFieldOptions);
 	}
 
 	async function loadList() {
@@ -133,7 +177,7 @@ export function useListControls(name: string, options: ListControlsOptions) {
 		if (!options.routes.summary || !isInitialized) return;
 
 		isLoadingSummary.value = true;
-		const summaryFilter: ListControlsFilter = { id: null, ...filter.value, ...globalFilter.value };
+		const summaryFilter: ListControlsFilter = { id: null, ...activeFilter.value, ...globalFilter.value };
 		if (selectedRows.value.length) {
 			summaryFilter.id = selectedRows.value.map((row) => row.id);
 		}
@@ -149,7 +193,7 @@ export function useListControls(name: string, options: ListControlsOptions) {
 	async function loadFilterFieldOptions() {
 		if (!options.routes.filterFieldOptions || !isInitialized) return;
 		isLoadingFilters.value = true;
-		filterFieldOptions.value = await options.routes.filterFieldOptions(filter.value) || {};
+		filterFieldOptions.value = await options.routes.filterFieldOptions(activeFilter.value) || {};
 		isLoadingFilters.value = false;
 	}
 
@@ -164,10 +208,10 @@ export function useListControls(name: string, options: ListControlsOptions) {
 			const urlFilter = getFilterFromUrl(url, validFilterKeys);
 
 			if (Object.keys(urlFilter).length > 0) {
-				filter.value = urlFilter;
+				activeFilter.value = urlFilter;
 
 				// Override whatever is in local storage with this new filter
-				updateSettings("filter", filter.value);
+				updateSettings("filter", activeFilter.value);
 			}
 		}
 	}
@@ -187,8 +231,8 @@ export function useListControls(name: string, options: ListControlsOptions) {
 		}
 
 		// Update the Quasar pagination rows number if it is different from the total
-		if (meta && meta.total !== quasarPagination.value.rowsNumber) {
-			quasarPagination.value.rowsNumber = meta.total;
+		if (meta && meta.total !== pagination.value.rowsNumber) {
+			pagination.value.rowsNumber = meta.total;
 		}
 
 		// Add a reactive isSaving property to each item (for performance reasons in checking saving state)
@@ -206,7 +250,22 @@ export function useListControls(name: string, options: ListControlsOptions) {
 	 * Resets the filter and pagination settings to their defaults.
 	 */
 	function resetPaging() {
-		quasarPagination.value = PAGING_DEFAULT;
+		pagination.value = PAGING_DEFAULT;
+	}
+
+	/**
+	 * Sets the pagination settings to the given values.
+	 */
+	function setPagination(updated: ListControlsPagination) {
+		// @ts-expect-error Seems like a bug in the typescript linting?
+		pagination.value = updated;
+	}
+
+	/**
+	 * Sets the selected rows in the list for batch actions or other operations.
+	 */
+	function setSelectedRows(selection: ActionTargetItem[]) {
+		selectedRows.value = selection;
 	}
 
 	/**
@@ -236,7 +295,7 @@ export function useListControls(name: string, options: ListControlsOptions) {
 		const newItems = await options.routes.more({
 			page: index + 1,
 			perPage,
-			filter: { ...filter.value, ...globalFilter.value }
+			filter: { ...activeFilter.value, ...globalFilter.value }
 		});
 
 		if (newItems && newItems.length > 0) {
@@ -277,11 +336,11 @@ export function useListControls(name: string, options: ListControlsOptions) {
 
 		// Load the filter settings from local storage
 		if (settings) {
-			filter.value = { ...settings.filter, ...filter.value };
-			quasarPagination.value = settings.quasarPagination;
+			activeFilter.value = { ...settings.filter, ...activeFilter.value };
+			pagination.value = settings.pagination;
 		} else {
 			// If no local storage settings, apply the default filters
-			filter.value = { ...options.filterDefaults, ...filter.value };
+			activeFilter.value = { ...options.filterDefaults, ...activeFilter.value };
 		}
 
 		setTimeout(() => {
@@ -304,8 +363,8 @@ export function useListControls(name: string, options: ListControlsOptions) {
 	 */
 	async function saveSettings() {
 		const settings = {
-			filter: filter.value,
-			quasarPagination: { ...quasarPagination.value, page: 1 }
+			filter: activeFilter.value,
+			pagination: { ...pagination.value, page: 1 }
 		};
 		// save in local storage
 		setItem(PAGE_SETTINGS_KEY, settings);
@@ -343,9 +402,16 @@ export function useListControls(name: string, options: ListControlsOptions) {
 	/**
 	 * Opens the item's form with the given item and tab
 	 */
-	function activatePanel(item: ActionTargetItem, panel: string | null) {
+	function activatePanel(item: ActionTargetItem | null, panel: string) {
 		activeItem.value = item;
 		activePanel.value = panel;
+	}
+
+	/**
+	 * Sets the currently active item in the list.
+	 */
+	function setActiveItem(item: ActionTargetItem | null) {
+		activeItem.value = item;
 	}
 
 	/**
@@ -362,8 +428,8 @@ export function useListControls(name: string, options: ListControlsOptions) {
 
 		// Load the previous page if the offset is before index 0
 		if (nextIndex < 0) {
-			if (quasarPagination.value.page > 1) {
-				quasarPagination.value = { ...quasarPagination.value, page: quasarPagination.value.page - 1 };
+			if (pagination.value.page > 1) {
+				pagination.value = { ...pagination.value, page: pagination.value.page - 1 };
 				await waitForRef(isLoadingList, false);
 				nextIndex = pagedItems.value.data.length - 1;
 			} else {
@@ -374,8 +440,8 @@ export function useListControls(name: string, options: ListControlsOptions) {
 
 		// Load the next page if the offset is past the last index
 		if (nextIndex >= pagedItems.value.data.length) {
-			if (quasarPagination.value.page < (pagedItems.value?.meta?.last_page || 1)) {
-				quasarPagination.value = { ...quasarPagination.value, page: quasarPagination.value.page + 1 };
+			if (pagination.value.page < (pagedItems.value?.meta?.last_page || 1)) {
+				pagination.value = { ...pagination.value, page: pagination.value.page + 1 };
 				await waitForRef(isLoadingList, false);
 				nextIndex = 0;
 			} else {
@@ -387,6 +453,17 @@ export function useListControls(name: string, options: ListControlsOptions) {
 		activeItem.value = pagedItems.value?.data[nextIndex];
 	}
 
+	/**
+	 * Sets the active filter to the given filter.
+	 */
+	function setActiveFilter(filter: ListControlsFilter) {
+		activeFilter.value = filter;
+	}
+
+	async function exportList(filter: object) {
+		return options.routes.export(filter);
+	}
+
 	// Initialize the list actions and load settings, lists, summaries, filter fields, etc.
 	function initialize() {
 		isInitialized = true;
@@ -395,8 +472,10 @@ export function useListControls(name: string, options: ListControlsOptions) {
 
 	return {
 		// State
+		name,
+		label: options.label || name,
 		pagedItems,
-		filter,
+		activeFilter,
 		globalFilter,
 		filterActiveCount,
 		showFilters,
@@ -407,7 +486,7 @@ export function useListControls(name: string, options: ListControlsOptions) {
 		isLoadingFilters,
 		isLoadingSummary,
 		pager,
-		quasarPagination,
+		pagination,
 		activeItem,
 		activePanel,
 
@@ -415,11 +494,16 @@ export function useListControls(name: string, options: ListControlsOptions) {
 		initialize,
 		loadSummary,
 		resetPaging,
+		setPagination,
+		setSelectedRows,
 		loadList,
 		loadMore,
 		refreshAll,
+		exportList,
+		setActiveItem,
 		getNextItem,
 		activatePanel,
+		setActiveFilter,
 		applyFilterFromUrl,
 		setItemInList
 	};

@@ -20,7 +20,7 @@ export interface ActionOptions {
 	class?: string;
 	debounce?: number;
 	trigger?: (target: ActionTarget, input: any) => Promise<any>;
-	vnode?: (target: ActionTarget) => VNode;
+	vnode?: ((target: ActionTarget) => VNode) | undefined;
 	enabled?: (target: object) => boolean;
 	batchEnabled?: (targets: object[]) => boolean;
 	optimistic?: (action: ActionOptions, target: object, input: any) => void;

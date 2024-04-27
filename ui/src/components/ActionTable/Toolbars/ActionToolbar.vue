@@ -29,29 +29,18 @@
     </div>
   </div>
 </template>
-<script setup>
+<script setup lang="ts">
+import { ActionOptions, ActionTargetItem } from "../../../helpers";
 import { ExportButton, RefreshButton } from "../../Utility";
 import ActionMenu from "../ActionMenu";
 
 defineEmits(["refresh"]);
-defineProps({
-  title: {
-    type: String,
-    default: null
-  },
-  actions: {
-    type: Array,
-    default: () => []
-  },
-  actionTarget: {
-    type: Object,
-    default: null
-  },
-  refreshButton: Boolean,
-  loading: Boolean,
-  exporter: {
-    type: Function,
-    default: null
-  }
-});
+defineProps<{
+  title?: string,
+  actions: ActionOptions[],
+  actionTarget?: ActionTargetItem[],
+  refreshButton?: boolean,
+  loading?: boolean,
+  exporter?: () => void
+}>();
 </script>

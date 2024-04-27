@@ -10,7 +10,7 @@
     <div class="py-3 px-6 flex items-center flex-nowrap">
       <slot />
       <RefreshButton
-        v-if="refresh"
+        v-if="refreshButton"
         :loading="loading"
         @click="$emit('refresh')"
       />
@@ -47,7 +47,7 @@ defineProps({
     type: Object,
     default: null
   },
-  refresh: Boolean,
+  refreshButton: Boolean,
   loading: Boolean,
   exporter: {
     type: Function,

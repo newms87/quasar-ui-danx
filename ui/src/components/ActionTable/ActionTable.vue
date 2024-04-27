@@ -7,9 +7,9 @@
     <QTable
       ref="actionTable"
       :selected="selectedRows"
-      :pagination="quasarPagination"
+      :pagination="pagination"
       :columns="columns"
-      :loading="isLoadingList"
+      :loading="loadingList"
       :rows="pagedItems?.data || []"
       :binary-state-sort="false"
       selection="multiple"
@@ -18,7 +18,7 @@
       :color="color"
       @update:selected="$emit('update:selected-rows', $event)"
       @update:pagination="() => {}"
-      @request="(e) => $emit('update:quasar-pagination', {...e.pagination, __sort: mapSortBy(e.pagination, columns)})"
+      @request="(e) => $emit('update:pagination', {...e.pagination, __sort: mapSortBy(e.pagination, columns)})"
     >
       <template #no-data>
         <slot name="empty">
@@ -31,7 +31,7 @@
           :label="label"
           :item-count="summary?.count || 0"
           :selected-count="selectedRows.length"
-          :loading="isLoadingSummary"
+          :loading="loadingSummary"
           :summary="summary"
           :columns="columns"
           @clear="$emit('update:selected-rows', [])"
@@ -72,7 +72,7 @@ import EmptyTableState from "./EmptyTableState.vue";
 import { mapSortBy, registerStickyScrolling } from "./listHelpers";
 import TableSummaryRow from "./TableSummaryRow.vue";
 
-defineEmits(["update:quasar-pagination", "update:selected-rows"]);
+defineEmits(["update:selected-rows", "update:pagination"]);
 const props = defineProps({
   name: {
     type: String,
@@ -90,16 +90,16 @@ const props = defineProps({
     type: Array,
     required: true
   },
-  quasarPagination: {
+  pagination: {
     type: Object,
     required: true
   },
-  isLoadingList: Boolean,
+  loadingList: Boolean,
+  loadingSummary: Boolean,
   pagedItems: {
     type: Object,
     default: null
   },
-  isLoadingSummary: Boolean,
   summary: {
     type: Object,
     default: null

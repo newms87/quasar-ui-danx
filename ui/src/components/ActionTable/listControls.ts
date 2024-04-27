@@ -73,7 +73,7 @@ export function useListControls(name: string, options: ListControlsOptions) {
 	const filter: Ref<ListControlsFilter> = ref({});
 	const globalFilter = ref({});
 	const showFilters = ref(false);
-	const selectedRows = shallowRef([]);
+	const selectedRows: ShallowRef<ActionTargetItem[]> = shallowRef([]);
 	const isLoadingList = ref(false);
 	const isLoadingSummary = ref(false);
 	const summary: ShallowRef<object | null> = shallowRef(null);
@@ -81,7 +81,7 @@ export function useListControls(name: string, options: ListControlsOptions) {
 	// The active ad for viewing / editing
 	const activeItem: ShallowRef<ActionTargetItem | null> = shallowRef(null);
 	// Controls the active panel (ie: tab) if rendering a panels drawer or similar
-	const activePanel: ShallowRef<ActionPanel | null> = shallowRef(null);
+	const activePanel: ShallowRef<string | null> = shallowRef(null);
 
 	// Filter fields are the field values available for the currently applied filter on Creative Groups
 	// (ie: all states available under the current filter)
@@ -135,7 +135,7 @@ export function useListControls(name: string, options: ListControlsOptions) {
 		isLoadingSummary.value = true;
 		const summaryFilter: ListControlsFilter = { id: null, ...filter.value, ...globalFilter.value };
 		if (selectedRows.value.length) {
-			summaryFilter.id = selectedRows.value.map((row: { id: string }) => row.id);
+			summaryFilter.id = selectedRows.value.map((row) => row.id);
 		}
 		summary.value = await options.routes.summary(summaryFilter);
 		isLoadingSummary.value = false;
@@ -342,11 +342,8 @@ export function useListControls(name: string, options: ListControlsOptions) {
 
 	/**
 	 * Opens the item's form with the given item and tab
-	 *
-	 * @param item
-	 * @param panel
 	 */
-	function activatePanel(item: ActionTargetItem, panel: ActionPanel) {
+	function activatePanel(item: ActionTargetItem, panel: string | null) {
 		activeItem.value = item;
 		activePanel.value = panel;
 	}

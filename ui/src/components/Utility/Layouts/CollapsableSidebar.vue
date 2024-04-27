@@ -1,7 +1,7 @@
 <template>
   <div
+    class="dx-collapsable-sidebar overflow-y-auto overflow-x-hidden scroll-smooth flex-shrink-0 transition-all relative"
     :class="{
-      [cls['collapsable-sidebar']]: true,
       'is-collapsed': isCollapsed,
       'is-right-side': rightSide,
       [displayClass]: true,
@@ -104,9 +104,3 @@ watch(() => props.collapse, () => {
   setCollapse(props.collapse);
 });
 </script>
-
-<style module="cls" lang="scss">
-.collapsable-sidebar {
-  @apply overflow-y-auto overflow-x-hidden scroll-smooth flex-shrink-0 border-r border-gray-200 transition-all relative;
-}
-</style>

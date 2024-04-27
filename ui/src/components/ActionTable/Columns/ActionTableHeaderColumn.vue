@@ -19,9 +19,9 @@
 </template>
 <script setup>
 import { QTh } from "quasar";
+import { HandleDraggable } from "src/components/DragAndDrop";
+import { DragHandleIcon as RowResizeIcon } from "src/svg";
 import { computed } from "vue";
-import { DragHandleIcon as RowResizeIcon } from "../../svg";
-import { HandleDraggable } from "../DragAndDrop";
 
 const emit = defineEmits(["update:model-value"]);
 const props = defineProps({

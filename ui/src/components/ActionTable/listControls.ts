@@ -1,6 +1,38 @@
-import { computed, Ref, ref, ShallowRef, shallowRef, watch } from "vue";
+import { computed, Ref, ref, ShallowRef, shallowRef, VNode, watch } from "vue";
 import { ActionTargetItem, getItem, setItem, waitForRef } from "../../helpers";
 import { getFilterFromUrl } from "./listHelpers";
+
+export interface LabelValueItem {
+	label: string;
+	value: string | number | boolean;
+}
+
+export interface FilterField {
+	name: string;
+	label: string;
+	type: string;
+	options?: string[] | number[] | LabelValueItem[];
+	inline?: boolean;
+}
+
+export interface FilterGroup {
+	name?: string;
+	flat?: boolean;
+	fields: FilterField[];
+}
+
+export interface ActionPanel {
+	name: string;
+	label: string;
+	category?: string;
+	enabled: boolean | (() => boolean);
+	tabVnode: () => VNode;
+	vnode: () => VNode;
+}
+
+export interface ListControlsFilter {
+	[key: string]: object | object[] | null | undefined | string | number | boolean;
+}
 
 export interface ListControlsRoutes {
 	list: (pager: object) => Promise<ActionTargetItem[]>;
@@ -13,8 +45,17 @@ export interface ListControlsRoutes {
 export interface ListControlsOptions {
 	routes: ListControlsRoutes;
 	urlPattern?: RegExp | null;
-	filterDefaults?: Record<string, any>;
+	filterDefaults?: Record<string, object>;
 	refreshFilters?: boolean;
+}
+
+export interface ListControlsPagination {
+	__sort: object[];
+	sortBy: string | null;
+	descending: boolean;
+	page: number;
+	rowsNumber: number;
+	rowsPerPage: number;
 }
 
 export interface PagedItems {
@@ -29,7 +70,7 @@ export function useListControls(name: string, options: ListControlsOptions) {
 	let isInitialized = false;
 	const PAGE_SETTINGS_KEY = `${name}-pagination-settings`;
 	const pagedItems: Ref<PagedItems | null> = shallowRef(null);
-	const filter: Ref<object | any> = ref({});
+	const filter: Ref<ListControlsFilter> = ref({});
 	const globalFilter = ref({});
 	const showFilters = ref(false);
 	const selectedRows = shallowRef([]);
@@ -40,7 +81,7 @@ export function useListControls(name: string, options: ListControlsOptions) {
 	// The active ad for viewing / editing
 	const activeItem: ShallowRef<ActionTargetItem | null> = shallowRef(null);
 	// Controls the active panel (ie: tab) if rendering a panels drawer or similar
-	const activePanel = shallowRef(null);
+	const activePanel: ShallowRef<ActionPanel | null> = shallowRef(null);
 
 	// Filter fields are the field values available for the currently applied filter on Creative Groups
 	// (ie: all states available under the current filter)
@@ -92,7 +133,7 @@ export function useListControls(name: string, options: ListControlsOptions) {
 		if (!options.routes.summary || !isInitialized) return;
 
 		isLoadingSummary.value = true;
-		const summaryFilter = { id: null, ...filter.value, ...globalFilter.value };
+		const summaryFilter: ListControlsFilter = { id: null, ...filter.value, ...globalFilter.value };
 		if (selectedRows.value.length) {
 			summaryFilter.id = selectedRows.value.map((row: { id: string }) => row.id);
 		}
@@ -115,7 +156,7 @@ export function useListControls(name: string, options: ListControlsOptions) {
 	/**
 	 * Watches for a filter URL parameter and applies the filter if it is set.
 	 */
-	function applyFilterFromUrl(url: string, filterFields: Ref<object[]> | null = null) {
+	function applyFilterFromUrl(url: string, filterFields: Ref<FilterGroup[]> | null = null) {
 		if (options.urlPattern && url.match(options.urlPattern)) {
 			// A flat list of valid filterable field names
 			const validFilterKeys = filterFields?.value?.map(group => group.fields.map(field => field.name)).flat();
@@ -133,14 +174,14 @@ export function useListControls(name: string, options: ListControlsOptions) {
 
 	// Set the reactive pager to map from the Laravel pagination to Quasar pagination
 	// and automatically update the list of ads
-	function setPagedItems(items: object[] | PagedItems) {
-		let data, meta;
+	function setPagedItems(items: ActionTargetItem[] | PagedItems) {
+		let data: ActionTargetItem[] = [], meta;
 
 		if (Array.isArray(items)) {
 			data = items;
 			meta = { total: items.length };
 
-		} else {
+		} else if (items.data) {
 			data = items.data;
 			meta = items.meta;
 		}
@@ -151,7 +192,7 @@ export function useListControls(name: string, options: ListControlsOptions) {
 		}
 
 		// Add a reactive isSaving property to each item (for performance reasons in checking saving state)
-		data = data.map((item: object) => {
+		data = data.map((item) => {
 			// We want to keep the isSaving state if it is already set, as optimizations prevent reloading the
 			// components, and therefore reactivity is not responding to the new isSaving state
 			const oldItem = pagedItems.value?.data?.find(i => i.id === item.id);
@@ -305,7 +346,7 @@ export function useListControls(name: string, options: ListControlsOptions) {
 	 * @param item
 	 * @param panel
 	 */
-	function activatePanel(item: ActionTargetItem, panel) {
+	function activatePanel(item: ActionTargetItem, panel: ActionPanel) {
 		activeItem.value = item;
 		activePanel.value = panel;
 	}

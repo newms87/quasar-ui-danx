@@ -56,10 +56,10 @@
 </template>
 <script setup>
 import { QTd } from "quasar";
+import ActionMenu from "src/components/ActionTable/ActionMenu";
+import { TitleColumnFormat } from "src/components/ActionTable/Columns/index";
+import { RenderVnode } from "src/components/Utility";
 import { computed } from "vue";
-import { RenderVnode } from "../Utility";
-import ActionMenu from "./ActionMenu";
-import { TitleColumnFormat } from "./Columns";
 
 const props = defineProps({
   rowProps: {

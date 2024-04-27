@@ -64,11 +64,11 @@
 
 <script setup>
 import { QTable } from "quasar";
+import ActionTableColumn from "src/components/ActionTable/Columns/ActionTableColumn.vue";
+import ActionTableHeaderColumn from "src/components/ActionTable/Columns/ActionTableHeaderColumn";
 import { computed, ref } from "vue";
 import { getItem, setItem } from "../../helpers";
 import { ActionVnode } from "../Utility";
-import ActionTableColumn from "./ActionTableColumn.vue";
-import ActionTableHeaderColumn from "./ActionTableHeaderColumn";
 import EmptyTableState from "./EmptyTableState.vue";
 import { mapSortBy, registerStickyScrolling } from "./listHelpers";
 import TableSummaryRow from "./TableSummaryRow.vue";

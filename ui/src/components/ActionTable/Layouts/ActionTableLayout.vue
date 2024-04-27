@@ -16,9 +16,9 @@
           v-if="controller.activeFilter"
           :name="controller.name"
           :show-filters="showFilters"
-          :filter-fields="filterFields"
-          :filter="controller.activeFilter.value"
-          @update:filter="controller.setActiveFilter"
+          :filters="filters"
+          :active-filter="controller.activeFilter.value"
+          @update:active-filter="controller.setActiveFilter"
         />
       </slot>
       <slot>
@@ -63,7 +63,7 @@ defineProps<{
   showFilters: boolean,
   controller: ActionController,
   columns: TableColumn[],
-  filterFields?: FilterField[],
+  filters?: FilterField[],
   panels?: ActionPanel[],
   actions?: ActionOptions[],
   exporter?: () => Promise<void>,

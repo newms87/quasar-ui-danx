@@ -8,9 +8,9 @@
     @update:collapse="$emit('update:show-filters', !$event)"
   >
     <FilterFieldList
-      :filter="filter"
-      :filter-fields="filterFields"
-      @update:filter="$emit('update:filter', $event)"
+      :filter="activeFilter"
+      :filter-fields="filters"
+      @update:filter="$emit('update:active-filter', $event)"
     />
   </CollapsableSidebar>
 </template>
@@ -19,20 +19,20 @@ import { FilterField, ListControlsFilter } from "src/components/ActionTable/list
 import { FilterFieldList } from ".";
 import { CollapsableSidebar } from "../../Utility";
 
-defineEmits(["update:filter", "update:show-filters"]);
+defineEmits(["update:active-filter", "update:show-filters"]);
 
 export interface Props {
   name: string,
   showFilters?: boolean,
-  filter: ListControlsFilter,
+  activeFilter: ListControlsFilter,
   minWidth?: string,
   maxWidth?: string,
-  filterFields?: FilterField[]
+  filters?: FilterField[]
 }
 
 withDefaults(defineProps<Props>(), {
   minWidth: "5rem",
   maxWidth: "18rem",
-  filterFields: () => []
+  filters: () => []
 });
 </script>

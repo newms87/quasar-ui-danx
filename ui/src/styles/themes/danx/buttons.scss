@@ -1,0 +1,7 @@
+.dx-action-button {
+  @apply bg-slate-200 transition-all cursor-pointer rounded outline outline-transparent;
+
+  &.dx-column-action-menu:hover {
+    @apply bg-blue-200 outline-blue-600;
+  }
+}

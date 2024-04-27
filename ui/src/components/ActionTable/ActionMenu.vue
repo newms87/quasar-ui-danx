@@ -1,6 +1,6 @@
 <template>
   <PopoverMenu
-    class="px-2 flex action-button"
+    class="px-2 flex dx-action-button"
     :items="activeActions"
     :disabled="!hasTarget"
     :tooltip="!hasTarget ? tooltip : null"

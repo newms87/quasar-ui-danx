@@ -1,6 +1,6 @@
 <template>
   <a
-    class="p-3 actionable"
+    class="p-3 dx-popover-menu"
     :class="{'opacity-50 cursor-not-allowed': disabled}"
   >
     <QTooltip v-if="$slots.tooltip || tooltip">
@@ -16,7 +16,7 @@
       />
       <MenuIcon
         v-else
-        class="w-4 text-black"
+        class="w-4 dx-menu-icon"
       />
     </Transition>
     <QMenu
@@ -73,7 +73,7 @@ defineProps({
     type: [Function, Object],
     default: () => ({
       is: QSpinner,
-      props: { class: "w-4 h-4 text-black" }
+      props: { class: "w-4 h-4" }
     })
   }
 });

@@ -44,6 +44,7 @@
           class="flex flex-shrink-0 pl-2"
         >
           <ActionMenu
+            class="dx-column-action-menu"
             :actions="column.actionMenu"
             :target="row"
             :loading="isSaving"

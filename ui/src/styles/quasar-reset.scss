@@ -60,17 +60,20 @@
         }
       }
 
+    }
+
+    &.q-field--labeled {
       .q-field__control-container {
         padding-top: 1.1rem;
       }
     }
 
-    .q-field__label {
-      color: inherit;
-    }
-
-    .q-field__marginal {
+    .q-field__marginal, .q-field__input, .q-field__label {
       color: inherit;
     }
   }
+}
+
+.q-item {
+  min-height: 0;
 }

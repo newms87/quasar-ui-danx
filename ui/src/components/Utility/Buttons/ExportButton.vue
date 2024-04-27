@@ -1,6 +1,6 @@
 <template>
   <QBtn
-    class="bg-slate-200"
+    class="dx-export-button dx-action-button"
     :loading="isExporting"
     @click="onExport"
   >

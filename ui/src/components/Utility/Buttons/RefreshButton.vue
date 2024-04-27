@@ -1,6 +1,6 @@
 <template>
   <QBtn
-    class="bg-slate-200"
+    class="dx-refresh-button dx-action-button"
     :loading="loading"
   >
     <RefreshIcon class="w-5" />

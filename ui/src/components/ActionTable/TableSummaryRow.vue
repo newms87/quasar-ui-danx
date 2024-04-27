@@ -1,12 +1,12 @@
 <template>
   <QTr
-    class="sticky-column-1 transition-all sticky-row"
-    :class="{'!bg-gray-100': !selectedCount, '!bg-blue-600 text-white selected': selectedCount, 'opacity-50': loading}"
+    class="dx-table-summary-tr sticky-column-1 transition-all sticky-row"
+    :class="{'has-selection': selectedCount, 'is-loading': loading}"
   >
     <QTd
       :colspan="stickyColspan"
-      class="font-bold transition-all"
-      :class="{'!bg-gray-100 !pl-5': !selectedCount, '!bg-blue-600 text-white !pl-4': selectedCount}"
+      class="dx-table-summary-td transition-all"
+      :class="{'has-selection': selectedCount}"
     >
       <div class="flex flex-nowrap items-center">
         <div

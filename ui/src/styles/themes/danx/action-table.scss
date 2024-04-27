@@ -1,0 +1,19 @@
+.dx-table-summary-tr {
+  @apply bg-gray-100;
+
+  &.has-selection {
+    @apply bg-blue-600 text-white;
+  }
+
+  &.is-loading {
+    @apply opacity-50;
+  }
+
+  .dx-table-summary-td {
+    @apply font-bold bg-gray-100 pl-5;
+
+    &.has-selection {
+      @apply bg-blue-600 text-white pl-4;
+    }
+  }
+}

@@ -1,10 +1,7 @@
 <template>
   <div>
-    <div
-      v-if="label"
-      class="font-bold text-xs mb-2"
-    >
-      {{ label }}
+    <div class="mb-2">
+      <FieldLabel :label="label" />
     </div>
     <template v-if="inline">
       <QDate
@@ -41,6 +38,7 @@
 import { CalendarIcon as DateIcon } from "@heroicons/vue/outline";
 import { computed, ref, watch } from "vue";
 import { fDate, parseQDate, parseQDateTime } from "../../../../helpers";
+import FieldLabel from "./FieldLabel";
 
 const emit = defineEmits(["update:model-value"]);
 const props = defineProps({

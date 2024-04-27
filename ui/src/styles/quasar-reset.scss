@@ -1,32 +1,76 @@
-.q-tab {
-  text-transform: capitalize
-}
+#primary-layout {
+  .q-tab {
+    text-transform: capitalize
+  }
 
-.q-tab-panels {
-  overflow: visible;
+  .q-table__card {
+    background: inherit;
+    color: inherit;
+  }
 
-  .q-panel {
+  .q-checkbox__inner {
+    color: inherit;
+  }
+
+  .q-tab-panels {
     overflow: visible;
 
-    &.scroll {
-      overflow: auto;
+    .q-panel {
+      overflow: visible;
+
+      &.scroll {
+        overflow: auto;
+      }
+
+      .q-tab-panel {
+        padding: 0;
+      }
     }
 
-    .q-tab-panel {
-      padding: 0;
+    &.overflow-y-auto {
+      overflow-y: auto;
     }
   }
 
-  &.overflow-y-auto {
-    overflow-y: auto;
+  .q-toolbar {
+    min-height: 0;
+    padding: 0;
   }
-}
 
-.q-toolbar {
-  min-height: 0;
-  padding: 0;
-}
+  .q-notification__actions {
+    color: inherit;
+  }
 
-.q-notification__actions {
-  color: inherit;
+  .q-date {
+    min-width: 100px;
+
+    .q-date__view {
+      min-height: 0;
+    }
+  }
+
+  .q-field {
+    &.q-field--auto-height {
+      .q-field__control {
+        min-height: 0;
+
+        .q-field__native {
+          min-height: 0;
+          color: inherit;
+        }
+      }
+
+      .q-field__control-container {
+        padding-top: 1.1rem;
+      }
+    }
+
+    .q-field__label {
+      color: inherit;
+    }
+
+    .q-field__marginal {
+      color: inherit;
+    }
+  }
 }

@@ -81,7 +81,7 @@ const isCollapsed = ref(getItem(props.name + "-is-collapsed", props.collapse));
 
 function setCollapse(state) {
   isCollapsed.value = state;
-  setItem(props.name + "-is-collapsed", isCollapsed.value ? "1" : "");
+  setItem(props.name + "-is-collapsed", !!isCollapsed.value);
 }
 
 function toggleCollapse() {

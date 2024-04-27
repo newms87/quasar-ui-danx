@@ -1,5 +1,8 @@
 <template>
-  <div class="overflow-hidden w-full">
+  <div
+    class="dx-action-table overflow-hidden w-full"
+    :class="{'dx-no-data': !hasData}"
+  >
     <ActionVnode />
     <QTable
       ref="actionTable"
@@ -12,10 +15,10 @@
       selection="multiple"
       :rows-per-page-options="rowsPerPageOptions"
       class="sticky-column sticky-header w-full h-full !border-0"
-      color="blue-600"
+      :color="color"
       @update:selected="$emit('update:selected-rows', $event)"
       @update:pagination="() => {}"
-      @request="$emit('update:quasar-pagination', {...$event.pagination, __sort: mapSortBy($event.pagination, columns)})"
+      @request="(e) => $emit('update:quasar-pagination', {...e.pagination, __sort: mapSortBy(e.pagination, columns)})"
     >
       <template #no-data>
         <slot name="empty">
@@ -24,6 +27,7 @@
       </template>
       <template #top-row>
         <TableSummaryRow
+          v-if="hasData"
           :label="label"
           :item-count="summary?.count || 0"
           :selected-count="selectedRows.length"
@@ -60,7 +64,7 @@
 
 <script setup>
 import { QTable } from "quasar";
-import { ref } from "vue";
+import { computed, ref } from "vue";
 import { getItem, setItem } from "../../helpers";
 import { ActionVnode } from "../Utility";
 import ActionTableColumn from "./ActionTableColumn.vue";
@@ -78,6 +82,10 @@ const props = defineProps({
   label: {
     type: String,
     required: true
+  },
+  color: {
+    type: String,
+    default: "blue-600"
   },
   selectedRows: {
     type: Array,
@@ -109,9 +117,21 @@ const props = defineProps({
 const actionTable = ref(null);
 registerStickyScrolling(actionTable);
 
+const hasData = computed(() => props.pagedItems?.data?.length);
 const COLUMN_SETTINGS_KEY = `column-settings-${props.name}`;
 const columnSettings = ref(getItem(COLUMN_SETTINGS_KEY) || {});
 function onUpdateColumnSettings() {
   setItem(COLUMN_SETTINGS_KEY, columnSettings.value);
 }
 </script>
+
+<style scoped lang="scss">
+.dx-action-table {
+  &.dx-no-data {
+    :deep(.q-table__middle) {
+      flex-grow: 0;
+      flex-shrink: 1;
+    }
+  }
+}
+</style>

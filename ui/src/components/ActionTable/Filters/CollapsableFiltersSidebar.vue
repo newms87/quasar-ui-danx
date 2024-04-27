@@ -2,8 +2,8 @@
   <CollapsableSidebar
     :collapse="!showFilters"
     disabled
-    min-width="0"
-    max-width="18rem"
+    :min-width="minWidth"
+    :max-width="maxWidth"
     :name="name"
     @update:collapse="$emit('update:show-filters', !$event)"
   >
@@ -28,6 +28,14 @@ defineProps({
   filter: {
     type: Object,
     default: null
+  },
+  minWidth: {
+    type: String,
+    default: "5rem"
+  },
+  maxWidth: {
+    type: String,
+    default: "18rem"
   },
   filterFields: {
     type: Array,

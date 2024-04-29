@@ -45,7 +45,14 @@
           :panels="panels"
           @update:model-value="panel => controller.activatePanel(activeItem, panel)"
           @close="controller.setActiveItem(null)"
-        />
+        >
+          <template #controls>
+            <PreviousNextControls
+              :is-loading="controller.isLoadingList.value"
+              @next="controller.getNextItem"
+            />
+          </template>
+        </PanelsDrawer>
       </slot>
     </div>
   </div>
@@ -54,6 +61,7 @@
 import { computed } from "vue";
 import { ActionOptions } from "../../../helpers";
 import { PanelsDrawer } from "../../PanelsDrawer";
+import { PreviousNextControls } from "../../Utility";
 import ActionTable from "../ActionTable";
 import { CollapsableFiltersSidebar } from "../Filters";
 import { ActionController, ActionPanel, FilterField } from "../listControls";

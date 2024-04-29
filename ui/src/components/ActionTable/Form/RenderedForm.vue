@@ -104,72 +104,75 @@
     />
   </div>
 </template>
-<script setup>
+<script setup lang="ts">
 import { ExclamationCircleIcon as MissingIcon, PencilIcon as EditIcon } from "@heroicons/vue/solid";
 import { computed, ref } from "vue";
 import { FlashMessages, incrementName, replace } from "../../../helpers";
 import { TrashIcon as RemoveIcon } from "../../../svg";
 import { ConfirmDialog } from "../../Utility";
 import {
-  BooleanField,
-  DateField,
-  DateRangeField,
-  IntegerField,
-  MultiFileField,
-  NumberField,
-  SingleFileField,
-  TextField,
-  WysiwygField
+	BooleanField,
+	DateField,
+	DateRangeField,
+	IntegerField,
+	MultiFileField,
+	NumberField,
+	SingleFileField,
+	TextField,
+	WysiwygField
 } from "./Fields";
+import { Form, FormFieldValue } from "./form.d.ts";
 
-const emit = defineEmits(["update:values"]);
-const props = defineProps({
-  values: {
-    type: Array,
-    default: null
-  },
-  form: {
-    type: Object,
-    required: true
-  },
-  noLabel: Boolean,
-  showName: Boolean,
-  disable: Boolean,
-  readonly: Boolean,
-  saving: Boolean,
-  emptyValue: {
-    type: [String, Number, Boolean],
-    default: undefined
-  },
-  canModifyVariations: Boolean
+export interface Props {
+	values?: FormFieldValue[] | object;
+	form: Form;
+	noLabel?: boolean;
+	showName?: boolean;
+	disable?: boolean;
+	readonly?: boolean;
+	saving?: boolean;
+	emptyValue?: string | number | boolean;
+	canModifyVariations?: boolean;
+}
+
+const props = withDefaults(defineProps<Props>(), {
+	values: null,
+	emptyValue: undefined
 });
 
+const emit = defineEmits(["update:values"]);
+
 const FORM_FIELD_MAP = {
-  BOOLEAN: BooleanField,
-  DATE: DateField,
-  DATE_RANGE: DateRangeField,
-  INTEGER: IntegerField,
-  NUMBER: NumberField,
-  TEXT: TextField,
-  SINGLE_FILE: SingleFileField,
-  MULTI_FILE: MultiFileField,
-  WYSIWYG: WysiwygField
+	BOOLEAN: BooleanField,
+	DATE: DateField,
+	DATE_RANGE: DateRangeField,
+	INTEGER: IntegerField,
+	NUMBER: NumberField,
+	TEXT: TextField,
+	SINGLE_FILE: SingleFileField,
+	MULTI_FILE: MultiFileField,
+	WYSIWYG: WysiwygField
 };
 
 const mappedFields = props.form.fields.map((field) => ({
-  placeholder: `Enter ${field.label}`,
-  ...field,
-  component: FORM_FIELD_MAP[field.type],
-  default: field.type === "BOOLEAN" ? false : ""
+	placeholder: `Enter ${field.label}`,
+	...field,
+	component: field.component || FORM_FIELD_MAP[field.type],
+	default: field.type === "BOOLEAN" ? false : ""
 }));
 
+const fieldResponses = computed(() => {
+	if (!props.values) return [];
+	if (Array.isArray(props.values)) return props.values;
+	return Object.entries(props.values).map(([name, value]) => ({ name, value, variation: "" }));
+});
 const variationNames = computed(() => {
-  const names = [...new Set(props.values.map(v => v.variation))].sort();
-  // Always guarantee that we show the default variation
-  if (names.length === 0) {
-    names.push("");
-  }
-  return names;
+	const names = [...new Set(fieldResponses.value.map(v => v.variation))].sort();
+	// Always guarantee that we show the default variation
+	if (names.length === 0) {
+		names.push("");
+	}
+	return names;
 });
 
 const currentVariation = ref(variationNames.value[0] || "");
@@ -178,89 +181,101 @@ const variationToEdit = ref(false);
 const variationToDelete = ref("");
 const canAddVariation = computed(() => props.canModifyVariations && !props.readonly && !props.disable && variationNames.value.length < props.form.variations);
 
-function getFieldResponse(name, variation) {
-  if (!props.values) return undefined;
-  return props.values.find((v) => v.variation === (variation !== undefined ? variation : currentVariation.value) && v.name === name);
+function getFieldResponse(name, variation: string = undefined) {
+	if (!fieldResponses.value) return undefined;
+	return fieldResponses.value.find((fr: FormFieldValue) => fr.variation === (variation !== undefined ? variation : currentVariation.value) && fr.name === name);
 }
 function getFieldValue(name) {
-  return getFieldResponse(name)?.value;
+	return getFieldResponse(name)?.value;
 }
 function onInput(name, value) {
-  const fieldResponse = getFieldResponse(name);
-  const newFieldResponse = {
-    name,
-    variation: currentVariation.value || "",
-    value: value === undefined ? props.emptyValue : value
-  };
-  const newValues = replace(props.values, fieldResponse, newFieldResponse, true);
-  emit("update:values", newValues);
+	const fieldResponse = getFieldResponse(name);
+	const newFieldResponse = {
+		name,
+		variation: currentVariation.value || "",
+		value: value === undefined ? props.emptyValue : value
+	};
+	const newValues = replace(fieldResponses.value, fieldResponse, newFieldResponse, true);
+	updateValues(newValues);
 }
 
 function createVariation(variation) {
-  return props.form.fields.map((field) => ({
-    variation,
-    name: field.name,
-    value: field.type === "BOOLEAN" ? false : null
-  }));
+	return props.form.fields.map((field) => ({
+		variation,
+		name: field.name,
+		value: field.type === "BOOLEAN" ? false : null
+	}));
 }
 
 function onAddVariation() {
-  if (props.saving) return;
-  let newValues = [...props.values];
+	if (props.saving) return;
+	let newValues = [...fieldResponses.value];
 
-  if (newValues.length === 0) {
-    newValues = createVariation("");
-  }
-  const previousName = variationNames.value[variationNames.value.length - 1];
-  const newName = incrementName(!previousName ? "1" : previousName);
-  const newVariation = createVariation(newName);
-  emit("update:values", [...newValues, ...newVariation]);
-  currentVariation.value = newName;
+	if (newValues.length === 0) {
+		newValues = createVariation("");
+	}
+	const previousName = variationNames.value[variationNames.value.length - 1];
+	const newName = incrementName(!previousName ? "1" : previousName);
+	const newVariation = createVariation(newName);
+	updateValues([...newValues, ...newVariation]);
+	currentVariation.value = newName;
 }
 
 function onChangeVariationName() {
-  if (!newVariationName.value) return;
-  if (variationNames.value.includes(newVariationName.value)) {
-    FlashMessages.error("Variation name already exists");
-    return;
-  }
-  const newValues = props.values.map((v) => {
-    if (v.variation === variationToEdit.value) {
-      return { ...v, variation: newVariationName.value };
-    }
-    return v;
-  });
-  emit("update:values", newValues);
+	if (!newVariationName.value) return;
+	if (variationNames.value.includes(newVariationName.value)) {
+		FlashMessages.error("Variation name already exists");
+		return;
+	}
+	const newValues = fieldResponses.value.map((v) => {
+		if (v.variation === variationToEdit.value) {
+			return { ...v, variation: newVariationName.value };
+		}
+		return v;
+	});
+	updateValues(newValues);
 
-  currentVariation.value = newVariationName.value;
-  variationToEdit.value = false;
-  newVariationName.value = "";
+	currentVariation.value = newVariationName.value;
+	variationToEdit.value = false;
+	newVariationName.value = "";
 }
 
-function onRemoveVariation(name) {
-  if (!name) return;
+function updateValues(values: FormFieldValue[]) {
+	let updatedValues: FormFieldValue[] | object = values;
 
-  const newValues = props.values.filter((v) => v.variation !== name);
-  emit("update:values", newValues);
+	if (!Array.isArray(props.values)) {
+		updatedValues = values.reduce((acc, v) => {
+			acc[v.name] = v.value;
+			return acc;
+		}, {});
+	}
+	emit("update:values", updatedValues);
+}
 
-  if (currentVariation.value === name) {
-    currentVariation.value = variationNames.value[0];
-  }
-  variationToDelete.value = "";
+function onRemoveVariation(name: string) {
+	if (!name) return;
+
+	const newValues = fieldResponses.value.filter((v) => v.variation !== name);
+	updateValues(newValues);
+
+	if (currentVariation.value === name) {
+		currentVariation.value = variationNames.value[0];
+	}
+	variationToDelete.value = "";
 }
 
 function isVariationFormComplete(variation) {
-  const requiredGroups = {};
-  return props.form.fields.filter(r => r.required || r.required_group).every((field) => {
-    const fieldResponse = getFieldResponse(field.name, variation);
-    const hasValue = !!fieldResponse && fieldResponse.value !== null;
-    if (field.required_group) {
-      // This required group has already been satisfied
-      if (requiredGroups[field.required_group]) return true;
-      return requiredGroups[field.required_group] = hasValue;
-    } else {
-      return hasValue;
-    }
-  });
+	const requiredGroups = {};
+	return props.form.fields.filter(r => r.required || r.required_group).every((field) => {
+		const fieldResponse = getFieldResponse(field.name, variation);
+		const hasValue = !!fieldResponse && fieldResponse.value !== null;
+		if (field.required_group) {
+			// This required group has already been satisfied
+			if (requiredGroups[field.required_group]) return true;
+			return requiredGroups[field.required_group] = hasValue;
+		} else {
+			return hasValue;
+		}
+	});
 }
 </script>

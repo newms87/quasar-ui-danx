@@ -15,7 +15,12 @@
             <h2>{{ title }}</h2>
           </slot>
         </div>
-
+        <div
+          v-if="$slots.controls"
+          class="mr-4"
+        >
+          <slot name="controls" />
+        </div>
         <div>
           <QBtn
             class="dx-close-button"
@@ -50,9 +55,9 @@
   </ContentDrawer>
 </template>
 <script setup lang="ts">
-import { ActionPanel } from "src/components/ActionTable";
 import { ref, watch } from "vue";
 import { XIcon as CloseIcon } from "../../svg";
+import { ActionPanel } from "../ActionTable";
 import { ContentDrawer } from "../Utility";
 import PanelsDrawerPanels from "./PanelsDrawerPanels";
 import PanelsDrawerTabs from "./PanelsDrawerTabs";

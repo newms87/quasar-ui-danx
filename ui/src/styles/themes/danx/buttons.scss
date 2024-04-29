@@ -5,3 +5,9 @@
     @apply bg-blue-200 outline-blue-600;
   }
 }
+
+.dx-previous-next-controls {
+  .dx-control {
+    @apply bg-slate-200 border-gray-300;
+  }
+}

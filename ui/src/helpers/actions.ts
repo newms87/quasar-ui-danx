@@ -194,9 +194,17 @@ async function onConfirmAction(action: ActionOptions, target: ActionTarget, inpu
 		if (result.errors) {
 			errors.push(...result.errors);
 		} else if (result.error) {
-			errors.push(typeof result.error === "string" ? result.error : result.error.message);
+			let message = result.error;
+			if (typeof result.error === "boolean") {
+				message = result.message;
+			} else if (typeof result.error === "object") {
+				message = result.error.message;
+			} else if (typeof result.error !== "string") {
+				message = "An unknown error occurred. Please try again later.";
+			}
+			errors.push(message);
 		} else {
-			errors.push("An unknown error occurred. Please try again later.");
+			errors.push("An unexpected error occurred. Please try again later.");
 		}
 
 		FlashMessages.combine("error", errors);

@@ -67,6 +67,16 @@
       :key="field.id"
       :class="{ 'mt-4': index > 0 }"
     >
+      <RenderVnode
+        v-if="field.vnode"
+        :vnode="field.vnode"
+        :readonly="readonly"
+        :disable="disable"
+        :show-name="showName"
+        :no-label="noLabel"
+        :model-value="getFieldValue(field.name)"
+        @update:model-value="onInput(field.name, $event)"
+      />
       <Component
         :is="field.component"
         :key="field.name + '-' + currentVariation"
@@ -109,7 +119,7 @@ import { ExclamationCircleIcon as MissingIcon, PencilIcon as EditIcon } from "@h
 import { computed, ref } from "vue";
 import { FlashMessages, incrementName, replace } from "../../../helpers";
 import { TrashIcon as RemoveIcon } from "../../../svg";
-import { ConfirmDialog } from "../../Utility";
+import { ConfirmDialog, RenderVnode } from "../../Utility";
 import {
 	BooleanField,
 	DateField,

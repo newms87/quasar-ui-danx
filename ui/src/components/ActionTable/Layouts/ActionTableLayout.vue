@@ -23,6 +23,7 @@
       </slot>
       <slot>
         <ActionTable
+          class="flex-grow"
           :pagination="controller.pagination.value"
           :selected-rows="controller.selectedRows.value"
           :label="controller.label"

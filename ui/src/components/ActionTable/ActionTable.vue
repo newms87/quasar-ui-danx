@@ -1,6 +1,6 @@
 <template>
   <div
-    class="dx-action-table overflow-hidden w-full"
+    class="dx-action-table overflow-hidden"
     :class="{'dx-no-data': !hasData}"
   >
     <ActionVnode />
@@ -74,44 +74,44 @@ import TableSummaryRow from "./TableSummaryRow.vue";
 
 defineEmits(["update:selected-rows", "update:pagination"]);
 const props = defineProps({
-  name: {
-    type: String,
-    required: true
-  },
-  label: {
-    type: String,
-    required: true
-  },
-  color: {
-    type: String,
-    default: "blue-600"
-  },
-  selectedRows: {
-    type: Array,
-    required: true
-  },
-  pagination: {
-    type: Object,
-    required: true
-  },
-  loadingList: Boolean,
-  loadingSummary: Boolean,
-  pagedItems: {
-    type: Object,
-    default: null
-  },
-  summary: {
-    type: Object,
-    default: null
-  },
-  columns: {
-    type: Array,
-    required: true
-  },
-  rowsPerPageOptions: {
-    type: Array,
-    default: () => [10, 25, 50, 100]
-  }
+	name: {
+		type: String,
+		required: true
+	},
+	label: {
+		type: String,
+		required: true
+	},
+	color: {
+		type: String,
+		default: "blue-600"
+	},
+	selectedRows: {
+		type: Array,
+		required: true
+	},
+	pagination: {
+		type: Object,
+		required: true
+	},
+	loadingList: Boolean,
+	loadingSummary: Boolean,
+	pagedItems: {
+		type: Object,
+		default: null
+	},
+	summary: {
+		type: Object,
+		default: null
+	},
+	columns: {
+		type: Array,
+		required: true
+	},
+	rowsPerPageOptions: {
+		type: Array,
+		default: () => [10, 25, 50, 100]
+	}
 });
 const actionTable = ref(null);
 registerStickyScrolling(actionTable);
@@ -120,17 +120,17 @@ const hasData = computed(() => props.pagedItems?.data?.length);
 const COLUMN_SETTINGS_KEY = `column-settings-${props.name}`;
 const columnSettings = ref(getItem(COLUMN_SETTINGS_KEY) || {});
 function onUpdateColumnSettings() {
-  setItem(COLUMN_SETTINGS_KEY, columnSettings.value);
+	setItem(COLUMN_SETTINGS_KEY, columnSettings.value);
 }
 </script>
 
 <style scoped lang="scss">
 .dx-action-table {
-  &.dx-no-data {
-    :deep(.q-table__middle) {
-      flex-grow: 0;
-      flex-shrink: 1;
-    }
-  }
+	&.dx-no-data {
+		:deep(.q-table__middle) {
+			flex-grow: 0;
+			flex-shrink: 1;
+		}
+	}
 }
 </style>

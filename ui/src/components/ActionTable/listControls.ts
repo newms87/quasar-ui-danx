@@ -186,6 +186,13 @@ export function useListControls(name: string, options: ListControlsOptions) {
 	}
 
 	/**
+	 * Gets the field options for the given field name.
+	 */
+	function getFieldOptions(field: string) {
+		return filterFieldOptions.value[field] || [];
+	}
+
+	/**
 	 * Loads the filter field options for the current filter.
 	 *
 	 * @returns {Promise<void>}
@@ -274,15 +281,17 @@ export function useListControls(name: string, options: ListControlsOptions) {
 	 * @param updatedItem
 	 */
 	function setItemInList(updatedItem: ActionTargetItem) {
-		const data = pagedItems.value?.data?.map(item => (item.id === updatedItem.id && (item.updated_at === null || item.updated_at <= updatedItem.updated_at)) ? updatedItem : item);
-		setPagedItems({
-			data,
-			meta: { total: pagedItems.value?.meta?.total || 0 }
-		});
+		if (updatedItem && updatedItem.id) {
+			const data = pagedItems.value?.data?.map(item => (item.id === updatedItem.id && (item.updated_at === null || item.updated_at <= updatedItem.updated_at)) ? updatedItem : item);
+			setPagedItems({
+				data,
+				meta: { total: pagedItems.value?.meta?.total || 0 }
+			});
 
-		// Update the active item as well if it is set
-		if (activeItem.value?.id === updatedItem.id) {
-			activeItem.value = { ...activeItem.value, ...updatedItem };
+			// Update the active item as well if it is set
+			if (activeItem.value?.id === updatedItem.id) {
+				activeItem.value = { ...activeItem.value, ...updatedItem };
+			}
 		}
 	}
 
@@ -505,6 +514,7 @@ export function useListControls(name: string, options: ListControlsOptions) {
 		activatePanel,
 		setActiveFilter,
 		applyFilterFromUrl,
-		setItemInList
+		setItemInList,
+		getFieldOptions
 	};
 }

@@ -1,11 +1,20 @@
+import { VNode } from "vue";
+
+export interface FormFieldOption {
+	value: string;
+	label: string;
+}
+
 export interface FormField {
 	id?: string;
 	type?: string;
 	name: string;
 	label: string;
+	vnode?: ((props) => VNode | any);
 	component?: any;
 	required?: boolean;
 	required_group?: string;
+	options?: FormFieldOption[];
 }
 
 export interface Form {

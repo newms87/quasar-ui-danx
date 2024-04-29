@@ -1,0 +1,19 @@
+.dx-panels-drawer-header {
+  @apply border-b;
+}
+
+.dx-panels-drawer-panels {
+  @apply bg-gray-100
+}
+
+.dx-panels-drawer-tabs {
+  @apply bg-gray-200 border-r;
+
+  .q-tab {
+    @apply text-left py-2.5 px-2 rounded-lg hover:bg-slate-200;
+
+    &.q-tab--active {
+      @apply text-white bg-blue-600;
+    }
+  }
+}

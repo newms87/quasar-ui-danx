@@ -1,5 +1,6 @@
 <template>
   <QTabs
+    class="dx-panels-drawer-tabs overflow-y-auto"
     :model-value="modelValue"
     vertical
     align="left"
@@ -50,8 +51,6 @@ defineProps({
 
   :global(.q-tab) {
     justify-content: start !important;
-    padding: 0;
-    @apply text-left py-2.5 px-2 rounded-lg hover:bg-slate-200;
 
     :global(.q-focus-helper), :global(.q-tab__indicator) {
       display: none;
@@ -60,10 +59,6 @@ defineProps({
     :global(.q-tab__content) {
       @apply p-0;
     }
-  }
-
-  :global(.q-tab.q-tab--active) {
-    @apply text-white bg-blue-600;
   }
 }
 </style>

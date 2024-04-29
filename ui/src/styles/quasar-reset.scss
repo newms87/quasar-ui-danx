@@ -1,4 +1,4 @@
-#primary-layout {
+.danx-app {
   .q-tab {
     text-transform: capitalize
   }
@@ -10,26 +10,6 @@
 
   .q-checkbox__inner {
     color: inherit;
-  }
-
-  .q-tab-panels {
-    overflow: visible;
-
-    .q-panel {
-      overflow: visible;
-
-      &.scroll {
-        overflow: auto;
-      }
-
-      .q-tab-panel {
-        padding: 0;
-      }
-    }
-
-    &.overflow-y-auto {
-      overflow-y: auto;
-    }
   }
 
   .q-toolbar {
@@ -76,4 +56,25 @@
 
 .q-item {
   min-height: 0;
+}
+
+.q-tab-panels {
+  overflow: visible;
+  background: inherit;
+
+  .q-panel {
+    overflow: visible;
+
+    &.scroll {
+      overflow: auto;
+    }
+
+    .q-tab-panel {
+      padding: 0;
+    }
+  }
+
+  &.overflow-y-auto {
+    overflow-y: auto;
+  }
 }

@@ -1,7 +1,7 @@
 <template>
   <QTabPanels
     :model-value="activePanel"
-    class="overflow-y-auto bg-gray-100 h-full transition-all"
+    class="dx-panels-drawer-panels overflow-y-auto h-full transition-all"
   >
     <QTabPanel
       v-for="panel in panels"

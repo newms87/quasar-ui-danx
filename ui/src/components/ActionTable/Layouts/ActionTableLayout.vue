@@ -13,11 +13,11 @@
     <div class="flex flex-nowrap flex-grow overflow-hidden w-full">
       <slot name="filter-fields">
         <CollapsableFiltersSidebar
-          v-if="controller.activeFilter"
+          v-if="activeFilter"
           :name="controller.name"
           :show-filters="showFilters"
           :filters="filters"
-          :active-filter="controller.activeFilter.value"
+          :active-filter="activeFilter"
           @update:active-filter="controller.setActiveFilter"
         />
       </slot>
@@ -39,10 +39,11 @@
       </slot>
       <slot name="panels">
         <PanelsDrawer
-          v-if="controller.activeItem.value && panels"
-          :model-value="controller.activePanel.value || ''"
+          v-if="activeItem && panels"
+          :title="panelTitle"
+          :model-value="activePanel"
           :panels="panels"
-          @update:model-value="panel => controller.activatePanel(controller.activeItem.value, panel)"
+          @update:model-value="panel => controller.activatePanel(activeItem, panel)"
           @close="controller.setActiveItem(null)"
         />
       </slot>
@@ -50,6 +51,7 @@
   </div>
 </template>
 <script setup lang="ts">
+import { computed } from "vue";
 import { ActionOptions } from "../../../helpers";
 import { PanelsDrawer } from "../../PanelsDrawer";
 import ActionTable from "../ActionTable";
@@ -58,15 +60,26 @@ import { ActionController, ActionPanel, FilterField } from "../listControls";
 import { TableColumn } from "../tableColumns";
 import { ActionToolbar } from "../Toolbars";
 
-defineProps<{
-  refreshButton: boolean,
-  showFilters: boolean,
-  controller: ActionController,
-  columns: TableColumn[],
-  filters?: FilterField[],
-  panels?: ActionPanel[],
-  actions?: ActionOptions[],
-  exporter?: () => Promise<void>,
-  tableClass?: string
+const props = defineProps<{
+	refreshButton: boolean,
+	showFilters: boolean,
+	controller: ActionController,
+	columns: TableColumn[],
+	filters?: FilterField[],
+	panels?: ActionPanel[],
+	actions?: ActionOptions[],
+	exporter?: () => Promise<void>,
+	titleField?: string,
+	tableClass?: string
 }>();
+
+const activeFilter = computed(() => props.controller.activeFilter.value);
+const activeItem = computed(() => props.controller.activeItem.value);
+const activePanel = computed(() => props.controller.activePanel.value || "");
+const panelTitle = computed(() => {
+	if (activeItem.value) {
+		return activeItem.value[props.titleField || "title"] || activeItem.value.label || activeItem.value.name;
+	}
+	return null;
+});
 </script>

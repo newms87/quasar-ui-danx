@@ -4,30 +4,35 @@
     :show="true"
     overlay
     content-class="h-full"
+    class="dx-panels-drawer"
     title=""
     @update:show="$emit('close')"
   >
     <div class="flex flex-col flex-nowrap h-full">
-      <div class="flex items-center px-6 py-4 border-b">
+      <div class="dx-panels-drawer-header flex items-center px-6 py-4">
         <div class="flex-grow">
-          <slot name="header" />
+          <slot name="header">
+            <h2>{{ title }}</h2>
+          </slot>
         </div>
 
         <div>
-          <QBtn @click="$emit('close')">
+          <QBtn
+            class="dx-close-button"
+            @click="$emit('close')"
+          >
             <CloseIcon class="w-4" />
           </QBtn>
         </div>
       </div>
-      <div class="flex-grow overflow-hidden h-full">
+      <div class="dx-panels-drawer-body flex-grow overflow-hidden h-full">
         <div class="flex items-stretch flex-nowrap h-full">
-          <div class="border-r w-[13.5rem] overflow-y-auto">
-            <PanelsDrawerTabs
-              v-model="activePanel"
-              :panels="panels"
-              @update:model-value="$emit('update:model-value', $event)"
-            />
-          </div>
+          <PanelsDrawerTabs
+            v-model="activePanel"
+            :class="tabsClass"
+            :panels="panels"
+            @update:model-value="$emit('update:model-value', $event)"
+          />
           <PanelsDrawerPanels
             :panels="panels"
             :active-panel="activePanel"
@@ -44,27 +49,28 @@
     </div>
   </ContentDrawer>
 </template>
-<script setup>
+<script setup lang="ts">
+import { ActionPanel } from "src/components/ActionTable";
 import { ref, watch } from "vue";
 import { XIcon as CloseIcon } from "../../svg";
 import { ContentDrawer } from "../Utility";
 import PanelsDrawerPanels from "./PanelsDrawerPanels";
 import PanelsDrawerTabs from "./PanelsDrawerTabs";
 
+export interface Props {
+	title?: string,
+	modelValue?: string,
+	tabsClass?: string | object,
+	panelsClass?: string | object,
+	panels: ActionPanel[]
+}
+
 defineEmits(["update:model-value", "close"]);
-const props = defineProps({
-  modelValue: {
-    type: String,
-    default: null
-  },
-  panelsClass: {
-    type: [Object, String],
-    default: "w-[35.5rem]"
-  },
-  panels: {
-    type: Array,
-    required: true
-  }
+const props = withDefaults(defineProps<Props>(), {
+	title: "",
+	modelValue: null,
+	tabsClass: "w-[13.5rem]",
+	panelsClass: "w-[35.5rem]"
 });
 
 const activePanel = ref(props.modelValue);

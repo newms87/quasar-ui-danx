@@ -2,4 +2,22 @@
 	.q-field__label {
 		@apply text-sm text-gray-700;
 	}
+
+	&.dx-number-field {
+		&.dx-prepend-label {
+			@apply text-xs text-black font-normal;
+		}
+
+		&.dx-no-prepend-label {
+			@apply w-32;
+
+			.q-field__native {
+				@apply bg-white text-right;
+			}
+
+			.q-field__prepend {
+				padding: 0;
+			}
+		}
+	}
 }

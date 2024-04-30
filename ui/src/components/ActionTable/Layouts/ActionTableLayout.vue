@@ -18,6 +18,7 @@
           :show-filters="showFilters"
           :filters="filters"
           :active-filter="activeFilter"
+          class="dx-action-table-filters"
           @update:active-filter="controller.setActiveFilter"
         />
       </slot>

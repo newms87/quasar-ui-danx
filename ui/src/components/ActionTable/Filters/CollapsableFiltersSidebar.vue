@@ -1,5 +1,6 @@
 <template>
   <CollapsableSidebar
+    class="dx-collapsable-filters-sidebar"
     :collapse="!showFilters"
     disabled
     :min-width="minWidth"
@@ -22,17 +23,17 @@ import { CollapsableSidebar } from "../../Utility";
 defineEmits(["update:active-filter", "update:show-filters"]);
 
 export interface Props {
-  name: string,
-  showFilters?: boolean,
-  activeFilter: ListControlsFilter,
-  minWidth?: string,
-  maxWidth?: string,
-  filters?: FilterField[]
+	name: string,
+	showFilters?: boolean,
+	activeFilter: ListControlsFilter,
+	minWidth?: string,
+	maxWidth?: string,
+	filters?: FilterField[]
 }
 
 withDefaults(defineProps<Props>(), {
-  minWidth: "5rem",
-  maxWidth: "18rem",
-  filters: () => []
+	minWidth: "5rem",
+	maxWidth: "18rem",
+	filters: () => []
 });
 </script>

@@ -8,6 +8,7 @@
       hide-dropdown-icon
       dense
       emit-value
+      :autocomplete="autocomplete"
       :use-input="filterable"
       :hide-selected="filterable && isShowing && !$props.multiple"
       :input-debounce="100"
@@ -16,7 +17,7 @@
       option-value="value"
       placeholder=""
       :input-class="{'is-hidden': !isShowing, [inputClass]: true}"
-      class="max-w-full"
+      class="max-w-full dx-select-field"
       @filter="onFilter"
       @clear="onClear"
       @popup-show="onShow"
@@ -71,40 +72,41 @@ import { computed, isRef, nextTick, ref } from "vue";
 
 const emit = defineEmits(["update:model-value", "search", "update"]);
 const props = defineProps({
-  ...QSelect.props,
-  modelValue: {
-    type: [Array, String, Number, Object],
-    default: undefined
-  },
-  placeholder: {
-    type: String,
-    default: ""
-  },
-  selectionLabel: {
-    type: String,
-    default: null
-  },
-  chipLimit: {
-    type: Number,
-    default: 3
-  },
-  inputClass: {
-    type: String,
-    default: ""
-  },
-  selectionClass: {
-    type: String,
-    default: ""
-  },
-  options: {
-    type: Array,
-    default: () => []
-  },
-  filterable: Boolean,
-  filterFn: {
-    type: Function,
-    default: null
-  }
+	...QSelect.props,
+	modelValue: {
+		type: [Array, String, Number, Object],
+		default: undefined
+	},
+	placeholder: {
+		type: String,
+		default: ""
+	},
+	selectionLabel: {
+		type: String,
+		default: null
+	},
+	chipLimit: {
+		type: Number,
+		default: 3
+	},
+	inputClass: {
+		type: String,
+		default: ""
+	},
+	selectionClass: {
+		type: String,
+		default: ""
+	},
+	options: {
+		type: Array,
+		default: () => []
+	},
+	autocomplete: Boolean,
+	filterable: Boolean,
+	filterFn: {
+		type: Function,
+		default: null
+	}
 });
 
 const selectField = ref(null);
@@ -119,27 +121,27 @@ const isShowing = ref(false);
  * @type {ComputedRef<{selectionLabel: string, label: string, value: string|*}[]>}
  */
 const computedOptions = computed(() => {
-  let options = props.options;
-  if (props.placeholder && !props.multiple && !props.filterable) {
-    options = [{ label: props.placeholder, value: null }, ...props.options];
-  }
-  options = options.map((o) => {
-    let opt = isRef(o) ? o.value : o;
-    return {
-      label: resolveLabel(opt),
-      value: resolveValue(opt),
-      selectionLabel: resolveSelectionLabel(opt)
-    };
-  });
-  return options;
+	let options = props.options;
+	if (props.placeholder && !props.multiple && !props.filterable) {
+		options = [{ label: props.placeholder, value: null }, ...props.options];
+	}
+	options = options.map((o) => {
+		let opt = isRef(o) ? o.value : o;
+		return {
+			label: resolveLabel(opt),
+			value: resolveValue(opt),
+			selectionLabel: resolveSelectionLabel(opt)
+		};
+	});
+	return options;
 });
 
 const filteredOptions = computed(() => {
-  if (filter.value && !props.filterFn) {
-    return computedOptions.value.filter(o => o.label.toLocaleLowerCase().indexOf(filter.value.toLowerCase()) > -1);
-  } else {
-    return computedOptions.value;
-  }
+	if (filter.value && !props.filterFn) {
+		return computedOptions.value.filter(o => o.label.toLocaleLowerCase().indexOf(filter.value.toLowerCase()) > -1);
+	} else {
+		return computedOptions.value;
+	}
 });
 
 /**
@@ -147,14 +149,14 @@ const filteredOptions = computed(() => {
  * @type {ComputedRef<unknown>}
  */
 const selectedValue = computed(() => {
-  if (props.multiple) {
-    const arrVal = Array.isArray(props.modelValue) ? props.modelValue : [];
-    return arrVal.map((v) => {
-      return v === null ? "__null__" : v;
-    }) || [];
-  } else {
-    return props.modelValue === null ? "__null__" : props.modelValue;
-  }
+	if (props.multiple) {
+		const arrVal = Array.isArray(props.modelValue) ? props.modelValue : [];
+		return arrVal.map((v) => {
+			return v === null ? "__null__" : v;
+		}) || [];
+	} else {
+		return props.modelValue === null ? "__null__" : props.modelValue;
+	}
 });
 
 /**
@@ -162,13 +164,13 @@ const selectedValue = computed(() => {
  * @type {ComputedRef<*>}
  */
 const selectedOptions = computed(() => {
-  let values = selectedValue.value;
-  if (!props.multiple) {
-    values = (values || values === 0) ? [values] : [];
-  }
-  return computedOptions.value.filter((o) => {
-    return values.includes(o.value) || values.map(v => typeof v === "object" && v.id).includes(o.value?.id);
-  });
+	let values = selectedValue.value;
+	if (!props.multiple) {
+		values = (values || values === 0) ? [values] : [];
+	}
+	return computedOptions.value.filter((o) => {
+		return values.includes(o.value) || values.map(v => typeof v === "object" && v.id).includes(o.value?.id);
+	});
 });
 
 /**
@@ -177,12 +179,12 @@ const selectedOptions = computed(() => {
  * @type {ComputedRef<unknown>}
  */
 const selectedLabel = computed(() => {
-  if (props.filterable && isShowing.value) return "";
+	if (props.filterable && isShowing.value) return "";
 
-  if (!selectedOptions.value || selectedOptions.value.length === 0) {
-    return props.placeholder || "(Select Option)";
-  }
-  return selectedOptions.value[0].selectionLabel;
+	if (!selectedOptions.value || selectedOptions.value.length === 0) {
+		return props.placeholder || "(Select Option)";
+	}
+	return selectedOptions.value[0].selectionLabel;
 });
 
 /**
@@ -190,7 +192,7 @@ const selectedLabel = computed(() => {
  * @type {ComputedRef<*>}
  */
 const chipOptions = computed(() => {
-  return selectedOptions.value.slice(0, props.chipLimit);
+	return selectedOptions.value.slice(0, props.chipLimit);
 });
 
 /**
@@ -199,16 +201,16 @@ const chipOptions = computed(() => {
  * @returns {*|string}
  */
 function resolveLabel(option) {
-  if (typeof option === "string") {
-    return option;
-  }
-  if (typeof props.optionLabel === "string") {
-    return option[props.optionLabel];
-  }
-  if (typeof props.optionLabel === "function") {
-    return props.optionLabel(option);
-  }
-  return option?.label;
+	if (typeof option === "string") {
+		return option;
+	}
+	if (typeof props.optionLabel === "string") {
+		return option[props.optionLabel];
+	}
+	if (typeof props.optionLabel === "function") {
+		return props.optionLabel(option);
+	}
+	return option?.label;
 }
 
 /**
@@ -218,16 +220,16 @@ function resolveLabel(option) {
  * @returns {*|{default: null, type: String | StringConstructor}|string}
  */
 function resolveSelectionLabel(option) {
-  if (typeof option === "string") {
-    return option;
-  }
-  if (typeof props.selectionLabel === "string") {
-    return option[props.selectionLabel];
-  }
-  if (typeof props.selectionLabel === "function") {
-    return props.selectionLabel(option);
-  }
-  return option?.selectionLabel || option?.label;
+	if (typeof option === "string") {
+		return option;
+	}
+	if (typeof props.selectionLabel === "string") {
+		return option[props.selectionLabel];
+	}
+	if (typeof props.selectionLabel === "function") {
+		return props.selectionLabel(option);
+	}
+	return option?.selectionLabel || option?.label;
 }
 
 /**
@@ -236,17 +238,17 @@ function resolveSelectionLabel(option) {
  * @returns {string|*|string}
  */
 function resolveValue(option) {
-  if (!option || typeof option === "string") {
-    return option;
-  }
-  let value = option.value;
-  if (typeof props.optionValue === "string") {
-    value = option[props.optionValue];
-  } else if (typeof props.optionValue === "function") {
-    value = props.optionValue(option);
-  }
-  // Note the __null__ special case here. See the onUpdate function for more details
-  return value === null ? "__null__" : value;
+	if (!option || typeof option === "string") {
+		return option;
+	}
+	let value = option.value;
+	if (typeof props.optionValue === "string") {
+		value = option[props.optionValue];
+	} else if (typeof props.optionValue === "function") {
+		value = props.optionValue(option);
+	}
+	// Note the __null__ special case here. See the onUpdate function for more details
+	return value === null ? "__null__" : value;
 }
 
 /**
@@ -256,14 +258,14 @@ function resolveValue(option) {
  * @param value
  */
 function onUpdate(value) {
-  if (Array.isArray(value)) {
-    value = value.map((v) => v === "__null__" ? null : v);
-  }
+	if (Array.isArray(value)) {
+		value = value.map((v) => v === "__null__" ? null : v);
+	}
 
-  value = value === "__null__" ? null : value;
+	value = value === "__null__" ? null : value;
 
-  emit("update", value);
-  emit("update:model-value", value);
+	emit("update", value);
+	emit("update:model-value", value);
 }
 
 /** XXX: This tells us when we should apply the filter. QSelect likes to trigger a new filter everytime you open the dropdown
@@ -277,19 +279,19 @@ const shouldFilter = ref(false);
  * @param update
  */
 async function onFilter(val, update) {
-  if (!props.filterFn) {
-    filter.value = val;
-    await nextTick(update);
-  } else {
-    update();
-    if (shouldFilter.value === false) return;
-    if (val !== null && val !== filter.value) {
-      filter.value = val;
-      if (props.filterFn) {
-        await props.filterFn(val);
-      }
-    }
-  }
+	if (!props.filterFn) {
+		filter.value = val;
+		await nextTick(update);
+	} else {
+		update();
+		if (shouldFilter.value === false) return;
+		if (val !== null && val !== filter.value) {
+			filter.value = val;
+			if (props.filterFn) {
+				await props.filterFn(val);
+			}
+		}
+	}
 }
 
 /**
@@ -297,29 +299,29 @@ async function onFilter(val, update) {
  * See the onUpdate function for more details
  */
 function onClear() {
-  emit("update:model-value", undefined);
-  emit("update", undefined);
+	emit("update:model-value", undefined);
+	emit("update", undefined);
 }
 
 /**
  * Handle behavior when showing the dropdown
  */
 function onShow() {
-  isShowing.value = true;
+	isShowing.value = true;
 
-  // XXX: See description on shouldFilter declaration. Only allow filtering after dropdown is ALREADY opened
-  shouldFilter.value = false;
-  nextTick(() => {
-    shouldFilter.value = true;
-    selectField.value.focus();
-  });
+	// XXX: See description on shouldFilter declaration. Only allow filtering after dropdown is ALREADY opened
+	shouldFilter.value = false;
+	nextTick(() => {
+		shouldFilter.value = true;
+		selectField.value.focus();
+	});
 }
 
 /**
  * Handle behavior when hiding the dropdown
  */
 function onHide() {
-  isShowing.value = false;
-  shouldFilter.value = false;
+	isShowing.value = false;
+	shouldFilter.value = false;
 }
 </script>

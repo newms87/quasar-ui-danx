@@ -1,5 +1,5 @@
 <template>
-  <div class="flex items-center">
+  <div class="dx-action-toolbar flex items-center">
     <div class="flex-grow px-6">
       <slot name="title">
         <h2 v-if="title">
@@ -36,11 +36,11 @@ import ActionMenu from "../ActionMenu";
 
 defineEmits(["refresh"]);
 defineProps<{
-  title?: string,
-  actions: ActionOptions[],
-  actionTarget?: ActionTargetItem[],
-  refreshButton?: boolean,
-  loading?: boolean,
-  exporter?: () => void
+	title?: string,
+	actions: ActionOptions[],
+	actionTarget?: ActionTargetItem[],
+	refreshButton?: boolean,
+	loading?: boolean,
+	exporter?: () => void
 }>();
 </script>

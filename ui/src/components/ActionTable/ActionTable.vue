@@ -8,7 +8,7 @@
       ref="actionTable"
       :selected="selectedRows"
       :pagination="pagination"
-      :columns="columns"
+      :columns="tableColumns"
       :loading="loadingList"
       :rows="pagedItems?.data || []"
       :binary-state-sort="false"
@@ -18,7 +18,7 @@
       :color="color"
       @update:selected="$emit('update:selected-rows', $event)"
       @update:pagination="() => {}"
-      @request="(e) => $emit('update:pagination', {...e.pagination, __sort: mapSortBy(e.pagination, columns)})"
+      @request="(e) => $emit('update:pagination', {...e.pagination, __sort: mapSortBy(e.pagination, tableColumns)})"
     >
       <template #no-data>
         <slot name="empty">
@@ -33,7 +33,7 @@
           :selected-count="selectedRows.length"
           :loading="loadingSummary"
           :summary="summary"
-          :columns="columns"
+          :columns="tableColumns"
           @clear="$emit('update:selected-rows', [])"
         />
       </template>
@@ -116,6 +116,7 @@ const props = defineProps({
 const actionTable = ref(null);
 registerStickyScrolling(actionTable);
 
+const tableColumns = computed(() => props.columns.map((column) => ({ ...column, field: column.field || column.name })));
 const hasData = computed(() => props.pagedItems?.data?.length);
 const COLUMN_SETTINGS_KEY = `column-settings-${props.name}`;
 const columnSettings = ref(getItem(COLUMN_SETTINGS_KEY) || {});

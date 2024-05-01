@@ -8,7 +8,6 @@
       hide-dropdown-icon
       dense
       emit-value
-      :autocomplete="autocomplete"
       :use-input="filterable"
       :hide-selected="filterable && isShowing && !$props.multiple"
       :input-debounce="100"
@@ -101,7 +100,6 @@ const props = defineProps({
 		type: Array,
 		default: () => []
 	},
-	autocomplete: Boolean,
 	filterable: Boolean,
 	filterFn: {
 		type: Function,

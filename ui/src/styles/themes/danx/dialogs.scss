@@ -1,0 +1,39 @@
+.dx-dialog {
+	.dx-dialog-title {
+		@apply pl-6 pr-10 border-b border-gray-300 font-normal;
+	}
+
+	.dx-dialog-subtitle {
+		@apply mt-1 text-sm;
+	}
+
+	.dx-dialog-content {
+		@apply px-6 bg-gray-100;
+	}
+
+	.dx-dialog-actions {
+		@apply px-6 py-4 border-t border-gray-300;
+	}
+
+	.dx-dialog-button {
+		&.dx-dialog-button-confirm {
+			@apply bg-blue-600 text-white;
+		}
+
+		& + .dx-dialog-button {
+			@apply ml-4;
+		}
+	}
+
+	.dx-close-button {
+		@apply p-4 text-black;
+	}
+
+	&.dx-info-dialog {
+		.dx-dialog-actions {
+			& > .flex-grow {
+				@apply text-right;
+			}
+		}
+	}
+}

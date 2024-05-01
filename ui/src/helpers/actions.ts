@@ -9,7 +9,7 @@ export type ActionTargetItem = {
 	isSaving: Ref<boolean>;
 	[key: string]: any;
 };
-export type ActionTarget = ActionTargetItem[] | ActionTargetItem;
+export type ActionTarget = ActionTargetItem[] | ActionTargetItem | null;
 
 export interface ActionOptions {
 	name?: string;
@@ -23,9 +23,9 @@ export interface ActionOptions {
 	vnode?: ((target: ActionTarget) => VNode) | undefined;
 	enabled?: (target: object) => boolean;
 	batchEnabled?: (targets: object[]) => boolean;
-	optimistic?: (action: ActionOptions, target: object, input: any) => void;
-	onAction?: (action: string | null | undefined, target: object, input: any) => Promise<any>;
-	onBatchAction?: (action: string | null | undefined, targets: object[], input: any) => Promise<any>;
+	optimistic?: (action: ActionOptions, target: ActionTargetItem | null, input: any) => void;
+	onAction?: (action: string | null | undefined, target: ActionTargetItem | null, input: any) => Promise<any>;
+	onBatchAction?: (action: string | null | undefined, targets: ActionTargetItem[], input: any) => Promise<any>;
 	onStart?: (action: ActionOptions | null, targets: ActionTarget, input: any) => boolean;
 	onSuccess?: (result: any, targets: ActionTarget, input: any) => any;
 	onError?: (result: any, targets: ActionTarget, input: any) => any;
@@ -60,7 +60,7 @@ export function useActions(actions: ActionOptions[], globalOptions: ActionOption
 			for (const t of target) {
 				t.isSaving.value = saving;
 			}
-		} else {
+		} else if (target) {
 			target.isSaving.value = saving;
 		}
 	}
@@ -73,7 +73,7 @@ export function useActions(actions: ActionOptions[], globalOptions: ActionOption
 	 * @param {any} input - The input data to pass to the action handler
 	 * @param isTriggered - Whether the action was triggered by a trigger function
 	 */
-	async function performAction(name: string | object, target: ActionTarget, input: any = null, isTriggered = false) {
+	async function performAction(name: string | object, target: ActionTarget = null, input: any = null, isTriggered = false) {
 		const action: ActionOptions | null | undefined = typeof name === "string" ? mappedActions.find(a => a.name === name) : name;
 		if (!action) {
 			throw new Error(`Unknown action: ${name}`);

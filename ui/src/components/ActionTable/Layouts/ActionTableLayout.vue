@@ -8,7 +8,11 @@
         :action-target="controller.selectedRows.value"
         :exporter="controller.exportList"
         @refresh="controller.refreshAll"
-      />
+      >
+        <template #default>
+          <slot name="action-toolbar" />
+        </template>
+      </ActionToolbar>
     </slot>
     <div class="flex flex-nowrap flex-grow overflow-hidden w-full">
       <slot name="filter-fields">
@@ -66,7 +70,7 @@ import { PanelsDrawer } from "../../PanelsDrawer";
 import { PreviousNextControls } from "../../Utility";
 import ActionTable from "../ActionTable";
 import { CollapsableFiltersSidebar } from "../Filters";
-import { ActionController, ActionPanel, FilterField } from "../listControls";
+import { ActionController, ActionPanel, FilterGroup } from "../listControls";
 import { TableColumn } from "../tableColumns";
 import { ActionToolbar } from "../Toolbars";
 
@@ -75,7 +79,7 @@ const props = defineProps<{
 	showFilters: boolean,
 	controller: ActionController,
 	columns: TableColumn[],
-	filters?: FilterField[],
+	filters?: FilterGroup[],
 	panels?: ActionPanel[],
 	actions?: ActionOptions[],
 	exporter?: () => Promise<void>,

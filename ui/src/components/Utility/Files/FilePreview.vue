@@ -27,7 +27,7 @@
         </div>
         <QImg
           v-if="thumbUrl || isPreviewable"
-          fit="scale-down"
+          fit="fill"
           class="non-selectable max-h-full max-w-full h-full"
           :src="(thumbUrl || previewUrl) + '#t=0.1'"
           preload="auto"

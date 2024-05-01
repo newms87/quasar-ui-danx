@@ -16,10 +16,6 @@
 	}
 
 	.dx-dialog-button {
-		&.dx-dialog-button-confirm {
-			@apply bg-blue-600 text-white;
-		}
-
 		& + .dx-dialog-button {
 			@apply ml-4;
 		}
@@ -27,6 +23,14 @@
 
 	.dx-close-button {
 		@apply p-4 text-black;
+	}
+
+	.dx-dialog-button-confirm .dx-dialog-button {
+		@apply bg-blue-600 text-white;
+	}
+
+	.dx-dialog-button-cancel {
+		@apply flex-grow;
 	}
 
 	&.dx-info-dialog {

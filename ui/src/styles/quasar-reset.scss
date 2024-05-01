@@ -54,6 +54,11 @@
 	}
 }
 
+.q-btn {
+	text-transform: inherit;
+	@apply bg-inherit text-inherit;
+}
+
 .q-item {
 	min-height: 0;
 }
@@ -76,5 +81,11 @@
 
 	&.overflow-y-auto {
 		overflow-y: auto;
+	}
+}
+
+.dx-dialog {
+	.q-card__section--vert {
+		@apply p-0;
 	}
 }

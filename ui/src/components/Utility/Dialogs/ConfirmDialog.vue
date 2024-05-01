@@ -4,21 +4,31 @@
     v-bind="layoutProps"
     @close="onClose"
   >
+    <template
+      v-for="slotName in childSlots"
+      #[slotName]
+    >
+      <slot :name="slotName" />
+    </template>
+
     <template #actions>
-      <div class="flex-grow">
+      <div class="dx-dialog-button-cancel">
         <QBtn
           :label="cancelText"
-          class="dx-dialog-button dx-dialog-button-cancel"
+          class="dx-dialog-button"
           @click="onClose"
         >
           <slot name="cancel-text" />
         </QBtn>
       </div>
       <slot name="actions" />
-      <div v-if="!hideConfirm">
+      <div
+        v-if="!hideConfirm"
+        class="dx-dialog-button-confirm"
+      >
         <QBtn
           :label="$slots['confirm-text'] ? '' : confirmText"
-          class="dx-dialog-button dx-dialog-button-confirm"
+          class="dx-dialog-button"
           :class="confirmClass"
           :loading="isSaving"
           :disable="disabled"
@@ -62,6 +72,7 @@ const props = defineProps({
 });
 
 const layoutProps = computed(() => ({ ...props, disabled: undefined }));
+const childSlots = computed(() => ["title", "subtitle", "default", "toolbar"]);
 
 function onConfirm() {
 	emit("confirm");

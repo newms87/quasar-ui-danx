@@ -56,12 +56,14 @@ export function useActions(actions: ActionOptions[], globalOptions: ActionOption
 	 * Set the reactive saving state of a target
 	 */
 	function setTargetSavingState(target: ActionTarget, saving: boolean) {
-		if (Array.isArray(target)) {
-			for (const t of target) {
+		if (!target) return;
+		target = Array.isArray(target) ? target : [target];
+		for (const t of target) {
+			if (!t.isSaving) {
+				t.isSaving = shallowRef(saving);
+			} else {
 				t.isSaving.value = saving;
 			}
-		} else if (target) {
-			target.isSaving.value = saving;
 		}
 	}
 

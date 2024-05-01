@@ -122,91 +122,91 @@ import { FullScreenCarouselDialog } from "../Dialogs";
 
 const emit = defineEmits(["remove"]);
 const props = defineProps({
-  src: {
-    type: String,
-    default: ""
-  },
-  image: {
-    type: Object,
-    default: null
-  },
-  relatedFiles: {
-    type: Array,
-    default: null
-  },
-  missingIcon: {
-    type: [Function, Object],
-    default: ImageIcon
-  },
-  downloadButtonClass: {
-    type: String,
-    default: "bg-blue-600 text-white"
-  },
-  downloadable: Boolean,
-  removable: Boolean,
-  disabled: Boolean,
-  square: Boolean
+	src: {
+		type: String,
+		default: ""
+	},
+	image: {
+		type: Object,
+		default: null
+	},
+	relatedFiles: {
+		type: Array,
+		default: null
+	},
+	missingIcon: {
+		type: [Function, Object],
+		default: ImageIcon
+	},
+	downloadButtonClass: {
+		type: String,
+		default: "bg-blue-600 text-white"
+	},
+	downloadable: Boolean,
+	removable: Boolean,
+	disabled: Boolean,
+	square: Boolean
 });
 
 const showPreview = ref(false);
 const computedImage = computed(() => {
-  if (props.image) {
-    return props.image;
-  } else if (props.src) {
-    return {
-      id: props.src,
-      url: props.src,
-      type: "image/" + props.src.split(".").pop().toLowerCase()
-    };
-  }
-  return null;
+	if (props.image) {
+		return props.image;
+	} else if (props.src) {
+		return {
+			id: props.src,
+			url: props.src,
+			type: "image/" + props.src.split(".").pop().toLowerCase()
+		};
+	}
+	return null;
 });
 const mimeType = computed(
-  () => computedImage.value.type || computedImage.value.mime
+	() => computedImage.value?.type || computedImage.value?.mime || ""
 );
-const isImage = computed(() => mimeType.value.match(/^image\//));
-const isVideo = computed(() => mimeType.value.match(/^video\//));
-const isPdf = computed(() => mimeType.value.match(/^application\/pdf/));
+const isImage = computed(() => !!mimeType.value.match(/^image\//));
+const isVideo = computed(() => !!mimeType.value.match(/^video\//));
+const isPdf = computed(() => !!mimeType.value.match(/^application\/pdf/));
 const previewUrl = computed(
-  () => computedImage.value.transcodes?.compress?.url || computedImage.value.blobUrl || computedImage.value.url
+	() => computedImage.value?.transcodes?.compress?.url || computedImage.value?.blobUrl || computedImage.value?.url
 );
 const thumbUrl = computed(() => {
-  return computedImage.value.transcodes?.thumb?.url;
+	return computedImage.value?.transcodes?.thumb?.url;
 });
 const isPreviewable = computed(() => {
-  return !!thumbUrl.value || isVideo.value || isImage.value;
+	return !!thumbUrl.value || isVideo.value || isImage.value;
 });
 const isConfirmingRemove = ref(false);
 function onRemove() {
-  if (!isConfirmingRemove.value) {
-    isConfirmingRemove.value = true;
-    setTimeout(() => {
-      isConfirmingRemove.value = false;
-    }, 2000);
-  } else {
-    emit("remove");
-  }
+	if (!isConfirmingRemove.value) {
+		isConfirmingRemove.value = true;
+		setTimeout(() => {
+			isConfirmingRemove.value = false;
+		}, 2000);
+	} else {
+		emit("remove");
+	}
 }
 </script>
 
 <style module="cls" lang="scss">
 .action-button {
-  position: absolute;
-  bottom: 1.5em;
-  right: 1em;
-  z-index: 1;
+	position: absolute;
+	bottom: 1.5em;
+	right: 1em;
+	z-index: 1;
 }
 
 .play-button {
-  position: absolute;
-  top: 0;
-  left: 0;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  width: 100%;
-  height: 100%;
-  pointer-events: none;
-  @apply text-blue-200;
+	position: absolute;
+	top: 0;
+	left: 0;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	width: 100%;
+	height: 100%;
+	pointer-events: none;
+	@apply text-blue-200;
 }
 </style>

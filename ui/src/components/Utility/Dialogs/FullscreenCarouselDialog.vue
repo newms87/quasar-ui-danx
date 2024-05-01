@@ -30,7 +30,7 @@
                 controls
               >
                 <source
-                  :src="file.url + '#t=0.1'"
+                  :src="getPreviewUrl(file) + '#t=0.1'"
                   :type="file.mime"
                 >
               </video>
@@ -38,7 +38,7 @@
             <img
               v-else
               :alt="file.filename"
-              :src="file.url"
+              :src="getPreviewUrl(file)"
             >
           </div>
         </QCarouselSlide>
@@ -56,54 +56,59 @@ import { XIcon as CloseIcon } from "../../../svg";
 
 defineEmits(["close"]);
 const props = defineProps({
-  files: {
-    type: Array,
-    default: () => []
-  },
-  defaultSlide: {
-    type: String,
-    default: ""
-  }
+	files: {
+		type: Array,
+		default: () => []
+	},
+	defaultSlide: {
+		type: String,
+		default: ""
+	}
 });
 
 const carousel = ref(null);
 const currentSlide = ref(props.defaultSlide);
 function isVideo(file) {
-  return file.mime?.startsWith("video");
+	return file.mime?.startsWith("video");
 }
+
+function getPreviewUrl(file) {
+	return file.transcodes?.compress?.url || file.blobUrl || file.url;
+}
+
 function getThumbUrl(file) {
-  if (file.thumb) {
-    return file.thumb.url;
-  } else if (isVideo(file)) {
-    // Base64 encode a PlayIcon for the placeholder image
-    return `data:image/svg+xml;base64,${btoa(
-      `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="white"><path d="M0 0h24v24H0z" fill="none"/><path d="M8 5v14l11-7z"/></svg>`
-    )}`;
-  } else {
-    return file.url;
-  }
+	if (file.thumb) {
+		return file.thumb.url;
+	} else if (isVideo(file)) {
+		// Base64 encode a PlayIcon for the placeholder image
+		return `data:image/svg+xml;base64,${btoa(
+			`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="white"><path d="M0 0h24v24H0z" fill="none"/><path d="M8 5v14l11-7z"/></svg>`
+		)}`;
+	} else {
+		return getPreviewUrl(file);
+	}
 }
 </script>
 <style module="cls" lang="scss">
 .slide-image {
-  width: 100%;
-  height: 100%;
-  background: black;
-  display: flex;
-  justify-content: center;
-  align-items: center;
+	width: 100%;
+	height: 100%;
+	background: black;
+	display: flex;
+	justify-content: center;
+	align-items: center;
 
-  img {
-    max-height: 100%;
-    max-width: 100%;
-    object-fit: contain;
-  }
+	img {
+		max-height: 100%;
+		max-width: 100%;
+		object-fit: contain;
+	}
 }
 
 .carousel {
-  :deep(.q-carousel__navigation--bottom) {
-    position: relative;
-    bottom: 8em;
-  }
+	:deep(.q-carousel__navigation--bottom) {
+		position: relative;
+		bottom: 8em;
+	}
 }
 </style>

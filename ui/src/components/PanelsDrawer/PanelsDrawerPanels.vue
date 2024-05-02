@@ -16,17 +16,12 @@
   </QTabPanels>
 </template>
 
-<script setup>
+<script setup lang="ts">
+import { ActionPanel } from "src/components/ActionTable";
 import { RenderVnode } from "../Utility";
 
-defineProps({
-  activePanel: {
-    type: String,
-    default: null
-  },
-  panels: {
-    type: Array,
-    required: true
-  }
-});
+defineProps<{
+	activePanel?: string | number,
+	panels: ActionPanel[]
+}>();
 </script>

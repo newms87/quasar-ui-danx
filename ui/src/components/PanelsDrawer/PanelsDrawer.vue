@@ -41,7 +41,7 @@
           <PanelsDrawerPanels
             :panels="panels"
             :active-panel="activePanel"
-            :class="panelsClass"
+            :class="activePanelOptions?.class || panelsClass"
           />
           <div
             v-if="$slots['right-sidebar']"
@@ -55,7 +55,7 @@
   </ContentDrawer>
 </template>
 <script setup lang="ts">
-import { ref, watch } from "vue";
+import { computed, ref, watch } from "vue";
 import { XIcon as CloseIcon } from "../../svg";
 import { ActionPanel } from "../ActionTable";
 import { ContentDrawer } from "../Utility";
@@ -64,7 +64,7 @@ import PanelsDrawerTabs from "./PanelsDrawerTabs";
 
 export interface Props {
 	title?: string,
-	modelValue?: string,
+	modelValue?: string | number,
 	tabsClass?: string | object,
 	panelsClass?: string | object,
 	panels: ActionPanel[]
@@ -79,5 +79,6 @@ const props = withDefaults(defineProps<Props>(), {
 });
 
 const activePanel = ref(props.modelValue);
+const activePanelOptions = computed(() => props.panels.find((panel) => panel.name === activePanel.value));
 watch(() => props.modelValue, (value) => activePanel.value = value);
 </script>

@@ -28,37 +28,37 @@
     </template>
   </QTabs>
 </template>
-<script setup>
+<script setup lang="ts">
 import { QTab } from "quasar";
+import { ActionPanel } from "src/components/ActionTable";
 import { RenderVnode } from "../Utility";
 
 defineEmits(["update:model-value"]);
-defineProps({
-  modelValue: {
-    type: String,
-    default: "general"
-  },
-  panels: {
-    type: Array,
-    required: true
-  }
+
+interface Props {
+	modelValue?: string | number;
+	panels: ActionPanel[];
+}
+
+withDefaults(defineProps<Props>(), {
+	modelValue: "general"
 });
 </script>
 
 <style lang="scss" module="cls">
 .panel-tabs {
-  @apply p-4 h-auto;
+	@apply p-4 h-auto;
 
-  :global(.q-tab) {
-    justify-content: start !important;
+	:global(.q-tab) {
+		justify-content: start !important;
 
-    :global(.q-focus-helper), :global(.q-tab__indicator) {
-      display: none;
-    }
+		:global(.q-focus-helper), :global(.q-tab__indicator) {
+			display: none;
+		}
 
-    :global(.q-tab__content) {
-      @apply p-0;
-    }
-  }
+		:global(.q-tab__content) {
+			@apply p-0;
+		}
+	}
 }
 </style>

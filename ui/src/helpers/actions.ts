@@ -6,7 +6,7 @@ export type AnyObject = { [key: string]: any };
 
 export type ActionTargetItem = {
 	id: number | string;
-	isSaving: Ref<boolean>;
+	isSaving?: Ref<boolean>;
 	[key: string]: any;
 };
 export type ActionTarget = ActionTargetItem[] | ActionTargetItem | null;
@@ -20,11 +20,11 @@ export interface ActionOptions {
 	class?: string;
 	debounce?: number;
 	trigger?: (target: ActionTarget, input: any) => Promise<any>;
-	vnode?: ((target: ActionTarget) => VNode) | undefined;
+	vnode?: ((target: ActionTarget) => VNode) | any;
 	enabled?: (target: object) => boolean;
 	batchEnabled?: (targets: object[]) => boolean;
 	optimistic?: (action: ActionOptions, target: ActionTargetItem | null, input: any) => void;
-	onAction?: (action: string | null | undefined, target: ActionTargetItem | null, input: any) => Promise<any>;
+	onAction?: (action: string | null | undefined, target: ActionTargetItem | null, input: any) => Promise<any> | void;
 	onBatchAction?: (action: string | null | undefined, targets: ActionTargetItem[], input: any) => Promise<any>;
 	onStart?: (action: ActionOptions | null, targets: ActionTarget, input: any) => boolean;
 	onSuccess?: (result: any, targets: ActionTarget, input: any) => any;

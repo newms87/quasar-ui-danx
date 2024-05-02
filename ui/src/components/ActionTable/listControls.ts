@@ -64,12 +64,13 @@ export interface FilterGroup {
 }
 
 export interface ActionPanel {
-	name: string;
+	name: string | number;
 	label: string;
 	category?: string;
+	class?: string | object;
 	enabled?: boolean | (() => boolean);
-	tabVnode?: () => VNode | any;
-	vnode: () => VNode | any;
+	tabVnode?: (activePanel: string) => VNode | any;
+	vnode: (activePanel: string) => VNode | any;
 }
 
 export interface ListControlsFilter {

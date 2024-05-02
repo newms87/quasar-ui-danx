@@ -7,6 +7,7 @@
       :placeholder="field?.placeholder"
       outlined
       dense
+      :autogrow="autogrow"
       :disable="disabled"
       :label-slot="!noLabel"
       :input-class="inputClass"
@@ -70,6 +71,7 @@ defineProps({
 		type: String,
 		default: ""
 	},
+	autogrow: Boolean,
 	noLabel: Boolean,
 	showName: Boolean,
 	disabled: Boolean,

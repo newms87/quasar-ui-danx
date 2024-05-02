@@ -11,6 +11,7 @@ export * from "./formats";
 export * from "./hotkeys";
 export * from "./multiFileUpload";
 export * from "./request";
+export * from "./routes";
 export * from "./singleFileUpload";
 export * from "./storage";
 export * from "./styles";

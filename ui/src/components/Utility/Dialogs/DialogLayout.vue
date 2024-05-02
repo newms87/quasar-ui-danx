@@ -57,36 +57,19 @@
   </QDialog>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { XIcon as CloseIcon } from "@heroicons/vue/outline";
+import { DialogLayoutProps } from "./dialogs";
 
 const emit = defineEmits(["close"]);
-defineProps({
-	modelValue: { type: [String, Boolean, Object], default: true },
-	title: {
-		type: String,
-		default: ""
-	},
-	titleClass: {
-		type: String,
-		default: ""
-	},
-	subtitle: {
-		type: String,
-		default: ""
-	},
-	content: {
-		type: String,
-		default: ""
-	},
-	backdropDismiss: Boolean,
-	maximized: Boolean,
-	fullWidth: Boolean,
-	fullHeight: Boolean,
-	contentClass: {
-		type: String,
-		default: ""
-	}
+
+withDefaults(defineProps<DialogLayoutProps>(), {
+	modelValue: true,
+	title: "",
+	titleClass: "",
+	subtitle: "",
+	content: "",
+	contentClass: ""
 });
 
 function onClose() {

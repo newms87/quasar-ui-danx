@@ -10,6 +10,7 @@
     >
       <slot :name="slotName" />
     </template>
+    <slot />
 
     <template #actions>
       <div class="dx-dialog-button-cancel">
@@ -42,37 +43,22 @@
   </DialogLayout>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { computed } from "vue";
 import DialogLayout from "./DialogLayout";
+import { ConfirmDialogProps } from "./dialogs";
 
 const emit = defineEmits(["update:model-value", "confirm", "close"]);
-const props = defineProps({
-	...DialogLayout.props,
-	disabled: Boolean,
-	isSaving: Boolean,
-	closeOnConfirm: Boolean,
-	hideConfirm: Boolean,
-	confirmText: {
-		type: String,
-		default: "Confirm"
-	},
-	cancelText: {
-		type: String,
-		default: "Cancel"
-	},
-	confirmClass: {
-		type: String,
-		default: ""
-	},
-	contentClass: {
-		type: String,
-		default: ""
-	}
+
+const props = withDefaults(defineProps<ConfirmDialogProps>(), {
+	confirmText: "Confirm",
+	cancelText: "Cancel",
+	confirmClass: "",
+	contentClass: ""
 });
 
 const layoutProps = computed(() => ({ ...props, disabled: undefined }));
-const childSlots = computed(() => ["title", "subtitle", "default", "toolbar"]);
+const childSlots = computed(() => ["title", "subtitle", "toolbar"]);
 
 function onConfirm() {
 	emit("confirm");

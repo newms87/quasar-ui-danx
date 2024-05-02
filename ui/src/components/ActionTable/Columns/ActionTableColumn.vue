@@ -13,6 +13,7 @@
           <a
             v-if="column.onClick"
             :class="column.innerClass"
+            class="dx-column-link"
             @click="column.onClick(row)"
           >
             <RenderVnode
@@ -62,14 +63,14 @@ import ActionMenu from "../ActionMenu";
 import { TitleColumnFormat } from "./";
 
 const props = defineProps({
-  rowProps: {
-    type: Object,
-    required: true
-  },
-  settings: {
-    type: Object,
-    default: null
-  }
+	rowProps: {
+		type: Object,
+		required: true
+	},
+	settings: {
+		type: Object,
+		default: null
+	}
 });
 
 const row = computed(() => props.rowProps.row);
@@ -78,18 +79,18 @@ const value = computed(() => props.rowProps.value);
 const isSaving = computed(() => row.value.isSaving?.value);
 
 const columnStyle = computed(() => {
-  const width = props.settings?.width || column.value.width;
-  return {
-    width: width ? `${width}px` : undefined,
-    minWidth: column.value.minWidth ? `${column.value.minWidth}px` : undefined
-  };
+	const width = props.settings?.width || column.value.width;
+	return {
+		width: width ? `${width}px` : undefined,
+		minWidth: column.value.minWidth ? `${column.value.minWidth}px` : undefined
+	};
 });
 
 const columnClass = computed(() => ({
-  [column.value.class || ""]: true,
-  "is-saving": isSaving.value,
-  "justify-end": column.value.align === "right",
-  "justify-center": column.value.align === "center",
-  "justify-start": column.value.align === "left"
+	[column.value.class || ""]: true,
+	"is-saving": isSaving.value,
+	"justify-end": column.value.align === "right",
+	"justify-center": column.value.align === "center",
+	"justify-start": column.value.align === "left"
 }));
 </script>

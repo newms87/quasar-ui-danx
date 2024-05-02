@@ -84,7 +84,7 @@ const props = defineProps({
 	},
 	color: {
 		type: String,
-		default: "blue-600"
+		default: ""
 	},
 	selectedRows: {
 		type: Array,

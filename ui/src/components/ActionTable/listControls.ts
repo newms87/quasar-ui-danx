@@ -67,9 +67,9 @@ export interface ActionPanel {
 	name: string;
 	label: string;
 	category?: string;
-	enabled: boolean | (() => boolean);
-	tabVnode: () => VNode;
-	vnode: () => VNode;
+	enabled?: boolean | (() => boolean);
+	tabVnode?: () => VNode | any;
+	vnode: () => VNode | any;
 }
 
 export interface ListControlsFilter {

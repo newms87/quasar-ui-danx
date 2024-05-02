@@ -1,5 +1,5 @@
 <template>
-  <div class="rendered-form">
+  <div class="dx-rendered-form">
     <div
       v-if="form.variations > 1"
       class="mb-4"
@@ -65,7 +65,7 @@
     <div
       v-for="(field, index) in mappedFields"
       :key="field.id"
-      :class="{ 'mt-4': index > 0 }"
+      :class="{ 'mt-4': index > 0, [fieldClass]: true }"
     >
       <RenderVnode
         v-if="field.vnode"
@@ -139,6 +139,7 @@ export interface Props {
 	saving?: boolean;
 	emptyValue?: string | number | boolean;
 	canModifyVariations?: boolean;
+	fieldClass?: string;
 }
 
 const props = withDefaults(defineProps<Props>(), {

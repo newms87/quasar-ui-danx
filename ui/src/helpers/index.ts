@@ -10,6 +10,7 @@ export * from "./FlashMessages";
 export * from "./formats";
 export * from "./hotkeys";
 export * from "./multiFileUpload";
+export * from "./objectStore";
 export * from "./request";
 export * from "./routes";
 export * from "./singleFileUpload";

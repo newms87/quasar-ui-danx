@@ -1,4 +1,4 @@
-import { AnyObject } from "src/helpers/actions";
+import { AnyObject, HttpResponse } from "../types";
 import { download } from "./download";
 
 /**
@@ -20,7 +20,7 @@ export async function downloadFile(url: string, filename = "", postParams: AnyOb
 		};
 	}
 
-	const response = await fetch(url, fetchOptions);
+	const response: HttpResponse = await fetch(url, fetchOptions);
 
 	if (!response.ok) {
 		throw Error("File download failed: invalid response from server");
@@ -30,7 +30,6 @@ export async function downloadFile(url: string, filename = "", postParams: AnyOb
 
 	// Handle a JSON response (which indicates an error occurred)
 	try {
-		// @ts-expect-error data is defined on response
 		const jsonResponse = JSON.parse(new TextDecoder().decode(response.data));
 		console.error("Error downloading file:", jsonResponse);
 		errorMessage = jsonResponse.message;
@@ -54,7 +53,7 @@ export async function downloadFile(url: string, filename = "", postParams: AnyOb
  * @param response
  * @param filename
  */
-export async function downloadFileResponse(response: Response, filename = "") {
+export async function downloadFileResponse(response: HttpResponse, filename = "") {
 	const contentDisposition = getResponseHeader(
 			response,
 			"content-disposition",
@@ -82,7 +81,7 @@ export async function downloadFileResponse(response: Response, filename = "") {
  * @param defaultValue
  * @returns {*}
  */
-export function getResponseHeader(response: Response, header, defaultValue) {
+export function getResponseHeader(response: HttpResponse, header: string, defaultValue: any) {
 	if (response.headers) {
 		if (typeof response.headers.get === "function") {
 			return response.headers.get(header) || defaultValue;

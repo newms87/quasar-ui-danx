@@ -1,5 +1,5 @@
 import { DateTime, IANAZone } from "luxon";
-import { ActionTargetItem } from "./actions";
+import { ActionTargetItem, fDateOptions } from "../types";
 
 const SERVER_TZ = new IANAZone("America/Chicago");
 
@@ -8,7 +8,7 @@ const SERVER_TZ = new IANAZone("America/Chicago");
  * @param {String} dateTimeString
  * @returns {DateTime}
  */
-export function localizedDateTime(dateTimeString) {
+export function localizedDateTime(dateTimeString: string) {
 	dateTimeString = dateTimeString?.replace("T", " ");
 	// noinspection JSCheckFunctionSignatures
 	return DateTime.fromSQL(dateTimeString, { zone: SERVER_TZ }).setZone("local");
@@ -19,7 +19,7 @@ export function localizedDateTime(dateTimeString) {
  * @param dateTimeString
  * @returns {DateTime}
  */
-export function remoteDateTime(dateTimeString) {
+export function remoteDateTime(dateTimeString: string) {
 	dateTimeString = dateTimeString?.replace("T", " ");
 	// noinspection JSCheckFunctionSignatures
 	return DateTime.fromSQL(dateTimeString, { zone: "local" }).setZone(SERVER_TZ);
@@ -29,7 +29,7 @@ export function remoteDateTime(dateTimeString) {
  * @param {DateTime|String} dateTime
  * @returns {DateTime|*}
  */
-export function parseDateTime(dateTime) {
+export function parseDateTime(dateTime: string | DateTime) {
 	if (typeof dateTime === "string") {
 		dateTime = dateTime.replace("T", " ").replace(/\//g, "-");
 		return DateTime.fromSQL(dateTime);
@@ -43,7 +43,7 @@ export function parseDateTime(dateTime) {
  * @param format
  * @returns {DateTime}
  */
-export function parseQDate(date, format = "yyyy/MM/dd") {
+export function parseQDate(date: string, format = "yyyy/MM/dd") {
 	return DateTime.fromFormat(date, format);
 }
 
@@ -53,7 +53,7 @@ export function parseQDate(date, format = "yyyy/MM/dd") {
  * @param format
  * @returns {DateTime}
  */
-export function parseQDateTime(date, format = "yyyy/MM/dd HH:mm:ss") {
+export function parseQDateTime(date: string, format = "yyyy/MM/dd HH:mm:ss") {
 	return DateTime.fromFormat(date, format);
 }
 
@@ -62,7 +62,7 @@ export function parseQDateTime(date, format = "yyyy/MM/dd HH:mm:ss") {
  * @param date
  * @returns {string}
  */
-export function fQDate(date) {
+export function fQDate(date: string) {
 	return fDate(date, { format: "yyyy/MM/dd" });
 }
 
@@ -72,7 +72,7 @@ export function fQDate(date) {
  * @param options
  * @returns {string}
  */
-export function fLocalizedDateTime(dateTimeString, options = {}) {
+export function fLocalizedDateTime(dateTimeString: string, options = {}) {
 	return fDateTime(localizedDateTime(dateTimeString), options);
 }
 
@@ -85,8 +85,8 @@ export function fLocalizedDateTime(dateTimeString, options = {}) {
  * @returns {string}
  */
 export function fDateTime(
-		dateTime = null,
-		{ format = "M/d/yy h:mma", empty = "- -" } = {}
+		dateTime: string | DateTime | null = null,
+		{ format = "M/d/yy h:mma", empty = "- -" }: fDateOptions = {}
 ) {
 	const formatted = (dateTime ? parseDateTime(dateTime) : DateTime.now()).toFormat(format).toLowerCase();
 	return formatted === "invalid datetime" ? empty : formatted;
@@ -97,8 +97,8 @@ export function fDateTime(
  * @param dateTime
  * @returns {string}
  */
-export function dbDateTime(dateTime = null) {
-	return fDateTime(dateTime, { format: "yyyy-MM-dd HH:mm:ss", empty: null });
+export function dbDateTime(dateTime: string | DateTime | null = null) {
+	return fDateTime(dateTime, { format: "yyyy-MM-dd HH:mm:ss", empty: undefined });
 }
 
 /**
@@ -108,8 +108,8 @@ export function dbDateTime(dateTime = null) {
  * @param format
  * @returns {string}
  */
-export function fDate(dateTime, { empty = "--", format = "M/d/yy" } = {}) {
-	const formatted = parseDateTime(dateTime).toFormat(format);
+export function fDate(dateTime: string, { empty = "--", format = "M/d/yy" }: fDateOptions = {}) {
+	const formatted = parseDateTime(dateTime).toFormat(format || "M/d/yy");
 	return ["Invalid DateTime", "invalid datetime"].includes(formatted) ? empty : formatted;
 }
 
@@ -119,7 +119,7 @@ export function fDate(dateTime, { empty = "--", format = "M/d/yy" } = {}) {
  * @param second
  * @returns {string}
  */
-export function fSecondsToTime(second) {
+export function fSecondsToTime(second: number) {
 	const time = DateTime.now().setZone("UTC").startOf("year").set({ second });
 	const hours = Math.floor(second / 3600);
 	return (hours ? hours + ":" : "") + time.toFormat("mm:ss");
@@ -130,7 +130,7 @@ export function fSecondsToTime(second) {
  * @param amount
  * @returns {string}
  */
-export function fCurrency(amount) {
+export function fCurrency(amount: number) {
 	return new Intl.NumberFormat("en-US", {
 		style: "currency",
 		currency: "USD"
@@ -143,7 +143,7 @@ export function fCurrency(amount) {
  * @param options
  * @returns {string}
  */
-export function fNumber(number, options = {}) {
+export function fNumber(number: number, options = {}) {
 	return new Intl.NumberFormat("en-US", options).format(number);
 }
 
@@ -153,7 +153,7 @@ export function fNumber(number, options = {}) {
  * @param maxLength
  * @returns {string|*}
  */
-export function centerTruncate(str, maxLength) {
+export function centerTruncate(str: string, maxLength: number) {
 	if (str.length > maxLength) {
 		const frontCharCount = Math.floor((maxLength - 3) / 2);
 		const backCharCount = maxLength - frontCharCount - 3;
@@ -192,7 +192,7 @@ export function fPercent(num: string | number, options: FPercentOptions = {}) {
 }
 
 
-export function fPhone(value) {
+export function fPhone(value: string | number) {
 	if (!value || typeof value !== "string") {
 		return value || "";
 	}
@@ -233,5 +233,5 @@ export function fPhone(value) {
 }
 
 export function fNameOrCount(items: ActionTargetItem[] | ActionTargetItem, label: string) {
-	return Array.isArray(items) ? `${items?.length} ${label}` : `${items.name || items.id}`;
+	return Array.isArray(items) ? `${items?.length} ${label}` : `${items.title || items.name || items.id}`;
 }

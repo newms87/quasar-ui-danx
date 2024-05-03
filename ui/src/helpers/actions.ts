@@ -1,36 +1,8 @@
 import { useDebounceFn } from "@vueuse/core";
-import { Ref, shallowRef, VNode } from "vue";
+import { Ref, shallowRef } from "vue";
+import { ActionOptions, ActionTarget, AnyObject } from "../types";
 import { FlashMessages } from "./FlashMessages";
-
-export type AnyObject = { [key: string]: any };
-
-export type ActionTargetItem = {
-	id: number | string;
-	isSaving?: Ref<boolean>;
-	[key: string]: any;
-};
-export type ActionTarget = ActionTargetItem[] | ActionTargetItem | null;
-
-export interface ActionOptions {
-	name?: string;
-	label?: string;
-	menu?: boolean;
-	batch?: boolean;
-	category?: string;
-	class?: string;
-	debounce?: number;
-	trigger?: (target: ActionTarget, input: any) => Promise<any>;
-	vnode?: ((target: ActionTarget) => VNode) | any;
-	enabled?: (target: object) => boolean;
-	batchEnabled?: (targets: object[]) => boolean;
-	optimistic?: (action: ActionOptions, target: ActionTargetItem | null, input: any) => void;
-	onAction?: (action: string | null | undefined, target: ActionTargetItem | null, input: any) => Promise<any> | void;
-	onBatchAction?: (action: string | null | undefined, targets: ActionTargetItem[], input: any) => Promise<any>;
-	onStart?: (action: ActionOptions | null, targets: ActionTarget, input: any) => boolean;
-	onSuccess?: (result: any, targets: ActionTarget, input: any) => any;
-	onError?: (result: any, targets: ActionTarget, input: any) => any;
-	onFinish?: (result: any, targets: ActionTarget, input: any) => any;
-}
+import { storeObject } from "./objectStore";
 
 export const activeActionVnode: Ref = shallowRef(null);
 
@@ -128,6 +100,8 @@ export function useActions(actions: ActionOptions[], globalOptions: ActionOption
 
 		setTargetSavingState(target, false);
 
+		result.item = storeObject(result.item);
+
 		return result;
 	}
 
@@ -160,9 +134,11 @@ async function onConfirmAction(action: ActionOptions, target: ActionTarget, inpu
 		throw new Error("No onAction handler found for the selected action:" + action.name);
 	}
 
+	const isBatch = Array.isArray(target);
 	let result: any;
+	
 	try {
-		if (Array.isArray(target)) {
+		if (isBatch) {
 			if (action.onBatchAction) {
 				result = await action.onBatchAction(action.name, target, input);
 			} else {
@@ -184,12 +160,21 @@ async function onConfirmAction(action: ActionOptions, target: ActionTarget, inpu
 
 	// If there is no return value or the result marks it as successful, we show a success message
 	if (result === undefined || result === true || result?.success) {
+		// Add the item to the object store if it has a type
+		if (result && result.item) {
+			result.item = storeObject(result.item);
+		}
+
 		if (result?.success && Array.isArray(target)) {
 			FlashMessages.success(`Successfully performed action ${action.label} on ${target.length} items`);
 		}
 
 		if (action.onSuccess) {
 			action.onSuccess(result, target, input);
+		}
+
+		if (isBatch && action.onBatchSuccess) {
+			action.onBatchSuccess(result, target, input);
 		}
 	} else {
 		const errors = [];

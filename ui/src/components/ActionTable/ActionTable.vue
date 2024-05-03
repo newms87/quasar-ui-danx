@@ -62,10 +62,11 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { QTable } from "quasar";
 import { computed, ref } from "vue";
 import { getItem, setItem } from "../../helpers";
+import { ActionTargetItem, ListControlsPagination, TableColumn } from "../../types";
 import { ActionVnode } from "../Utility";
 import { ActionTableColumn, ActionTableHeaderColumn } from "./Columns";
 import EmptyTableState from "./EmptyTableState.vue";
@@ -73,50 +74,36 @@ import { mapSortBy, registerStickyScrolling } from "./listHelpers";
 import TableSummaryRow from "./TableSummaryRow.vue";
 
 defineEmits(["update:selected-rows", "update:pagination"]);
-const props = defineProps({
-	name: {
-		type: String,
-		required: true
-	},
-	label: {
-		type: String,
-		required: true
-	},
-	color: {
-		type: String,
-		default: ""
-	},
-	selectedRows: {
-		type: Array,
-		required: true
-	},
-	pagination: {
-		type: Object,
-		required: true
-	},
-	loadingList: Boolean,
-	loadingSummary: Boolean,
-	pagedItems: {
-		type: Object,
-		default: null
-	},
-	summary: {
-		type: Object,
-		default: null
-	},
-	columns: {
-		type: Array,
-		required: true
-	},
-	rowsPerPageOptions: {
-		type: Array,
-		default: () => [10, 25, 50, 100]
-	}
+
+export interface Props {
+	name: string;
+	label: string;
+	color?: string;
+	selectedRows: ActionTargetItem[];
+	pagination: ListControlsPagination;
+	loadingList?: boolean;
+	loadingSummary?: boolean;
+	pagedItems?: any;
+	summary: any;
+	columns: TableColumn[];
+	rowsPerPageOptions?: number[];
+}
+
+const props = withDefaults(defineProps<Props>(), {
+	color: "",
+	pagedItems: null,
+	summary: null,
+	loadingSummary: false,
+	rowsPerPageOptions: () => [10, 25, 50, 100]
 });
+
 const actionTable = ref(null);
 registerStickyScrolling(actionTable);
 
-const tableColumns = computed(() => props.columns.map((column) => ({ ...column, field: column.field || column.name })));
+const tableColumns = computed<TableColumn[]>(() => props.columns.map((column) => ({
+	...column,
+	field: column.field || column.name
+})));
 const hasData = computed(() => props.pagedItems?.data?.length);
 const COLUMN_SETTINGS_KEY = `column-settings-${props.name}`;
 const columnSettings = ref(getItem(COLUMN_SETTINGS_KEY) || {});

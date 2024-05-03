@@ -1,4 +1,4 @@
-import { ActionTargetItem } from "src/helpers";
+import { ActionTargetItem } from "./actions";
 
 export interface DialogLayoutProps {
 	modelValue?: string | boolean | object;

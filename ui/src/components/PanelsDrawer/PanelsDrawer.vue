@@ -57,7 +57,7 @@
 <script setup lang="ts">
 import { computed, ref, watch } from "vue";
 import { XIcon as CloseIcon } from "../../svg";
-import { ActionPanel } from "../ActionTable";
+import { ActionPanel } from "../../types";
 import { ContentDrawer } from "../Utility";
 import PanelsDrawerPanels from "./PanelsDrawerPanels";
 import PanelsDrawerTabs from "./PanelsDrawerTabs";

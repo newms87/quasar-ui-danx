@@ -1,136 +1,36 @@
-import { computed, ComputedRef, Ref, ref, ShallowRef, shallowRef, VNode, watch } from "vue";
-import { ActionTargetItem, AnyObject, getItem, setItem, waitForRef } from "../../helpers";
+import { computed, Ref, ref, shallowRef, watch } from "vue";
+import { getItem, setItem, storeObject, waitForRef } from "../../helpers";
+import {
+	ActionTargetItem,
+	AnyObject,
+	FilterGroup,
+	ListControlsFilter,
+	ListControlsOptions,
+	ListControlsPagination,
+	PagedItems
+} from "../../types";
 import { getFilterFromUrl } from "./listHelpers";
-
-export interface ActionController {
-	name: string;
-	label: string;
-	pagedItems: Ref<PagedItems | null>;
-	activeFilter: Ref<ListControlsFilter>;
-	globalFilter: Ref<ListControlsFilter>;
-	filterActiveCount: ComputedRef<number>;
-	showFilters: Ref<boolean>;
-	summary: ShallowRef<object | null>;
-	filterFieldOptions: Ref<AnyObject>;
-	selectedRows: ShallowRef<ActionTargetItem[]>;
-	isLoadingList: Ref<boolean>;
-	isLoadingFilters: Ref<boolean>;
-	isLoadingSummary: Ref<boolean>;
-	pager: ComputedRef<{
-		perPage: number;
-		page: number;
-		filter: ListControlsFilter;
-		sort: object[] | undefined;
-	}>;
-	pagination: ShallowRef<ListControlsPagination>;
-	activeItem: ShallowRef<ActionTargetItem | null>;
-	activePanel: ShallowRef<string | null>;
-
-	// Actions
-	initialize: () => void;
-	loadSummary: () => Promise<void>;
-	resetPaging: () => void;
-	setPagination: (updated: ListControlsPagination) => void;
-	setSelectedRows: (selection: ActionTargetItem[]) => void;
-	loadList: () => Promise<void>;
-	loadMore: (index: number, perPage?: number) => Promise<boolean>;
-	refreshAll: () => Promise<void[]>;
-	exportList: () => Promise<void>;
-	setActiveItem: (item: ActionTargetItem | null) => void;
-	getNextItem: (offset: number) => Promise<void>;
-	activatePanel: (item: ActionTargetItem | null, panel: string | null) => void;
-	setActiveFilter: (filter: ListControlsFilter) => void;
-	applyFilterFromUrl: (url: string, filterFields: Ref<FilterGroup[]> | null) => void;
-	setItemInList: (updatedItem: ActionTargetItem) => void;
-}
-
-export interface LabelValueItem {
-	label: string;
-	value: string | number | boolean;
-}
-
-export interface FilterField {
-	name: string;
-	label: string;
-	type: string;
-	options?: string[] | number[] | LabelValueItem[];
-	inline?: boolean;
-}
-
-export interface FilterGroup {
-	name?: string;
-	flat?: boolean;
-	fields: FilterField[];
-}
-
-export interface ActionPanel {
-	name: string | number;
-	label: string;
-	category?: string;
-	class?: string | object;
-	enabled?: boolean | (() => boolean);
-	tabVnode?: (activePanel: string) => VNode | any;
-	vnode: (activePanel: string) => VNode | any;
-}
-
-export interface ListControlsFilter {
-	[key: string]: object | object[] | null | undefined | string | number | boolean;
-}
-
-export interface ListControlsRoutes {
-	list: (pager: object) => Promise<ActionTargetItem[]>;
-	details?: (item: object) => Promise<ActionTargetItem> | null;
-	summary?: (filter: object | null) => Promise<object> | null;
-	filterFieldOptions?: (filter: object | null) => Promise<object> | null;
-	more?: (pager: object) => Promise<ActionTargetItem[]> | null;
-	export: (filter: object) => Promise<void>;
-}
-
-export interface ListControlsOptions {
-	label?: string,
-	routes: ListControlsRoutes;
-	urlPattern?: RegExp | null;
-	filterDefaults?: Record<string, object>;
-	refreshFilters?: boolean;
-}
-
-export interface ListControlsPagination {
-	__sort: object[] | null;
-	sortBy: string | null;
-	descending: boolean;
-	page: number;
-	rowsNumber: number;
-	rowsPerPage: number;
-}
-
-export interface PagedItems {
-	data: ActionTargetItem[] | undefined;
-	meta: {
-		total: number;
-		last_page?: number;
-	} | undefined;
-}
 
 export function useListControls(name: string, options: ListControlsOptions) {
 	let isInitialized = false;
 	const PAGE_SETTINGS_KEY = `dx-${name}-pager`;
-	const pagedItems: Ref<PagedItems | null> = shallowRef(null);
-	const activeFilter: Ref<ListControlsFilter> = ref({});
+	const pagedItems = shallowRef<PagedItems | null>(null);
+	const activeFilter = ref<ListControlsFilter>({});
 	const globalFilter = ref({});
 	const showFilters = ref(false);
-	const selectedRows: ShallowRef<ActionTargetItem[]> = shallowRef([]);
+	const selectedRows = shallowRef<ActionTargetItem[]>([]);
 	const isLoadingList = ref(false);
 	const isLoadingSummary = ref(false);
-	const summary: ShallowRef<object | null> = shallowRef(null);
+	const summary = shallowRef<AnyObject | null>(null);
 
 	// The active ad for viewing / editing
-	const activeItem: ShallowRef<ActionTargetItem | null> = shallowRef(null);
+	const activeItem = shallowRef<ActionTargetItem | null>(null);
 	// Controls the active panel (ie: tab) if rendering a panels drawer or similar
-	const activePanel: ShallowRef<string> = shallowRef("");
+	const activePanel = shallowRef<string>("");
 
 	// Filter fields are the field values available for the currently applied filter on Creative Groups
 	// (ie: all states available under the current filter)
-	const filterFieldOptions: Ref<AnyObject> = ref({});
+	const filterFieldOptions = ref<AnyObject>({});
 	const isLoadingFilters = ref(false);
 
 	const filterActiveCount = computed(() => Object.keys(activeFilter.value).filter(key => activeFilter.value[key] !== undefined).length);
@@ -232,7 +132,6 @@ export function useListControls(name: string, options: ListControlsOptions) {
 		if (Array.isArray(items)) {
 			data = items;
 			meta = { total: items.length };
-
 		} else if (items.data) {
 			data = items.data;
 			meta = items.meta;
@@ -244,10 +143,10 @@ export function useListControls(name: string, options: ListControlsOptions) {
 		}
 
 		// Add a reactive isSaving property to each item (for performance reasons in checking saving state)
-		data = data.map((item) => {
+		data = data.map((item: ActionTargetItem) => {
 			// We want to keep the isSaving state if it is already set, as optimizations prevent reloading the
 			// components, and therefore reactivity is not responding to the new isSaving state
-			const oldItem = pagedItems.value?.data?.find(i => i.id === item.id);
+			const oldItem = storeObject(item);
 			return { ...item, isSaving: oldItem?.isSaving || ref(false) };
 		});
 
@@ -277,23 +176,10 @@ export function useListControls(name: string, options: ListControlsOptions) {
 	}
 
 	/**
-	 * Updates a row in the paged items list with the new item data. Uses the item's id to find the row.
-	 *
-	 * @param updatedItem
+	 * Clears the selected rows in the list.
 	 */
-	function setItemInList(updatedItem: ActionTargetItem) {
-		if (updatedItem && updatedItem.id) {
-			const data = pagedItems.value?.data?.map(item => (item.id === updatedItem.id && (item.updated_at === null || item.updated_at <= updatedItem.updated_at)) ? updatedItem : item);
-			setPagedItems({
-				data,
-				meta: { total: pagedItems.value?.meta?.total || 0 }
-			});
-
-			// Update the active item as well if it is set
-			if (activeItem.value?.id === updatedItem.id) {
-				activeItem.value = { ...activeItem.value, ...updatedItem };
-			}
-		}
+	function clearSelectedRows() {
+		selectedRows.value = [];
 	}
 
 	/**
@@ -390,13 +276,11 @@ export function useListControls(name: string, options: ListControlsOptions) {
 
 		const result = await options.routes.details(activeItem.value);
 
-		// Only set the ad details if we are the response for the currently loaded item
-		// NOTE: race conditions might allow the finished loading item to be different to the currently
-		// requested item
-		if (result?.id === activeItem.value?.id) {
-			const loadedItem = pagedItems.value?.data?.find((i: ActionTargetItem) => i.id === result.id);
-			activeItem.value = { ...result, isSaving: loadedItem?.isSaving || ref(false) };
+		if (!result || !result.__type || !result.id) {
+			return console.error("Invalid response from details route: All responses must include a __type and id field. result =", result);
 		}
+
+		storeObject(result);
 	}
 
 	// Whenever the active item changes, fill the additional item details
@@ -506,6 +390,7 @@ export function useListControls(name: string, options: ListControlsOptions) {
 		resetPaging,
 		setPagination,
 		setSelectedRows,
+		clearSelectedRows,
 		loadList,
 		loadMore,
 		refreshAll,
@@ -515,7 +400,6 @@ export function useListControls(name: string, options: ListControlsOptions) {
 		activatePanel,
 		setActiveFilter,
 		applyFilterFromUrl,
-		setItemInList,
 		getFieldOptions
 	};
 }

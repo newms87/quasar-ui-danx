@@ -1,30 +1,6 @@
-import { computed, ref, VNode, watch } from "vue";
-import { ActionOptions, getItem, setItem } from "../../helpers";
-
-export interface TableColumn {
-	actionMenu?: ActionOptions[],
-	align?: string,
-	category?: string,
-	class?: string | object,
-	field: string,
-	format?: (value: any, options: any) => any,
-	innerClass?: string | object,
-	style?: string | object,
-	headerStyle?: string | object,
-	isSavingRow?: boolean | (() => boolean),
-	label: string,
-	maxWidth?: number,
-	minWidth?: number,
-	name: string,
-	onClick?: (target: any) => void,
-	required?: boolean,
-	resizeable?: boolean,
-	sortable?: boolean,
-	sortBy?: string,
-	sortByExpression?: string,
-	titleColumns?: () => string[],
-	vnode?: () => VNode,
-}
+import { computed, ref, watch } from "vue";
+import { getItem, setItem } from "../../helpers";
+import { TableColumn } from "../../types";
 
 export function useTableColumns(name: string, columns: TableColumn[]) {
 	const COLUMN_ORDER_KEY = `${name}-column-order`;

@@ -21,8 +21,8 @@
 <script setup lang="ts">
 import { computed } from "vue";
 import { fNameOrCount } from "../../../helpers";
+import { ConfirmActionDialogProps } from "../../../types";
 import { default as ConfirmDialog } from "./ConfirmDialog";
-import { ConfirmActionDialogProps } from "./dialogs";
 
 defineEmits(["confirm", "close"]);
 

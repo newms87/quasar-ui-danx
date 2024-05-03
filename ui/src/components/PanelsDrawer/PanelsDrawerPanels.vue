@@ -17,7 +17,7 @@
 </template>
 
 <script setup lang="ts">
-import { ActionPanel } from "src/components/ActionTable";
+import { ActionPanel } from "../../types";
 import { RenderVnode } from "../Utility";
 
 defineProps<{

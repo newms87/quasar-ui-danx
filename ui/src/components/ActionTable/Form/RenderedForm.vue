@@ -115,6 +115,7 @@ import { ExclamationCircleIcon as MissingIcon, PencilIcon as EditIcon } from "@h
 import { computed, ref } from "vue";
 import { FlashMessages, incrementName, replace } from "../../../helpers";
 import { TrashIcon as RemoveIcon } from "../../../svg";
+import { Form, FormFieldValue } from "../../../types";
 import { ConfirmDialog, RenderVnode } from "../../Utility";
 import {
 	BooleanField,
@@ -127,7 +128,6 @@ import {
 	TextField,
 	WysiwygField
 } from "./Fields";
-import { Form, FormFieldValue } from "./form.d.ts";
 
 export interface Props {
 	values?: FormFieldValue[] | object;
@@ -144,7 +144,8 @@ export interface Props {
 
 const props = withDefaults(defineProps<Props>(), {
 	values: null,
-	emptyValue: undefined
+	emptyValue: undefined,
+	fieldClass: ""
 });
 
 const emit = defineEmits(["update:values"]);
@@ -184,7 +185,7 @@ const variationNames = computed(() => {
 
 const currentVariation = ref(variationNames.value[0] || "");
 const newVariationName = ref("");
-const variationToEdit = ref(false);
+const variationToEdit = ref<boolean | string>(false);
 const variationToDelete = ref("");
 const canAddVariation = computed(() => props.canModifyVariations && !props.readonly && !props.disable && variationNames.value.length < props.form.variations);
 

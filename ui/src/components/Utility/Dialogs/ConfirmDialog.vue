@@ -45,8 +45,8 @@
 
 <script setup lang="ts">
 import { computed } from "vue";
+import { ConfirmDialogProps } from "../../../types";
 import DialogLayout from "./DialogLayout";
-import { ConfirmDialogProps } from "./dialogs";
 
 const emit = defineEmits(["update:model-value", "confirm", "close"]);
 

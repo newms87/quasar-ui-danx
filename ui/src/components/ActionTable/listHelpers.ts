@@ -1,7 +1,6 @@
-import { ListControlsPagination } from "src/components/ActionTable/listControls";
-import { TableColumn } from "src/components/ActionTable/tableColumns";
 import { onMounted, Ref } from "vue";
-import { AnyObject, getUrlParam } from "../../helpers";
+import { getUrlParam } from "../../helpers";
+import { AnyObject, ListControlsPagination, TableColumn } from "../../types";
 
 export function registerStickyScrolling(tableRef: Ref) {
 	onMounted(() => {

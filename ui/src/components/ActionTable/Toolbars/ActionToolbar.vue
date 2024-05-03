@@ -30,7 +30,7 @@
   </div>
 </template>
 <script setup lang="ts">
-import { ActionOptions, ActionTargetItem } from "../../../helpers";
+import { ActionOptions, ActionTargetItem } from "../../../types";
 import { ExportButton, RefreshButton } from "../../Utility";
 import ActionMenu from "../ActionMenu";
 

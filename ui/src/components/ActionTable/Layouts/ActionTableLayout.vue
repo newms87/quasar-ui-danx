@@ -65,13 +65,11 @@
 </template>
 <script setup lang="ts">
 import { computed } from "vue";
-import { ActionOptions } from "../../../helpers";
+import { ActionController, ActionOptions, ActionPanel, FilterGroup, TableColumn } from "../../../types";
 import { PanelsDrawer } from "../../PanelsDrawer";
 import { PreviousNextControls } from "../../Utility";
 import ActionTable from "../ActionTable";
 import { CollapsableFiltersSidebar } from "../Filters";
-import { ActionController, ActionPanel, FilterGroup } from "../listControls";
-import { TableColumn } from "../tableColumns";
 import { ActionToolbar } from "../Toolbars";
 
 const props = defineProps<{

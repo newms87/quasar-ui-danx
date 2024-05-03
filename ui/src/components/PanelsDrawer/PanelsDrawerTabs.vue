@@ -30,7 +30,7 @@
 </template>
 <script setup lang="ts">
 import { QTab } from "quasar";
-import { ActionPanel } from "src/components/ActionTable";
+import { ActionPanel } from "../../types";
 import { RenderVnode } from "../Utility";
 
 defineEmits(["update:model-value"]);

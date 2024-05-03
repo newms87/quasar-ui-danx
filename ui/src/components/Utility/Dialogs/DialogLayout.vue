@@ -59,7 +59,7 @@
 
 <script setup lang="ts">
 import { XIcon as CloseIcon } from "@heroicons/vue/outline";
-import { DialogLayoutProps } from "./dialogs";
+import { DialogLayoutProps } from "../../../types";
 
 const emit = defineEmits(["close"]);
 

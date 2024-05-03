@@ -1,5 +1,4 @@
-import { ListControlsPagination } from "../components";
-import { ActionTargetItem, AnyObject } from "./actions";
+import { ActionTargetItem, AnyObject, ListControlsPagination } from "../types";
 import { downloadFile } from "./downloadPdf";
 import { request } from "./request";
 

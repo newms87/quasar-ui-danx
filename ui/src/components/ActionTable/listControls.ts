@@ -281,7 +281,8 @@ export function useListControls(name: string, options: ListControlsOptions): Act
 			return console.error("Invalid response from details route: All responses must include a __type and id field. result =", result);
 		}
 
-		storeObject(result);
+		// Reassign the active item to the store object to ensure reactivity
+		activeItem.value = { ...storeObject(result) };
 	}
 
 	// Whenever the active item changes, fill the additional item details

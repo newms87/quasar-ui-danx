@@ -100,7 +100,9 @@ export function useActions(actions: ActionOptions[], globalOptions: ActionOption
 
 		setTargetSavingState(target, false);
 
-		result.item = storeObject(result.item);
+		if (result?.item) {
+			result.item = storeObject(result.item);
+		}
 
 		return result;
 	}
@@ -136,7 +138,7 @@ async function onConfirmAction(action: ActionOptions, target: ActionTarget, inpu
 
 	const isBatch = Array.isArray(target);
 	let result: any;
-	
+
 	try {
 		if (isBatch) {
 			if (action.onBatchAction) {

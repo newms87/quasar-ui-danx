@@ -47,6 +47,12 @@
 			.q-field__control-container {
 				padding-top: 1.1rem;
 			}
+
+			&.q-textarea {
+				.q-field__control-container {
+					padding-bottom: 1.1rem;
+				}
+			}
 		}
 
 		.q-field__marginal, .q-field__input, .q-field__label {

@@ -6,7 +6,7 @@ export interface TableColumn {
 	align?: string,
 	category?: string,
 	class?: string | object,
-	field: string,
+	field?: string,
 	format?: (value: any, options: any) => any,
 	innerClass?: string | object,
 	style?: string | object,

@@ -30,15 +30,17 @@ export interface ActionController {
 	resetPaging: () => void;
 	setPagination: (updated: ListControlsPagination) => void;
 	setSelectedRows: (selection: ActionTargetItem[]) => void;
+	clearSelectedRows: () => void;
 	loadList: (filter) => Promise<void>;
 	loadMore: (index: number, perPage?: number) => Promise<boolean>;
 	refreshAll: () => Promise<void[]>;
 	exportList: (filter) => Promise<void>;
 	setActiveItem: (item: ActionTargetItem | null) => void;
 	getNextItem: (offset: number) => Promise<void>;
-	activatePanel: (item: ActionTargetItem | null, panel: string | null) => void;
+	activatePanel: (item: ActionTargetItem | null, panel: string) => void;
 	setActiveFilter: (filter: ListControlsFilter) => void;
 	applyFilterFromUrl: (url: string, filterFields?: Ref<FilterGroup[]> | null) => void;
+	getFieldOptions: (field: string) => any[];
 }
 
 export interface LabelValueItem {

@@ -50,7 +50,5 @@ export function storeObject<T extends TypedObject>(newObject: T): T {
 	}
 
 	store.set(objectKey, newObject);
-
-	console.log(objectKey, newObject);
 	return newObject;
 }

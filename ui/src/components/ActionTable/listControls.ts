@@ -1,6 +1,7 @@
 import { computed, Ref, ref, shallowRef, watch } from "vue";
 import { getItem, setItem, storeObject, waitForRef } from "../../helpers";
 import {
+	ActionController,
 	ActionTargetItem,
 	AnyObject,
 	FilterGroup,
@@ -11,7 +12,7 @@ import {
 } from "../../types";
 import { getFilterFromUrl } from "./listHelpers";
 
-export function useListControls(name: string, options: ListControlsOptions) {
+export function useListControls(name: string, options: ListControlsOptions): ActionController {
 	let isInitialized = false;
 	const PAGE_SETTINGS_KEY = `dx-${name}-pager`;
 	const pagedItems = shallowRef<PagedItems | null>(null);
@@ -89,7 +90,7 @@ export function useListControls(name: string, options: ListControlsOptions) {
 	/**
 	 * Gets the field options for the given field name.
 	 */
-	function getFieldOptions(field: string) {
+	function getFieldOptions(field: string): any[] {
 		return filterFieldOptions.value[field] || [];
 	}
 
@@ -185,8 +186,8 @@ export function useListControls(name: string, options: ListControlsOptions) {
 	/**
 	 * Loads more items into the list.
 	 */
-	async function loadMore(index: number, perPage = undefined) {
-		if (!options.routes.more) return;
+	async function loadMore(index: number, perPage: number | undefined = undefined) {
+		if (!options.routes.more) return false;
 
 		const newItems = await options.routes.more({
 			page: index + 1,
@@ -296,7 +297,7 @@ export function useListControls(name: string, options: ListControlsOptions) {
 	/**
 	 * Opens the item's form with the given item and tab
 	 */
-	function activatePanel(item: ActionTargetItem | null, panel: string) {
+	function activatePanel(item: ActionTargetItem | null, panel: string = "") {
 		activeItem.value = item;
 		activePanel.value = panel;
 	}

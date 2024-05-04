@@ -1,7 +1,8 @@
 import { reactive, UnwrapNestedRefs } from "vue";
 
 export interface TypedObject {
-	id: string | number;
+	id?: string | number;
+	name?: string;
 	__type: string;
 
 	[key: string]: TypedObject[] | any;
@@ -17,9 +18,11 @@ const store = new Map<string, any>();
  * @returns {TypedObject}
  */
 export function storeObject<T extends TypedObject>(newObject: T): UnwrapNestedRefs<T> {
-	if (!newObject.id || !newObject.__type) return reactive(newObject);
+	const id = newObject.id || newObject.name;
+	const type = newObject.__type;
+	if (!id || !type) return reactive(newObject);
 
-	const objectKey = newObject.__type + ":" + newObject.id;
+	const objectKey = `${type}:${id}`;
 
 	let reactiveObject;
 	const oldObject: UnwrapNestedRefs<T> | undefined = store.get(objectKey);

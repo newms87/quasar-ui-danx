@@ -33,6 +33,7 @@ export interface ActionController {
 	clearSelectedRows: () => void;
 	loadList: (filter) => Promise<void>;
 	loadMore: (index: number, perPage?: number) => Promise<boolean>;
+	getActiveItemDetails: () => Promise<void>;
 	refreshAll: () => Promise<void[]>;
 	exportList: (filter) => Promise<void>;
 	setActiveItem: (item: ActionTargetItem | null) => void;
@@ -129,8 +130,9 @@ export interface ActionOptions {
 	category?: string;
 	class?: string;
 	debounce?: number;
+	isApplying?: boolean;
 	optimistic?: boolean | ((action: ActionOptions, target: ActionTargetItem | null, input: any) => void);
-	trigger?: (target: ActionTarget, input: any) => Promise<any>;
+	trigger?: (target?: ActionTarget, input?: any) => Promise<any>;
 	vnode?: ((target: ActionTarget) => VNode) | any;
 	enabled?: (target: object) => boolean;
 	batchEnabled?: (targets: object[]) => boolean;
@@ -141,4 +143,5 @@ export interface ActionOptions {
 	onBatchSuccess?: (result: any, targets: ActionTargetItem[], input: any) => any;
 	onError?: (result: any, targets: ActionTarget, input: any) => any;
 	onFinish?: (result: any, targets: ActionTarget, input: any) => any;
+	__type?: string;
 }

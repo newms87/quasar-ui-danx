@@ -1,5 +1,6 @@
 import { useDebounceFn } from "@vueuse/core";
-import { Ref, shallowRef } from "vue";
+import { uid } from "quasar";
+import { isReactive, Ref, shallowRef } from "vue";
 import { ActionOptions, ActionTarget, AnyObject } from "../types";
 import { FlashMessages } from "./FlashMessages";
 import { storeObject } from "./objectStore";
@@ -14,46 +15,65 @@ export const activeActionVnode: Ref = shallowRef(null);
  * @param {ActionOptions | null} globalOptions
  */
 export function useActions(actions: ActionOptions[], globalOptions: ActionOptions | null = null) {
-	const mappedActions = actions.map(action => {
-		const mappedAction: ActionOptions = { ...globalOptions, ...action };
-		if (mappedAction.debounce) {
-			mappedAction.trigger = useDebounceFn((target, input) => performAction(mappedAction, target, input, true), mappedAction.debounce);
-		} else if (!mappedAction.trigger) {
-			mappedAction.trigger = (target, input) => performAction(mappedAction, target, input, true);
-		}
-		return mappedAction;
-	});
+	const namespace = uid();
 
 	/**
-	 * Set the reactive saving state of a target
+	 * Resolve the action object based on the provided name (or return the object if the name is already an object)
 	 */
-	function setTargetSavingState(target: ActionTarget, saving: boolean) {
-		if (!target) return;
-		target = Array.isArray(target) ? target : [target];
-		for (const t of target) {
-			t.isSaving = saving;
+	function getAction(action: string | ActionOptions): ActionOptions {
+		if (typeof action === "string") {
+			action = actions.find(a => a.name === action) || { name: action };
 		}
+
+		// If the action is already reactive, return it
+		if (isReactive(action) && action.__type) return action;
+
+		action = { ...globalOptions, ...action };
+
+		// Assign Trigger function if it doesn't exist
+		if (!action.trigger) {
+			if (action.debounce) {
+				action.trigger = useDebounceFn((target, input) => performAction(action, target, input), action.debounce);
+			} else {
+				action.trigger = (target, input) => performAction(action, target, input);
+			}
+		}
+
+		// Set the initial state for the action
+		action.isApplying = false;
+
+		return storeObject({ ...action, __type: "__Action:" + namespace });
+	}
+
+	/**
+	 * Filter the list of actions based on the provided filters in key-value pairs
+	 * You can filter on any ActionOptions property by matching the value exactly or by providing an array of values
+	 *
+	 * @param filters
+	 * @returns {ActionOptions[]}
+	 */
+	function getActions(filters?: AnyObject): ActionOptions[] {
+		let filteredActions = [...actions];
+
+		if (filters) {
+			for (const filter of Object.keys(filters)) {
+				const filterValue = filters[filter];
+				filteredActions = filteredActions.filter((a: AnyObject) => a[filter] === filterValue || (Array.isArray(filterValue) && filterValue.includes(a[filter])));
+			}
+		}
+
+		return filteredActions.map((a: AnyObject) => getAction(a));
 	}
 
 	/**
 	 * Perform an action on a set of targets
 	 *
-	 * @param {string} name - can either be a string or an action object
+	 * @param {string} action - can either be a string or an action object
 	 * @param {object[]|object} target - an array of targets or a single target object
 	 * @param {any} input - The input data to pass to the action handler
-	 * @param isTriggered - Whether the action was triggered by a trigger function
 	 */
-	async function performAction(name: string | object, target: ActionTarget = null, input: any = null, isTriggered = false) {
-		const action: ActionOptions | null | undefined = typeof name === "string" ? mappedActions.find(a => a.name === name) : name;
-		if (!action) {
-			throw new Error(`Unknown action: ${name}`);
-		}
-
-		// We always want to call the trigger function if it exists, unless it's already been triggered
-		// This provides behavior like debounce and custom action resolution
-		if (action.trigger && !isTriggered) {
-			return action.trigger(target, input);
-		}
+	async function performAction(action: string | ActionOptions, target: ActionTarget = null, input: any = null) {
+		action = getAction(action);
 
 		const vnode = action.vnode && action.vnode(target);
 		let result: any;
@@ -66,6 +86,7 @@ export function useActions(actions: ActionOptions[], globalOptions: ActionOption
 		}
 
 		setTargetSavingState(target, true);
+		action.isApplying = true;
 
 		// If additional input is required, first render the vnode and wait for the confirm or cancel action
 		if (vnode) {
@@ -94,6 +115,7 @@ export function useActions(actions: ActionOptions[], globalOptions: ActionOption
 			result = await onConfirmAction(action, target, input);
 		}
 
+		action.isApplying = false;
 		setTargetSavingState(target, false);
 
 		if (result?.item) {
@@ -103,30 +125,31 @@ export function useActions(actions: ActionOptions[], globalOptions: ActionOption
 		return result;
 	}
 
-	/**
-	 * Filter the list of actions based on the provided filters in key-value pairs
-	 * You can filter on any ActionOptions property by matching the value exactly or by providing an array of values
-	 *
-	 * @param filters
-	 * @returns {ActionOptions[]}
-	 */
-	function filterActions(filters: AnyObject): ActionOptions[] {
-		let filteredActions = [...mappedActions];
-
-		for (const filter of Object.keys(filters)) {
-			const filterValue = filters[filter];
-			filteredActions = filteredActions.filter((a: AnyObject) => a[filter] === filterValue || (Array.isArray(filterValue) && filterValue.includes(a[filter])));
-		}
-		return filteredActions;
-	}
-
 	return {
-		actions: mappedActions,
-		filterActions,
-		performAction
+		getAction,
+		getActions
 	};
 }
 
+/**
+ * Set the reactive saving state of a target
+ */
+function setTargetSavingState(target: ActionTarget, saving: boolean) {
+	if (!target) return;
+	target = Array.isArray(target) ? target : [target];
+	for (const t of target) {
+		t.isSaving = saving;
+	}
+}
+
+/**
+ * Execute the confirmed action on the target (ie: calling the server, or whatever the callback function does).
+ *
+ * 1. If the action has an optimistic callback, it will be called before the actual action to immediately update the UI (non batch actions only).
+ * 2. Call the onBatchAction or onAction callback of the action object, depending on if the target is an array or not.
+ * 3. Call the onSuccess or onError callback based on the result of the action.
+ * 4. Call the onFinish callback of the action object.
+ */
 async function onConfirmAction(action: ActionOptions, target: ActionTarget, input: any = null) {
 	if (!action.onAction) {
 		throw new Error("No onAction handler found for the selected action:" + action.name);

@@ -395,6 +395,7 @@ export function useListControls(name: string, options: ListControlsOptions): Act
 		clearSelectedRows,
 		loadList,
 		loadMore,
+		getActiveItemDetails,
 		refreshAll,
 		exportList,
 		setActiveItem,

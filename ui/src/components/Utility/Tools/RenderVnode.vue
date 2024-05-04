@@ -5,7 +5,7 @@ const RenderVnode = (props) => {
 	if (isVNode(props.vnode)) {
 		return props.vnode;
 	}
-	
+
 	if (isRef(props.vnode)) {
 		return props.vnode.value;
 	}

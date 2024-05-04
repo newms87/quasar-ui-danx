@@ -145,10 +145,10 @@ export function useListControls(name: string, options: ListControlsOptions): Act
 
 		// Add a reactive isSaving property to each item (for performance reasons in checking saving state)
 		data = data.map((item: ActionTargetItem) => {
+			item.isSaving = item.isSaving === undefined ? false : item.isSaving;
 			// We want to keep the isSaving state if it is already set, as optimizations prevent reloading the
 			// components, and therefore reactivity is not responding to the new isSaving state
-			const oldItem = storeObject(item);
-			return { ...item, isSaving: oldItem?.isSaving || ref(false) };
+			return storeObject(item);
 		});
 
 		pagedItems.value = { data, meta };

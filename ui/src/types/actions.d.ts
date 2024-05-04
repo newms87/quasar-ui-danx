@@ -114,7 +114,7 @@ export type AnyObject = { [key: string]: any };
 
 export type ActionTargetItem = AnyObject & {
 	id: number | string;
-	isSaving?: Ref<boolean>;
+	isSaving?: boolean;
 	__type: string;
 };
 
@@ -122,17 +122,18 @@ export type ActionTarget = ActionTargetItem[] | ActionTargetItem | null;
 
 export interface ActionOptions {
 	name?: string;
+	alias?: string;
 	label?: string;
 	menu?: boolean;
 	batch?: boolean;
 	category?: string;
 	class?: string;
 	debounce?: number;
+	optimistic?: boolean | ((action: ActionOptions, target: ActionTargetItem | null, input: any) => void);
 	trigger?: (target: ActionTarget, input: any) => Promise<any>;
 	vnode?: ((target: ActionTarget) => VNode) | any;
 	enabled?: (target: object) => boolean;
 	batchEnabled?: (targets: object[]) => boolean;
-	optimistic?: (action: ActionOptions, target: ActionTargetItem | null, input: any) => void;
 	onAction?: (action: string | null | undefined, target: ActionTargetItem | null, input: any) => Promise<any> | void;
 	onBatchAction?: (action: string | null | undefined, targets: ActionTargetItem[], input: any) => Promise<any>;
 	onStart?: (action: ActionOptions | null, targets: ActionTarget, input: any) => boolean;

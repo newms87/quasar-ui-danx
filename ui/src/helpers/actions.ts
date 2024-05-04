@@ -31,11 +31,7 @@ export function useActions(actions: ActionOptions[], globalOptions: ActionOption
 		if (!target) return;
 		target = Array.isArray(target) ? target : [target];
 		for (const t of target) {
-			if (!t.isSaving) {
-				t.isSaving = shallowRef(saving);
-			} else {
-				t.isSaving.value = saving;
-			}
+			t.isSaving = saving;
 		}
 	}
 
@@ -142,18 +138,20 @@ async function onConfirmAction(action: ActionOptions, target: ActionTarget, inpu
 	try {
 		if (isBatch) {
 			if (action.onBatchAction) {
-				result = await action.onBatchAction(action.name, target, input);
+				result = await action.onBatchAction(action.alias || action.name, target, input);
 			} else {
 				result = { error: `Action ${action.name} does not support batch actions` };
 			}
 		} else {
 			// If the action has an optimistic callback, we call it before the actual action to immediately
 			// update the UI
-			if (action.optimistic) {
+			if (typeof action.optimistic === "function") {
 				action.optimistic(action, target, input);
+			} else if (action.optimistic) {
+				storeObject({ ...target, ...input });
 			}
 
-			result = await action.onAction(action.name, target, input);
+			result = await action.onAction(action.alias || action.name, target, input);
 		}
 	} catch (e) {
 		console.error(e);

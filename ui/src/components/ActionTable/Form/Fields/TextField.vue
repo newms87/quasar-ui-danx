@@ -1,43 +1,53 @@
 <template>
   <div>
-    <QInput
-      v-if="!readonly"
-      :data-dusk="'text-field-' + field?.id"
-      :data-testid="'text-field-' + field?.id"
-      :placeholder="field?.placeholder"
-      outlined
-      dense
-      :autogrow="autogrow"
-      :disable="disabled"
-      :label-slot="!noLabel"
-      :input-class="inputClass"
-      :class="parentClass"
-      stack-label
-      :type="type"
-      :model-value="modelValue"
-      :debounce="debounce"
-      @keydown.enter="$emit('submit')"
-      @update:model-value="$emit('update:model-value', $event)"
-    >
-      <template #label>
-        <FieldLabel
-          :field="field"
-          :label="label"
-          :show-name="showName"
-          :class="labelClass"
-        />
-      </template>
-    </QInput>
     <div v-if="readonly">
       <LabelValueBlock
         :label="label || field.label"
         :value="modelValue"
       />
     </div>
+    <template v-else>
+      <QInput
+        :data-dusk="'text-field-' + field?.id"
+        :data-testid="'text-field-' + field?.id"
+        :placeholder="field?.placeholder"
+        outlined
+        dense
+        :autogrow="autogrow"
+        :disable="disabled"
+        :label-slot="!noLabel"
+        :input-class="inputClass"
+        :class="parentClass"
+        stack-label
+        :type="type"
+        :model-value="modelValue"
+        :maxlength="allowOverMax ? undefined : field?.maxLength"
+        :debounce="debounce"
+        @keydown.enter="$emit('submit')"
+        @update:model-value="$emit('update:model-value', $event)"
+      >
+        <template #label>
+          <FieldLabel
+            :field="field"
+            :label="label"
+            :show-name="showName"
+            :class="labelClass"
+          />
+        </template>
+      </QInput>
+      <div
+        v-if="maxLength"
+        class="danx-input-chars mt-1"
+        :class="{'danx-input-chars--error': modelValue.length > maxLength}"
+      >
+        {{ fNumber(modelValue.length) }} / {{ fNumber(maxLength) }} characters
+      </div>
+    </template>
   </div>
 </template>
 
 <script setup>
+import { fNumber } from "../../../../helpers";
 import FieldLabel from "./FieldLabel";
 import LabelValueBlock from "./LabelValueBlock";
 
@@ -70,6 +80,11 @@ defineProps({
 	inputClass: {
 		type: String,
 		default: ""
+	},
+	allowOverMax: Boolean,
+	maxLength: {
+		type: Number,
+		default: null
 	},
 	autogrow: Boolean,
 	noLabel: Boolean,

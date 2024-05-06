@@ -14,6 +14,8 @@ export interface FormField {
 	component?: any;
 	required?: boolean;
 	required_group?: string;
+	maxLength?: number;
+	minLength?: number;
 	options?: FormFieldOption[];
 }
 

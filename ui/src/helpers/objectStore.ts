@@ -24,7 +24,6 @@ export function storeObject<T extends TypedObject>(newObject: T): UnwrapNestedRe
 
 	const objectKey = `${type}:${id}`;
 
-	let reactiveObject;
 	const oldObject: UnwrapNestedRefs<T> | undefined = store.get(objectKey);
 
 	// Apply all properties from newObject to oldObject then store and return the updated object
@@ -35,13 +34,9 @@ export function storeObject<T extends TypedObject>(newObject: T): UnwrapNestedRe
 		if (oldTimestamp && newTimestamp && newTimestamp < oldTimestamp) {
 			return oldObject;
 		}
-
-		// If the new object is newer, apply all properties from the new object to the old object
-		Object.assign(oldObject, newObject);
-		reactiveObject = oldObject;
 	}
 
-	// Store all the children of the object as well
+	// Recursively store all the children of the object as well
 	for (const key of Object.keys(newObject)) {
 		const value = newObject[key];
 		if (Array.isArray(value) && value.length > 0 && typeof value[0] === "object") {
@@ -51,10 +46,14 @@ export function storeObject<T extends TypedObject>(newObject: T): UnwrapNestedRe
 		}
 	}
 
-	if (!reactiveObject) {
-		reactiveObject = reactive(newObject);
+	// Update the old object with the new object properties
+	if (oldObject) {
+		// If the new object is newer, apply all properties from the new object to the old object
+		Object.assign(oldObject, newObject);
+		return oldObject;
 	}
 
+	const reactiveObject = reactive(newObject);
 	store.set(objectKey, reactiveObject);
 	return reactiveObject;
 }

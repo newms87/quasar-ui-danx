@@ -74,6 +74,8 @@ export function useActions(actions: ActionOptions[], globalOptions: ActionOption
 	 */
 	async function performAction(action: string | ActionOptions, target: ActionTarget = null, input: any = null) {
 		action = getAction(action);
+		// Resolve the original action, if the current action is an alias
+		const aliasedAction = action.alias ? getAction(action.alias) : null;
 
 		const vnode = action.vnode && action.vnode(target);
 		let result: any;
@@ -87,6 +89,10 @@ export function useActions(actions: ActionOptions[], globalOptions: ActionOption
 
 		setTargetSavingState(target, true);
 		action.isApplying = true;
+
+		if (aliasedAction) {
+			aliasedAction.isApplying = true;
+		}
 
 		// If additional input is required, first render the vnode and wait for the confirm or cancel action
 		if (vnode) {
@@ -117,6 +123,10 @@ export function useActions(actions: ActionOptions[], globalOptions: ActionOption
 
 		action.isApplying = false;
 		setTargetSavingState(target, false);
+
+		if (aliasedAction) {
+			aliasedAction.isApplying = false;
+		}
 
 		if (result?.item) {
 			result.item = storeObject(result.item);

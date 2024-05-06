@@ -1,3 +1,4 @@
+import { TypedObject } from "src/helpers";
 import { ComputedRef, Ref, ShallowRef, VNode } from "vue";
 
 export interface ActionController {
@@ -113,11 +114,9 @@ export interface PagedItems {
 
 export type AnyObject = { [key: string]: any };
 
-export type ActionTargetItem = AnyObject & {
-	id: number | string;
+export interface ActionTargetItem extends TypedObject {
 	isSaving?: boolean;
-	__type: string;
-};
+}
 
 export type ActionTarget = ActionTargetItem[] | ActionTargetItem | null;
 

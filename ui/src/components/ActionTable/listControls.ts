@@ -282,7 +282,7 @@ export function useListControls(name: string, options: ListControlsOptions): Act
 		}
 
 		// Reassign the active item to the store object to ensure reactivity
-		activeItem.value = { ...storeObject(result) };
+		activeItem.value = storeObject(result);
 	}
 
 	// Whenever the active item changes, fill the additional item details
@@ -299,7 +299,7 @@ export function useListControls(name: string, options: ListControlsOptions): Act
 	 * Opens the item's form with the given item and tab
 	 */
 	function activatePanel(item: ActionTargetItem | null, panel: string = "") {
-		activeItem.value = item;
+		setActiveItem(item);
 		activePanel.value = panel;
 	}
 
@@ -307,7 +307,7 @@ export function useListControls(name: string, options: ListControlsOptions): Act
 	 * Sets the currently active item in the list.
 	 */
 	function setActiveItem(item: ActionTargetItem | null) {
-		activeItem.value = item;
+		activeItem.value = item ? storeObject(item) : item;
 	}
 
 	/**

@@ -36,7 +36,7 @@
         </template>
       </QInput>
       <MaxLengthCounter
-        :length="modelValue"
+        :length="modelValue?.length || 0"
         :max-length="field?.maxLength"
       />
     </template>

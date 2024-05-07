@@ -1,5 +1,6 @@
 import { DateTime, IANAZone } from "luxon";
 import { ActionTargetItem, fDateOptions } from "../types";
+import { isJSON } from "./utils";
 
 const SERVER_TZ = new IANAZone("America/Chicago");
 
@@ -234,4 +235,27 @@ export function fPhone(value: string | number) {
 
 export function fNameOrCount(items: ActionTargetItem[] | ActionTargetItem, label: string) {
 	return Array.isArray(items) ? `${items?.length} ${label}` : `${items.title || items.name || items.id}`;
+}
+
+export function fJSON(string: string | object) {
+	if (!string) {
+		return string;
+	}
+
+	try {
+		if (typeof string === "object") {
+			return JSON.stringify(string, null, 2);
+		}
+		return JSON.stringify(JSON.parse(string), null, 2);
+	} catch (e) {
+		return string;
+	}
+}
+
+export function fMarkdownJSON(string: string | object): string {
+	if (isJSON(string)) {
+		return `\`\`\`json\n${fJSON(string)}\n\`\`\``;
+	}
+	// @ts-expect-error Guaranteed to only allow strings here using isJSON check
+	return string;
 }

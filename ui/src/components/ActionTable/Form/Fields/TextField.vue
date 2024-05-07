@@ -35,19 +35,16 @@
           />
         </template>
       </QInput>
-      <div
-        v-if="maxLength"
-        class="danx-input-chars mt-1"
-        :class="{'danx-input-chars--error': modelValue.length > maxLength}"
-      >
-        {{ fNumber(modelValue.length) }} / {{ fNumber(maxLength) }} characters
-      </div>
+      <MaxLengthCounter
+        :length="modelValue"
+        :max-length="field?.maxLength"
+      />
     </template>
   </div>
 </template>
 
 <script setup>
-import { fNumber } from "../../../../helpers";
+import MaxLengthCounter from "../Utilities/MaxLengthCounter";
 import FieldLabel from "./FieldLabel";
 import LabelValueBlock from "./LabelValueBlock";
 

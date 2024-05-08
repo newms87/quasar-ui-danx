@@ -5,8 +5,8 @@ export const danxOptions = shallowRef<DanxOptions>({
 	tinyMceApiKey: "set-api-key-in-danx-options",
 	fileUpload: {
 		directory: "file-upload",
-		presignedUploadUrl: null,
-		uploadCompletedUrl: null
+		presignedUploadUrl: (path, name, mime) => ``,
+		uploadCompletedUrl: (fileId) => ""
 	},
 	flashMessages: {
 		default: {},

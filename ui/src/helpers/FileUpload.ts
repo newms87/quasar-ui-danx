@@ -1,6 +1,6 @@
 import { uid } from "quasar";
 import { danxOptions } from "../config";
-import { FileUploadOptions, UploadedFile } from "../types";
+import { FileUploadOptions, UploadedFile, VoidCallback } from "../types";
 import { resolveFileLocation } from "./files";
 import { FlashMessages } from "./FlashMessages";
 
@@ -9,11 +9,11 @@ export class FileUpload {
 	fileUploads: UploadedFile[] = [];
 	onErrorCb: ((error) => void) | null = null;
 	onProgressCb: ((file) => void) | null = null;
-	onCompleteCb: (() => void) | null = null;
-	onAllCompleteCb: (() => void) | null = null;
-	options: FileUploadOptions | null = {};
+	onCompleteCb: VoidCallback | null = null;
+	onAllCompleteCb: VoidCallback | null = null;
+	options: FileUploadOptions;
 
-	constructor(files: UploadedFile[] | UploadedFile, options: FileUploadOptions | null = {}) {
+	constructor(files: UploadedFile[] | UploadedFile, options?: FileUploadOptions) {
 		this.files = !Array.isArray(files) && !(files instanceof FileList) ? [files] : files;
 		this.fileUploads = [];
 		this.onErrorCb = null;
@@ -22,12 +22,14 @@ export class FileUpload {
 		this.onAllCompleteCb = null;
 
 		this.options = {
+			presignedUploadUrl: () => "",
+			uploadCompletedUrl: () => "",
 			...danxOptions.value.fileUpload,
 			...options
 		};
 
-		if (!this.options.presignedUploadUrl) {
-			throw new Error("Please configure the danxOptions: import { configure } from 'quasar-ui-danx';");
+		if (!this.options.presignedUploadUrl("test", "test", "test")) {
+			throw new Error("Please configure danxOptions.fileUpload: import { configure } from 'quasar-ui-danx';");
 		}
 		this.prepare();
 	}
@@ -63,7 +65,7 @@ export class FileUpload {
 	/**
 	 * Callback for when all files have been uploaded
 	 */
-	onAllComplete(cb: Function) {
+	onAllComplete(cb: VoidCallback) {
 		this.onAllCompleteCb = cb;
 		return this;
 	}
@@ -73,7 +75,7 @@ export class FileUpload {
 	 * @param cb
 	 * @returns {FileUpload}
 	 */
-	onComplete(cb: Function) {
+	onComplete(cb: VoidCallback) {
 		this.onCompleteCb = cb;
 		return this;
 	}

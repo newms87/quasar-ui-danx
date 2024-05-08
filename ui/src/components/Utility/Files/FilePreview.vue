@@ -27,7 +27,7 @@
         </div>
         <QImg
           v-if="thumbUrl || isPreviewable"
-          fit="fill"
+          :fit="imageFit"
           class="non-selectable max-h-full max-w-full h-full"
           :src="(thumbUrl || previewUrl) + '#t=0.1'"
           preload="auto"
@@ -78,7 +78,7 @@
       <QBtn
         v-if="downloadable && computedImage?.url"
         size="sm"
-        class="!p-1 opacity-70 hover:opacity-100"
+        class="dx-file-preview-download py-1 px-2 opacity-70 hover:opacity-100"
         :class="downloadButtonClass"
         @click.stop="download(computedImage.url)"
       >
@@ -88,7 +88,7 @@
       <QBtn
         v-if="removable"
         size="sm"
-        class="bg-red-900 text-white !p-1 opacity-50 hover:opacity-100"
+        class="dx-file-preview-remove bg-red-900 text-white opacity-50 hover:opacity-100 py-1 px-2"
         @click.stop="onRemove"
       >
         <div
@@ -141,6 +141,10 @@ const props = defineProps({
 	downloadButtonClass: {
 		type: String,
 		default: "bg-blue-600 text-white"
+	},
+	imageFit: {
+		type: String,
+		default: "cover"
 	},
 	downloadable: Boolean,
 	removable: Boolean,

@@ -63,7 +63,11 @@
 
 .q-btn {
 	text-transform: inherit;
-	@apply bg-inherit text-inherit;
+	@apply bg-inherit text-inherit min-h-[auto] p-2;
+
+	&:before {
+		@apply shadow-none;
+	}
 }
 
 .q-item {

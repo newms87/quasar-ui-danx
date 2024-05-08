@@ -1,23 +1,16 @@
-import { ref, Ref } from "vue";
-import { RequestOptions } from "../types";
+import { Ref } from "vue";
+import { danxOptions } from "../config";
 
-const requestOptions = ref<RequestOptions>({
-	baseUrl: ""
-});
 /**
  * A simple request helper that wraps the fetch API
  * to make GET and POST requests easier w/ JSON payloads
  */
 export const request = {
-	configure(options: RequestOptions) {
-		requestOptions.value = options;
-	},
-
 	url(url: string) {
 		if (url.startsWith("http")) {
 			return url;
 		}
-		return requestOptions.value.baseUrl + url;
+		return (danxOptions.value.request?.baseUrl || "").replace(/\/$/, "") + "/" + url;
 	},
 
 	async get(url: string, options = {}): Promise<object> {

@@ -1,7 +1,7 @@
 export interface FileUploadOptions {
 	directory?: string,
-	presignedUploadUrl?: () => Promise<object> | null;
-	uploadCompletedUrl?: Promise<void> | null;
+	presignedUploadUrl: (path: string, name: string, mime?: string) => string;
+	uploadCompletedUrl: (fileId: string) => string;
 }
 
 export interface UploadedFile {
@@ -14,3 +14,6 @@ export interface UploadedFile {
 	blobUrl: string,
 	url: string,
 }
+
+export type OnFilesChangeCallback = (files: UploadedFile[]) => void;
+export type VoidCallback = () => void;

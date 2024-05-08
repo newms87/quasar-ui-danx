@@ -1,6 +1,6 @@
 import { uid } from "quasar";
 import { danxOptions } from "../config";
-import { FileUploadOptions, UploadedFile, VoidCallback } from "../types";
+import { FileUploadOptions, OnCompleteCallback, UploadedFile, VoidCallback } from "../types";
 import { resolveFileLocation } from "./files";
 import { FlashMessages } from "./FlashMessages";
 
@@ -9,7 +9,7 @@ export class FileUpload {
 	fileUploads: UploadedFile[] = [];
 	onErrorCb: ((error) => void) | null = null;
 	onProgressCb: ((file) => void) | null = null;
-	onCompleteCb: VoidCallback | null = null;
+	onCompleteCb: OnCompleteCallback | null = null;
 	onAllCompleteCb: VoidCallback | null = null;
 	options: FileUploadOptions;
 
@@ -75,7 +75,7 @@ export class FileUpload {
 	 * @param cb
 	 * @returns {FileUpload}
 	 */
-	onComplete(cb: VoidCallback) {
+	onComplete(cb: OnCompleteCallback) {
 		this.onCompleteCb = cb;
 		return this;
 	}

@@ -15,5 +15,11 @@ export interface UploadedFile {
 	url: string,
 }
 
+export interface OnCompleteCallbackParams {
+	file?: UploadedFile | null;
+	uploadedFile?: UploadedFile | null;
+}
+
+export type OnCompleteCallback = (params: OnCompleteCallbackParams) => void
 export type OnFilesChangeCallback = (files: UploadedFile[]) => void;
 export type VoidCallback = () => void;

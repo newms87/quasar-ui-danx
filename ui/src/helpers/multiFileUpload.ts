@@ -1,10 +1,11 @@
 import { Ref, ref } from "vue";
-import { FileUploadOptions, OnFilesChangeCallback, UploadedFile, VoidCallback } from "../types";
+import { FlashMessages } from "../helpers";
+import { FileUploadOptions, OnCompleteCallback, OnFilesChangeCallback, UploadedFile, VoidCallback } from "../types";
 import { FileUpload } from "./FileUpload";
 
 export function useMultiFileUpload(options?: FileUploadOptions) {
 	const uploadedFiles: Ref<UploadedFile[]> = ref([]);
-	const onCompleteCb: Ref<VoidCallback | null> = ref(null);
+	const onCompleteCb: Ref<OnCompleteCallback | null> = ref(null);
 	const onFilesChangeCb: Ref<OnFilesChangeCallback | null> = ref(null);
 	const onFilesSelected = (e: any) => {
 		uploadedFiles.value = [...uploadedFiles.value, ...e.target.files];
@@ -12,11 +13,17 @@ export function useMultiFileUpload(options?: FileUploadOptions) {
 				.onProgress(({ file }: { file: UploadedFile }) => {
 					updateFileInList(file);
 				})
-				.onComplete(({ file, uploadedFile }: { file: UploadedFile, uploadedFile: UploadedFile }) => {
-					updateFileInList(file, uploadedFile);
+				.onComplete(({ file, uploadedFile }) => {
+					file && updateFileInList(file, uploadedFile);
+				})
+				.onError(({ file }: { file: UploadedFile }) => {
+					FlashMessages.error(`Failed to upload ${file.name}`);
 				})
 				.onAllComplete(() => {
-					onCompleteCb.value && onCompleteCb.value();
+					onCompleteCb.value && onCompleteCb.value({
+						file: uploadedFiles.value[0],
+						uploadedFile: uploadedFiles.value[0]
+					});
 					onFilesChangeCb.value && onFilesChangeCb.value(uploadedFiles.value);
 				})
 				.upload();
@@ -45,7 +52,7 @@ export function useMultiFileUpload(options?: FileUploadOptions) {
 	const clearUploadedFiles = () => {
 		uploadedFiles.value = [];
 		onFilesChangeCb.value && onFilesChangeCb.value(uploadedFiles.value);
-		onCompleteCb.value && onCompleteCb.value();
+		onCompleteCb.value && onCompleteCb.value({ file: null, uploadedFile: null });
 	};
 
 	const onRemove = (file: UploadedFile) => {
@@ -54,7 +61,7 @@ export function useMultiFileUpload(options?: FileUploadOptions) {
 			uploadedFiles.value.splice(index, 1);
 		}
 		onFilesChangeCb.value && onFilesChangeCb.value(uploadedFiles.value);
-		onCompleteCb.value && onCompleteCb.value();
+		onCompleteCb.value && onCompleteCb.value({ file, uploadedFile: file });
 	};
 
 	return {

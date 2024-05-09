@@ -32,8 +32,8 @@ const props = withDefaults(defineProps<ConfirmActionDialogProps>(), {
 });
 
 const nameLabel = computed(() => fNameOrCount(props.target, props.label));
-const computedTitle = computed(() => `Confirm ${props.action} ${nameLabel.value}`);
-const computedConfirmText = computed(() => `${props.action} ${nameLabel.value}`);
+const computedTitle = computed(() => `Confirm ${props.action}`);
+const computedConfirmText = computed(() => `${props.action}`);
 const computedContentText = computed(() => `${props.message} ${props.action.toLowerCase()} ${nameLabel.value}?`);
 
 const childSlots = computed(() => ["title", "subtitle", "default", "toolbar", "actions"]);

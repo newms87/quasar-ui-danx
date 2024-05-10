@@ -13,8 +13,8 @@ export function useActionRoutes(baseUrl: string) {
 		details(target: ActionTargetItem) {
 			return request.get(`${baseUrl}/${target.id}/details`);
 		},
-		filterFieldOptions() {
-			return request.get(`${baseUrl}/filter-field-options`);
+		fieldOptions() {
+			return request.get(`${baseUrl}/field-options`);
 		},
 		applyAction(action: string, target: ActionTargetItem | null, data: object) {
 			return request.post(`${baseUrl}/${target ? target.id : "new"}/apply-action`, { action, data });

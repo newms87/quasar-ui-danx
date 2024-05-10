@@ -29,9 +29,9 @@ export function useListControls(name: string, options: ListControlsOptions): Act
 	// Controls the active panel (ie: tab) if rendering a panels drawer or similar
 	const activePanel = shallowRef<string>("");
 
-	// Filter fields are the field values available for the currently applied filter on Creative Groups
+	// Field options are the lists of field values available given the applied filter on the list query. These are used for drop-downs / options in forms, filters, etc.
 	// (ie: all states available under the current filter)
-	const filterFieldOptions = ref<AnyObject>({});
+	const fieldOptions = ref<AnyObject>({});
 	const isLoadingFilters = ref(false);
 
 	const filterActiveCount = computed(() => Object.keys(activeFilter.value).filter(key => activeFilter.value[key] !== undefined).length);
@@ -65,7 +65,7 @@ export function useListControls(name: string, options: ListControlsOptions): Act
 	watch(selectedRows, loadSummary);
 
 	if (options.refreshFilters) {
-		watch(activeFilter, loadFilterFieldOptions);
+		watch(activeFilter, loadFieldOptions);
 	}
 
 	async function loadList() {
@@ -91,7 +91,7 @@ export function useListControls(name: string, options: ListControlsOptions): Act
 	 * Gets the field options for the given field name.
 	 */
 	function getFieldOptions(field: string): any[] {
-		return filterFieldOptions.value[field] || [];
+		return fieldOptions.value[field] || [];
 	}
 
 	/**
@@ -99,20 +99,20 @@ export function useListControls(name: string, options: ListControlsOptions): Act
 	 *
 	 * @returns {Promise<void>}
 	 */
-	async function loadFilterFieldOptions() {
-		if (!options.routes.filterFieldOptions || !isInitialized) return;
+	async function loadFieldOptions() {
+		if (!options.routes.fieldOptions || !isInitialized) return;
 		isLoadingFilters.value = true;
-		filterFieldOptions.value = await options.routes.filterFieldOptions(activeFilter.value) || {};
+		fieldOptions.value = await options.routes.fieldOptions(activeFilter.value) || {};
 		isLoadingFilters.value = false;
 	}
 
 	/**
 	 * Watches for a filter URL parameter and applies the filter if it is set.
 	 */
-	function applyFilterFromUrl(url: string, filterFields: Ref<FilterGroup[]> | null = null) {
+	function applyFilterFromUrl(url: string, filterGroups: Ref<FilterGroup[]> | null = null) {
 		if (options.urlPattern && url.match(options.urlPattern)) {
 			// A flat list of valid filterable field names
-			const validFilterKeys = filterFields?.value?.map(group => group.fields.map(field => field.name)).flat();
+			const validFilterKeys = filterGroups?.value?.map(group => group.fields.map(field => field.name)).flat();
 
 			const urlFilter = getFilterFromUrl(url, validFilterKeys);
 
@@ -210,7 +210,7 @@ export function useListControls(name: string, options: ListControlsOptions): Act
 	 * Refreshes the list, summary, and filter field options.
 	 */
 	async function refreshAll() {
-		return Promise.all([loadList(), loadSummary(), loadFilterFieldOptions(), getActiveItemDetails()]);
+		return Promise.all([loadList(), loadSummary(), loadFieldOptions(), getActiveItemDetails()]);
 	}
 
 	/**
@@ -250,7 +250,7 @@ export function useListControls(name: string, options: ListControlsOptions): Act
 			}
 
 			if (!isLoadingFilters.value) {
-				loadFilterFieldOptions();
+				loadFieldOptions();
 			}
 		}, 1);
 	}
@@ -376,7 +376,6 @@ export function useListControls(name: string, options: ListControlsOptions): Act
 		filterActiveCount,
 		showFilters,
 		summary,
-		filterFieldOptions,
 		selectedRows,
 		isLoadingList,
 		isLoadingFilters,

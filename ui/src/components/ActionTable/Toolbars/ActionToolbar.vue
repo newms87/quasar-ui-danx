@@ -30,7 +30,7 @@
   </div>
 </template>
 <script setup lang="ts">
-import { ActionOptions, ActionTargetItem } from "../../../types";
+import { ActionOptions, ActionTargetItem, AnyObject } from "../../../types";
 import { ExportButton, RefreshButton } from "../../Utility";
 import ActionMenu from "../ActionMenu";
 
@@ -41,6 +41,6 @@ defineProps<{
 	actionTarget?: ActionTargetItem[],
 	refreshButton?: boolean,
 	loading?: boolean,
-	exporter?: () => void
+	exporter?: (filter?: AnyObject) => void | Promise<void>
 }>();
 </script>

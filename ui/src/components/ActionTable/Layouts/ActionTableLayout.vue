@@ -15,7 +15,7 @@
       </ActionToolbar>
     </slot>
     <div class="flex flex-nowrap flex-grow overflow-hidden w-full">
-      <slot name="filter-fields">
+      <slot name="filters">
         <CollapsableFiltersSidebar
           v-if="activeFilter"
           :name="controller.name"

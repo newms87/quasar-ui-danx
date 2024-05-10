@@ -10,7 +10,6 @@ export interface ActionController {
 	filterActiveCount: ComputedRef<number>;
 	showFilters: Ref<boolean>;
 	summary: ShallowRef<object | null>;
-	filterFieldOptions: Ref<AnyObject>;
 	selectedRows: ShallowRef<ActionTargetItem[]>;
 	isLoadingList: Ref<boolean>;
 	isLoadingFilters: Ref<boolean>;
@@ -41,7 +40,7 @@ export interface ActionController {
 	getNextItem: (offset: number) => Promise<void>;
 	activatePanel: (item: ActionTargetItem | null, panel: string) => void;
 	setActiveFilter: (filter: ListControlsFilter) => void;
-	applyFilterFromUrl: (url: string, filterFields?: Ref<FilterGroup[]> | null) => void;
+	applyFilterFromUrl: (url: string, filters?: Ref<FilterGroup[]> | null) => void;
 	getFieldOptions: (field: string) => any[];
 }
 
@@ -50,7 +49,7 @@ export interface LabelValueItem {
 	value: string | number | boolean;
 }
 
-export interface FilterField {
+export interface FilterableField {
 	name: string;
 	label: string;
 	type: string;
@@ -61,7 +60,7 @@ export interface FilterField {
 export interface FilterGroup {
 	name?: string;
 	flat?: boolean;
-	fields: FilterField[];
+	fields: FilterableField[];
 }
 
 export interface ActionPanel {
@@ -82,7 +81,7 @@ export interface ListControlsRoutes {
 	list: (pager: object) => Promise<ActionTargetItem[]>;
 	details?: (item: object) => Promise<ActionTargetItem> | null;
 	summary?: (filter: object | null) => Promise<object> | null;
-	filterFieldOptions?: (filter: object | null) => Promise<object> | null;
+	fieldOptions?: (filter: object | null) => Promise<object> | null;
 	more?: (pager: object) => Promise<ActionTargetItem[]> | null;
 	export: (filter: object) => Promise<void>;
 }

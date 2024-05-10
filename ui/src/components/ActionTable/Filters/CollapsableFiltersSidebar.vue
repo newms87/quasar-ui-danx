@@ -8,17 +8,17 @@
     :name="name"
     @update:collapse="$emit('update:show-filters', !$event)"
   >
-    <FilterFieldList
-      :filter="activeFilter"
-      :filter-fields="filters"
+    <FilterList
+      :active-filter="activeFilter"
+      :filters="filters"
       @update:filter="$emit('update:active-filter', $event)"
     />
   </CollapsableSidebar>
 </template>
 <script setup lang="ts">
-import { FilterFieldList } from ".";
 import { FilterGroup, ListControlsFilter } from "../../../types";
 import { CollapsableSidebar } from "../../Utility";
+import FilterList from "./FilterList";
 
 defineEmits(["update:active-filter", "update:show-filters"]);
 

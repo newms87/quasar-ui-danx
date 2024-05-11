@@ -64,47 +64,33 @@
     </QSelect>
   </div>
 </template>
-<script setup>
+<script setup lang="ts">
 import { ChevronDownIcon as DropDownIcon } from "@heroicons/vue/outline";
-import { QSelect } from "quasar";
+import { QSelect, QSelectProps } from "quasar";
 import { computed, isRef, nextTick, ref } from "vue";
 
+export interface Props extends QSelectProps {
+	modelValue?: any;
+	placeholder?: string;
+	selectionLabel?: string | ((option) => string);
+	chipLimit?: number;
+	inputClass?: string;
+	selectionClass?: string;
+	options?: unknown[];
+	filterable?: boolean;
+	filterFn?: (val: string) => void;
+}
+
 const emit = defineEmits(["update:model-value", "search", "update"]);
-const props = defineProps({
-	...QSelect.props,
-	modelValue: {
-		type: [Array, String, Number, Object],
-		default: undefined
-	},
-	placeholder: {
-		type: String,
-		default: ""
-	},
-	selectionLabel: {
-		type: String,
-		default: null
-	},
-	chipLimit: {
-		type: Number,
-		default: 3
-	},
-	inputClass: {
-		type: String,
-		default: ""
-	},
-	selectionClass: {
-		type: String,
-		default: ""
-	},
-	options: {
-		type: Array,
-		default: () => []
-	},
-	filterable: Boolean,
-	filterFn: {
-		type: Function,
-		default: null
-	}
+const props = withDefaults(defineProps<Props>(), {
+	modelValue: undefined,
+	placeholder: "",
+	selectionLabel: null,
+	chipLimit: 3,
+	inputClass: "",
+	selectionClass: "",
+	options: () => [],
+	filterFn: null
 });
 
 const selectField = ref(null);

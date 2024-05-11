@@ -26,7 +26,7 @@ export interface ConfirmDialogProps extends DialogLayoutProps {
 
 export interface ConfirmActionDialogProps extends ConfirmDialogProps {
 	action: string,
-	label: string,
+	label?: string,
 	target: ActionTargetItem | ActionTargetItem[]
 	message?: string,
 }

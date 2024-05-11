@@ -27,11 +27,10 @@ import { default as ConfirmDialog } from "./ConfirmDialog";
 defineEmits(["confirm", "close"]);
 
 const props = withDefaults(defineProps<ConfirmActionDialogProps>(), {
-	message: "Are you sure you want to",
-	modelValue: true
+	message: "Are you sure you want to"
 });
 
-const nameLabel = computed(() => fNameOrCount(props.target, props.label));
+const nameLabel = computed(() => fNameOrCount(props.target, props.label || props.action));
 const computedTitle = computed(() => `Confirm ${props.action}`);
 const computedConfirmText = computed(() => `${props.action}`);
 const computedContentText = computed(() => `${props.message} ${props.action.toLowerCase()}${nameLabel.value ? " " + nameLabel.value : ""}?`);

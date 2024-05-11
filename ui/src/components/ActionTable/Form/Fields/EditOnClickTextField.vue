@@ -1,6 +1,6 @@
 <template>
   <div
-    class="danx-edit-on-click-text-field flex flex-nowrap items-center"
+    class="danx-edit-on-click-text-field flex flex-nowrap items-center rounded overflow-ellipsis"
     :class="{[props.class]: true, 'cursor-pointer': !isEditing}"
     @click="onEdit"
   >

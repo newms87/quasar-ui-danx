@@ -68,10 +68,10 @@
 </template>
 
 <script setup lang="ts">
-import { FormField, UploadedFile } from "src/types";
 import { onMounted } from "vue";
 import { useMultiFileUpload } from "../../../../helpers";
 import { ImageIcon as AddFileIcon, TrashIcon as RemoveFileIcon } from "../../../../svg";
+import { FormField, UploadedFile } from "../../../../types";
 import { FilePreview } from "../../../Utility";
 import FieldLabel from "./FieldLabel";
 

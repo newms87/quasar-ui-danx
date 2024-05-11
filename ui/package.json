@@ -49,6 +49,7 @@
     "@heroicons/vue": "v1",
     "@tinymce/tinymce-vue": "^5.1.1",
     "@vueuse/core": "^10.7.2",
+    "danx-icon": "^1.0.2",
     "exifreader": "^4.21.1",
     "gsap": "^3.12.5",
     "luxon": "^3.4.4"

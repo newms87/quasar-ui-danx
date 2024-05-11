@@ -70,7 +70,8 @@
       <RenderVnode
         v-if="field.vnode"
         :vnode="field.vnode"
-        :props="{field, modelValue: getFieldValue(field.name), readonly, disable, showName, noLabel}"
+        :field="field"
+        :props="{modelValue: getFieldValue(field.name), readonly, disable, showName, noLabel}"
         @update:model-value="onInput(field.name, $event)"
       />
       <Component

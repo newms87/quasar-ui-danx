@@ -5,6 +5,7 @@ export { default as DateRangeField } from "./DateRangeField.vue";
 export { default as DateTimeField } from "./DateTimeField.vue";
 export { default as DateTimePicker } from "./DateTimePicker.vue";
 export { default as EditableDiv } from "./EditableDiv.vue";
+export { default as EditOnClickTextField } from "./EditOnClickTextField.vue";
 export { default as FieldLabel } from "./FieldLabel.vue";
 export { default as FileUploadButton } from "./FileUploadButton.vue";
 export { default as InlineDateTimeField } from "./InlineDateTimeField.vue";

@@ -43,54 +43,22 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
+import { TextFieldProps } from "../../../../types";
 import MaxLengthCounter from "../Utilities/MaxLengthCounter";
 import FieldLabel from "./FieldLabel";
 import LabelValueBlock from "./LabelValueBlock";
 
 defineEmits(["update:model-value", "submit"]);
-defineProps({
-	modelValue: {
-		type: [String, Number],
-		default: ""
-	},
-	field: {
-		type: Object,
-		default: null
-	},
-	type: {
-		type: String,
-		default: "text"
-	},
-	label: {
-		type: String,
-		default: null
-	},
-	labelClass: {
-		type: String,
-		default: ""
-	},
-	parentClass: {
-		type: String,
-		default: ""
-	},
-	inputClass: {
-		type: String,
-		default: ""
-	},
-	allowOverMax: Boolean,
-	maxLength: {
-		type: Number,
-		default: null
-	},
-	autogrow: Boolean,
-	noLabel: Boolean,
-	showName: Boolean,
-	disabled: Boolean,
-	readonly: Boolean,
-	debounce: {
-		type: [String, Number],
-		default: 0
-	}
+withDefaults(defineProps<TextFieldProps>(), {
+	modelValue: "",
+	field: null,
+	type: "text",
+	label: "",
+	labelClass: "",
+	parentClass: "",
+	inputClass: "",
+	maxLength: null,
+	debounce: 0
 });
 </script>

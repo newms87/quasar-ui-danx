@@ -234,7 +234,7 @@ export function fPhone(value: string | number) {
 }
 
 export function fNameOrCount(items: ActionTargetItem[] | ActionTargetItem, label: string) {
-	return Array.isArray(items) ? `${items?.length} ${label}` : `${items.title || items.name || items.id}`;
+	return Array.isArray(items) ? `${items?.length} ${label}` : `${items ? items.title || items.name || items.id : ""}`;
 }
 
 export function fJSON(string: string | object) {

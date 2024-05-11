@@ -3,7 +3,7 @@
     class="dx-dialog"
     :full-height="fullHeight"
     :full-width="fullWidth"
-    :model-value="!!modelValue"
+    :model-value="true"
     :no-backdrop-dismiss="!backdropDismiss"
     :maximized="maximized"
     @update:model-value="onClose"
@@ -64,7 +64,6 @@ import { DialogLayoutProps } from "../../../types";
 const emit = defineEmits(["close"]);
 
 withDefaults(defineProps<DialogLayoutProps>(), {
-	modelValue: true,
 	title: "",
 	titleClass: "",
 	subtitle: "",

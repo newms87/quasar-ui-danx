@@ -21,5 +21,6 @@ export { default as SelectDrawer } from "./SelectDrawer.vue";
 export { default as SelectField } from "./SelectField.vue";
 export { default as SelectWithChildrenField } from "./SelectWithChildrenField.vue";
 export { default as SingleFileField } from "./SingleFileField.vue";
+export { default as SliderNumberField } from "./SliderNumberField.vue";
 export { default as TextField } from "./TextField.vue";
 export { default as WysiwygField } from "./WysiwygField.vue";

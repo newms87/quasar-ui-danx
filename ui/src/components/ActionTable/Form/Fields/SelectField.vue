@@ -122,7 +122,7 @@ const computedOptions = computed(() => {
 
 const filteredOptions = computed(() => {
 	if (filter.value && !props.filterFn) {
-		return computedOptions.value.filter(o => o.label.toLocaleLowerCase().indexOf(filter.value.toLowerCase()) > -1);
+		return computedOptions.value.filter(o => o.label.toLocaleLowerCase().indexOf(filter.value?.toLowerCase()) > -1);
 	} else {
 		return computedOptions.value;
 	}

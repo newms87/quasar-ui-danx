@@ -1,12 +1,5 @@
 import { reactive, UnwrapNestedRefs } from "vue";
-
-export interface TypedObject {
-	id?: string | number;
-	name?: string;
-	__type: string;
-
-	[key: string]: TypedObject[] | any;
-}
+import { TypedObject } from "../types";
 
 const store = new Map<string, any>();
 

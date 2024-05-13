@@ -23,5 +23,5 @@ export interface TableColumn {
 	sortBy?: string,
 	sortByExpression?: string,
 	titleColumns?: () => string[],
-	vnode?: () => VNode,
+	vnode?: () => VNode | any,
 }

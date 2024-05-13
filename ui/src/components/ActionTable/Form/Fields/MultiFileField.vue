@@ -77,7 +77,7 @@ import FieldLabel from "./FieldLabel";
 
 const emit = defineEmits(["update:model-value"]);
 const props = defineProps<{
-	modelValue: UploadedFile[];
+	modelValue?: UploadedFile[];
 	field?: FormField;
 	label?: string;
 	showName?: boolean;

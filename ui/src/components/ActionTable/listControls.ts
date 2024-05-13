@@ -87,6 +87,10 @@ export function useListControls(name: string, options: ListControlsOptions): Act
 		isLoadingSummary.value = false;
 	}
 
+	async function loadListAndSummary() {
+		await Promise.all([loadList(), loadSummary()]);
+	}
+
 	/**
 	 * Gets the field options for the given field name.
 	 */
@@ -352,11 +356,11 @@ export function useListControls(name: string, options: ListControlsOptions): Act
 	/**
 	 * Sets the active filter to the given filter.
 	 */
-	function setActiveFilter(filter: ListControlsFilter) {
-		activeFilter.value = filter;
+	function setActiveFilter(filter?: ListControlsFilter) {
+		activeFilter.value = filter || {};
 	}
 
-	async function exportList(filter: object) {
+	async function exportList(filter?: ListControlsFilter) {
 		return options.routes.export(filter);
 	}
 
@@ -387,12 +391,13 @@ export function useListControls(name: string, options: ListControlsOptions): Act
 
 		// Actions
 		initialize,
-		loadSummary,
 		resetPaging,
 		setPagination,
 		setSelectedRows,
 		clearSelectedRows,
 		loadList,
+		loadSummary,
+		loadListAndSummary,
 		loadMore,
 		getActiveItemDetails,
 		refreshAll,

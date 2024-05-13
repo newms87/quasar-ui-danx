@@ -22,6 +22,7 @@
           :key="'file-' + file.id"
           :name="file.id"
           :img-src="getThumbUrl(file)"
+          class="bg-black"
         >
           <div :class="cls['slide-image']">
             <template v-if="isVideo(file)">

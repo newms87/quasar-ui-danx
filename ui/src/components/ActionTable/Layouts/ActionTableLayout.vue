@@ -3,6 +3,7 @@
     <slot name="top" />
     <slot name="toolbar">
       <ActionToolbar
+        :title="title"
         :refresh-button="refreshButton"
         :actions="actions?.filter(a => a.batch)"
         :action-target="controller.selectedRows.value"
@@ -73,16 +74,17 @@ import { CollapsableFiltersSidebar } from "../Filters";
 import { ActionToolbar } from "../Toolbars";
 
 const props = defineProps<{
-	refreshButton: boolean,
-	showFilters: boolean,
-	controller: ActionController,
-	columns: TableColumn[],
-	filters?: FilterGroup[],
-	panels?: ActionPanel[],
-	actions?: ActionOptions[],
-	exporter?: () => Promise<void>,
-	titleField?: string,
-	tableClass?: string
+	title?: string;
+	refreshButton: boolean;
+	showFilters: boolean;
+	controller: ActionController;
+	columns: TableColumn[];
+	filters?: FilterGroup[];
+	panels?: ActionPanel[];
+	actions?: ActionOptions[];
+	exporter?: () => Promise<void>;
+	panelTitleField?: string;
+	tableClass?: string;
 }>();
 
 const activeFilter = computed(() => props.controller.activeFilter.value);
@@ -90,7 +92,7 @@ const activeItem = computed(() => props.controller.activeItem.value);
 const activePanel = computed(() => props.controller.activePanel.value || "");
 const panelTitle = computed(() => {
 	if (activeItem.value) {
-		return activeItem.value[props.titleField || "title"] || activeItem.value.label || activeItem.value.name;
+		return activeItem.value[props.panelTitleField || "title"] || activeItem.value.label || activeItem.value.name;
 	}
 	return null;
 });

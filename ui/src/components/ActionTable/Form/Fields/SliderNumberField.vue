@@ -23,11 +23,11 @@ import { FormField } from "../../../../types";
 import FieldLabel from "./FieldLabel";
 
 export interface SliderFieldProps extends QSliderProps {
-	modelValue: number;
-	field: FormField;
+	modelValue?: number | null;
+	field?: FormField;
 	label?: string;
-	currency: boolean;
-	percent: boolean;
+	currency?: boolean;
+	percent?: boolean;
 }
 
 defineEmits(["update:model-value"]);

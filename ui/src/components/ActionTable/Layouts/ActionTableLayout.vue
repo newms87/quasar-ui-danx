@@ -49,6 +49,7 @@
           v-if="activeItem && panels"
           :title="panelTitle"
           :model-value="activePanel"
+          :active-item="activeItem"
           :panels="panels"
           @update:model-value="panel => controller.activatePanel(activeItem, panel)"
           @close="controller.setActiveItem(null)"

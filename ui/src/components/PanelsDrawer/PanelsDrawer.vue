@@ -33,12 +33,14 @@
       <div class="dx-panels-drawer-body flex-grow overflow-hidden h-full">
         <div class="flex items-stretch flex-nowrap h-full">
           <PanelsDrawerTabs
+            :key="'pd-tabs:' + activeItem.id"
             v-model="activePanel"
             :class="tabsClass"
             :panels="panels"
             @update:model-value="$emit('update:model-value', $event)"
           />
           <PanelsDrawerPanels
+            :key="'pd-panels:' + activeItem.id"
             :panels="panels"
             :active-panel="activePanel"
             :class="activePanelOptions?.class || panelsClass"
@@ -57,7 +59,7 @@
 <script setup lang="ts">
 import { computed, ref, watch } from "vue";
 import { XIcon as CloseIcon } from "../../svg";
-import { ActionPanel } from "../../types";
+import { ActionPanel, ActionTargetItem } from "../../types";
 import { ContentDrawer } from "../Utility";
 import PanelsDrawerPanels from "./PanelsDrawerPanels";
 import PanelsDrawerTabs from "./PanelsDrawerTabs";
@@ -65,6 +67,7 @@ import PanelsDrawerTabs from "./PanelsDrawerTabs";
 export interface Props {
 	title?: string,
 	modelValue?: string | number,
+	activeItem?: ActionTargetItem;
 	tabsClass?: string | object,
 	panelsClass?: string | object,
 	panels: ActionPanel[]
@@ -74,6 +77,7 @@ defineEmits(["update:model-value", "close"]);
 const props = withDefaults(defineProps<Props>(), {
 	title: "",
 	modelValue: null,
+	activeItem: null,
 	tabsClass: "w-[13.5rem]",
 	panelsClass: "w-[35.5rem]"
 });

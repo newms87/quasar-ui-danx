@@ -87,6 +87,16 @@
         @update:model-value="onInput(field.name, $event)"
       />
     </div>
+    <div
+      v-if="saving"
+      :class="savingClass"
+      class="flex items-center flex-nowrap"
+    >
+      <slot name="saving">
+        Saving...
+        <QSpinnerPie class="ml-2" />
+      </slot>
+    </div>
     <ConfirmDialog
       v-if="variationToEdit !== false"
       title="Change variation name"
@@ -141,12 +151,14 @@ export interface Props {
 	emptyValue?: string | number | boolean;
 	canModifyVariations?: boolean;
 	fieldClass?: string;
+	savingClass?: string;
 }
 
 const props = withDefaults(defineProps<Props>(), {
 	values: null,
 	emptyValue: undefined,
-	fieldClass: ""
+	fieldClass: "",
+	savingClass: "text-sm text-slate-500 justify-end mt-4"
 });
 
 const emit = defineEmits(["update:values"]);

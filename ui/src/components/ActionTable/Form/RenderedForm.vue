@@ -71,7 +71,7 @@
         v-if="field.vnode"
         :vnode="field.vnode"
         :field="field"
-        :props="{modelValue: getFieldValue(field.name), readonly, disable, showName, noLabel}"
+        :props="{modelValue: getFieldValue(field.name), label: field.label, readonly, disable, showName, noLabel}"
         @update:model-value="onInput(field.name, $event)"
       />
       <Component
@@ -88,13 +88,22 @@
       />
     </div>
     <div
-      v-if="saving"
+      v-if="savedAt"
       :class="savingClass"
-      class="flex items-center flex-nowrap"
+      class="dx-saving-indicator flex items-center flex-nowrap"
     >
-      <slot name="saving">
+      <slot
+        v-if="saving"
+        name="saving"
+      >
         Saving...
         <QSpinnerPie class="ml-2" />
+      </slot>
+      <slot
+        v-else
+        name="saved"
+      >
+        Saved at {{ fDateTime(savedAt, { format: "M/d/yy h:mm:ssa" }) }}
       </slot>
     </div>
     <ConfirmDialog
@@ -124,7 +133,7 @@
 <script setup lang="ts">
 import { ExclamationCircleIcon as MissingIcon, PencilIcon as EditIcon } from "@heroicons/vue/solid";
 import { computed, ref } from "vue";
-import { FlashMessages, incrementName, replace } from "../../../helpers";
+import { fDateTime, FlashMessages, incrementName, replace } from "../../../helpers";
 import { TrashIcon as RemoveIcon } from "../../../svg";
 import { Form, FormFieldValue } from "../../../types";
 import { ConfirmDialog, RenderVnode } from "../../Utility";
@@ -140,7 +149,7 @@ import {
 	WysiwygField
 } from "./Fields";
 
-export interface Props {
+export interface RenderedFormProps {
 	values?: FormFieldValue[] | object;
 	form: Form;
 	noLabel?: boolean;
@@ -152,13 +161,15 @@ export interface Props {
 	canModifyVariations?: boolean;
 	fieldClass?: string;
 	savingClass?: string;
+	savedAt?: string;
 }
 
-const props = withDefaults(defineProps<Props>(), {
+const props = withDefaults(defineProps<RenderedFormProps>(), {
 	values: null,
 	emptyValue: undefined,
 	fieldClass: "",
-	savingClass: "text-sm text-slate-500 justify-end mt-4"
+	savingClass: "text-sm text-slate-500 justify-end mt-4",
+	savedAt: null
 });
 
 const emit = defineEmits(["update:values"]);

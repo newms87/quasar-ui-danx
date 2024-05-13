@@ -38,12 +38,12 @@ export interface ListControlsOptions {
 }
 
 export interface ListControlsPagination {
-	__sort: object[] | null;
-	sortBy: string | null;
-	descending: boolean;
-	page: number;
-	rowsNumber: number;
-	rowsPerPage: number;
+	__sort?: object[] | null;
+	sortBy?: string | null;
+	descending?: boolean;
+	page?: number;
+	rowsNumber?: number;
+	rowsPerPage?: number;
 }
 
 export interface PagedItems {

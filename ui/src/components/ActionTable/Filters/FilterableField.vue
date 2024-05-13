@@ -5,6 +5,7 @@
         v-if="field.options?.length > 0 || loading"
         :model-value="modelValue"
         :options="field.options"
+        :clearable="field.clearable === undefined ? true : field.clearable"
         multiple
         :loading="loading"
         :chip-limit="1"
@@ -30,6 +31,7 @@
       v-else-if="field.type === 'single-select'"
       :model-value="modelValue"
       :options="field.options"
+      :clearable="field.clearable === undefined ? true : field.clearable"
       :placeholder="field.placeholder"
       :loading="loading"
       :label="field.label"
@@ -108,41 +110,41 @@
 </template>
 <script setup>
 import {
-  BooleanField,
-  DateField,
-  DateRangeField,
-  MultiKeywordField,
-  NumberRangeField,
-  SelectField,
-  SelectWithChildrenField
+	BooleanField,
+	DateField,
+	DateRangeField,
+	MultiKeywordField,
+	NumberRangeField,
+	SelectField,
+	SelectWithChildrenField
 } from "../Form/Fields";
 
 const emit = defineEmits(["update:model-value"]);
 const props = defineProps({
-  field: {
-    type: Object,
-    required: true
-  },
-  modelValue: {
-    type: [String, Array, Number, Object, Boolean],
-    default: undefined
-  },
-  loading: Boolean
+	field: {
+		type: Object,
+		required: true
+	},
+	modelValue: {
+		type: [String, Array, Number, Object, Boolean],
+		default: undefined
+	},
+	loading: Boolean
 });
 
 function onUpdate(val) {
-  let newVal = val || undefined;
+	let newVal = val || undefined;
 
-  switch (props.field.type) {
-    case "multi-select":
-      newVal = val.length > 0 ? val : undefined;
-      break;
-    case "single-select":
-    case "boolean":
-      newVal = val === null ? undefined : val;
-      break;
-  }
+	switch (props.field.type) {
+		case "multi-select":
+			newVal = (val && val.length > 0) ? val : undefined;
+			break;
+		case "single-select":
+		case "boolean":
+			newVal = val === null ? undefined : val;
+			break;
+	}
 
-  emit("update:model-value", newVal);
+	emit("update:model-value", newVal);
 }
 </script>

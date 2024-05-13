@@ -75,6 +75,7 @@
         :label="field.label || undefined"
         :no-label="noLabel"
         :show-name="showName"
+        :clearable="field.clearable || clearable"
         :disable="disable"
         :readonly="readonly"
         @update:model-value="onInput(field.name, $event)"
@@ -111,65 +112,66 @@ import { FlashMessages, incrementName, replace } from "../../../helpers";
 import { TrashIcon as RemoveIcon } from "../../../svg";
 import { ConfirmDialog } from "../../Utility";
 import {
-  BooleanField,
-  DateField,
-  DateRangeField,
-  IntegerField,
-  MultiFileField,
-  NumberField,
-  SingleFileField,
-  TextField,
-  WysiwygField
+	BooleanField,
+	DateField,
+	DateRangeField,
+	IntegerField,
+	MultiFileField,
+	NumberField,
+	SingleFileField,
+	TextField,
+	WysiwygField
 } from "./Fields";
 
 const emit = defineEmits(["update:values"]);
 const props = defineProps({
-  values: {
-    type: Array,
-    default: null
-  },
-  form: {
-    type: Object,
-    required: true
-  },
-  noLabel: Boolean,
-  showName: Boolean,
-  disable: Boolean,
-  readonly: Boolean,
-  saving: Boolean,
-  emptyValue: {
-    type: [String, Number, Boolean],
-    default: undefined
-  },
-  canModifyVariations: Boolean
+	values: {
+		type: Array,
+		default: null
+	},
+	form: {
+		type: Object,
+		required: true
+	},
+	noLabel: Boolean,
+	showName: Boolean,
+	disable: Boolean,
+	clearable: Boolean,
+	readonly: Boolean,
+	saving: Boolean,
+	emptyValue: {
+		type: [String, Number, Boolean],
+		default: undefined
+	},
+	canModifyVariations: Boolean
 });
 
 const FORM_FIELD_MAP = {
-  BOOLEAN: BooleanField,
-  DATE: DateField,
-  DATE_RANGE: DateRangeField,
-  INTEGER: IntegerField,
-  NUMBER: NumberField,
-  TEXT: TextField,
-  SINGLE_FILE: SingleFileField,
-  MULTI_FILE: MultiFileField,
-  WYSIWYG: WysiwygField
+	BOOLEAN: BooleanField,
+	DATE: DateField,
+	DATE_RANGE: DateRangeField,
+	INTEGER: IntegerField,
+	NUMBER: NumberField,
+	TEXT: TextField,
+	SINGLE_FILE: SingleFileField,
+	MULTI_FILE: MultiFileField,
+	WYSIWYG: WysiwygField
 };
 
 const mappedFields = props.form.fields.map((field) => ({
-  placeholder: `Enter ${field.label}`,
-  ...field,
-  component: FORM_FIELD_MAP[field.type],
-  default: field.type === "BOOLEAN" ? false : ""
+	placeholder: `Enter ${field.label}`,
+	...field,
+	component: FORM_FIELD_MAP[field.type],
+	default: field.type === "BOOLEAN" ? false : ""
 }));
 
 const variationNames = computed(() => {
-  const names = [...new Set(props.values.map(v => v.variation))].sort();
-  // Always guarantee that we show the default variation
-  if (names.length === 0) {
-    names.push("");
-  }
-  return names;
+	const names = [...new Set(props.values.map(v => v.variation))].sort();
+	// Always guarantee that we show the default variation
+	if (names.length === 0) {
+		names.push("");
+	}
+	return names;
 });
 
 const currentVariation = ref(variationNames.value[0] || "");
@@ -179,88 +181,88 @@ const variationToDelete = ref("");
 const canAddVariation = computed(() => props.canModifyVariations && !props.readonly && !props.disable && variationNames.value.length < props.form.variations);
 
 function getFieldResponse(name, variation) {
-  if (!props.values) return undefined;
-  return props.values.find((v) => v.variation === (variation !== undefined ? variation : currentVariation.value) && v.name === name);
+	if (!props.values) return undefined;
+	return props.values.find((v) => v.variation === (variation !== undefined ? variation : currentVariation.value) && v.name === name);
 }
 function getFieldValue(name) {
-  return getFieldResponse(name)?.value;
+	return getFieldResponse(name)?.value;
 }
 function onInput(name, value) {
-  const fieldResponse = getFieldResponse(name);
-  const newFieldResponse = {
-    name,
-    variation: currentVariation.value || "",
-    value: value === undefined ? props.emptyValue : value
-  };
-  const newValues = replace(props.values, fieldResponse, newFieldResponse, true);
-  emit("update:values", newValues);
+	const fieldResponse = getFieldResponse(name);
+	const newFieldResponse = {
+		name,
+		variation: currentVariation.value || "",
+		value: value === undefined ? props.emptyValue : value
+	};
+	const newValues = replace(props.values, fieldResponse, newFieldResponse, true);
+	emit("update:values", newValues);
 }
 
 function createVariation(variation) {
-  return props.form.fields.map((field) => ({
-    variation,
-    name: field.name,
-    value: field.type === "BOOLEAN" ? false : null
-  }));
+	return props.form.fields.map((field) => ({
+		variation,
+		name: field.name,
+		value: field.type === "BOOLEAN" ? false : null
+	}));
 }
 
 function onAddVariation() {
-  if (props.saving) return;
-  let newValues = [...props.values];
+	if (props.saving) return;
+	let newValues = [...props.values];
 
-  if (newValues.length === 0) {
-    newValues = createVariation("");
-  }
-  const previousName = variationNames.value[variationNames.value.length - 1];
-  const newName = incrementName(!previousName ? "1" : previousName);
-  const newVariation = createVariation(newName);
-  emit("update:values", [...newValues, ...newVariation]);
-  currentVariation.value = newName;
+	if (newValues.length === 0) {
+		newValues = createVariation("");
+	}
+	const previousName = variationNames.value[variationNames.value.length - 1];
+	const newName = incrementName(!previousName ? "1" : previousName);
+	const newVariation = createVariation(newName);
+	emit("update:values", [...newValues, ...newVariation]);
+	currentVariation.value = newName;
 }
 
 function onChangeVariationName() {
-  if (!newVariationName.value) return;
-  if (variationNames.value.includes(newVariationName.value)) {
-    FlashMessages.error("Variation name already exists");
-    return;
-  }
-  const newValues = props.values.map((v) => {
-    if (v.variation === variationToEdit.value) {
-      return { ...v, variation: newVariationName.value };
-    }
-    return v;
-  });
-  emit("update:values", newValues);
+	if (!newVariationName.value) return;
+	if (variationNames.value.includes(newVariationName.value)) {
+		FlashMessages.error("Variation name already exists");
+		return;
+	}
+	const newValues = props.values.map((v) => {
+		if (v.variation === variationToEdit.value) {
+			return { ...v, variation: newVariationName.value };
+		}
+		return v;
+	});
+	emit("update:values", newValues);
 
-  currentVariation.value = newVariationName.value;
-  variationToEdit.value = false;
-  newVariationName.value = "";
+	currentVariation.value = newVariationName.value;
+	variationToEdit.value = false;
+	newVariationName.value = "";
 }
 
 function onRemoveVariation(name) {
-  if (!name) return;
+	if (!name) return;
 
-  const newValues = props.values.filter((v) => v.variation !== name);
-  emit("update:values", newValues);
+	const newValues = props.values.filter((v) => v.variation !== name);
+	emit("update:values", newValues);
 
-  if (currentVariation.value === name) {
-    currentVariation.value = variationNames.value[0];
-  }
-  variationToDelete.value = "";
+	if (currentVariation.value === name) {
+		currentVariation.value = variationNames.value[0];
+	}
+	variationToDelete.value = "";
 }
 
 function isVariationFormComplete(variation) {
-  const requiredGroups = {};
-  return props.form.fields.filter(r => r.required || r.required_group).every((field) => {
-    const fieldResponse = getFieldResponse(field.name, variation);
-    const hasValue = !!fieldResponse && fieldResponse.value !== null;
-    if (field.required_group) {
-      // This required group has already been satisfied
-      if (requiredGroups[field.required_group]) return true;
-      return requiredGroups[field.required_group] = hasValue;
-    } else {
-      return hasValue;
-    }
-  });
+	const requiredGroups = {};
+	return props.form.fields.filter(r => r.required || r.required_group).every((field) => {
+		const fieldResponse = getFieldResponse(field.name, variation);
+		const hasValue = !!fieldResponse && fieldResponse.value !== null;
+		if (field.required_group) {
+			// This required group has already been satisfied
+			if (requiredGroups[field.required_group]) return true;
+			return requiredGroups[field.required_group] = hasValue;
+		} else {
+			return hasValue;
+		}
+	});
 }
 </script>

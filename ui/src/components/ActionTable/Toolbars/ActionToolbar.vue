@@ -20,7 +20,7 @@
         class="ml-4"
       />
       <ActionMenu
-        v-if="actions.length > 0"
+        v-if="actions && actions.length > 0"
         class="ml-4 dx-batch-actions"
         :target="actionTarget"
         :actions="actions"
@@ -37,7 +37,7 @@ import ActionMenu from "../ActionMenu";
 defineEmits(["refresh"]);
 defineProps<{
 	title?: string,
-	actions: ActionOptions[],
+	actions?: ActionOptions[],
 	actionTarget?: ActionTargetItem[],
 	refreshButton?: boolean,
 	loading?: boolean,

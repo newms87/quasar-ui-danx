@@ -93,7 +93,7 @@ const activeItem = computed(() => props.controller.activeItem.value);
 const activePanel = computed(() => props.controller.activePanel.value || "");
 const panelTitle = computed(() => {
 	if (activeItem.value) {
-		return activeItem.value[props.panelTitleField || "title"] || activeItem.value.label || activeItem.value.name;
+		return activeItem.value[props.panelTitleField || "title"] || activeItem.value.label || activeItem.value.name || (props.title + " " + activeItem.value.id);
 	}
 	return null;
 });

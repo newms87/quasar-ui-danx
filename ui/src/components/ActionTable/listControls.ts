@@ -1,4 +1,5 @@
 import { computed, Ref, ref, shallowRef, watch } from "vue";
+import { RouteLocationNormalizedLoaded, Router, useRoute, useRouter } from "vue-router";
 import { getItem, setItem, storeObject, waitForRef } from "../../helpers";
 import {
 	ActionController,
@@ -14,6 +15,8 @@ import { getFilterFromUrl } from "./listHelpers";
 
 export function useListControls(name: string, options: ListControlsOptions): ActionController {
 	let isInitialized = false;
+	let vueRoute: RouteLocationNormalizedLoaded | null = null;
+	let vueRouter: Router | null = null;
 	const PAGE_SETTINGS_KEY = `dx-${name}-pager`;
 	const pagedItems = shallowRef<PagedItems | null>(null);
 	const activeFilter = ref<ListControlsFilter>({});
@@ -303,8 +306,20 @@ export function useListControls(name: string, options: ListControlsOptions): Act
 	 * Opens the item's form with the given item and tab
 	 */
 	function activatePanel(item: ActionTargetItem | null, panel: string = "") {
+		// If we're already on the correct item and panel, don't do anything
+		if (item?.id === activeItem.value?.id && panel === activePanel.value) return;
+
 		setActiveItem(item);
 		activePanel.value = panel;
+
+		// Push vue router change /:id/:panel
+		if (vueRoute && vueRouter && item?.id) {
+			vueRouter.push({
+				name: Array.isArray(vueRoute.name) ? vueRoute.name[0] : vueRoute.name,
+				params: { id: item.id, panel },
+				replace: true
+			});
+		}
 	}
 
 	/**
@@ -312,6 +327,10 @@ export function useListControls(name: string, options: ListControlsOptions): Act
 	 */
 	function setActiveItem(item: ActionTargetItem | null) {
 		activeItem.value = item ? storeObject(item) : item;
+
+		if (!item?.id) {
+			vueRouter?.push({ name: vueRoute?.name || "home" });
+		}
 	}
 
 	/**
@@ -368,6 +387,21 @@ export function useListControls(name: string, options: ListControlsOptions): Act
 	function initialize() {
 		isInitialized = true;
 		loadSettings();
+
+		// Setup Vue Router handling
+		vueRoute = useRoute();
+		vueRouter = useRouter();
+		/**
+		 * Watch the id params in the route and set the active item to the item with the given id.
+		 */
+		if (options.routes.details) {
+			const { params, meta } = useRoute();
+			const id = Array.isArray(params?.id) ? params.id[0] : params?.id;
+			if (id && meta.type) {
+				const panel = Array.isArray(params?.panel) ? params.panel[0] : params?.panel;
+				activatePanel({ id, __type: "" + meta.type }, panel || activePanel.value || "");
+			}
+		}
 	}
 
 	return {

@@ -6,6 +6,7 @@
     content-class="h-full"
     class="dx-panels-drawer"
     title=""
+    no-route-dismiss
     @update:show="$emit('close')"
   >
     <div class="flex flex-col flex-nowrap h-full">
@@ -57,7 +58,7 @@
   </ContentDrawer>
 </template>
 <script setup lang="ts">
-import { computed, ref, watch } from "vue";
+import { computed, onMounted, ref, watch } from "vue";
 import { XIcon as CloseIcon } from "../../svg";
 import { ActionPanel, ActionTargetItem } from "../../types";
 import { ContentDrawer } from "../Utility";
@@ -85,4 +86,11 @@ const props = withDefaults(defineProps<Props>(), {
 const activePanel = ref(props.modelValue);
 const activePanelOptions = computed(() => props.panels.find((panel) => panel.name === activePanel.value));
 watch(() => props.modelValue, (value) => activePanel.value = value);
+
+onMounted(() => {
+	// Resolve the default panel if a panel has not been selected
+	if (!activePanel.value && props.panels.length) {
+		activePanel.value = props.panels[0].name;
+	}
+});
 </script>

@@ -82,6 +82,7 @@
         :label="field.label || undefined"
         :no-label="noLabel"
         :show-name="showName"
+        :clearable="field.clearable || clearable"
         :disable="disable"
         :readonly="readonly"
         @update:model-value="onInput(field.name, $event)"

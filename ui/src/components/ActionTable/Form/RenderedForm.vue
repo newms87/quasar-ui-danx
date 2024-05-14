@@ -71,7 +71,7 @@
         v-if="field.vnode"
         :vnode="field.vnode"
         :field="field"
-        :props="{modelValue: getFieldValue(field.name), label: field.label, readonly, disable, showName, noLabel}"
+        :props="getVnodeProps(field)"
         @update:model-value="onInput(field.name, $event)"
       />
       <Component
@@ -158,6 +158,7 @@ export interface RenderedFormProps {
 	disable?: boolean;
 	readonly?: boolean;
 	saving?: boolean;
+	clearable?: boolean;
 	emptyValue?: string | number | boolean;
 	canModifyVariations?: boolean;
 	fieldClass?: string;
@@ -199,6 +200,19 @@ const fieldResponses = computed(() => {
 	if (Array.isArray(props.values)) return props.values;
 	return Object.entries(props.values).map(([name, value]) => ({ name, value, variation: "" }));
 });
+
+function getVnodeProps(field) {
+	return {
+		modelValue: getFieldValue(field.name),
+		label: field.label,
+		clearable: field.clearable || props.clearable,
+		readonly: props.readonly,
+		disable: props.disable,
+		showName: props.showName,
+		noLabel: props.noLabel
+	};
+}
+
 const variationNames = computed(() => {
 	const names = [...new Set(fieldResponses.value.map(v => v.variation))].sort();
 	// Always guarantee that we show the default variation

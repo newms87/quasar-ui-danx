@@ -10,10 +10,14 @@ export interface FormField {
 	type?: string;
 	name: string;
 	label: string;
+	placeholder?: string;
 	vnode?: ((props) => VNode | any);
 	component?: any;
+	clearable?: boolean;
 	required?: boolean;
 	required_group?: string;
+	toggleIndeterminate?: boolean;
+	inline?: boolean;
 	maxLength?: number;
 	minLength?: number;
 	options?: FormFieldOption[];

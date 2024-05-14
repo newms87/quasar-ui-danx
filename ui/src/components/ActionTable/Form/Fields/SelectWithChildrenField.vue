@@ -31,55 +31,50 @@
     </div>
   </div>
 </template>
-<script setup>
+<script setup lang="ts">
 import { ref, watch } from "vue";
 import { remove } from "../../../../helpers";
 import SelectField from "./SelectField";
 
+export interface SelectWithChildrenFieldProps {
+	modelValue?: string[];
+	label?: string;
+	placeholder?: string;
+	options?: any[];
+	loading?: boolean;
+}
+
 const emit = defineEmits(["update:model-value"]);
-const props = defineProps({
-  modelValue: {
-    type: Array,
-    default: () => ([])
-  },
-  label: {
-    type: String,
-    default: "Selection"
-  },
-  placeholder: {
-    type: String,
-    default: "Select an option"
-  },
-  options: {
-    type: Array,
-    default: () => []
-  },
-  loading: Boolean
+const props = withDefaults(defineProps<SelectWithChildrenFieldProps>(), {
+	modelValue: () => [],
+	label: "Selection",
+	placeholder: "Select an option",
+	options: () => []
 });
 
 function resolveSelectedOption() {
-  if (props.modelValue?.length > 0) {
-    return props.options.find((option) => option.children.find(child => props.modelValue.includes(child.id)));
-  }
+	if (props.modelValue?.length > 0) {
+		return props.options.find((option) => option.children.find(child => props.modelValue.includes(child.id)));
+	}
 
-  return null;
+	return null;
 }
 const selectedOption = ref(resolveSelectedOption());
 const selectedChildren = ref(props.modelValue || []);
 function onSelectChild(child) {
-  if (selectedChildren.value.includes(child.id)) {
-    selectedChildren.value = remove(selectedChildren.value, child.id);
-  } else {
-    selectedChildren.value.push(child.id);
-  }
-  emit("update:model-value", selectedChildren.value.length > 0 ? selectedChildren.value : undefined);
+	if (selectedChildren.value.includes(child.id)) {
+		selectedChildren.value = remove(selectedChildren.value, child.id);
+	} else {
+		selectedChildren.value.push(child.id);
+	}
+	emit("update:model-value", selectedChildren.value.length > 0 ? selectedChildren.value : undefined);
 }
 function onSelectOption() {
-  selectedChildren.value = [];
-  emit("update:model-value", undefined);
+	selectedChildren.value = [];
+	emit("update:model-value", undefined);
 }
 watch(() => props.modelValue, (value) => {
-  selectedOption.value = resolveSelectedOption();
-  selectedChildren.value = value || [];
+	selectedOption.value = resolveSelectedOption();
+	selectedChildren.value = value || [];
 });
 </script>

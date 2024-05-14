@@ -48,7 +48,7 @@
       v-else-if="field.type === 'date-range'"
       :model-value="modelValue"
       :label="field.label"
-      :inline="field.inline"
+      :inline="!!field.inline"
       with-time
       class="mt-2 reactive"
       @update:model-value="onUpdate"
@@ -108,7 +108,8 @@
     </template>
   </div>
 </template>
-<script setup>
+<script setup lang="ts">
+import { FormField } from "../../../types";
 import {
 	BooleanField,
 	DateField,
@@ -120,17 +121,11 @@ import {
 } from "../Form/Fields";
 
 const emit = defineEmits(["update:model-value"]);
-const props = defineProps({
-	field: {
-		type: Object,
-		required: true
-	},
-	modelValue: {
-		type: [String, Array, Number, Object, Boolean],
-		default: undefined
-	},
-	loading: Boolean
-});
+const props = defineProps<{
+	field: FormField;
+	modelValue?: any;
+	loading?: boolean;
+}>();
 
 function onUpdate(val) {
 	let newVal = val || undefined;

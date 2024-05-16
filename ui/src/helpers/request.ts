@@ -18,7 +18,8 @@ export const request = {
 			method: "get",
 			headers: {
 				Accept: "application/json",
-				"Content-Type": "application/json"
+				"Content-Type": "application/json",
+				...danxOptions.value.request?.headers
 			},
 			...options
 		}).then((r) => r.json());
@@ -30,7 +31,8 @@ export const request = {
 			body: JSON.stringify(data),
 			headers: {
 				Accept: "application/json",
-				"Content-Type": "application/json"
+				"Content-Type": "application/json",
+				...danxOptions.value.request?.headers
 			},
 			...options
 		}).then((r) => r.json());

@@ -7,5 +7,6 @@ export interface HttpResponse {
 }
 
 export interface RequestOptions {
-	baseUrl: string;
+	baseUrl?: string;
+	headers?: object;
 }

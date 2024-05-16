@@ -1,7 +1,7 @@
 export interface FileUploadOptions {
 	directory?: string,
-	presignedUploadUrl: (path: string, name: string, mime?: string) => string;
-	uploadCompletedUrl: (fileId: string) => string;
+	presignedUploadUrl?: (path: string, name: string, mime?: string) => string;
+	uploadCompletedUrl?: (fileId: string) => string;
 }
 
 export interface UploadedFile {

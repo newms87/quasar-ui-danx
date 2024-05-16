@@ -2,9 +2,9 @@
   <div class="dx-action-toolbar flex items-center">
     <div class="flex-grow px-6">
       <slot name="title">
-        <h2 v-if="title">
+        <h4 v-if="title">
           {{ title }}
-        </h2>
+        </h4>
       </slot>
     </div>
     <div class="py-3 px-6 flex items-center flex-nowrap">

@@ -7,9 +7,9 @@ export interface DanxOptions {
 	fileUpload?: FileUploadOptions;
 	request?: RequestOptions,
 	flashMessages?: {
-		default: QNotifyCreateOptions;
-		success: QNotifyCreateOptions;
-		warning: QNotifyCreateOptions;
-		error: QNotifyCreateOptions;
+		default?: QNotifyCreateOptions;
+		success?: QNotifyCreateOptions;
+		warning?: QNotifyCreateOptions;
+		error?: QNotifyCreateOptions;
 	};
 }

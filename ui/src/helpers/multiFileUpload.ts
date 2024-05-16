@@ -1,11 +1,17 @@
 import { Ref, ref } from "vue";
 import { FlashMessages } from "../helpers";
-import { FileUploadOptions, OnCompleteCallback, OnFilesChangeCallback, UploadedFile, VoidCallback } from "../types";
+import {
+	FileUploadCompleteCallback,
+	FileUploadOptions,
+	OnFilesChangeCallback,
+	UploadedFile,
+	VoidCallback
+} from "../types";
 import { FileUpload } from "./FileUpload";
 
 export function useMultiFileUpload(options?: FileUploadOptions) {
 	const uploadedFiles: Ref<UploadedFile[]> = ref([]);
-	const onCompleteCb: Ref<OnCompleteCallback | null> = ref(null);
+	const onCompleteCb: Ref<FileUploadCompleteCallback | null> = ref(null);
 	const onFilesChangeCb: Ref<OnFilesChangeCallback | null> = ref(null);
 	const onFilesSelected = (e: any) => {
 		uploadedFiles.value = [...uploadedFiles.value, ...e.target.files];

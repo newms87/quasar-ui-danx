@@ -9,8 +9,8 @@ export const danxOptions = shallowRef<DanxOptions>({
 	},
 	fileUpload: {
 		directory: "file-upload",
-		presignedUploadUrl: (path, name, mime) => ``,
-		uploadCompletedUrl: (fileId) => ""
+		createPresignedUpload: null,
+		presignedUploadCompleted: null
 	},
 	flashMessages: {
 		default: {},

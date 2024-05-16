@@ -1,16 +1,25 @@
 import { uid } from "quasar";
 import { danxOptions } from "../config";
-import { FileUploadOptions, OnCompleteCallback, UploadedFile, VoidCallback } from "../types";
+import {
+	FileUploadAllCompleteCallback,
+	FileUploadCompleteCallback,
+	FileUploadErrorCallback,
+	FileUploadOptions,
+	FileUploadProgressCallback,
+	UploadedFile,
+	XHRFileUpload
+} from "../types";
 import { resolveFileLocation } from "./files";
 import { FlashMessages } from "./FlashMessages";
 
+
 export class FileUpload {
 	files: UploadedFile[] = [];
-	fileUploads: UploadedFile[] = [];
-	onErrorCb: ((error) => void) | null = null;
-	onProgressCb: ((file) => void) | null = null;
-	onCompleteCb: OnCompleteCallback | null = null;
-	onAllCompleteCb: VoidCallback | null = null;
+	fileUploads: XHRFileUpload[] = [];
+	onErrorCb: FileUploadErrorCallback | null = null;
+	onProgressCb: FileUploadProgressCallback | null = null;
+	onCompleteCb: FileUploadCompleteCallback | null = null;
+	onAllCompleteCb: FileUploadAllCompleteCallback | null = null;
 	options: FileUploadOptions;
 
 	constructor(files: UploadedFile[] | UploadedFile, options?: FileUploadOptions) {
@@ -22,13 +31,13 @@ export class FileUpload {
 		this.onAllCompleteCb = null;
 
 		this.options = {
-			presignedUploadUrl: () => "",
-			uploadCompletedUrl: () => "",
+			createPresignedUpload: null,
+			presignedUploadCompleted: null,
 			...danxOptions.value.fileUpload,
 			...options
 		};
 
-		if (!this.options.presignedUploadUrl("test", "test", "test")) {
+		if (!this.options.createPresignedUpload || !this.options.presignedUploadCompleted) {
 			throw new Error("Please configure danxOptions.fileUpload: import { configure } from 'quasar-ui-danx';");
 		}
 		this.prepare();
@@ -65,7 +74,7 @@ export class FileUpload {
 	/**
 	 * Callback for when all files have been uploaded
 	 */
-	onAllComplete(cb: VoidCallback) {
+	onAllComplete(cb: FileUploadAllCompleteCallback) {
 		this.onAllCompleteCb = cb;
 		return this;
 	}
@@ -75,7 +84,7 @@ export class FileUpload {
 	 * @param cb
 	 * @returns {FileUpload}
 	 */
-	onComplete(cb: OnCompleteCallback) {
+	onComplete(cb: FileUploadCompleteCallback) {
 		this.onCompleteCb = cb;
 		return this;
 	}
@@ -85,26 +94,21 @@ export class FileUpload {
 	 * @param cb
 	 * @returns {FileUpload}
 	 */
-	onProgress(cb: Function) {
+	onProgress(cb: FileUploadProgressCallback) {
 		this.onProgressCb = cb;
 		return this;
 	}
 
 	/**
 	 * Callback fired when an error occurs during upload
-	 * @param cb
-	 * @returns {FileUpload}
 	 */
-	onError(cb: Function) {
+	onError(cb: FileUploadErrorCallback) {
 		this.onErrorCb = cb;
 		return this;
 	}
 
 	/**
 	 * Handles the error events / fires the callback if it is set
-	 * @param e
-	 * @param file
-	 * @param error
 	 */
 	errorHandler(e: InputEvent, file: UploadedFile, error = null) {
 		if (this.onErrorCb) {
@@ -135,7 +139,7 @@ export class FileUpload {
 	 * @param fileUpload
 	 * @param progress
 	 */
-	fireProgressCallback(fileUpload, progress) {
+	fireProgressCallback(fileUpload: XHRFileUpload, progress: number) {
 		fileUpload.file.progress = progress;
 		this.onProgressCb && this.onProgressCb({ file: this.wrapFile(fileUpload.file), progress });
 	}
@@ -145,7 +149,7 @@ export class FileUpload {
 	 * @param fileUpload
 	 * @param uploadedFile
 	 */
-	fireCompleteCallback(fileUpload, uploadedFile) {
+	fireCompleteCallback(fileUpload: XHRFileUpload, uploadedFile: UploadedFile) {
 		fileUpload.isComplete = true;
 		fileUpload.file.progress = 1;
 		this.onCompleteCb && this.onCompleteCb({ file: this.wrapFile(fileUpload.file), uploadedFile });
@@ -165,10 +169,8 @@ export class FileUpload {
 	/**
 	 * Returns a native JS object that is easier to work with than the File objects (no weird behavior of missing
 	 * properties, easily printable, etc.)
-	 * @param file
-	 * @returns {{size, name, progress, location, blobUrl: *, id, type}}
 	 */
-	wrapFile(file) {
+	wrapFile(file: UploadedFile) {
 		return {
 			id: file.id,
 			name: file.name,
@@ -176,7 +178,8 @@ export class FileUpload {
 			type: file.type,
 			progress: file.progress,
 			location: file.location,
-			blobUrl: file.blobUrl
+			blobUrl: file.blobUrl,
+			url: ""
 		};
 	}
 
@@ -186,7 +189,7 @@ export class FileUpload {
 	setXhrCallbacks() {
 		// Set the error callbacks
 		for (const fileUpload of this.fileUploads) {
-			fileUpload.xhr.addEventListener(
+			fileUpload.xhr?.addEventListener(
 					"error",
 					(e) => this.errorHandler(e, fileUpload.file),
 					false
@@ -196,7 +199,7 @@ export class FileUpload {
 		// Set the progress callbacks
 		if (this.onProgressCb) {
 			for (const fileUpload of this.fileUploads) {
-				fileUpload.xhr.upload.addEventListener(
+				fileUpload.xhr?.upload.addEventListener(
 						"progress",
 						(e) => {
 							// Max of 95%, so we can indicate we are completing the signed URL process
@@ -211,7 +214,7 @@ export class FileUpload {
 		// Set the load callbacks which registers the Complete / All Complete callbacks and handles non-xhr related
 		// errors
 		for (const fileUpload of this.fileUploads) {
-			fileUpload.xhr.addEventListener(
+			fileUpload.xhr?.addEventListener(
 					"load",
 					async (e) => {
 						try {
@@ -232,15 +235,21 @@ export class FileUpload {
 
 	/**
 	 * Mark the presigned upload as completed and return the file resource from the platform server
-	 * @param fileUpload
-	 * @returns {Promise<void>}
 	 */
-	async completePresignedUpload(fileUpload) {
+	async completePresignedUpload(fileUpload: XHRFileUpload) {
 		// Show 95% as the last 5% will be to complete the presigned upload
 		this.fireProgressCallback(fileUpload, .95);
 
+		if (!fileUpload.file.resource_id) {
+			throw new Error("File resource ID is required to complete presigned upload");
+		}
+
+		if (!this.options.presignedUploadCompleted) {
+			throw new Error("Please configure danxOptions.fileUpload.presignedUploadCompleted");
+		}
+
 		// Let the platform know the presigned upload is complete
-		return await fetch(this.options.uploadCompletedUrl(fileUpload.file.resource_id), { method: "POST" }).then(r => r.json());
+		return await this.options.presignedUploadCompleted(fileUpload.file.resource_id);
 	}
 
 	/**
@@ -249,10 +258,13 @@ export class FileUpload {
 	async upload() {
 		for (const fileUpload of this.fileUploads) {
 			const mimeType = fileUpload.file.mimeType || fileUpload.file.type;
-			const presignedUrl = this.options.presignedUploadUrl(this.options.directory, fileUpload.file.name, mimeType);
+
+			if (!this.options.createPresignedUpload) {
+				throw new Error("Please configure danxOptions.fileUpload.createPresignedUpload");
+			}
 
 			// Fetch presigned upload URL
-			const fileResource = await fetch(presignedUrl).then(r => r.json());
+			const fileResource = await this.options.createPresignedUpload(this.options.directory || "", fileUpload.file.name, mimeType);
 
 			if (!fileResource.url) {
 				FlashMessages.error("Could not fetch presigned upload URL for file " + fileUpload.file.name);
@@ -285,7 +297,7 @@ export class FileUpload {
 
 		// Send all the XHR file uploads
 		for (const fileUpload of this.fileUploads) {
-			fileUpload.xhr.send(fileUpload.body);
+			fileUpload.xhr?.send(fileUpload.body);
 		}
 	}
 }

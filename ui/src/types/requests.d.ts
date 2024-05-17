@@ -9,4 +9,5 @@ export interface HttpResponse {
 export interface RequestOptions {
 	baseUrl?: string;
 	headers?: object;
+	onUnauthorized?: (response) => object;
 }

@@ -1,5 +1,6 @@
 import { Ref } from "vue";
 import { danxOptions } from "../config";
+import { AnyObject } from "../types";
 
 /**
  * A simple request helper that wraps the fetch API
@@ -13,8 +14,34 @@ export const request = {
 		return (danxOptions.value.request?.baseUrl || "").replace(/\/$/, "") + "/" + url;
 	},
 
-	async get(url: string, options = {}): Promise<object> {
-		return fetch(request.url(url), {
+	async call(url: string, options: RequestInit): Promise<object> {
+		try {
+			const response = await fetch(request.url(url), options);
+			const result = await response.json();
+
+			if (response.status === 401) {
+				const onUnauthorized = danxOptions.value.request?.onUnauthorized;
+				return onUnauthorized ? onUnauthorized(response) : {
+					error: true,
+					message: "Unauthorized"
+				};
+			}
+
+			if (response.status > 400) {
+				if (result.exception && !result.error) {
+					result.error = true;
+				}
+			}
+
+			return result;
+		} catch (error: any) {
+			return {
+				error: error.message || "An error occurred fetching the data"
+			};
+		}
+	},
+	async get(url: string, options: RequestInit = {}): Promise<object> {
+		return await request.call(url, {
 			method: "get",
 			headers: {
 				Accept: "application/json",
@@ -22,11 +49,11 @@ export const request = {
 				...danxOptions.value.request?.headers
 			},
 			...options
-		}).then((r) => r.json());
+		});
 	},
 
-	async post(url: string, data = {}, options = {}) {
-		return fetch(request.url(url), {
+	async post(url: string, data: AnyObject = {}, options: RequestInit = {}) {
+		return request.call(url, {
 			method: "post",
 			body: JSON.stringify(data),
 			headers: {
@@ -35,7 +62,7 @@ export const request = {
 				...danxOptions.value.request?.headers
 			},
 			...options
-		}).then((r) => r.json());
+		});
 	}
 };
 

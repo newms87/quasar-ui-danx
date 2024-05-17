@@ -1,7 +1,7 @@
 export interface FileUploadOptions {
 	directory?: string,
 	createPresignedUpload?: ((path: string, name: string, mime?: string) => Promise<UploadedFile>) | null;
-	presignedUploadCompleted?: ((fileId: string) => Promise<UploadedFile>) | null;
+	completePresignedUpload?: ((fileId: string) => Promise<UploadedFile>) | null;
 }
 
 export interface XHRFileUpload {

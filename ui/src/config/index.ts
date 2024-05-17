@@ -5,12 +5,13 @@ export const danxOptions = shallowRef<DanxOptions>({
 	tinyMceApiKey: "set-api-key-in-danx-options",
 	request: {
 		baseUrl: "",
-		headers: {}
+		headers: {},
+		onUnauthorized: undefined
 	},
 	fileUpload: {
 		directory: "file-upload",
 		createPresignedUpload: null,
-		presignedUploadCompleted: null
+		completePresignedUpload: null
 	},
 	flashMessages: {
 		default: {},

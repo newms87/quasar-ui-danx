@@ -32,12 +32,12 @@ export class FileUpload {
 
 		this.options = {
 			createPresignedUpload: null,
-			presignedUploadCompleted: null,
+			completePresignedUpload: null,
 			...danxOptions.value.fileUpload,
 			...options
 		};
 
-		if (!this.options.createPresignedUpload || !this.options.presignedUploadCompleted) {
+		if (!this.options.createPresignedUpload || !this.options.completePresignedUpload) {
 			throw new Error("Please configure danxOptions.fileUpload: import { configure } from 'quasar-ui-danx';");
 		}
 		this.prepare();
@@ -244,12 +244,12 @@ export class FileUpload {
 			throw new Error("File resource ID is required to complete presigned upload");
 		}
 
-		if (!this.options.presignedUploadCompleted) {
-			throw new Error("Please configure danxOptions.fileUpload.presignedUploadCompleted");
+		if (!this.options.completePresignedUpload) {
+			throw new Error("Please configure danxOptions.fileUpload.completePresignedUpload");
 		}
 
 		// Let the platform know the presigned upload is complete
-		return await this.options.presignedUploadCompleted(fileUpload.file.resource_id);
+		return await this.options.completePresignedUpload(fileUpload.file.resource_id);
 	}
 
 	/**

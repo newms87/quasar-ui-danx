@@ -35,7 +35,7 @@
       v-if="!readonly || uploadedFile"
       class="w-32 cursor-pointer mt-2"
       :class="{'border border-dashed border-blue-600': !uploadedFile, 'mx-auto': !readonly}"
-      :image="uploadedFile"
+      :file="uploadedFile"
       downloadable
       @click="!disable && $refs.file.click()"
     />
@@ -56,24 +56,24 @@ import FieldLabel from "./FieldLabel";
 
 const emit = defineEmits(["update:model-value"]);
 const props = defineProps({
-  modelValue: {
-    type: [Object, String],
-    default: null
-  },
-  field: {
-    type: Object,
-    required: true
-  },
-  showName: Boolean,
-  disable: Boolean,
-  readonly: Boolean
+	modelValue: {
+		type: [Object, String],
+		default: null
+	},
+	field: {
+		type: Object,
+		required: true
+	},
+	showName: Boolean,
+	disable: Boolean,
+	readonly: Boolean
 });
 const { onComplete, onDrop, onFileSelected, uploadedFile, clearUploadedFile } = useSingleFileUpload();
 onComplete(() => emit("update:model-value", uploadedFile.value));
 
 onMounted(() => {
-  if (props.modelValue) {
-    uploadedFile.value = props.modelValue;
-  }
+	if (props.modelValue) {
+		uploadedFile.value = props.modelValue;
+	}
 });
 </script>

@@ -2,7 +2,7 @@
   <div class="flex space-x-2">
     <template v-if="type === 'SINGLE_FILE'">
       <FilePreview
-        :image="value"
+        :file="value"
         class="w-24"
       />
     </template>
@@ -10,7 +10,7 @@
       <FilePreview
         v-for="file in value"
         :key="'file-' + file.id"
-        :image="file"
+        :file="file"
         class="w-24 mb-2"
       />
     </template>
@@ -27,34 +27,34 @@ import { fCurrency, fDate, fLocalizedDateTime, fNumber } from "../../helpers";
 import { FilePreview } from "../Utility";
 
 const props = defineProps({
-  type: {
-    type: String,
-    required: true
-  },
-  value: {
-    type: [Number, String, Array, Object, Boolean],
-    default: null
-  }
+	type: {
+		type: String,
+		required: true
+	},
+	value: {
+		type: [Number, String, Array, Object, Boolean],
+		default: null
+	}
 });
 
 function format(value) {
-  if (value === null || value === "" || value === undefined) {
-    return "";
-  }
+	if (value === null || value === "" || value === undefined) {
+		return "";
+	}
 
-  switch (props.type) {
-    case "NUMBER":
-      return fNumber(value);
-    case "CURRENCY":
-      return fCurrency(value);
-    case "DATE":
-      return fDate(value);
-    case "DATETIME":
-      return fLocalizedDateTime(value);
-    case "BOOLEAN":
-      return value ? "Yes" : "No";
-  }
+	switch (props.type) {
+		case "NUMBER":
+			return fNumber(value);
+		case "CURRENCY":
+			return fCurrency(value);
+		case "DATE":
+			return fDate(value);
+		case "DATETIME":
+			return fLocalizedDateTime(value);
+		case "BOOLEAN":
+			return value ? "Yes" : "No";
+	}
 
-  return value;
+	return value;
 }
 </script>

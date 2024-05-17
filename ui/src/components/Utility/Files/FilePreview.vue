@@ -54,11 +54,11 @@
         <slot name="action-button" />
       </div>
       <div
-        v-if="image && image.progress !== undefined"
+        v-if="file && file.progress !== undefined"
         class="absolute-bottom w-full"
       >
         <QLinearProgress
-          :value="image.progress"
+          :value="file.progress"
           size="15px"
           color="green-600"
           stripe
@@ -107,60 +107,59 @@
     <FullScreenCarouselDialog
       v-if="showPreview && !disabled"
       :files="relatedFiles || [computedImage]"
-      :default-slide="computedImage.id"
+      :default-slide="computedImage?.id || ''"
       @close="showPreview = false"
     />
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { DocumentTextIcon as TextFileIcon, DownloadIcon, PlayIcon } from "@heroicons/vue/outline";
-import { computed, ref } from "vue";
+import { UploadedFile } from "src/types";
+import { computed, ComputedRef, ref } from "vue";
 import { download } from "../../../helpers";
 import { ImageIcon, PdfIcon, TrashIcon as RemoveIcon } from "../../../svg";
 import { FullScreenCarouselDialog } from "../Dialogs";
 
+export interface FilePreviewProps {
+	src?: string;
+	file?: UploadedFile;
+	relatedFiles?: UploadedFile[];
+	missingIcon?: any;
+	downloadButtonClass?: string;
+	imageFit?: "cover" | "contain" | "fill" | "none" | "scale-down";
+	downloadable?: boolean;
+	removable?: boolean;
+	disabled?: boolean;
+	square?: boolean;
+}
+
 const emit = defineEmits(["remove"]);
-const props = defineProps({
-	src: {
-		type: String,
-		default: ""
-	},
-	image: {
-		type: Object,
-		default: null
-	},
-	relatedFiles: {
-		type: Array,
-		default: null
-	},
-	missingIcon: {
-		type: [Function, Object],
-		default: ImageIcon
-	},
-	downloadButtonClass: {
-		type: String,
-		default: "bg-blue-600 text-white"
-	},
-	imageFit: {
-		type: String,
-		default: "cover"
-	},
-	downloadable: Boolean,
-	removable: Boolean,
-	disabled: Boolean,
-	square: Boolean
+
+const props = withDefaults(defineProps<FilePreviewProps>(), {
+	src: "",
+	file: null,
+	relatedFiles: null,
+	missingIcon: ImageIcon,
+	downloadButtonClass: "bg-blue-600 text-white",
+	imageFit: "cover",
+	downloadable: false,
+	removable: false,
+	disabled: false,
+	square: false
 });
 
 const showPreview = ref(false);
-const computedImage = computed(() => {
-	if (props.image) {
-		return props.image;
+const computedImage: ComputedRef<UploadedFile | null> = computed(() => {
+	if (props.file) {
+		return props.file;
 	} else if (props.src) {
 		return {
 			id: props.src,
 			url: props.src,
-			type: "image/" + props.src.split(".").pop().toLowerCase()
+			type: "image/" + props.src.split(".").pop()?.toLowerCase(),
+			name: "",
+			size: 0
 		};
 	}
 	return null;

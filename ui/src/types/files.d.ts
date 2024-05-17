@@ -19,9 +19,10 @@ export interface UploadedFile {
 	size: number,
 	type: string;
 	mimeType?: string;
-	progress: number;
-	location: string;
-	blobUrl: string;
+	mime?: string;
+	progress?: number;
+	location?: string;
+	blobUrl?: string;
 	url?: string;
 }
 

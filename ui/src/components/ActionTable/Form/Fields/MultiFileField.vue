@@ -27,7 +27,7 @@
         :key="'file-upload-' + file.id"
         class="w-32 h-32 m-2 cursor-pointer bg-gray-200"
         :class="{'border border-dashed border-blue-600': !uploadedFiles.length}"
-        :image="file"
+        :file="file"
         :related-files="uploadedFiles"
         downloadable
         :removable="!readonly && !disable"

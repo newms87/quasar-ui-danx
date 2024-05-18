@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div v-if="readonly">
+    <div v-if="readonly && label || field?.label">
       <LabelValueBlock
         :label="label || field.label"
         :value="modelValue"
@@ -13,6 +13,7 @@
         :placeholder="field?.placeholder"
         outlined
         dense
+        :readonly="readonly"
         :autogrow="autogrow"
         :disable="disabled"
         :label-slot="!noLabel"

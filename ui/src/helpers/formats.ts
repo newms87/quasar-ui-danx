@@ -131,6 +131,9 @@ export function fSecondsToTime(second: number) {
 export function fElapsedTime(start: string, end?: string) {
 	const endDateTime = end ? parseDateTime(end) : DateTime.now();
 	const diff = endDateTime.diff(parseDateTime(start), ["hours", "minutes", "seconds"]);
+	if (!diff.isValid) {
+		return "-";
+	}
 	const hours = Math.floor(diff.hours);
 	const minutes = Math.floor(diff.minutes);
 	const seconds = Math.floor(diff.seconds);

@@ -6,14 +6,14 @@
   >
     <div
       ref="editableBox"
-      :contenteditable="isEditing"
+      :contenteditable="!readonly && isEditing"
       class="flex-grow p-2 rounded outline-none border-none"
       :class="{[editingClass]: isEditing}"
       @input="text = $event.target.innerText"
     >
       {{ text }}
     </div>
-    <div>
+    <div v-if="!readonly">
       <QBtn
         v-if="isEditing"
         @click.stop="isEditing = false"
@@ -36,6 +36,7 @@ import { nextTick, ref } from "vue";
 export interface Props {
 	class?: "hover:bg-slate-300",
 	editingClass?: "bg-slate-500";
+	readonly?: boolean;
 }
 
 const editableBox = ref<HTMLElement | null>(null);
@@ -43,6 +44,7 @@ const text = defineModel({ type: String });
 const props = defineProps<Props>();
 const isEditing = ref(false);
 function onEdit() {
+	if (props.readonly) return;
 	isEditing.value = true;
 	nextTick(() => {
 		editableBox.value?.focus();

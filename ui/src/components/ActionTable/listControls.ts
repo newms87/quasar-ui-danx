@@ -1,5 +1,5 @@
 import { computed, Ref, ref, shallowRef, watch } from "vue";
-import { RouteLocationNormalizedLoaded, Router, useRoute, useRouter } from "vue-router";
+import { RouteLocationNormalizedLoaded, RouteParams, Router, useRoute, useRouter } from "vue-router";
 import { getItem, setItem, storeObject, waitForRef } from "../../helpers";
 import {
 	ActionController,
@@ -395,12 +395,24 @@ export function useListControls(name: string, options: ListControlsOptions): Act
 		 * Watch the id params in the route and set the active item to the item with the given id.
 		 */
 		if (options.routes.details) {
-			const { params, meta } = useRoute();
-			const id = Array.isArray(params?.id) ? params.id[0] : params?.id;
-			if (id && meta.type) {
-				const panel = Array.isArray(params?.panel) ? params.panel[0] : params?.panel;
-				activatePanel({ id, __type: "" + meta.type }, panel || activePanel.value || "");
-			}
+			const { params, meta } = vueRoute;
+
+			const controlRouteName = vueRoute.name;
+			vueRouter.afterEach((to) => {
+				if (to.name === controlRouteName) {
+					setPanelFromRoute(to.params, to.meta);
+				}
+			});
+
+			setPanelFromRoute(params, meta);
+		}
+	}
+
+	function setPanelFromRoute(params: RouteParams, meta: AnyObject) {
+		const id = Array.isArray(params?.id) ? params.id[0] : params?.id;
+		if (id && meta.type) {
+			const panel = Array.isArray(params?.panel) ? params.panel[0] : params?.panel;
+			activatePanel({ id, __type: "" + meta.type }, panel || activePanel.value || "");
 		}
 	}
 

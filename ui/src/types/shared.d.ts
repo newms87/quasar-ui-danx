@@ -4,6 +4,7 @@ export interface TypedObject {
 	id?: string | number;
 	name?: string;
 	__type: string;
+	__timestamp?: number;
 
 	[key: string]: TypedObject[] | any;
 }

@@ -4,6 +4,8 @@ import { isJSON } from "./utils";
 
 const SERVER_TZ = new IANAZone("America/Chicago");
 
+export { DateTime, SERVER_TZ };
+
 /**
  * Converts a date string from the server's time zone to the user's time zone.
  * @param {String} dateTimeString
@@ -124,6 +126,15 @@ export function fSecondsToTime(second: number) {
 	const time = DateTime.now().setZone("UTC").startOf("year").set({ second });
 	const hours = Math.floor(second / 3600);
 	return (hours ? hours + ":" : "") + time.toFormat("mm:ss");
+}
+
+export function fElapsedTime(start: string, end?: string) {
+	const endDateTime = end ? parseDateTime(end) : DateTime.now();
+	const diff = endDateTime.diff(parseDateTime(start), ["hours", "minutes", "seconds"]);
+	const hours = Math.floor(diff.hours);
+	const minutes = Math.floor(diff.minutes);
+	const seconds = Math.floor(diff.seconds);
+	return `${hours ? hours + "h " : ""}${minutes ? minutes + "m " : ""}${seconds}s`;
 }
 
 /**

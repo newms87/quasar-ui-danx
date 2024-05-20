@@ -142,13 +142,12 @@ export function fElapsedTime(start: string, end?: string) {
 
 /**
  * Formats an amount into USD currency format
- * @param amount
- * @returns {string}
  */
-export function fCurrency(amount: number) {
+export function fCurrency(amount: number, options?: object) {
 	return new Intl.NumberFormat("en-US", {
 		style: "currency",
-		currency: "USD"
+		currency: "USD",
+		...options
 	}).format(amount);
 }
 

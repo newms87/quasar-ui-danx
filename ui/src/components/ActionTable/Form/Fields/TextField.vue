@@ -1,15 +1,13 @@
 <template>
   <div>
-    <div v-if="readonly && label || field?.label">
+    <div v-if="readonly">
       <LabelValueBlock
-        :label="label || field.label"
+        :label="label || field?.label || 'Text'"
         :value="modelValue"
       />
     </div>
     <template v-else>
       <QInput
-        :data-dusk="'text-field-' + field?.id"
-        :data-testid="'text-field-' + field?.id"
         :placeholder="field?.placeholder"
         outlined
         dense

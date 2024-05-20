@@ -1,9 +1,10 @@
+import { QInputProps } from "quasar";
 import { FormField } from "./forms";
 
 export interface TextFieldProps {
-	modelValue?: string | number,
+	modelValue?: string,
 	field?: FormField,
-	type?: string,
+	type?: QInputProps["type"],
 	label?: string,
 	labelClass?: string,
 	parentClass?: string,

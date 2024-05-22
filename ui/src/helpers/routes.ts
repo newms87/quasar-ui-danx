@@ -22,8 +22,8 @@ export function useActionRoutes(baseUrl: string) {
 		batchAction(action: string, targets: ActionTargetItem[], data: object) {
 			return request.post(`${baseUrl}/batch-action`, { action, filter: { id: targets.map(r => r.id) }, data });
 		},
-		export(filter: AnyObject) {
-			return downloadFile(`${baseUrl}/export`, "agents.csv", { filter });
+		export(filter: AnyObject, name?: string) {
+			return downloadFile(`${baseUrl}/export`, name || "export.csv", { filter });
 		}
 	};
 }

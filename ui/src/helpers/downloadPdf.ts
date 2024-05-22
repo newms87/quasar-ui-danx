@@ -1,3 +1,4 @@
+import { danxOptions } from "../config";
 import { AnyObject, HttpResponse } from "../types";
 import { download } from "./download";
 
@@ -15,7 +16,9 @@ export async function downloadFile(url: string, filename = "", postParams: AnyOb
 	if (postParams) {
 		fetchOptions = {
 			method: "POST",
-			"Content-Type": "application/json",
+			headers: {
+				...danxOptions.value.request?.headers
+			},
 			body: JSON.stringify(postParams)
 		};
 	}

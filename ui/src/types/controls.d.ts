@@ -1,6 +1,7 @@
 import { ComputedRef, Ref, ShallowRef } from "vue";
+import { RouteLocationNormalizedLoaded, Router } from "vue-router";
 import { ActionTargetItem } from "./actions";
-import { LabelValueItem } from "./shared";
+import { AnyObject, LabelValueItem } from "./shared";
 
 export interface ListControlsFilter {
 	[key: string]: object | object[] | null | undefined | string | number | boolean;
@@ -20,13 +21,23 @@ export interface FilterGroup {
 	fields: FilterableField[];
 }
 
+
 export interface ListControlsRoutes {
-	list: (pager: object) => Promise<ActionTargetItem[]>;
-	details?: (item: object) => Promise<ActionTargetItem> | null;
-	summary?: (filter: object | null) => Promise<object> | null;
-	fieldOptions?: (filter: object | null) => Promise<object> | null;
-	more?: (pager: object) => Promise<ActionTargetItem[]> | null;
-	export: (filter?: ListControlsFilter) => Promise<void>;
+	list(pager?: ListControlsPagination): Promise<ActionTargetItem[]>;
+
+	summary?(filter?: ListControlsFilter): Promise<object>;
+
+	details?(target: ActionTargetItem): Promise<ActionTargetItem>;
+
+	more?(pager: ListControlsPagination): Promise<ActionTargetItem[]>;
+
+	fieldOptions?(filter?: AnyObject): Promise<object>;
+
+	applyAction?(action: string, target: ActionTargetItem | null, data: object): Promise<object>;
+
+	batchAction?(action: string, targets: ActionTargetItem[], data: object): Promise<object>;
+
+	export?(filter?: ListControlsFilter, name?: string): Promise<void>;
 }
 
 export interface ListControlsOptions {
@@ -44,6 +55,8 @@ export interface ListControlsPagination {
 	page?: number;
 	rowsNumber?: number;
 	rowsPerPage?: number;
+	perPage?: number;
+	filter?: ListControlsFilter;
 }
 
 export interface PagedItems {
@@ -52,6 +65,11 @@ export interface PagedItems {
 		total: number;
 		last_page?: number;
 	} | undefined;
+}
+
+export interface ListControlsInitializeOptions {
+	vueRoute: RouteLocationNormalizedLoaded;
+	vueRouter: Router;
 }
 
 export interface ActionController {
@@ -78,7 +96,7 @@ export interface ActionController {
 	activePanel: ShallowRef<string | null>;
 
 	// Actions
-	initialize: () => void;
+	initialize: (options: ListControlsInitializeOptions) => void;
 	resetPaging: () => void;
 	setPagination: (updated: ListControlsPagination) => void;
 	setSelectedRows: (selection: ActionTargetItem[]) => void;

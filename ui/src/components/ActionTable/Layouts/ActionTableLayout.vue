@@ -8,6 +8,7 @@
         :actions="actions?.filter(a => a.batch)"
         :action-target="controller.selectedRows.value"
         :exporter="controller.exportList"
+        :loading="controller.isLoadingList.value || controller.isLoadingSummary.value"
         @refresh="controller.refreshAll"
       >
         <template #default>

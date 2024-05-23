@@ -1,28 +1,29 @@
-import { ActionTargetItem, AnyObject, ListControlsPagination } from "../types";
+import { ListControlsRoutes } from "../types";
 import { downloadFile } from "./downloadPdf";
 import { request } from "./request";
 
-export function useActionRoutes(baseUrl: string) {
+export function useActionRoutes(baseUrl: string): ListControlsRoutes {
 	return {
-		list(pager: ListControlsPagination) {
-			return request.post(`${baseUrl}/list`, pager);
+		list(pager?) {
+			console.log("here");
+			return request.post(`${baseUrl}/list`, pager, { abortOn: "list" });
 		},
-		summary(filter: AnyObject) {
+		summary(filter) {
 			return request.post(`${baseUrl}/summary`, { filter });
 		},
-		details(target: ActionTargetItem) {
+		details(target) {
 			return request.get(`${baseUrl}/${target.id}/details`);
 		},
 		fieldOptions() {
 			return request.get(`${baseUrl}/field-options`);
 		},
-		applyAction(action: string, target: ActionTargetItem | null, data: object) {
+		applyAction(action, target, data) {
 			return request.post(`${baseUrl}/${target ? target.id : "new"}/apply-action`, { action, data });
 		},
-		batchAction(action: string, targets: ActionTargetItem[], data: object) {
+		batchAction(action, targets, data) {
 			return request.post(`${baseUrl}/batch-action`, { action, filter: { id: targets.map(r => r.id) }, data });
 		},
-		export(filter: AnyObject, name?: string) {
+		export(filter, name) {
 			return downloadFile(`${baseUrl}/export`, name || "export.csv", { filter });
 		}
 	};

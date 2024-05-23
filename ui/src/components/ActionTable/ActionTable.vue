@@ -9,7 +9,7 @@
       :selected="selectedRows"
       :pagination="pagination"
       :columns="tableColumns"
-      :loading="loadingList"
+      :loading="loadingList || loadingSummary"
       :rows="pagedItems?.data || []"
       :binary-state-sort="false"
       selection="multiple"

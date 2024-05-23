@@ -391,10 +391,12 @@ export function useListControls(name: string, options: ListControlsOptions): Act
 		// Setup Vue Router handling
 		vueRoute = useRoute();
 		vueRouter = useRouter();
+
+		console.log("init listControl", name, options, "vueRoute", vueRoute);
 		/**
 		 * Watch the id params in the route and set the active item to the item with the given id.
 		 */
-		if (options.routes.details) {
+		if (options.routes.details && vueRoute) {
 			const { params, meta } = vueRoute;
 
 			const controlRouteName = vueRoute.name;

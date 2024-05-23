@@ -1,5 +1,5 @@
 import { computed, Ref, ref, shallowRef, watch } from "vue";
-import { RouteLocationNormalizedLoaded, RouteParams, Router, useRoute, useRouter } from "vue-router";
+import { RouteLocationNormalizedLoaded, RouteParams, Router } from "vue-router";
 import { getItem, setItem, storeObject, waitForRef } from "../../helpers";
 import {
 	ActionController,
@@ -7,6 +7,7 @@ import {
 	AnyObject,
 	FilterGroup,
 	ListControlsFilter,
+	ListControlsInitializeOptions,
 	ListControlsOptions,
 	ListControlsPagination,
 	PagedItems
@@ -380,19 +381,16 @@ export function useListControls(name: string, options: ListControlsOptions): Act
 	}
 
 	async function exportList(filter?: ListControlsFilter) {
-		return options.routes.export(filter);
+		options.routes.export && await options.routes.export(filter);
 	}
 
 	// Initialize the list actions and load settings, lists, summaries, filter fields, etc.
-	function initialize() {
+	function initialize(initOptions: ListControlsInitializeOptions) {
+		vueRouter = initOptions.vueRouter;
+		vueRoute = initOptions.vueRoute;
 		isInitialized = true;
 		loadSettings();
 
-		// Setup Vue Router handling
-		vueRoute = useRoute();
-		vueRouter = useRouter();
-
-		console.log("init listControl", name, options, "vueRoute", vueRoute);
 		/**
 		 * Watch the id params in the route and set the active item to the item with the given id.
 		 */

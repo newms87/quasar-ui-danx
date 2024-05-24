@@ -17,59 +17,54 @@ export const request: RequestApi = {
 	},
 
 	async call(url, options) {
-		try {
+		options = options || {};
+		const abortKey = options?.abortOn !== undefined ? options.abortOn : url;
+		const timestamp = new Date().getTime();
+
+		if (abortKey) {
 			const abort = new AbortController();
-			const timestamp = new Date().getTime();
-
-			console.log("call", url, options);
-			if (options?.abortOn) {
-				console.log("setting up abort", options.abortOn);
-				const previousAbort = options.abortOn && request.abortControllers[options.abortOn];
-				// If there is already an abort controller set for this key, abort it
-				if (previousAbort) {
-					previousAbort.abort.abort();
-				}
-
-				// Set the new abort controller for this key
-				request.abortControllers[options.abortOn] = { abort, timestamp };
-				options.signal = abort.signal;
+			const previousAbort = request.abortControllers[abortKey];
+			// If there is already an abort controller set for this key, abort it
+			if (previousAbort) {
+				previousAbort.abort.abort("Request was aborted due to a newer request being made");
 			}
 
-			console.log("current timestamp:", timestamp);
-			const response = await fetch(request.url(url), options);
+			// Set the new abort controller for this key
+			request.abortControllers[abortKey] = { abort, timestamp };
+			options.signal = abort.signal;
+		}
 
-			// handle the case where the request was aborted too late, and we need to abort the response via timestamp check
-			if (options?.abortOn) {
-				if (request.abortControllers[options.abortOn].timestamp !== timestamp) {
-					console.log("aborting request", options.abortOn, timestamp, "!==", request.abortControllers[options.abortOn].timestamp);
-					return { abort: true };
-				}
+		const response = await fetch(request.url(url), options);
 
-				delete request.abortControllers[options.abortOn];
+		// handle the case where the request was aborted too late, and we need to abort the response via timestamp check
+		if (abortKey) {
+			// If the request was aborted too late, but there was still another request that was made after the current,
+			// then abort the current request with an abort flag
+			if (timestamp < request.abortControllers[abortKey].timestamp) {
+				throw new Error("Request was aborted due to a newer request being made: " + timestamp + " < " + request.abortControllers[abortKey].timestamp);
 			}
 
-			const result = await response.json();
+			// Otherwise, the current is the most recent request, so we can delete the abort controller
+			delete request.abortControllers[abortKey];
+		}
 
-			if (response.status === 401) {
-				const onUnauthorized = danxOptions.value.request?.onUnauthorized;
-				return onUnauthorized ? onUnauthorized(response) : {
-					error: true,
-					message: "Unauthorized"
-				};
-			}
+		const result = await response.json();
 
-			if (response.status > 400) {
-				if (result.exception && !result.error) {
-					result.error = true;
-				}
-			}
-
-			return result;
-		} catch (error: any) {
-			return {
-				error: error.message || "An error occurred fetching the data"
+		if (response.status === 401) {
+			const onUnauthorized = danxOptions.value.request?.onUnauthorized;
+			return onUnauthorized ? onUnauthorized(response) : {
+				error: true,
+				message: "Unauthorized"
 			};
 		}
+
+		if (response.status > 400) {
+			if (result.exception && !result.error) {
+				result.error = true;
+			}
+		}
+
+		return result;
 	},
 	async get(url, options) {
 		return await request.call(url, {

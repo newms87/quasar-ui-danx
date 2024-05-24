@@ -75,8 +75,12 @@ export function useListControls(name: string, options: ListControlsOptions): Act
 	async function loadList() {
 		if (!isInitialized) return;
 		isLoadingList.value = true;
-		setPagedItems(await options.routes.list(pager.value));
-		isLoadingList.value = false;
+		try {
+			setPagedItems(await options.routes.list(pager.value));
+			isLoadingList.value = false;
+		} catch (e) {
+			// Fail silently
+		}
 	}
 
 	async function loadSummary() {
@@ -87,8 +91,12 @@ export function useListControls(name: string, options: ListControlsOptions): Act
 		if (selectedRows.value.length) {
 			summaryFilter.id = selectedRows.value.map((row) => row.id);
 		}
-		summary.value = await options.routes.summary(summaryFilter);
-		isLoadingSummary.value = false;
+		try {
+			summary.value = await options.routes.summary(summaryFilter);
+			isLoadingSummary.value = false;
+		} catch (e) {
+			// Fail silently
+		}
 	}
 
 	async function loadListAndSummary() {
@@ -110,8 +118,12 @@ export function useListControls(name: string, options: ListControlsOptions): Act
 	async function loadFieldOptions() {
 		if (!options.routes.fieldOptions || !isInitialized) return;
 		isLoadingFilters.value = true;
-		fieldOptions.value = await options.routes.fieldOptions(activeFilter.value) || {};
-		isLoadingFilters.value = false;
+		try {
+			fieldOptions.value = await options.routes.fieldOptions(activeFilter.value) || {};
+			isLoadingFilters.value = false;
+		} catch (e) {
+			// Fail silently
+		}
 	}
 
 	/**
@@ -197,18 +209,22 @@ export function useListControls(name: string, options: ListControlsOptions): Act
 	async function loadMore(index: number, perPage: number | undefined = undefined) {
 		if (!options.routes.more) return false;
 
-		const newItems = await options.routes.more({
-			page: index + 1,
-			perPage,
-			filter: { ...activeFilter.value, ...globalFilter.value }
-		});
-
-		if (newItems && newItems.length > 0) {
-			setPagedItems({
-				data: [...(pagedItems.value?.data || []), ...newItems],
-				meta: { total: pagedItems.value?.meta?.total || 0 }
+		try {
+			const newItems = await options.routes.more({
+				page: index + 1,
+				perPage,
+				filter: { ...activeFilter.value, ...globalFilter.value }
 			});
-			return true;
+
+			if (newItems && newItems.length > 0) {
+				setPagedItems({
+					data: [...(pagedItems.value?.data || []), ...newItems],
+					meta: { total: pagedItems.value?.meta?.total || 0 }
+				});
+				return true;
+			}
+		} catch (e) {
+			// Fail silently
 		}
 
 		return false;
@@ -283,14 +299,18 @@ export function useListControls(name: string, options: ListControlsOptions): Act
 	async function getActiveItemDetails() {
 		if (!activeItem.value || !options.routes.details) return;
 
-		const result = await options.routes.details(activeItem.value);
+		try {
+			const result = await options.routes.details(activeItem.value);
 
-		if (!result || !result.__type || !result.id) {
-			return console.error("Invalid response from details route: All responses must include a __type and id field. result =", result);
+			if (!result || !result.__type || !result.id) {
+				return console.error("Invalid response from details route: All responses must include a __type and id field. result =", result);
+			}
+
+			// Reassign the active item to the store object to ensure reactivity
+			activeItem.value = storeObject(result);
+		} catch (e) {
+			// Fail silently
 		}
-
-		// Reassign the active item to the store object to ensure reactivity
-		activeItem.value = storeObject(result);
 	}
 
 	// Whenever the active item changes, fill the additional item details

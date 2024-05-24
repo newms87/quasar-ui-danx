@@ -5,7 +5,7 @@ import { request } from "./request";
 export function useActionRoutes(baseUrl: string): ListControlsRoutes {
 	return {
 		list(pager?) {
-			return request.post(`${baseUrl}/list`, pager, { abortOn: "list" });
+			return request.post(`${baseUrl}/list`, pager);
 		},
 		summary(filter) {
 			return request.post(`${baseUrl}/summary`, { filter });

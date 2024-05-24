@@ -1,5 +1,5 @@
 import { ComputedRef, Ref, ShallowRef } from "vue";
-import { RouteLocationNormalizedLoaded, Router } from "vue-router";
+import { Router } from "vue-router";
 import { ActionTargetItem } from "./actions";
 import { AnyObject, LabelValueItem } from "./shared";
 
@@ -68,8 +68,7 @@ export interface PagedItems {
 }
 
 export interface ListControlsInitializeOptions {
-	vueRoute: RouteLocationNormalizedLoaded;
-	vueRouter: Router;
+	vueRouter?: Router;
 }
 
 export interface ActionController {

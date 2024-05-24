@@ -16,8 +16,8 @@ import { getFilterFromUrl } from "./listHelpers";
 
 export function useListControls(name: string, options: ListControlsOptions): ActionController {
 	let isInitialized = false;
-	let vueRoute: RouteLocationNormalizedLoaded | null = null;
-	let vueRouter: Router | null = null;
+	let vueRoute: RouteLocationNormalizedLoaded | null | undefined;
+	let vueRouter: Router | null | undefined;
 	const PAGE_SETTINGS_KEY = `dx-${name}-pager`;
 	const pagedItems = shallowRef<PagedItems | null>(null);
 	const activeFilter = ref<ListControlsFilter>({});
@@ -314,12 +314,8 @@ export function useListControls(name: string, options: ListControlsOptions): Act
 		activePanel.value = panel;
 
 		// Push vue router change /:id/:panel
-		if (vueRoute && vueRouter && item?.id) {
-			vueRouter.push({
-				name: Array.isArray(vueRoute.name) ? vueRoute.name[0] : vueRoute.name,
-				params: { id: item.id, panel },
-				replace: true
-			});
+		if (item?.id) {
+			updateRouteParams({ id: item.id, panel });
 		}
 	}
 
@@ -330,7 +326,7 @@ export function useListControls(name: string, options: ListControlsOptions): Act
 		activeItem.value = item ? storeObject(item) : item;
 
 		if (!item?.id) {
-			vueRouter?.push({ name: vueRoute?.name || "home" });
+			updateRouteParams({});
 		}
 	}
 
@@ -385,16 +381,16 @@ export function useListControls(name: string, options: ListControlsOptions): Act
 	}
 
 	// Initialize the list actions and load settings, lists, summaries, filter fields, etc.
-	function initialize(initOptions: ListControlsInitializeOptions) {
-		vueRouter = initOptions.vueRouter;
-		vueRoute = initOptions.vueRoute;
+	function initialize(initOptions?: ListControlsInitializeOptions) {
+		vueRouter = initOptions?.vueRouter;
+		vueRoute = initOptions?.vueRouter?.currentRoute.value;
 		isInitialized = true;
 		loadSettings();
 
 		/**
 		 * Watch the id params in the route and set the active item to the item with the given id.
 		 */
-		if (options.routes.details && vueRoute) {
+		if (options.routes.details && vueRoute && vueRouter) {
 			const { params, meta } = vueRoute;
 
 			const controlRouteName = vueRoute.name;
@@ -405,6 +401,18 @@ export function useListControls(name: string, options: ListControlsOptions): Act
 			});
 
 			setPanelFromRoute(params, meta);
+		}
+	}
+
+	/**
+	 * Updates the URL bar and route to the given params.
+	 */
+	function updateRouteParams(params: AnyObject) {
+		if (vueRouter && vueRoute) {
+			vueRouter.push({
+				name: (Array.isArray(vueRoute.name) ? vueRoute.name[0] : vueRoute.name) || "home",
+				params
+			});
 		}
 	}
 

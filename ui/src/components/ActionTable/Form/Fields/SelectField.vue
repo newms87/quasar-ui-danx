@@ -1,5 +1,10 @@
 <template>
   <div>
+    <FieldLabel
+      v-if="label"
+      :label="label"
+      class="mb-1 block"
+    />
     <QSelect
       ref="selectField"
       v-bind="$props"
@@ -15,6 +20,7 @@
       option-label="label"
       option-value="value"
       placeholder=""
+      label=""
       :input-class="{'is-hidden': !isShowing, [inputClass]: true}"
       class="max-w-full dx-select-field"
       @filter="onFilter"
@@ -68,6 +74,7 @@
 import { ChevronDownIcon as DropDownIcon } from "@heroicons/vue/outline";
 import { QSelect, QSelectProps } from "quasar";
 import { computed, isRef, nextTick, ref } from "vue";
+import FieldLabel from "./FieldLabel";
 
 export interface Props extends QSelectProps {
 	modelValue?: any;

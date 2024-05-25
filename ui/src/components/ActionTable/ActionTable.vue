@@ -1,7 +1,7 @@
 <template>
   <div
     class="dx-action-table overflow-hidden"
-    :class="{'dx-no-data': !hasData}"
+    :class="{'dx-no-data': !hasData, 'dx-is-loading': loadingList || loadingSummary, 'dx-is-loading-list': loadingList}"
   >
     <ActionVnode />
     <QTable

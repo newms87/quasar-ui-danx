@@ -9,24 +9,28 @@
       :class="{'has-selection': selectedCount}"
     >
       <div class="flex flex-nowrap items-center">
-        <div
-          v-if="selectedCount"
-          class="flex items-center"
-        >
-          <ClearIcon
-            class="w-6 mr-3"
-            @click="$emit('clear')"
+        <div class="relative">
+          <QSpinner
+            v-if="loading"
+            class="absolute top-0 left-0"
+            size="18"
           />
-          {{ fNumber(selectedCount) }} {{ selectedLabel }}
+          <div
+            :class="{'opacity-0': loading}"
+            class="flex items-center nowrap"
+          >
+            <ClearIcon
+              v-if="selectedCount"
+              class="w-6 mr-3 cursor-pointer"
+              @click="$emit('clear')"
+            />
+
+            {{ fNumber(selectedCount || itemCount) }}
+          </div>
         </div>
-        <div v-else-if="itemCount">
-          {{ fNumber(itemCount) }} {{ label }}
+        <div class="ml-2">
+          {{ selectedCount ? selectedLabel : label }}
         </div>
-        <QSpinner
-          v-if="loading"
-          class="ml-3"
-          size="18"
-        />
       </div>
     </QTd>
     <QTd
@@ -48,49 +52,49 @@ import { fNumber } from "../../helpers";
 
 defineEmits(["clear"]);
 const props = defineProps({
-  loading: Boolean,
-  label: {
-    type: String,
-    default: "Rows"
-  },
-  selectedLabel: {
-    type: String,
-    default: "Selected"
-  },
-  selectedCount: {
-    type: Number,
-    default: 0
-  },
-  itemCount: {
-    type: Number,
-    default: 0
-  },
-  summary: {
-    type: Object,
-    default: null
-  },
-  columns: {
-    type: Array,
-    required: true
-  },
-  stickyColspan: {
-    type: Number,
-    default: 2
-  }
+	loading: Boolean,
+	label: {
+		type: String,
+		default: "Rows"
+	},
+	selectedLabel: {
+		type: String,
+		default: "Selected"
+	},
+	selectedCount: {
+		type: Number,
+		default: 0
+	},
+	itemCount: {
+		type: Number,
+		default: 0
+	},
+	summary: {
+		type: Object,
+		default: null
+	},
+	columns: {
+		type: Array,
+		required: true
+	},
+	stickyColspan: {
+		type: Number,
+		default: 2
+	}
 });
 
 const summaryColumns = computed(() => {
-  // The sticky columns are where we display the selection count and should not be included in the summary columns
-  return props.columns.slice(props.stickyColspan - 1);
+	// The sticky columns are where we display the selection count and should not be included in the summary columns
+	return props.columns.slice(props.stickyColspan - 1);
 });
 
 function formatValue(column) {
-  const value = props.summary[column.name];
-  if (value === undefined) return "";
+	const value = props.summary[column.name];
+	if (value === undefined) return "";
 
-  if (column.format) {
-    return column.format(value);
-  }
-  return value;
+	if (column.format) {
+		return column.format(value);
+	}
+	return value;
 }
 </script>

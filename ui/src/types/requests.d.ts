@@ -1,3 +1,5 @@
+import { AnyObject } from "src/types/shared";
+
 export interface RequestApi {
 	abortControllers: { [key: string]: { abort: AbortController, timestamp: number } };
 
@@ -20,8 +22,9 @@ export interface HttpResponse {
 
 export interface RequestOptions {
 	baseUrl?: string;
-	headers?: object;
+	headers?: AnyObject;
 	onUnauthorized?: (response) => object;
+	onAppVersionMismatch?: (version) => void;
 }
 
 export interface RequestCallOptions extends RequestInit {

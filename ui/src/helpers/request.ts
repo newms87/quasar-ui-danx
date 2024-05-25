@@ -1,6 +1,6 @@
 import { Ref } from "vue";
 import { danxOptions } from "../config";
-import { RequestApi } from "../types";
+import { HttpResponse, RequestApi } from "../types";
 
 /**
  * A simple request helper that wraps the fetch API
@@ -35,6 +35,9 @@ export const request: RequestApi = {
 		}
 
 		const response = await fetch(request.url(url), options);
+
+		// Verify the app version of the client and server are matching
+		checkAppVersion(response);
 
 		// handle the case where the request was aborted too late, and we need to abort the response via timestamp check
 		if (abortKey) {
@@ -91,6 +94,23 @@ export const request: RequestApi = {
 		});
 	}
 };
+
+/**
+ * Checks the app version of the client and server to see if they match.
+ * If they do not match, the onAppVersionMismatch callback is called
+ */
+function checkAppVersion(response: HttpResponse) {
+	const requestOptions = danxOptions.value.request;
+	if (!requestOptions || !requestOptions.headers || !requestOptions.onAppVersionMismatch) {
+		return;
+	}
+
+	const clientAppVersion = requestOptions.headers["X-App-Version"] || "";
+	const serverAppVersion = response.headers.get("X-App-Version");
+	if (clientAppVersion && clientAppVersion !== serverAppVersion) {
+		requestOptions.onAppVersionMismatch(serverAppVersion);
+	}
+}
 
 /**
  * Fetches a resource list applying the filter. If there is a selected resource,

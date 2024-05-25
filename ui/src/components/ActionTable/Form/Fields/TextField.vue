@@ -1,12 +1,14 @@
 <template>
   <div>
-    <div v-if="readonly">
-      <LabelValueBlock
-        :label="label || field?.label || 'Text'"
-        :value="modelValue"
-      />
-    </div>
-    <template v-else>
+    <FieldLabel
+      :field="field"
+      :label="label"
+      :show-name="showName"
+      :class="labelClass"
+      :value="readonly ? modelValue : ''"
+      class="mb-1 block"
+    />
+    <template v-if="!readonly">
       <QInput
         :placeholder="field?.placeholder"
         outlined
@@ -24,16 +26,7 @@
         :debounce="debounce"
         @keydown.enter="$emit('submit')"
         @update:model-value="$emit('update:model-value', $event)"
-      >
-        <template #label>
-          <FieldLabel
-            :field="field"
-            :label="label"
-            :show-name="showName"
-            :class="labelClass"
-          />
-        </template>
-      </QInput>
+      />
       <MaxLengthCounter
         :length="modelValue?.length || 0"
         :max-length="field?.maxLength"
@@ -46,7 +39,6 @@
 import { TextFieldProps } from "../../../../types";
 import MaxLengthCounter from "../Utilities/MaxLengthCounter";
 import FieldLabel from "./FieldLabel";
-import LabelValueBlock from "./LabelValueBlock";
 
 defineEmits(["update:model-value", "submit"]);
 withDefaults(defineProps<TextFieldProps>(), {

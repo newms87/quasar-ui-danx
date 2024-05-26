@@ -12,8 +12,8 @@
 </template>
 
 <script setup lang="ts">
-import { FormField } from "src/types";
 import { computed } from "vue";
+import { FormField } from "../../../../types";
 
 const props = defineProps<{
 	field?: FormField;

@@ -1,4 +1,4 @@
-import { AnyObject } from "src/types/shared";
+import { AnyObject } from "./shared";
 
 export interface RequestApi {
 	abortControllers: { [key: string]: { abort: AbortController, timestamp: number } };

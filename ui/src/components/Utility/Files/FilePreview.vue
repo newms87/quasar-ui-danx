@@ -115,10 +115,10 @@
 
 <script setup lang="ts">
 import { DocumentTextIcon as TextFileIcon, DownloadIcon, PlayIcon } from "@heroicons/vue/outline";
-import { UploadedFile } from "src/types";
 import { computed, ComputedRef, ref } from "vue";
 import { download } from "../../../helpers";
 import { ImageIcon, PdfIcon, TrashIcon as RemoveIcon } from "../../../svg";
+import { UploadedFile } from "../../../types";
 import { FullScreenCarouselDialog } from "../Dialogs";
 
 export interface FilePreviewProps {

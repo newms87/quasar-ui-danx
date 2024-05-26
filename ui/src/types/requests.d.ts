@@ -23,7 +23,7 @@ export interface HttpResponse {
 export interface RequestOptions {
 	baseUrl?: string;
 	headers?: AnyObject;
-	onUnauthorized?: (response) => object;
+	onUnauthorized?: (result: any, response: Response) => object;
 	onAppVersionMismatch?: (version) => void;
 }
 

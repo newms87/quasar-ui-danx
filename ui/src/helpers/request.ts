@@ -55,9 +55,10 @@ export const request: RequestApi = {
 
 		if (response.status === 401) {
 			const onUnauthorized = danxOptions.value.request?.onUnauthorized;
-			return onUnauthorized ? onUnauthorized(response) : {
+			return onUnauthorized ? onUnauthorized(result, response) : {
 				error: true,
-				message: "Unauthorized"
+				message: "Unauthorized",
+				...result
 			};
 		}
 

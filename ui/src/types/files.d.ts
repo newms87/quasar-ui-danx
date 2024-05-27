@@ -24,6 +24,9 @@ export interface UploadedFile {
 	location?: string;
 	blobUrl?: string;
 	url?: string;
+	thumb?: UploadedFile;
+	optimized?: UploadedFile;
+	transcodes?: UploadedFile[];
 }
 
 export interface FileUploadCompleteCallbackParams {

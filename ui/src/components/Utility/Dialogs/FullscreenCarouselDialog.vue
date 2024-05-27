@@ -74,7 +74,7 @@ function isVideo(file) {
 }
 
 function getPreviewUrl(file) {
-	return file.transcodes?.compress?.url || file.blobUrl || file.url;
+	return file.optimized?.url || file.blobUrl || file.url;
 }
 
 function getThumbUrl(file) {

@@ -1,0 +1,5 @@
+.q-carousel {
+	.q-carousel__thumbnail--active {
+		@apply outline-1 outline-sky-800;
+	}
+}

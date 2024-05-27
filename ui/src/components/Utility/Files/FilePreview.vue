@@ -107,7 +107,7 @@
     <FullScreenCarouselDialog
       v-if="showPreview && !disabled"
       :files="relatedFiles || [computedImage]"
-      :default-slide="computedImage?.id || ''"
+      :default-slide="relatedFiles ? relatedFiles[0].id : (computedImage?.id || '')"
       @close="showPreview = false"
     />
   </div>
@@ -171,10 +171,10 @@ const isImage = computed(() => !!mimeType.value.match(/^image\//));
 const isVideo = computed(() => !!mimeType.value.match(/^video\//));
 const isPdf = computed(() => !!mimeType.value.match(/^application\/pdf/));
 const previewUrl = computed(
-	() => computedImage.value?.transcodes?.compress?.url || computedImage.value?.blobUrl || computedImage.value?.url
+	() => computedImage.value?.optimized?.url || computedImage.value?.blobUrl || computedImage.value?.url
 );
 const thumbUrl = computed(() => {
-	return computedImage.value?.transcodes?.thumb?.url;
+	return computedImage.value?.thumb?.url;
 });
 const isPreviewable = computed(() => {
 	return !!thumbUrl.value || isVideo.value || isImage.value;

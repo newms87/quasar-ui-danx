@@ -9,7 +9,6 @@
       :field="field"
       :label="label"
       :show-name="showName"
-      class="text-sm font-semibold"
     />
 
     <input

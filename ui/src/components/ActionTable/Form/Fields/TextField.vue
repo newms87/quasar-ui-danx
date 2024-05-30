@@ -6,7 +6,6 @@
       :show-name="showName"
       :class="labelClass"
       :value="readonly ? modelValue : ''"
-      class="mb-1 block"
     />
     <template v-if="!readonly">
       <QInput

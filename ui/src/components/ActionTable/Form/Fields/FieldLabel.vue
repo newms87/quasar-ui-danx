@@ -1,12 +1,12 @@
 <template>
-  <span>
+  <span class="dx-field-label">
     <slot>
       {{ labelText }}
       <template v-if="showName">({{ field?.name }})</template>
     </slot>
     <span
       v-if="requiredLabel"
-      class="text-red-900 ml-1 text-xs bottom-1 relative"
+      class="dx-field-required"
     >{{ requiredLabel }}</span>
   </span>
 </template>

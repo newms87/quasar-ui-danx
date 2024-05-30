@@ -4,7 +4,6 @@
       v-if="!noLabel"
       :field="field"
       :show-name="showName"
-      class="text-sm font-semibold text-gray-700 block mb-2"
     />
     <template v-if="readonly">
       <div
@@ -30,17 +29,17 @@ import FieldLabel from "./FieldLabel";
 
 defineEmits(["update:model-value"]);
 defineProps({
-  modelValue: {
-    type: [String, Number],
-    default: null
-  },
-  field: {
-    type: Object,
-    required: true
-  },
-  noLabel: Boolean,
-  showName: Boolean,
-  disable: Boolean,
-  readonly: Boolean
+	modelValue: {
+		type: [String, Number],
+		default: null
+	},
+	field: {
+		type: Object,
+		required: true
+	},
+	noLabel: Boolean,
+	showName: Boolean,
+	disable: Boolean,
+	readonly: Boolean
 });
 </script>

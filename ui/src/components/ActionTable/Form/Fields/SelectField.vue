@@ -3,7 +3,6 @@
     <FieldLabel
       v-if="label"
       :label="label"
-      class="mb-1 block"
     />
     <QSelect
       ref="selectField"

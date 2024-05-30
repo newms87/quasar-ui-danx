@@ -1,3 +1,11 @@
+.dx-field-label {
+	@apply text-xs block mb-1.5;
+
+	.dx-field-required {
+		@apply text-red-900 ml-0.5 bottom-1 relative;
+	}
+}
+
 .q-field {
 	.q-field__label {
 		@apply text-sm text-gray-700;

@@ -58,6 +58,8 @@
 		.q-field__marginal, .q-field__input, .q-field__label {
 			color: inherit;
 			height: auto;
+			min-height: 0;
+			line-height: inherit;
 		}
 	}
 }

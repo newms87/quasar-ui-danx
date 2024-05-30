@@ -37,8 +37,8 @@
       <template #selected>
         <div
           v-if="$props.multiple"
-          class="flex gap-y-1 overflow-hidden"
-          :class="{'flex-nowrap gap-y-0': chipLimit === 1, [selectionClass]: true}"
+          class="flex gap-y-1 overflow-hidden dx-selected-label"
+          :class="{'flex-nowrap gap-y-0': chipLimit === 1, 'dx-selected-chips': chipOptions.length > 0, [selectionClass]: true}"
         >
           <template v-if="chipOptions.length > 0">
             <QChip
@@ -62,6 +62,7 @@
         <div
           v-else
           :class="selectionClass"
+          class="dx-selected-label"
         >
           {{ selectedLabel }}
         </div>

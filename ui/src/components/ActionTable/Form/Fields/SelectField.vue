@@ -255,8 +255,8 @@ function onUpdate(value) {
 
 	value = value === "__null__" ? null : value;
 
-	emit("update", value);
 	emit("update:model-value", value);
+	emit("update", value);
 }
 
 /** XXX: This tells us when we should apply the filter. QSelect likes to trigger a new filter everytime you open the dropdown

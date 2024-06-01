@@ -1,5 +1,5 @@
 .dx-field-label {
-	@apply text-xs block mb-1.5;
+	@apply text-xs mb-1.5 flex items-center space-x-1;
 
 	.dx-field-required {
 		@apply text-red-900 ml-0.5 bottom-1 relative;
@@ -9,23 +9,5 @@
 .q-field {
 	.q-field__label {
 		@apply text-sm text-gray-700;
-	}
-
-	&.dx-number-field {
-		&.dx-prepend-label {
-			@apply text-xs text-black font-normal;
-		}
-
-		&.dx-no-prepend-label {
-			@apply w-32;
-
-			.q-field__native {
-				@apply bg-white text-right;
-			}
-
-			.q-field__prepend {
-				padding: 0;
-			}
-		}
 	}
 }

@@ -1,16 +1,15 @@
 import { QInputProps } from "quasar";
-import { FormField } from "./forms";
 
 export interface TextFieldProps {
 	modelValue?: string | number;
-	field?: FormField;
 	type?: QInputProps["type"];
-	required?: boolean;
 	label?: string;
+	required?: boolean;
+	requiredLabel?: string;
+	prependLabel?: boolean;
 	placeholder?: string;
-	labelClass?: string;
-	parentClass?: string;
-	inputClass?: string;
+	labelClass?: string | object;
+	inputClass?: string | object;
 	allowOverMax?: boolean;
 	maxLength?: number;
 	autogrow?: boolean;
@@ -19,6 +18,4 @@ export interface TextFieldProps {
 	disabled?: boolean;
 	readonly?: boolean;
 	debounce?: string | number;
-	min?: number;
-	max?: number;
 }

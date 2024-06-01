@@ -1,72 +1,49 @@
 <template>
-  <QInput
-    class="dx-number-field max-w-full"
-    :class="{'dx-no-prepend-label': hidePrependLabel, 'dx-prepend-label': !hidePrependLabel}"
+  <TextField
+    class="dx-number-field"
+    v-bind="$props"
     :model-value="numberVal"
-    :data-testid="'number-field-' + fieldOptions.id"
-    :placeholder="fieldOptions.placeholder"
-    outlined
-    dense
-    inputmode="numeric"
-    :input-class="inputClass"
     @update:model-value="onInput"
-  >
-    <template #prepend>
-      <FieldLabel
-        :field="fieldOptions"
-        :show-name="showName"
-      />
-    </template>
-  </QInput>
+  />
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { useDebounceFn } from "@vueuse/core";
-import { computed, nextTick, ref, watch } from "vue";
+import { nextTick, ref, watch } from "vue";
 import { fNumber } from "../../../../helpers";
-import FieldLabel from "./FieldLabel";
+import { AnyObject, TextFieldProps } from "../../../../types";
+import TextField from "./TextField";
 
 const emit = defineEmits(["update:model-value", "update"]);
-const props = defineProps({
-	modelValue: {
-		type: [String, Number],
-		default: ""
-	},
-	precision: {
-		type: Number,
-		default: 2
-	},
-	label: {
-		type: String,
-		default: undefined
-	},
-	field: {
-		type: Object,
-		default: null
-	},
-	inputClass: {
-		type: [String, Object],
-		default: ""
-	},
-	delay: {
-		type: Number,
-		default: 1000
-	},
-	hidePrependLabel: Boolean,
-	currency: Boolean,
-	showName: Boolean
+
+export interface NumberFieldProps extends TextFieldProps {
+	precision?: number;
+	delay?: number;
+	currency?: boolean;
+	min?: number;
+	max?: number;
+}
+
+const props = withDefaults(defineProps<NumberFieldProps>(), {
+	modelValue: "",
+	precision: 2,
+	label: undefined,
+	delay: 1000,
+	min: undefined,
+	max: undefined
 });
 
 const numberVal = ref(format(props.modelValue));
-watch(() => props.modelValue, () => numberVal.value = format(props.modelValue));
 
-const fieldOptions = computed(() => props.field || { label: props.label || "", placeholder: "", id: "" });
+watch(() => props.modelValue, () => numberVal.value = format(props.modelValue));
 
 function format(number) {
 	if (!number && number !== 0 && number !== "0") return number;
 
+	if (props.type === "number") return number;
+
 	const minimumFractionDigits = Math.min(props.precision, ("" + number).split(".")[1]?.length || 0);
-	let options = {
+	let options: AnyObject = {
 		minimumFractionDigits
 	};
 
@@ -80,14 +57,15 @@ function format(number) {
 	return fNumber(number, options);
 }
 
-const onUpdateDebounced = useDebounceFn((val) => emit("update", val), props.delay);
+const onUpdateDebounced = useDebounceFn((val: number | string | undefined) => emit("update", val), props.delay);
 
 function onInput(value) {
-	let number = "";
+	let number: number | undefined = undefined;
 
 	// Prevent invalid characters
 	if (value.match(/[^\d.,$]/)) {
 		const oldVal = numberVal.value;
+
 		// XXX: To get QInput to show only the value we want
 		numberVal.value += " ";
 		return nextTick(() => numberVal.value = oldVal);
@@ -95,11 +73,19 @@ function onInput(value) {
 
 	if (value !== "") {
 		value = value.replace(/[^\d.]/g, "");
-		number = Number(value);
+		number = +value;
+
+		if (props.min) {
+			number = Math.max(number, props.min);
+		}
+		if (props.max) {
+			number = Math.min(number, props.max);
+		}
+
+		console.log("formattinged", number, value);
 		numberVal.value = format(number);
 	}
 
-	number = number === "" ? undefined : number;
 	emit("update:model-value", number);
 
 	// Delay the change event, so we only see the value after the user has finished

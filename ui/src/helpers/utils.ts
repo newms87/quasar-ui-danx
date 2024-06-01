@@ -1,5 +1,7 @@
 import { Ref, watch } from "vue";
 
+export { useDebounceFn } from "@vueuse/core";
+
 /**
  * Sleep function to be used in conjunction with async await:
  *

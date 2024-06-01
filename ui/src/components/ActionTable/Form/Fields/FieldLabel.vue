@@ -1,27 +1,30 @@
 <template>
-  <span class="dx-field-label">
+  <div class="dx-field-label">
     <slot>
-      {{ labelText }}
-      <template v-if="showName">({{ field?.name }})</template>
+      <div class="dx-field-label-text">
+        <div class="dx-field-label-label">
+          {{ label }}
+        </div>
+        <div
+          v-if="name"
+          class="dx-field-label-name"
+        >
+          ({{ name }})
+        </div>
+      </div>
     </slot>
     <span
-      v-if="requiredLabel"
+      v-if="required"
       class="dx-field-required"
-    >{{ requiredLabel }}</span>
-  </span>
+    >{{ requiredLabel || "*" }}</span>
+  </div>
 </template>
 
 <script setup lang="ts">
-import { computed } from "vue";
-import { FormField } from "../../../../types";
-
-const props = defineProps<{
-	field?: FormField;
+defineProps<{
 	label?: string;
-	showName?: boolean;
+	name?: string;
 	required?: boolean;
+	requiredLabel?: string;
 }>();
-
-const labelText = computed(() => props.label || props.field?.label);
-const requiredLabel = computed(() => props.field?.required_group || (props.required || props.field?.required ? "*" : ""));
 </script>

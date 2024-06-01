@@ -29,10 +29,9 @@ export function remoteDateTime(dateTimeString: string) {
 }
 
 /**
- * @param {DateTime|String} dateTime
- * @returns {DateTime|*}
+ * Parses a date string into a Luxon DateTime object
  */
-export function parseDateTime(dateTime: string | DateTime) {
+export function parseDateTime(dateTime: string | DateTime | null): DateTime {
 	if (typeof dateTime === "string") {
 		dateTime = dateTime.replace("T", " ").replace(/\//g, "-");
 		return DateTime.fromSQL(dateTime);
@@ -91,8 +90,8 @@ export function fDateTime(
 		dateTime: string | DateTime | null = null,
 		{ format = "M/d/yy h:mma", empty = "- -" }: fDateOptions = {}
 ) {
-	const formatted = (dateTime ? parseDateTime(dateTime) : DateTime.now()).toFormat(format).toLowerCase();
-	return formatted === "invalid datetime" ? empty : formatted;
+	const formatted = parseDateTime(dateTime).toFormat(format).toLowerCase();
+	return ["Invalid DateTime", "invalid datetime"].includes(formatted) ? empty : formatted;
 }
 
 /**
@@ -153,11 +152,8 @@ export function fCurrency(amount: number, options?: object) {
 
 /**
  * Formats a number into a human-readable format
- * @param number
- * @param options
- * @returns {string}
  */
-export function fNumber(number: number, options = {}) {
+export function fNumber(number: number, options: object) {
 	return new Intl.NumberFormat("en-US", options).format(number);
 }
 

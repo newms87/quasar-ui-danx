@@ -10,6 +10,8 @@ export interface RequestApi {
 	get(url: string, options?: RequestCallOptions): Promise<any>;
 
 	post(url: string, data?: object, options?: RequestCallOptions): Promise<any>;
+
+	poll(url: string, options?: RequestCallOptions, interval: number, fnUntil: (response) => boolean): Promise<any>;
 }
 
 export interface HttpResponse {

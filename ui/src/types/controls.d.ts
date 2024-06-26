@@ -33,7 +33,7 @@ export interface ListControlsRoutes {
 
 	fieldOptions?(filter?: AnyObject): Promise<object>;
 
-	applyAction?(action: string, target: ActionTargetItem | null, data: object): Promise<object>;
+	applyAction?(action: string, target: ActionTargetItem | null, data?: object): Promise<object>;
 
 	batchAction?(action: string, targets: ActionTargetItem[], data: object): Promise<object>;
 

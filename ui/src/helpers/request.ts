@@ -1,6 +1,7 @@
 import { Ref } from "vue";
 import { danxOptions } from "../config";
 import { HttpResponse, RequestApi } from "../types";
+import { sleep } from "./utils";
 
 /**
  * A simple request helper that wraps the fetch API
@@ -70,6 +71,17 @@ export const request: RequestApi = {
 
 		return result;
 	},
+
+	async poll(url: string, options, interval, fnUntil) {
+		let response;
+		do {
+			response = await request.call(url, options);
+			await sleep(interval);
+		} while (!fnUntil(response));
+
+		return response;
+	},
+
 	async get(url, options) {
 		return await request.call(url, {
 			method: "get",

@@ -12,6 +12,15 @@ export function sleep(delay: number) {
 }
 
 /**
+ * Poll a callback function until the result is true
+ */
+export async function pollUntil(callback: () => any, interval = 1000) {
+	while (!(await callback())) {
+		await sleep(interval);
+	}
+}
+
+/**
  * Wait for a ref to have a value and then resolve the promise
  */
 export function waitForRef(ref: Ref, value: any) {

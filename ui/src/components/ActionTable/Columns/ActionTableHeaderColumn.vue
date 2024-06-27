@@ -55,7 +55,8 @@ const columnStyle = computed(() => {
 const clsModule = useCssModule("cls");
 const columnClass = computed(() => {
 	const colCls = {
-		[clsModule["handle-drop-zone"]]: isResizeable.value
+		[clsModule["handle-drop-zone"]]: isResizeable.value,
+		"dx-column-shrink": column.value.shrink
 	};
 
 	const headerClass = column.value.headerClass;

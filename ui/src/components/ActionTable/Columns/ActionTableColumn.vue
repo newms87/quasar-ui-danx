@@ -3,6 +3,7 @@
     :key="rowProps.key"
     :props="rowProps"
     :style="columnStyle"
+    class="dx-column"
     :class="column.columnClass"
   >
     <div :style="columnStyle">

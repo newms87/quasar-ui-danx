@@ -31,6 +31,7 @@
           :label="label"
           :item-count="summary?.count || 0"
           :selected-count="selectedRows.length"
+          :sticky-colspan="summaryColSpan"
           :loading="loadingSummary"
           :summary="summary"
           :columns="tableColumns"
@@ -87,6 +88,7 @@ export interface Props {
 	summary: any;
 	columns: TableColumn[];
 	rowsPerPageOptions?: number[];
+	summaryColSpan?: number;
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -94,7 +96,8 @@ const props = withDefaults(defineProps<Props>(), {
 	pagedItems: null,
 	summary: null,
 	loadingSummary: false,
-	rowsPerPageOptions: () => [10, 25, 50, 100]
+	rowsPerPageOptions: () => [10, 25, 50, 100],
+	summaryColSpan: null
 });
 
 const actionTable = ref(null);

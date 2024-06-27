@@ -4,8 +4,8 @@
     :class="{'has-selection': selectedCount, 'is-loading': loading}"
   >
     <QTd
-      :colspan="stickyColspan"
-      class="dx-table-summary-td transition-all"
+      :colspan="colspan"
+      class="dx-table-summary-td dx-table-summary-count transition-all"
       :class="{'has-selection': selectedCount}"
     >
       <div class="flex flex-nowrap items-center">
@@ -37,59 +37,70 @@
       v-for="column in summaryColumns"
       :key="column.name"
       :align="column.align || 'left'"
+      :class="column.summaryClass"
+      class="dx-table-summary-fd"
     >
-      <template v-if="summary">
+      <div
+        v-if="summary"
+        :class="{'dx-summary-column-link': column.onClick}"
+      >
         {{ formatValue(column) }}
-      </template>
+      </div>
     </QTd>
   </QTr>
 </template>
-<script setup>
+<script setup lang="ts">
 import { XCircleIcon as ClearIcon } from "@heroicons/vue/solid";
 import { QSpinner, QTd, QTr } from "quasar";
 import { computed } from "vue";
 import { fNumber } from "../../helpers";
+import { TableColumn } from "../../types";
+
+interface TableSummaryRowProps {
+	loading: boolean;
+	label?: string;
+	selectedLabel?: string;
+	selectedCount?: number;
+	itemCount?: number;
+	summary?: Record<string, any> | null;
+	columns: TableColumn[];
+	stickyColspan?: number;
+}
 
 defineEmits(["clear"]);
-const props = defineProps({
-	loading: Boolean,
-	label: {
-		type: String,
-		default: "Rows"
-	},
-	selectedLabel: {
-		type: String,
-		default: "Selected"
-	},
-	selectedCount: {
-		type: Number,
-		default: 0
-	},
-	itemCount: {
-		type: Number,
-		default: 0
-	},
-	summary: {
-		type: Object,
-		default: null
-	},
-	columns: {
-		type: Array,
-		required: true
-	},
-	stickyColspan: {
-		type: Number,
-		default: 2
+const props = withDefaults(defineProps<TableSummaryRowProps>(), {
+	label: "Rows",
+	selectedLabel: "Selected",
+	selectedCount: 0,
+	itemCount: 0,
+	summary: null,
+	stickyColspan: null
+});
+
+// Allow the colspan for the first summary column w/ count + label to extend out to the first column with summary data
+// (ie: take up as much room as possible without affecting the summary columns)
+const colspan = computed(() => {
+	if (props.stickyColspan) return props.stickyColspan;
+
+	if (props.summary) {
+		for (let i = 0; i < props.columns.length; i++) {
+			const fieldName = props.columns[i].field || props.columns[i].name;
+			if (props.summary[fieldName]) {
+				return i + 1;
+			}
+		}
 	}
+
+	return props.columns.length + 1;
 });
 
 const summaryColumns = computed(() => {
 	// The sticky columns are where we display the selection count and should not be included in the summary columns
-	return props.columns.slice(props.stickyColspan - 1);
+	return props.columns.slice(colspan.value - 1);
 });
 
 function formatValue(column) {
-	const value = props.summary[column.name];
+	const value = props.summary && props.summary[column.name];
 	if (value === undefined) return "";
 
 	if (column.format) {

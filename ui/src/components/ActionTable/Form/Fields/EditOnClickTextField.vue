@@ -8,7 +8,7 @@
       ref="editableBox"
       :contenteditable="!readonly && isEditing"
       class="flex-grow p-2 rounded outline-none border-none"
-      :class="{[editingClass]: isEditing}"
+      :class="{[editingClass]: isEditing, [inputClass]: true}"
       @input="text = $event.target.innerText"
     >
       {{ text }}
@@ -33,15 +33,20 @@
 import { FaSolidCheck as DoneIcon, FaSolidPencil as EditIcon } from "danx-icon";
 import { nextTick, ref } from "vue";
 
-export interface Props {
-	class?: "hover:bg-slate-300",
-	editingClass?: "bg-slate-500";
+export interface EditOnClickTextFieldProps {
+	class?: string;
+	editingClass?: string;
+	inputClass?: string;
 	readonly?: boolean;
 }
 
 const editableBox = ref<HTMLElement | null>(null);
 const text = defineModel({ type: String });
-const props = defineProps<Props>();
+const props = withDefaults(defineProps<EditOnClickTextFieldProps>(), {
+	class: "hover:bg-slate-300",
+	editingClass: "bg-slate-500",
+	inputClass: "whitespace-normal"
+});
 const isEditing = ref(false);
 function onEdit() {
 	if (props.readonly) return;

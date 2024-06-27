@@ -3,13 +3,17 @@
     :key="rowProps.key"
     :props="rowProps"
     :style="columnStyle"
+    :class="column.columnClass"
   >
     <div :style="columnStyle">
       <div
         class="flex items-center flex-nowrap"
-        :class="columnClass"
+        :class="wrapClass"
       >
-        <div class="flex-grow overflow-hidden">
+        <div
+          v-if="!column.hideContent"
+          class="flex-grow overflow-hidden"
+        >
           <a
             v-if="column.onClick"
             :class="column.innerClass"
@@ -25,6 +29,7 @@
           <div
             v-else
             :class="column.innerClass"
+            class="dx-column-text"
           >
             <RenderVnode
               v-if="column.vnode"
@@ -42,7 +47,8 @@
         </div>
         <div
           v-if="column.actionMenu"
-          class="flex flex-shrink-0 pl-2"
+          class="flex flex-shrink-0"
+          :class="{'ml-2': !column.hideContent}"
         >
           <ActionMenu
             class="dx-column-action-menu"
@@ -55,12 +61,13 @@
     </div>
   </QTd>
 </template>
-<script setup>
+<script setup lang="ts">
 import { QTd } from "quasar";
 import { computed } from "vue";
 import { RenderVnode } from "../../Utility";
 import ActionMenu from "../ActionMenu";
 import { TitleColumnFormat } from "./";
+import { TableColumn } from "./../../../types";
 
 const props = defineProps({
 	rowProps: {
@@ -74,7 +81,7 @@ const props = defineProps({
 });
 
 const row = computed(() => props.rowProps.row);
-const column = computed(() => props.rowProps.col);
+const column = computed<TableColumn>(() => props.rowProps.col);
 const value = computed(() => props.rowProps.value);
 const isSaving = computed(() => row.value.isSaving?.value);
 
@@ -86,7 +93,7 @@ const columnStyle = computed(() => {
 	};
 });
 
-const columnClass = computed(() => ({
+const wrapClass = computed(() => ({
 	[column.value.class || ""]: true,
 	"is-saving": isSaving.value,
 	"justify-end": column.value.align === "right",

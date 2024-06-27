@@ -8,11 +8,15 @@ export interface TableColumn {
 	class?: string | object,
 	field?: string,
 	format?: (value: any, options: any) => any,
+	hideContent?: boolean,
+	headerClass?: string | object,
+	columnClass?: string | object,
 	innerClass?: string | object,
 	style?: string | object,
 	headerStyle?: string | object,
 	isSavingRow?: boolean | (() => boolean),
 	label: string,
+	width?: number;
 	maxWidth?: number,
 	minWidth?: number,
 	name: string,
@@ -23,5 +27,5 @@ export interface TableColumn {
 	sortBy?: string,
 	sortByExpression?: string,
 	titleColumns?: () => string[],
-	vnode?: () => VNode | any,
+	vnode?: (row?) => VNode | any,
 }

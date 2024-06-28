@@ -20,7 +20,7 @@
       @change="onFilesSelected"
     >
 
-    <div class="max-w-[50em] flex items-stretch justify-start">
+    <div class="flex items-stretch justify-start">
       <FilePreview
         v-for="file in uploadedFiles"
         :key="'file-upload-' + file.id"

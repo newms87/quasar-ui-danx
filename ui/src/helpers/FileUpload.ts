@@ -11,6 +11,8 @@ import {
 } from "../types";
 import { resolveFileLocation } from "./files";
 import { FlashMessages } from "./FlashMessages";
+import { storeObject } from "./objectStore";
+import { sleep } from "./utils";
 
 
 export class FileUpload {
@@ -22,7 +24,8 @@ export class FileUpload {
 	onAllCompleteCb: FileUploadAllCompleteCallback | null = null;
 	options: FileUploadOptions;
 
-	constructor(files: UploadedFile[] | UploadedFile, options?: FileUploadOptions) {
+	constructor(files: UploadedFile[] | UploadedFile, options?: FileUploadOptions | null) {
+		/* @ts-expect-error Files is an array */
 		this.files = !Array.isArray(files) && !(files instanceof FileList) ? [files] : files;
 		this.fileUploads = [];
 		this.onErrorCb = null;
@@ -33,6 +36,7 @@ export class FileUpload {
 		this.options = {
 			createPresignedUpload: null,
 			completePresignedUpload: null,
+			refreshFile: null,
 			...danxOptions.value.fileUpload,
 			...options
 		};
@@ -40,7 +44,6 @@ export class FileUpload {
 		if (!this.options.createPresignedUpload || !this.options.completePresignedUpload) {
 			throw new Error("Please configure danxOptions.fileUpload: import { configure } from 'quasar-ui-danx';");
 		}
-		this.prepare();
 	}
 
 	/**
@@ -69,6 +72,8 @@ export class FileUpload {
 				isComplete: false
 			});
 		}
+
+		return this;
 	}
 
 	/**
@@ -110,7 +115,7 @@ export class FileUpload {
 	/**
 	 * Handles the error events / fires the callback if it is set
 	 */
-	errorHandler(e: InputEvent, file: UploadedFile, error = null) {
+	errorHandler(e: InputEvent | ProgressEvent, file: UploadedFile, error = null) {
 		if (this.onErrorCb) {
 			this.onErrorCb({ e, file, error });
 		}
@@ -179,7 +184,8 @@ export class FileUpload {
 			progress: file.progress,
 			location: file.location,
 			blobUrl: file.blobUrl,
-			url: ""
+			url: "",
+			__type: "BrowserFile"
 		};
 	}
 
@@ -219,12 +225,13 @@ export class FileUpload {
 					async (e) => {
 						try {
 							// First complete the presigned upload to get the updated file resource data
-							const uploadedFile = await this.completePresignedUpload(fileUpload);
-
+							let storedFile = await this.completePresignedUpload(fileUpload);
+							storedFile = storeObject(storedFile);
 							// Fire the file complete callbacks
-							this.fireCompleteCallback(fileUpload, uploadedFile);
+							this.fireCompleteCallback(fileUpload, storedFile);
 							this.checkAllComplete();
-						} catch (error) {
+							await this.waitForTranscode(storedFile);
+						} catch (error: any) {
 							this.errorHandler(e, fileUpload.file, error);
 						}
 					},
@@ -250,6 +257,49 @@ export class FileUpload {
 
 		// Let the platform know the presigned upload is complete
 		return await this.options.completePresignedUpload(fileUpload.file.resource_id);
+	}
+
+	/**
+	 * Refresh the file data, in case transcoding or some transient state is needed to be refreshed on the file
+	 */
+	async refreshFile(file: UploadedFile): Promise<UploadedFile | null> {
+		if (!this.options.refreshFile) return null;
+
+		const storedFile = await this.options.refreshFile(file.id);
+
+		if (storedFile) {
+			return storeObject(storedFile);
+		}
+		return storedFile;
+	}
+
+	/**
+	 * Checks if the file has a transcode in progress or pending
+	 */
+	isTranscoding(file: UploadedFile) {
+		const metaTranscodes = file?.meta?.transcodes || [];
+
+		for (const transcodeName of Object.keys(metaTranscodes)) {
+			const transcode = metaTranscodes[transcodeName];
+			if (transcode.status === "Pending" || transcode.status === "In Progress") {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	/**
+	 * Keeps refreshing the file while there is transcoding in progress
+	 */
+	async waitForTranscode(file: UploadedFile) {
+		// Only allow waiting for transcode 1 time per file
+		if (!file.meta || file.meta.is_waiting_transcode) return;
+		file.meta.is_waiting_transcode = true;
+		let currentFile: UploadedFile | null = file;
+		while (currentFile && this.isTranscoding(currentFile)) {
+			await sleep(1000);
+			currentFile = await this.refreshFile(currentFile);
+		}
 	}
 
 	/**
@@ -297,6 +347,7 @@ export class FileUpload {
 
 		// Send all the XHR file uploads
 		for (const fileUpload of this.fileUploads) {
+			// @ts-expect-error XHRFileUpload has a xhr property
 			fileUpload.xhr?.send(fileUpload.body);
 		}
 	}

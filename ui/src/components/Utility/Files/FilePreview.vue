@@ -60,15 +60,26 @@
         <slot name="action-button" />
       </div>
       <div
-        v-if="file && file.progress !== undefined"
-        class="absolute-bottom w-full"
+        v-if="isUploading || transcodingStatus"
+        class="absolute-bottom w-full bg-slate-800"
       >
         <QLinearProgress
-          :value="file.progress"
-          size="15px"
-          color="green-600"
+          :value="isUploading ? file.progress : (transcodingStatus.progress / 100)"
+          size="36px"
+          :color="isUploading ? 'green-800' : 'blue-800'"
+          :animation-speed="transcodingStatus?.estimate_ms || 3000"
           stripe
-        />
+        >
+          <div class="absolute-full flex items-center flex-nowrap text-[.7rem] text-slate-200 justify-start px-1">
+            <QSpinnerPie
+              class="mr-2 text-slate-50 ml-1"
+              size="20"
+            />
+            <div>
+              {{ isUploading ? "Uploading..." : transcodingStatus.message }}
+            </div>
+          </div>
+        </QLinearProgress>
       </div>
     </template>
     <template v-else>
@@ -121,11 +132,20 @@
 
 <script setup lang="ts">
 import { DocumentTextIcon as TextFileIcon, DownloadIcon, PlayIcon } from "@heroicons/vue/outline";
-import { computed, ComputedRef, ref } from "vue";
-import { download } from "../../../helpers";
+import { computed, ComputedRef, onMounted, ref } from "vue";
+import { download, FileUpload } from "../../../helpers";
 import { ImageIcon, PdfIcon, TrashIcon as RemoveIcon } from "../../../svg";
 import { UploadedFile } from "../../../types";
 import { FullScreenCarouselDialog } from "../Dialogs";
+
+export interface FileTranscode {
+	status: "Complete" | "Pending" | "In Progress";
+	progress: number;
+	estimate_ms: number;
+	started_at: string;
+	completed_at: string;
+	message?: string;
+}
 
 export interface FilePreviewProps {
 	src?: string;
@@ -155,6 +175,7 @@ const props = withDefaults(defineProps<FilePreviewProps>(), {
 	square: false
 });
 
+
 const showPreview = ref(false);
 const computedImage: ComputedRef<UploadedFile | null> = computed(() => {
 	if (props.file) {
@@ -165,11 +186,14 @@ const computedImage: ComputedRef<UploadedFile | null> = computed(() => {
 			url: props.src,
 			type: "image/" + props.src.split(".").pop()?.toLowerCase(),
 			name: "",
-			size: 0
+			size: 0,
+			__type: "BrowserFile"
 		};
 	}
 	return null;
 });
+
+const isUploading = computed(() => !props.file || props.file?.progress !== undefined);
 const previewableFiles: ComputedRef<[UploadedFile | null]> = computed(() => {
 	return props.relatedFiles?.length > 0 ? props.relatedFiles : [computedImage.value];
 });
@@ -190,6 +214,31 @@ const thumbUrl = computed(() => {
 const isPreviewable = computed(() => {
 	return !!thumbUrl.value || isVideo.value || isImage.value;
 });
+
+/**
+ * Resolve the active transcoding operation if there is one, otherwise return null
+ */
+const transcodingStatus = computed(() => {
+	let status = null;
+	const metaTranscodes: FileTranscode[] = props.file?.meta?.transcodes || [];
+
+	for (let transcodeName of Object.keys(metaTranscodes)) {
+		const transcode = metaTranscodes[transcodeName];
+		if (!transcode?.completed_at) {
+			return { ...transcode, message: `${transcodeName} ${transcode.status}` };
+		}
+	}
+
+	return status;
+});
+
+// Check for an active transcode and make sure the file is being polled for updates
+onMounted(() => {
+	if (transcodingStatus.value) {
+		(new FileUpload([])).waitForTranscode(props.file);
+	}
+});
+
 const isConfirmingRemove = ref(false);
 function onRemove() {
 	if (!isConfirmingRemove.value) {

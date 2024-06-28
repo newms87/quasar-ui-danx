@@ -36,7 +36,7 @@
     <QTd
       v-for="column in summaryColumns"
       :key="column.name"
-      :align="column.align || 'left'"
+      :align="column.align || 'right'"
       :class="column.summaryClass"
       class="dx-table-summary-fd"
     >

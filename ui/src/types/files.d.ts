@@ -1,7 +1,10 @@
+import { AnyObject, TypedObject } from "src/types/shared";
+
 export interface FileUploadOptions {
 	directory?: string,
 	createPresignedUpload?: ((path: string, name: string, mime?: string) => Promise<UploadedFile>) | null;
 	completePresignedUpload?: ((fileId: string) => Promise<UploadedFile>) | null;
+	refreshFile?: ((fileId: string) => Promise<UploadedFile>) | null;
 }
 
 export interface XHRFileUpload {
@@ -12,7 +15,7 @@ export interface XHRFileUpload {
 	body?: FormData | UploadedFile | string;
 }
 
-export interface UploadedFile {
+export interface UploadedFile extends TypedObject {
 	id: string;
 	resource_id?: string;
 	name: string;
@@ -28,6 +31,7 @@ export interface UploadedFile {
 	thumb?: UploadedFile;
 	optimized?: UploadedFile;
 	transcodes?: UploadedFile[];
+	meta?: AnyObject;
 }
 
 export interface FileUploadCompleteCallbackParams {
@@ -45,7 +49,7 @@ export interface FileUploadProgressCallbackParams {
 }
 
 export interface FileUploadErrorCallbackParams {
-	e: InputEvent;
+	e: InputEvent | ProgressEvent;
 	file: UploadedFile;
 	error: any;
 }

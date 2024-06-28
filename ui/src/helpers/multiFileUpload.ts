@@ -16,14 +16,16 @@ export function useMultiFileUpload(options?: FileUploadOptions) {
 	const onFilesSelected = (e: any) => {
 		uploadedFiles.value = [...uploadedFiles.value, ...e.target.files];
 		new FileUpload(e.target.files, options)
-				.onProgress(({ file }: { file: UploadedFile }) => {
-					updateFileInList(file);
+				.prepare()
+				.onProgress(({ file }) => {
+					file && updateFileInList(file);
 				})
 				.onComplete(({ file, uploadedFile }) => {
 					file && updateFileInList(file, uploadedFile);
 				})
-				.onError(({ file }: { file: UploadedFile }) => {
-					FlashMessages.error(`Failed to upload ${file.name}`);
+				.onError(({ file, error }) => {
+					console.error("Failed to upload", file, error);
+					FlashMessages.error(`Failed to upload ${file.name}: ${error}`);
 				})
 				.onAllComplete(() => {
 					onCompleteCb.value && onCompleteCb.value({

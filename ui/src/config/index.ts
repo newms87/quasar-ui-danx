@@ -11,7 +11,8 @@ export const danxOptions = shallowRef<DanxOptions>({
 	fileUpload: {
 		directory: "file-upload",
 		createPresignedUpload: null,
-		completePresignedUpload: null
+		completePresignedUpload: null,
+		refreshFile: null
 	},
 	flashMessages: {
 		default: {},

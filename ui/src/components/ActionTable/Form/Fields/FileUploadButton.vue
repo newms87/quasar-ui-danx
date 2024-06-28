@@ -62,6 +62,7 @@ function upload() {
 async function onAttachFiles({ target: { files } }) {
 	emit("uploading", files);
 	let fileUpload = new FileUpload(files)
+		.prepare()
 		.onProgress(({ file, progress }) => {
 			file.progress = progress;
 			emit("file-progress", file);

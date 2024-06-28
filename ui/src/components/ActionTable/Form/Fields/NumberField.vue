@@ -82,7 +82,6 @@ function onInput(value) {
 			number = Math.min(number, props.max);
 		}
 
-		console.log("formattinged", number, value);
 		numberVal.value = format(number);
 	}
 

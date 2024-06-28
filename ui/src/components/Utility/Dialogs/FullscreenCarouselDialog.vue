@@ -55,15 +55,19 @@
             </div>
           </div>
 
-          <div class="text-center py-4 bg-slate-800 opacity-70 text-slate-300 absolute-bottom">
+          <div class="text-base text-center py-5 bg-slate-800 opacity-70 text-slate-300 absolute-top hover:opacity-20 transition-all">
             {{ file.filename || file.name }}
           </div>
         </QCarouselSlide>
       </QCarousel>
-      <CloseIcon
-        class="absolute top-4 right-4 cursor-pointer text-white w-8 h-8"
+      <a
+        class="absolute top-0 right-0 text-white flex items-center justify-center w-16 h-16 hover:bg-slate-600 transition-all"
         @click="$emit('close')"
-      />
+      >
+        <CloseIcon
+          class="w-8 h-8"
+        />
+      </a>
     </div>
   </QDialog>
 </template>

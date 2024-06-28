@@ -37,10 +37,26 @@
               </video>
             </template>
             <img
-              v-else
+              v-else-if="getPreviewUrl(file)"
               :alt="file.filename"
               :src="getPreviewUrl(file)"
             >
+            <div v-else>
+              <h3 class="text-center mb-4">
+                No Preview Available
+              </h3>
+              <a
+                :href="file.url"
+                target="_blank"
+                class="text-base"
+              >
+                {{ file.url }}
+              </a>
+            </div>
+          </div>
+
+          <div class="text-center py-4 bg-slate-800 opacity-70 text-slate-300 absolute-bottom">
+            {{ file.filename || file.name }}
           </div>
         </QCarouselSlide>
       </QCarousel>
@@ -73,8 +89,13 @@ function isVideo(file) {
 	return file.mime?.startsWith("video");
 }
 
+function isImage(file) {
+	return file.mime?.startsWith("image");
+}
+
 function getPreviewUrl(file) {
-	return file.optimized?.url || file.blobUrl || file.url;
+	// Use the optimized URL first if available. If not, use the URL directly if its an image, otherwise use the thumb URL
+	return file.optimized?.url || (isImage(file) ? (file.blobUrl || file.url) : file.thumb?.url);
 }
 
 function getThumbUrl(file) {

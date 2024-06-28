@@ -13,10 +13,11 @@ export interface XHRFileUpload {
 }
 
 export interface UploadedFile {
-	id: string,
+	id: string;
 	resource_id?: string;
-	name: string,
-	size: number,
+	name: string;
+	filename?: string;
+	size: number;
 	type: string;
 	mimeType?: string;
 	mime?: string;

@@ -45,6 +45,12 @@
             v-else
             class="w-24"
           />
+          <div
+            v-if="filename"
+            class="text-[.7rem] bg-slate-900 text-slate-300 opacity-80 h-[2.25rem] py-.5 px-1 absolute-bottom"
+          >
+            {{ filename }}
+          </div>
         </div>
       </div>
       <div
@@ -105,9 +111,9 @@
     </div>
 
     <FullScreenCarouselDialog
-      v-if="showPreview && !disabled"
-      :files="relatedFiles || [computedImage]"
-      :default-slide="relatedFiles ? relatedFiles[0].id : (computedImage?.id || '')"
+      v-if="showPreview && !disabled && previewableFiles"
+      :files="previewableFiles"
+      :default-slide="previewableFiles[0]?.id || ''"
       @close="showPreview = false"
     />
   </div>
@@ -164,6 +170,11 @@ const computedImage: ComputedRef<UploadedFile | null> = computed(() => {
 	}
 	return null;
 });
+const previewableFiles: ComputedRef<[UploadedFile | null]> = computed(() => {
+	return props.relatedFiles?.length > 0 ? props.relatedFiles : [computedImage.value];
+});
+
+const filename = computed(() => computedImage.value?.name || computedImage.value?.filename || "");
 const mimeType = computed(
 	() => computedImage.value?.type || computedImage.value?.mime || ""
 );

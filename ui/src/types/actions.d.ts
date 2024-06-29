@@ -26,9 +26,7 @@ export interface ActionOptions {
 	category?: string;
 	class?: string;
 	debounce?: number;
-	isApplying?: boolean;
 	optimistic?: boolean | ((action: ActionOptions, target: ActionTargetItem | null, input: any) => void);
-	trigger?: (target?: ActionTarget, input?: any) => Promise<any>;
 	vnode?: ((target: ActionTarget) => VNode) | any;
 	enabled?: (target: object) => boolean;
 	batchEnabled?: (targets: object[]) => boolean;
@@ -39,5 +37,10 @@ export interface ActionOptions {
 	onBatchSuccess?: (result: any, targets: ActionTargetItem[], input: any) => any;
 	onError?: (result: any, targets: ActionTarget, input: any) => any;
 	onFinish?: (result: any, targets: ActionTarget, input: any) => any;
-	__type?: string;
+}
+
+export interface ResourceAction extends ActionOptions {
+	isApplying: boolean;
+	trigger: (target?: ActionTarget, input?: any) => Promise<any>;
+	__type: string;
 }

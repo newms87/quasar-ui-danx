@@ -68,7 +68,7 @@
 </template>
 <script setup lang="ts">
 import { computed } from "vue";
-import { ActionController, ActionOptions, ActionPanel, FilterGroup, TableColumn } from "../../../types";
+import { ActionController, ActionPanel, FilterGroup, ResourceAction, TableColumn } from "../../../types";
 import { PanelsDrawer } from "../../PanelsDrawer";
 import { PreviousNextControls } from "../../Utility";
 import ActionTable from "../ActionTable";
@@ -83,7 +83,7 @@ const props = defineProps<{
 	columns: TableColumn[];
 	filters?: FilterGroup[];
 	panels?: ActionPanel[];
-	actions?: ActionOptions[];
+	actions?: ResourceAction[];
 	exporter?: () => Promise<void>;
 	panelTitleField?: string;
 	tableClass?: string;

@@ -1,7 +1,7 @@
 import { useDebounceFn } from "@vueuse/core";
 import { uid } from "quasar";
-import { isReactive, Ref, shallowRef } from "vue";
-import { ActionOptions, ActionTarget, AnyObject } from "../types";
+import { isReactive, Ref, shallowRef, UnwrapNestedRefs } from "vue";
+import { ActionOptions, ActionTarget, AnyObject, ResourceAction } from "../types";
 import { FlashMessages } from "./FlashMessages";
 import { storeObject } from "./objectStore";
 
@@ -10,9 +10,6 @@ export const activeActionVnode: Ref = shallowRef(null);
 /**
  * Hook to perform an action on a set of targets
  * This helper allows you to perform actions by name on a set of targets using a provided list of actions
- *
- * @param actions
- * @param {ActionOptions | null} globalOptions
  */
 export function useActions(actions: ActionOptions[], globalOptions: ActionOptions | null = null) {
 	const namespace = uid();
@@ -20,29 +17,33 @@ export function useActions(actions: ActionOptions[], globalOptions: ActionOption
 	/**
 	 * Resolve the action object based on the provided name (or return the object if the name is already an object)
 	 */
-	function getAction(action: string | ActionOptions): ActionOptions {
-		if (typeof action === "string") {
-			action = actions.find(a => a.name === action) || { name: action };
+	function getAction(actionName: string | ActionOptions | ResourceAction): UnwrapNestedRefs<ResourceAction> {
+		let actionOptions: ActionOptions | ResourceAction;
+
+		/// Resolve the action options or resource action based on the provided input
+		if (typeof actionName === "string") {
+			actionOptions = actions.find(a => a.name === actionName) || { name: actionName };
+		} else {
+			actionOptions = actionName;
 		}
 
 		// If the action is already reactive, return it
-		if (isReactive(action) && action.__type) return action;
+		if (isReactive(actionOptions) && "__type" in actionOptions) return actionOptions as ResourceAction;
 
-		action = { ...globalOptions, ...action };
+		const resourceAction: ResourceAction = storeObject({
+			...globalOptions,
+			...actionOptions,
+			trigger: (target, input) => performAction(resourceAction, target, input),
+			isApplying: false,
+			__type: "__Action:" + namespace
+		});
 
 		// Assign Trigger function if it doesn't exist
-		if (!action.trigger) {
-			if (action.debounce) {
-				action.trigger = useDebounceFn((target, input) => performAction(action, target, input), action.debounce);
-			} else {
-				action.trigger = (target, input) => performAction(action, target, input);
-			}
+		if (actionOptions.debounce) {
+			resourceAction.trigger = useDebounceFn((target, input) => performAction(resourceAction, target, input), actionOptions.debounce);
 		}
 
-		// Set the initial state for the action
-		action.isApplying = false;
-
-		return storeObject({ ...action, __type: "__Action:" + namespace });
+		return resourceAction;
 	}
 
 	/**
@@ -56,13 +57,13 @@ export function useActions(actions: ActionOptions[], globalOptions: ActionOption
 		let filteredActions = [...actions];
 
 		if (filters) {
-			for (const filter of Object.keys(filters)) {
-				const filterValue = filters[filter];
-				filteredActions = filteredActions.filter((a: AnyObject) => a[filter] === filterValue || (Array.isArray(filterValue) && filterValue.includes(a[filter])));
+			for (const filterKey of Object.keys(filters)) {
+				const filterValue = filters[filterKey];
+				filteredActions = filteredActions.filter((a: AnyObject) => a[filterKey] === filterValue || (Array.isArray(filterValue) && filterValue.includes(a[filterKey])));
 			}
 		}
 
-		return filteredActions.map((a: AnyObject) => getAction(a));
+		return filteredActions.map((a: ActionOptions) => getAction(a));
 	}
 
 	/**
@@ -72,8 +73,9 @@ export function useActions(actions: ActionOptions[], globalOptions: ActionOption
 	 * @param {object[]|object} target - an array of targets or a single target object
 	 * @param {any} input - The input data to pass to the action handler
 	 */
-	async function performAction(action: string | ActionOptions, target: ActionTarget = null, input: any = null) {
-		action = getAction(action);
+	async function performAction(action: ResourceAction, target: ActionTarget = null, input: any = null) {
+		console.log("WE DONT NEED getAction(action) here right??", action);
+
 		// Resolve the original action, if the current action is an alias
 		const aliasedAction = action.alias ? getAction(action.alias) : null;
 

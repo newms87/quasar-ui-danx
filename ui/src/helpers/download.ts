@@ -23,6 +23,7 @@ export function download(data: any, strFileName?: string, strMimeType?: string) 
 
 	var anchor = document.createElement("a");
 
+	// @ts-ignore
 	var toString = function (a) {
 		return String(a);
 	};
@@ -35,8 +36,10 @@ export function download(data: any, strFileName?: string, strMimeType?: string) 
 	var blob;
 
 	var reader;
+	// @ts-ignore
 	myBlob = myBlob.call ? myBlob.bind(self) : Blob;
 
+	// @ts-ignore
 	if (String(this) === "true") {
 		// reverse arguments, allowing download.bind(true, "text/xml", "export.xml") to act as a callback
 		payload = [payload, mimeType];
@@ -64,6 +67,7 @@ export function download(data: any, strFileName?: string, strMimeType?: string) 
 			};
 			ajax.onerror = function (e) {
 				// As a fallback, just open the request in a new tab
+				// @ts-ignore
 				window.open(url, "_blank").focus();
 			};
 			setTimeout(function () {
@@ -77,6 +81,7 @@ export function download(data: any, strFileName?: string, strMimeType?: string) 
 
 	// go ahead and download dataURLs right away
 	if (/^data:[\w+-]+\/[\w+-]+[,;]/.test(payload)) {
+		// @ts-ignore
 		if (payload.length > 1024 * 1024 * 1.999 && myBlob !== toString) {
 			payload = dataUrlToBlob(payload);
 			mimeType = payload.type || defaultMime;
@@ -93,13 +98,14 @@ export function download(data: any, strFileName?: string, strMimeType?: string) 
 					? payload
 					: new myBlob([payload], { type: mimeType });
 
-	function dataUrlToBlob(strUrl) {
+	function dataUrlToBlob(strUrl: string) {
 		var parts = strUrl.split(/[:;,]/);
 
 		var type = parts[1];
 
 		var decoder = parts[2] === "base64" ? atob : decodeURIComponent;
 
+		// @ts-ignore
 		var binData = decoder(parts.pop());
 
 		var mx = binData.length;
@@ -113,7 +119,7 @@ export function download(data: any, strFileName?: string, strMimeType?: string) 
 		return new myBlob([uiArr], { type: type });
 	}
 
-	function saver(url, winMode) {
+	function saver(url: string, winMode: boolean | string) {
 		if ("download" in anchor) {
 			// html5 A[download]
 			anchor.href = url;

@@ -30,14 +30,14 @@
   </div>
 </template>
 <script setup lang="ts">
-import { ActionOptions, ActionTargetItem, AnyObject } from "../../../types";
+import { ActionTargetItem, AnyObject, ResourceAction } from "../../../types";
 import { ExportButton, RefreshButton } from "../../Utility";
 import ActionMenu from "../ActionMenu";
 
 defineEmits(["refresh"]);
 defineProps<{
 	title?: string,
-	actions?: ActionOptions[],
+	actions?: ResourceAction[],
 	actionTarget?: ActionTargetItem[],
 	refreshButton?: boolean,
 	loading?: boolean,

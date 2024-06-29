@@ -3,6 +3,7 @@
     class="danx-edit-on-click-text-field flex flex-nowrap items-center rounded overflow-ellipsis"
     :class="{[props.class]: true, 'is-readonly': readonly, 'cursor-pointer': !isEditing && !readonly}"
     @click="onEdit"
+    @focusout="isEditing = false"
   >
     <div
       ref="editableBox"

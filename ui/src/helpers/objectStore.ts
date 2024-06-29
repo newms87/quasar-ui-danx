@@ -6,27 +6,25 @@ const store = new Map<string, any>();
 /**
  * Store an object in the object store via type + id
  * Returns the stored object that should be used instead of the passed object as the returned object is shared across the system
- *
- * @param {TypedObject} newObject
- * @returns {TypedObject}
  */
 export function storeObject<T extends TypedObject>(newObject: T): UnwrapNestedRefs<T> {
 	const id = newObject.id || newObject.name;
 	const type = newObject.__type;
 	if (!id || !type) return reactive(newObject);
 
+	if (!newObject.__timestamp) {
+		newObject.__timestamp = newObject.updated_at || 0;
+	}
+
 	const objectKey = `${type}:${id}`;
 
-	const oldObject: UnwrapNestedRefs<T> | undefined = store.get(objectKey);
+	// Retrieve the existing object if it already exists in the store
+	const oldObject = store.get(objectKey);
 
-	// Apply all properties from newObject to oldObject then store and return the updated object
-	if (oldObject) {
-		const oldTimestamp = oldObject.__timestamp || oldObject.updated_at;
-		const newTimestamp = newObject.__timestamp || newObject.updated_at;
-		// If the old object is newer, do not store the new object, just return the old
-		if (oldTimestamp && newTimestamp && newTimestamp < oldTimestamp) {
-			return oldObject;
-		}
+	// If an old object exists, and it is newer than the new object, do not store the new object, just return the old
+	// @ts-expect-error __timestamp is guaranteed to be set in this case on both old and new
+	if (oldObject && newObject.__timestamp <= oldObject.__timestamp) {
+		return oldObject;
 	}
 
 	// Recursively store all the children of the object as well
@@ -41,7 +39,6 @@ export function storeObject<T extends TypedObject>(newObject: T): UnwrapNestedRe
 
 	// Update the old object with the new object properties
 	if (oldObject) {
-		// If the new object is newer, apply all properties from the new object to the old object
 		Object.assign(oldObject, newObject);
 		return oldObject;
 	}

@@ -151,7 +151,7 @@ import {
 } from "./Fields";
 
 export interface RenderedFormProps {
-	values?: FormFieldValue[] | object;
+	values?: FormFieldValue[] | object | null;
 	form: Form;
 	noLabel?: boolean;
 	showName?: boolean;
@@ -171,7 +171,7 @@ const props = withDefaults(defineProps<RenderedFormProps>(), {
 	emptyValue: undefined,
 	fieldClass: "",
 	savingClass: "text-sm text-slate-500 justify-end mt-4",
-	savedAt: null
+	savedAt: undefined
 });
 
 const emit = defineEmits(["update:values"]);

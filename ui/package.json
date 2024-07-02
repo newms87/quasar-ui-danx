@@ -7,6 +7,7 @@
   "type": "module",
   "main": "./dist/danx.umd.js",
   "module": "./dist/danx.es.js",
+  "types": "types/index.d.ts",
   "scripts": {
     "dev": "cd dev && quasar dev && cd ..",
     "build": "vite build",

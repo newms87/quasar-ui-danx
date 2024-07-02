@@ -25,6 +25,7 @@
     "forceConsistentCasingInFileNames": true,
     // Resolve modules using Node.js style
     "moduleResolution": "node",
+    "resolveJsonModule": true,
     // Allow default imports from modules with no default export
     "allowSyntheticDefaultImports": true,
     // Enables experimental support for decorators

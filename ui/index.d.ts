@@ -1,6 +1,4 @@
-declare module "quasar-ui-danx" {
-	export * from "./src";
-}
+declare module "quasar-ui-danx";
 
 export * from "./src/components";
 export * from "./src/config";

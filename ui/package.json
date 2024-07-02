@@ -5,8 +5,8 @@
   "description": "DanX Vue / Quasar component library",
   "license": "MIT",
   "type": "module",
-  "main": "dist/danx.es.js",
-  "module": "dist/danx.es.js",
+  "main": "./dist/danx.umd.js",
+  "module": "./dist/danx.es.js",
   "scripts": {
     "dev": "cd dev && quasar dev && cd ..",
     "build": "vite build",
@@ -16,6 +16,10 @@
   "repository": {
     "type": "git",
     "url": "https://github.com/flytedan/quasar-ui-danx"
+  },
+  "peerDependencies": {
+    "quasar": "^2.0.0",
+    "vue": "^3.4.21"
   },
   "devDependencies": {
     "@quasar/extras": "^1.16.4",

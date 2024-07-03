@@ -317,7 +317,8 @@ export function useListControls(name: string, options: ListControlsOptions): Act
 	// (ie: tasks, verifications, creatives, etc.)
 	if (options.routes.details) {
 		watch(() => activeItem.value, async (newItem, oldItem) => {
-			if (newItem && oldItem?.id !== newItem.id) {
+			// Note we want a loose comparison in case it's a string vs int for the ID
+			if (newItem?.id && oldItem?.id != newItem.id) {
 				await getActiveItemDetails();
 			}
 		});
@@ -328,7 +329,7 @@ export function useListControls(name: string, options: ListControlsOptions): Act
 	 */
 	function activatePanel(item: ActionTargetItem | null, panel: string = "") {
 		// If we're already on the correct item and panel, don't do anything
-		if (item?.id === activeItem.value?.id && panel === activePanel.value) return;
+		if (item?.id == activeItem.value?.id && panel === activePanel.value) return;
 
 		setActiveItem(item);
 		activePanel.value = panel;

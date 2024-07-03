@@ -136,7 +136,7 @@ import { ExclamationCircleIcon as MissingIcon, PencilIcon as EditIcon } from "@h
 import { computed, ref } from "vue";
 import { fDateTime, FlashMessages, incrementName, replace } from "../../../helpers";
 import { TrashIcon as RemoveIcon } from "../../../svg";
-import { Form, FormFieldValue } from "../../../types";
+import { AnyObject, Form, FormFieldValue } from "../../../types";
 import { ConfirmDialog, RenderVnode } from "../../Utility";
 import {
 	BooleanField,
@@ -226,16 +226,16 @@ const currentVariation = ref(variationNames.value[0] || "");
 const newVariationName = ref("");
 const variationToEdit = ref<boolean | string>(false);
 const variationToDelete = ref("");
-const canAddVariation = computed(() => props.canModifyVariations && !props.readonly && !props.disable && variationNames.value.length < props.form.variations);
+const canAddVariation = computed(() => props.canModifyVariations && !props.readonly && !props.disable && variationNames.value.length < (props.form.variations || 0));
 
-function getFieldResponse(name, variation: string = undefined) {
+function getFieldResponse(name: string, variation?: string) {
 	if (!fieldResponses.value) return undefined;
 	return fieldResponses.value.find((fr: FormFieldValue) => fr.variation === (variation !== undefined ? variation : currentVariation.value) && fr.name === name);
 }
-function getFieldValue(name) {
+function getFieldValue(name: string) {
 	return getFieldResponse(name)?.value;
 }
-function onInput(name, value) {
+function onInput(name: string, value: any) {
 	const fieldResponse = getFieldResponse(name);
 	const newFieldResponse = {
 		name,
@@ -291,11 +291,12 @@ function updateValues(values: FormFieldValue[]) {
 	let updatedValues: FormFieldValue[] | object = values;
 
 	if (!Array.isArray(props.values)) {
-		updatedValues = values.reduce((acc, v) => {
+		updatedValues = values.reduce((acc: AnyObject, v) => {
 			acc[v.name] = v.value;
 			return acc;
 		}, {});
 	}
+
 	emit("update:values", updatedValues);
 }
 
@@ -311,8 +312,8 @@ function onRemoveVariation(name: string) {
 	variationToDelete.value = "";
 }
 
-function isVariationFormComplete(variation) {
-	const requiredGroups = {};
+function isVariationFormComplete(variation: string) {
+	const requiredGroups: AnyObject = {};
 	return props.form.fields.filter(r => r.required || r.required_group).every((field) => {
 		const fieldResponse = getFieldResponse(field.name, variation);
 		const hasValue = !!fieldResponse && fieldResponse.value !== null;

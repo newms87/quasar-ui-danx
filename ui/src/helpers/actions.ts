@@ -1,7 +1,7 @@
 import { useDebounceFn } from "@vueuse/core";
 import { uid } from "quasar";
-import { isReactive, Ref, shallowRef, UnwrapNestedRefs } from "vue";
-import { ActionOptions, ActionTarget, AnyObject, ResourceAction } from "../types";
+import { isReactive, Ref, shallowRef } from "vue";
+import type { ActionOptions, ActionTarget, AnyObject, ResourceAction } from "../types";
 import { FlashMessages } from "./FlashMessages";
 import { storeObject } from "./objectStore";
 
@@ -17,7 +17,7 @@ export function useActions(actions: ActionOptions[], globalOptions: ActionOption
 	/**
 	 * Resolve the action object based on the provided name (or return the object if the name is already an object)
 	 */
-	function getAction(actionName: string | ActionOptions | ResourceAction): UnwrapNestedRefs<ResourceAction> {
+	function getAction(actionName: string | ActionOptions | ResourceAction): ResourceAction {
 		let actionOptions: ActionOptions | ResourceAction;
 
 		/// Resolve the action options or resource action based on the provided input
@@ -74,8 +74,6 @@ export function useActions(actions: ActionOptions[], globalOptions: ActionOption
 	 * @param {any} input - The input data to pass to the action handler
 	 */
 	async function performAction(action: ResourceAction, target: ActionTarget = null, input: any = null) {
-		console.log("WE DONT NEED getAction(action) here right??", action);
-
 		// Resolve the original action, if the current action is an alias
 		const aliasedAction = action.alias ? getAction(action.alias) : null;
 

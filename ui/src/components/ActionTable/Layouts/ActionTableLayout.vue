@@ -71,7 +71,7 @@ import { computed } from "vue";
 import { ActionController, ActionPanel, FilterGroup, ResourceAction, TableColumn } from "../../../types";
 import { PanelsDrawer } from "../../PanelsDrawer";
 import { PreviousNextControls } from "../../Utility";
-import ActionTable from "../ActionTable";
+import ActionTable from "../ActionTable.vue";
 import { CollapsableFiltersSidebar } from "../Filters";
 import { ActionToolbar } from "../Toolbars";
 

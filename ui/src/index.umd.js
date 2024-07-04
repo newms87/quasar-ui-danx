@@ -1,3 +1,3 @@
-import * as VuePlugin from "src/vue-plugin.js";
+import * as VuePlugin from "./vue-plugin";
 
 export default VuePlugin;

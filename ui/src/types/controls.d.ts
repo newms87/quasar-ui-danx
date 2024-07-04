@@ -25,17 +25,17 @@ export interface FilterGroup {
 export interface ListControlsRoutes {
 	list(pager?: ListControlsPagination): Promise<ActionTargetItem[]>;
 
-	summary?(filter?: ListControlsFilter): Promise<object>;
+	summary?(filter?: ListControlsFilter): Promise<AnyObject>;
 
 	details?(target: ActionTargetItem): Promise<ActionTargetItem>;
 
 	more?(pager: ListControlsPagination): Promise<ActionTargetItem[]>;
 
-	fieldOptions?(filter?: AnyObject): Promise<object>;
+	fieldOptions?(filter?: AnyObject): Promise<AnyObject>;
 
-	applyAction?(action: string, target: ActionTargetItem | null, data?: object): Promise<object>;
+	applyAction?(action: string, target: ActionTargetItem | null, data?: object): Promise<AnyObject>;
 
-	batchAction?(action: string, targets: ActionTargetItem[], data: object): Promise<object>;
+	batchAction?(action: string, targets: ActionTargetItem[], data: object): Promise<AnyObject>;
 
 	export?(filter?: ListControlsFilter, name?: string): Promise<void>;
 }

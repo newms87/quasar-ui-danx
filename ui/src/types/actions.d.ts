@@ -18,9 +18,11 @@ export interface ActionTargetItem extends TypedObject {
 export type ActionTarget = ActionTargetItem[] | ActionTargetItem | null;
 
 export interface ActionOptions {
-	name?: string;
+	name: string;
 	alias?: string;
 	label?: string;
+	icon?: string | object;
+	iconClass?: string | object;
 	menu?: boolean;
 	batch?: boolean;
 	category?: string;
@@ -37,6 +39,10 @@ export interface ActionOptions {
 	onBatchSuccess?: (result: any, targets: ActionTargetItem[], input: any) => any;
 	onError?: (result: any, targets: ActionTarget, input: any) => any;
 	onFinish?: (result: any, targets: ActionTarget, input: any) => any;
+}
+
+export interface ActionOptionsPartial extends ActionOptions {
+	name?: string;
 }
 
 export interface ResourceAction extends ActionOptions {

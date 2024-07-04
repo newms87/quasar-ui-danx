@@ -1,4 +1,4 @@
-import { reactive, UnwrapNestedRefs } from "vue";
+import { ShallowReactive, shallowReactive } from "vue";
 import { TypedObject } from "../types";
 
 const store = new Map<string, any>();
@@ -7,10 +7,10 @@ const store = new Map<string, any>();
  * Store an object in the object store via type + id
  * Returns the stored object that should be used instead of the passed object as the returned object is shared across the system
  */
-export function storeObject<T extends TypedObject>(newObject: T): UnwrapNestedRefs<T> {
+export function storeObject<T extends TypedObject>(newObject: T): ShallowReactive<T> {
 	const id = newObject.id || newObject.name;
 	const type = newObject.__type;
-	if (!id || !type) return reactive(newObject);
+	if (!id || !type) return shallowReactive(newObject);
 
 	if (!newObject.__timestamp) {
 		newObject.__timestamp = newObject.updated_at || 0;
@@ -43,7 +43,7 @@ export function storeObject<T extends TypedObject>(newObject: T): UnwrapNestedRe
 		return oldObject;
 	}
 
-	const reactiveObject = reactive(newObject);
+	const reactiveObject = shallowReactive(newObject);
 	store.set(objectKey, reactiveObject);
 	return reactiveObject;
 }

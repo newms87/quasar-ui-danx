@@ -335,10 +335,31 @@ export function fJSON(string: string | object) {
 	}
 }
 
+/**
+ * Convert markdown formatted string into a valid JSON object
+ */
+export function parseMarkdownJSON(string: string | object): object | undefined {
+	if (typeof string === "object") return string as object;
+
+	try {
+		return JSON.parse(string.replace("```json\n", "").replace("\n```", ""));
+	} catch (e) {
+		return undefined;
+	}
+}
+
+/**
+ * Convert a JSON object into a markdown formatted JSON string
+ * ie: a valid JSON string with a ```json prefix and ``` postfix
+ */
 export function fMarkdownJSON(string: string | object): string {
 	if (isJSON(string)) {
 		return `\`\`\`json\n${fJSON(string)}\n\`\`\``;
 	}
-	// @ts-expect-error Guaranteed to only allow strings here using isJSON check
-	return string;
+
+	if (!(string as string || "").match(/```json/)) {
+		return `\`\`\`json\n${string}\n\`\`\``;
+	}
+
+	return string as string;
 }

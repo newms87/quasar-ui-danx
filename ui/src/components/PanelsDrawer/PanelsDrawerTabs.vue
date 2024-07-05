@@ -9,11 +9,11 @@
     @update:model-value="$emit('update:model-value', $event)"
   >
     <template v-for="panel in panels">
-      <template v-if="panel.enabled === undefined || !!panel.enabled">
+      <template v-if="isEnabled(panel)">
         <RenderVnode
           v-if="panel.tabVnode"
           :key="panel.name"
-          :vnode="panel.tabVnode(modelValue)"
+          :vnode="panel.tabVnode(activeItem, modelValue)"
           :is-active="modelValue === panel.name"
           :name="panel.name"
           :label="panel.label"
@@ -30,19 +30,32 @@
 </template>
 <script setup lang="ts">
 import { QTab } from "quasar";
-import { ActionPanel } from "../../types";
+import { ActionPanel, ActionTargetItem } from "../../types";
 import { RenderVnode } from "../Utility";
 
 defineEmits(["update:model-value"]);
 
 interface Props {
 	modelValue?: string | number;
+	activeItem: ActionTargetItem;
 	panels: ActionPanel[];
 }
 
-withDefaults(defineProps<Props>(), {
+const props = withDefaults(defineProps<Props>(), {
 	modelValue: "general"
 });
+
+function isEnabled(panel) {
+	if (panel.enabled === undefined) return true;
+
+	if (!panel.enabled) return false;
+
+	if (typeof panel.enabled === "function") {
+		return panel.enabled(props.activeItem);
+	}
+
+	return true;
+}
 </script>
 
 <style lang="scss" module="cls">

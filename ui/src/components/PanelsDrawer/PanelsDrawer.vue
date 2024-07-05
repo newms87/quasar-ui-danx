@@ -1,7 +1,7 @@
 <template>
   <ContentDrawer
     position="right"
-    :show="true"
+    show
     overlay
     content-class="h-full"
     class="dx-panels-drawer"
@@ -13,7 +13,13 @@
       <div class="dx-panels-drawer-header flex items-center px-6 py-4">
         <div class="flex-grow">
           <slot name="header">
-            <h2>{{ title }}</h2>
+            <h2 v-if="title">
+              {{ title }}
+            </h2>
+            <div v-if="!activeItem">
+              Loading
+              <QSpinnerHourglass />
+            </div>
           </slot>
         </div>
         <div
@@ -32,10 +38,14 @@
         </div>
       </div>
       <div class="dx-panels-drawer-body flex-grow overflow-hidden h-full">
-        <div class="flex items-stretch flex-nowrap h-full">
+        <div
+          v-if="activeItem.__timestamp > 0"
+          class="flex items-stretch flex-nowrap h-full"
+        >
           <PanelsDrawerTabs
             :key="'pd-tabs:' + activeItem.id"
             v-model="activePanel"
+            :active-item="activeItem"
             :class="tabsClass"
             :panels="panels"
             @update:model-value="$emit('update:model-value', $event)"
@@ -44,6 +54,7 @@
             :key="'pd-panels:' + activeItem.id"
             :panels="panels"
             :active-panel="activePanel"
+            :active-item="activeItem"
             :class="activePanelOptions?.class || panelsClass"
           />
           <div
@@ -68,7 +79,7 @@ import PanelsDrawerTabs from "./PanelsDrawerTabs";
 export interface Props {
 	title?: string,
 	modelValue?: string | number,
-	activeItem?: ActionTargetItem;
+	activeItem: ActionTargetItem;
 	tabsClass?: string | object,
 	panelsClass?: string | object,
 	panels: ActionPanel[]
@@ -78,7 +89,6 @@ defineEmits(["update:model-value", "close"]);
 const props = withDefaults(defineProps<Props>(), {
 	title: "",
 	modelValue: null,
-	activeItem: null,
 	tabsClass: "w-[13.5rem]",
 	panelsClass: "w-[35.5rem]"
 });

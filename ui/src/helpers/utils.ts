@@ -91,11 +91,11 @@ export function incrementName(name: string) {
  * Check if a string is a valid JSON object. If an object is passed, always return true
  */
 export function isJSON(string: string | object) {
-	if (!string) {
-		return false;
-	}
 	if (typeof string === "object") {
 		return true;
+	}
+	if (!string) {
+		return false;
 	}
 	try {
 		JSON.parse(string);

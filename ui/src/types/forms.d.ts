@@ -1,3 +1,4 @@
+import { AnyObject } from "src/types/shared";
 import { VNode } from "vue";
 
 export interface FormFieldOption {
@@ -11,6 +12,7 @@ export interface FormField {
 	name: string;
 	label: string;
 	placeholder?: string;
+	enabled?: boolean | ((input: AnyObject) => boolean);
 	vnode?: ((props) => VNode | any);
 	component?: any;
 	clearable?: boolean;

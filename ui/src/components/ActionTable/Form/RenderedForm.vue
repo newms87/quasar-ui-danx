@@ -62,32 +62,36 @@
         </QTab>
       </QTabs>
     </div>
-    <div
+    <template
       v-for="(field, index) in mappedFields"
       :key="field.id"
-      :class="{ 'mt-4': index > 0, [fieldClass]: true }"
     >
-      <RenderVnode
-        v-if="field.vnode"
-        :vnode="field.vnode"
-        :field="field"
-        :props="getVnodeProps(field)"
-        @update:model-value="onInput(field.name, $event)"
-      />
-      <Component
-        :is="field.component"
-        :key="field.name + '-' + currentVariation"
-        :model-value="getFieldValue(field.name)"
-        :field="field"
-        :label="field.label || undefined"
-        :no-label="noLabel"
-        :show-name="showName"
-        :clearable="field.clearable || clearable"
-        :disable="disable"
-        :readonly="readonly"
-        @update:model-value="onInput(field.name, $event)"
-      />
-    </div>
+      <div
+        v-show="isFieldEnabled(field)"
+        :class="{ 'mt-4': index > 0, [fieldClass]: true }"
+      >
+        <RenderVnode
+          v-if="field.vnode"
+          :vnode="field.vnode"
+          :field="field"
+          :props="getVnodeProps(field)"
+          @update:model-value="onInput(field.name, $event)"
+        />
+        <Component
+          :is="field.component"
+          :key="field.name + '-' + currentVariation"
+          :model-value="getFieldValue(field.name)"
+          :field="field"
+          :label="field.label || undefined"
+          :no-label="noLabel"
+          :show-name="showName"
+          :clearable="field.clearable || clearable"
+          :disable="disable"
+          :readonly="readonly"
+          @update:model-value="onInput(field.name, $event)"
+        />
+      </div>
+    </template>
     <div
       v-if="savedAt"
       :class="savingClass"
@@ -190,9 +194,9 @@ const FORM_FIELD_MAP = {
 
 const mappedFields = props.form.fields.map((field) => ({
 	placeholder: `Enter ${field.label}`,
+	default: field.type === "BOOLEAN" ? false : "",
 	...field,
-	component: field.component || FORM_FIELD_MAP[field.type],
-	default: field.type === "BOOLEAN" ? false : ""
+	component: field.component || FORM_FIELD_MAP[field.type]
 }));
 
 const fieldResponses = computed(() => {
@@ -200,6 +204,24 @@ const fieldResponses = computed(() => {
 	if (Array.isArray(props.values)) return props.values;
 	return Object.entries(props.values).map(([name, value]) => ({ name, value, variation: "" }));
 });
+
+const fieldInputs = computed(() => {
+	const inputs: AnyObject = {};
+	for (const field of mappedFields) {
+		inputs[field.name] = getFieldValue(field.name);
+	}
+	return inputs;
+});
+
+function isFieldEnabled(field) {
+	if (field.enabled === undefined) return true;
+
+	if (typeof field.enabled === "function") {
+		return field.enabled(fieldInputs.value);
+	}
+
+	return field.enabled;
+}
 
 function getVnodeProps(field) {
 	return {

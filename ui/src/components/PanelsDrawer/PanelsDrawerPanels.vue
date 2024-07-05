@@ -11,17 +11,19 @@
       <RenderVnode
         v-if="panel.vnode"
         :vnode="panel.vnode"
+        :props="activeItem"
       />
     </QTabPanel>
   </QTabPanels>
 </template>
 
 <script setup lang="ts">
-import { ActionPanel } from "../../types";
+import { ActionPanel, ActionTargetItem } from "../../types";
 import { RenderVnode } from "../Utility";
 
 defineProps<{
 	activePanel?: string | number,
+	activeItem: ActionTargetItem,
 	panels: ActionPanel[]
 }>();
 </script>

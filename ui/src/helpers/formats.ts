@@ -1,4 +1,5 @@
 import { DateTime, IANAZone } from "luxon";
+import { parse as parseYAML, stringify as stringifyYAML } from "yaml";
 import { ActionTargetItem, fDateOptions } from "../types";
 import { isJSON } from "./utils";
 
@@ -338,27 +339,52 @@ export function fJSON(string: string | object) {
 /**
  * Convert markdown formatted string into a valid JSON object
  */
-export function parseMarkdownJSON(string: string | object): object | undefined {
+export function parseMarkdownJSON(string: string | object): object | null | undefined {
 	if (typeof string === "object") return string as object;
 
 	try {
-		return JSON.parse(string.replace("```json\n", "").replace("\n```", ""));
+		return JSON.parse(parseMarkdownCode(string));
+	} catch (e) {
+		return undefined;
+	}
+}
+
+export function parseMarkdownYAML(string: string): object | null | undefined {
+	try {
+		return parseYAML(parseMarkdownCode(string)) || (string ? undefined : null);
 	} catch (e) {
 		return undefined;
 	}
 }
 
 /**
- * Convert a JSON object into a markdown formatted JSON string
+ * Parse a markdown formatted string and return the code block content
+ */
+export function parseMarkdownCode(string: string): string {
+	return string.replace(/^```[a-z0-9]{1,6}\s/, "").replace(/```$/, "");
+}
+
+/**
+ * Convert a JSON object or string of code into a markdown formatted JSON string
  * ie: a valid JSON string with a ```json prefix and ``` postfix
  */
-export function fMarkdownJSON(string: string | object): string {
-	if (isJSON(string)) {
-		return `\`\`\`json\n${fJSON(string)}\n\`\`\``;
+export function fMarkdownCode(type: string, string: string | object): string {
+	if (typeof string === "object" || isJSON(string)) {
+		switch (type) {
+			case "yaml":
+				string = stringifyYAML(string);
+				break;
+			case "ts":
+				string = "";
+				break;
+			default:
+				string = fJSON(string);
+		}
 	}
 
-	if (!(string as string || "").match(/```json/)) {
-		return `\`\`\`json\n${string}\n\`\`\``;
+	const regex = new RegExp(`\`\`\`${type}`, "g");
+	if (!((string || "") as string).match(regex)) {
+		return `\`\`\`${type}\n${string}\n\`\`\``;
 	}
 
 	return string as string;

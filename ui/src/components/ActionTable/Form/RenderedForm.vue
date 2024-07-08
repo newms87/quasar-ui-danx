@@ -73,8 +73,8 @@
         <RenderVnode
           v-if="field.vnode"
           :vnode="field.vnode"
-          :field="field"
           :props="getVnodeProps(field)"
+          :params="fieldInputs"
           @update:model-value="onInput(field.name, $event)"
         />
         <Component
@@ -140,7 +140,7 @@ import { ExclamationCircleIcon as MissingIcon, PencilIcon as EditIcon } from "@h
 import { computed, ref } from "vue";
 import { fDateTime, FlashMessages, incrementName, replace } from "../../../helpers";
 import { TrashIcon as RemoveIcon } from "../../../svg";
-import { AnyObject, Form, FormFieldValue } from "../../../types";
+import { AnyObject, FormFieldValue, RenderedFormProps } from "../../../types";
 import { ConfirmDialog, RenderVnode } from "../../Utility";
 import {
 	BooleanField,
@@ -153,22 +153,6 @@ import {
 	TextField,
 	WysiwygField
 } from "./Fields";
-
-export interface RenderedFormProps {
-	values?: FormFieldValue[] | object | null;
-	form: Form;
-	noLabel?: boolean;
-	showName?: boolean;
-	disable?: boolean;
-	readonly?: boolean;
-	saving?: boolean;
-	clearable?: boolean;
-	emptyValue?: string | number | boolean;
-	canModifyVariations?: boolean;
-	fieldClass?: string;
-	savingClass?: string;
-	savedAt?: string;
-}
 
 const props = withDefaults(defineProps<RenderedFormProps>(), {
 	values: null,

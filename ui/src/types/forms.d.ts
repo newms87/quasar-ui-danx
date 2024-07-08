@@ -1,5 +1,5 @@
-import { AnyObject } from "src/types/shared";
 import { VNode } from "vue";
+import { AnyObject } from "./shared";
 
 export interface FormFieldOption {
 	value: string;
@@ -13,7 +13,7 @@ export interface FormField {
 	label: string;
 	placeholder?: string;
 	enabled?: boolean | ((input: AnyObject) => boolean);
-	vnode?: ((props) => VNode | any);
+	vnode?: ((field: FormFieldOption, input?: AnyObject) => VNode | any);
 	component?: any;
 	clearable?: boolean;
 	required?: boolean;
@@ -36,4 +36,20 @@ export interface FormFieldValue {
 	name: string,
 	value: any,
 	variation?: string
+}
+
+export interface RenderedFormProps {
+	values?: FormFieldValue[] | object | null;
+	form: Form;
+	noLabel?: boolean;
+	showName?: boolean;
+	disable?: boolean;
+	readonly?: boolean;
+	saving?: boolean;
+	clearable?: boolean;
+	emptyValue?: string | number | boolean;
+	canModifyVariations?: boolean;
+	fieldClass?: string;
+	savingClass?: string;
+	savedAt?: string;
 }

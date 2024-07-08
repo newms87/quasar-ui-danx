@@ -57,7 +57,8 @@
     "danx-icon": "^1.0.2",
     "exifreader": "^4.21.1",
     "gsap": "^3.12.5",
-    "luxon": "^3.4.4"
+    "luxon": "^3.4.4",
+    "yaml": "^2.4.5"
   },
   "browserslist": [
     "last 4 Chrome versions",

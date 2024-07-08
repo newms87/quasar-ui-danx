@@ -11,7 +11,7 @@ const RenderVnode = (props) => {
 	}
 
 	if (typeof props.vnode === "function") {
-		return props.vnode(props.props);
+		return props.vnode(props.props, props.params);
 	}
 
 	return null;
@@ -24,6 +24,10 @@ RenderVnode.props = {
 	props: {
 		type: Object,
 		default: () => ({})
+	},
+	params: {
+		type: Object,
+		default: null
 	}
 };
 export default RenderVnode;

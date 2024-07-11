@@ -121,6 +121,11 @@ export function useActions(actions: ActionOptions[], globalOptions: ActionOption
 			result = await onConfirmAction(action, target, input);
 		}
 
+		// If the request was aborted (likely due to a newer request), just return immediately without changing state
+		if (result.abort) {
+			return result;
+		}
+
 		action.isApplying = false;
 		setTargetSavingState(target, false);
 
@@ -187,8 +192,16 @@ async function onConfirmAction(action: ActionOptions, target: ActionTarget, inpu
 			result = await action.onAction(action.alias || action.name, target, input);
 		}
 	} catch (e) {
-		console.error(e);
-		result = { error: `An error occurred while performing the action ${action.label}. Please try again later.` };
+		if (("" + e).match(/Request was aborted/)) {
+			result = { abort: true };
+		} else {
+			console.error(e);
+			result = { error: `An error occurred while performing the action ${action.label}. Please try again later.` };
+		}
+	}
+
+	if (result?.abort) {
+		return result;
 	}
 
 	// If there is no return value or the result marks it as successful, we show a success message

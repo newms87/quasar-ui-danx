@@ -45,7 +45,7 @@ export const request: RequestApi = {
 			// If the request was aborted too late, but there was still another request that was made after the current,
 			// then abort the current request with an abort flag
 			if (timestamp < request.abortControllers[abortKey].timestamp) {
-				throw new Error("Request was aborted due to a newer request being made: " + timestamp + " < " + request.abortControllers[abortKey].timestamp);
+				return { abort: true };
 			}
 
 			// Otherwise, the current is the most recent request, so we can delete the abort controller

@@ -339,21 +339,24 @@ export function fJSON(string: string | object) {
 /**
  * Convert markdown formatted string into a valid JSON object
  */
-export function parseMarkdownJSON(string: string | object): object | null | undefined {
+export function parseMarkdownJSON(string: string | object): object | null | false {
+	if (!string) return null;
 	if (typeof string === "object") return string as object;
 
 	try {
 		return JSON.parse(parseMarkdownCode(string));
 	} catch (e) {
-		return undefined;
+		return false;
 	}
 }
 
-export function parseMarkdownYAML(string: string): object | null | undefined {
+export function parseMarkdownYAML(string: string): object | null | false {
+	if (!string) return null;
+
 	try {
 		return parseYAML(parseMarkdownCode(string)) || (string ? undefined : null);
 	} catch (e) {
-		return undefined;
+		return false;
 	}
 }
 

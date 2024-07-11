@@ -203,11 +203,11 @@ async function onConfirmAction(action: ActionOptions, target: ActionTarget, inpu
 		}
 
 		if (action.onSuccess) {
-			action.onSuccess(result, target, input);
+			await action.onSuccess(result, target, input);
 		}
 
 		if (isBatch && action.onBatchSuccess) {
-			action.onBatchSuccess(result, target, input);
+			await action.onBatchSuccess(result, target, input);
 		}
 	} else {
 		const errors = [];
@@ -230,12 +230,12 @@ async function onConfirmAction(action: ActionOptions, target: ActionTarget, inpu
 		FlashMessages.combine("error", errors);
 
 		if (action.onError) {
-			action.onError(result, target, input);
+			await action.onError(result, target, input);
 		}
 	}
 
 	if (action.onFinish) {
-		action.onFinish(result, target, input);
+		await action.onFinish(result, target, input);
 	}
 
 	return result;

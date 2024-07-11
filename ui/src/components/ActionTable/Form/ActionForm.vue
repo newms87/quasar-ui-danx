@@ -1,16 +1,17 @@
 <template>
-  <div>
-    <RenderedForm
-      v-bind="renderedFormProps"
-      v-model:values="input"
-      empty-value=""
-      :saving="action.isApplying"
-      @update:values="action.trigger(target, input)"
-    />
-  </div>
+	<div>
+		<RenderedForm
+			v-bind="renderedFormProps"
+			v-model:values="input"
+			empty-value=""
+			:saved-at="target.updated_at"
+			:saving="action.isApplying"
+			@update:values="action.trigger(target, input)"
+		/>
+	</div>
 </template>
 <script setup lang="ts">
-import { ref, watch } from "vue";
+import { Ref, ref, watch } from "vue";
 import { ActionTargetItem, AnyObject, Form, ResourceAction } from "../../../types";
 import RenderedForm from "./RenderedForm.vue";
 
@@ -27,7 +28,10 @@ interface ActionFormProps {
 	savingClass?: string;
 }
 
-const props = defineProps<ActionFormProps>();
+const props = withDefaults(defineProps<ActionFormProps>(), {
+	fieldClass: "",
+	savingClass: undefined
+});
 const renderedFormProps = {
 	form: props.form,
 	noLabel: props.noLabel,
@@ -39,7 +43,7 @@ const renderedFormProps = {
 	savingClass: props.savingClass
 };
 
-const input: AnyObject = ref({ ...props.target });
+const input: Ref<AnyObject> = ref({ ...props.target });
 const fieldStatus: AnyObject = {};
 
 // Only update field values from target changes when the field is not already being saved

@@ -13,6 +13,7 @@ export interface ActionPanel {
 
 export interface ActionTargetItem extends TypedObject {
 	isSaving?: boolean;
+	updated_at?: string;
 }
 
 export type ActionTarget = ActionTargetItem[] | ActionTargetItem | null;

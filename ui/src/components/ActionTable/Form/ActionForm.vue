@@ -7,7 +7,9 @@
 			:saved-at="target.updated_at"
 			:saving="action.isApplying"
 			@update:values="action.trigger(target, input)"
-		/>
+		>
+			<slot />
+		</RenderedForm>
 	</div>
 </template>
 <script setup lang="ts">

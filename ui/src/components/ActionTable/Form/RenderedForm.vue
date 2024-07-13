@@ -92,6 +92,7 @@
 				/>
 			</div>
 		</template>
+		<slot />
 		<div
 			v-if="savedAt"
 			:class="savingClass"

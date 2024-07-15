@@ -179,7 +179,6 @@ const FORM_FIELD_MAP = {
 
 const mappedFields = props.form.fields.map((field) => ({
 	placeholder: `Enter ${field.label}`,
-	default: field.type === "BOOLEAN" ? false : "",
 	...field,
 	component: field.component || FORM_FIELD_MAP[field.type]
 }));
@@ -271,7 +270,7 @@ function createVariation(variation) {
 	return props.form.fields.map((field) => ({
 		variation,
 		name: field.name,
-		value: field.type === "BOOLEAN" ? false : null
+		value: field.default_value === undefined ? null : field.default_value
 	}));
 }
 

@@ -18,6 +18,7 @@ export interface FormField {
 	clearable?: boolean;
 	required?: boolean;
 	required_group?: string;
+	default_value?: any;
 	toggleIndeterminate?: boolean;
 	inline?: boolean;
 	maxLength?: number;

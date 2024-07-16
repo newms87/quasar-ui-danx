@@ -5,6 +5,7 @@ export interface TypedObject {
 	name?: string;
 	__type: string;
 	__timestamp?: number;
+	__id: string;
 
 	[key: string]: TypedObject[] | any;
 }

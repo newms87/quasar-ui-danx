@@ -1,3 +1,4 @@
+import { uid } from "quasar";
 import { ShallowReactive, shallowReactive } from "vue";
 import { TypedObject } from "../types";
 
@@ -12,6 +13,9 @@ export function storeObject<T extends TypedObject>(newObject: T): ShallowReactiv
 	const type = newObject.__type;
 	if (!id || !type) return shallowReactive(newObject);
 
+	if (!newObject.__id) {
+		newObject.__id = uid();
+	}
 	if (!newObject.__timestamp) {
 		newObject.__timestamp = newObject.updated_at || 0;
 	}
@@ -34,6 +38,9 @@ export function storeObject<T extends TypedObject>(newObject: T): ShallowReactiv
 			for (const index in value) {
 				newObject[key][index] = storeObject(value[index]);
 			}
+		} else if (value?.__type) {
+			// @ts-expect-error newObject[key] is guaranteed to be a TypedObject
+			newObject[key] = storeObject(value);
 		}
 	}
 

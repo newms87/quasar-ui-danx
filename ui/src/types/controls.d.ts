@@ -1,5 +1,4 @@
 import { ComputedRef, Ref, ShallowRef } from "vue";
-import { Router } from "vue-router";
 import { ActionTargetItem } from "./actions";
 import { AnyObject, LabelValueItem } from "./shared";
 
@@ -69,10 +68,6 @@ export interface PagedItems {
 	} | undefined;
 }
 
-export interface ListControlsInitializeOptions {
-	vueRouter?: Router;
-}
-
 export interface ActionController {
 	name: string;
 	label: string;
@@ -97,7 +92,7 @@ export interface ActionController {
 	activePanel: ShallowRef<string | null>;
 
 	// Actions
-	initialize: (options: ListControlsInitializeOptions) => void;
+	initialize: () => void;
 	resetPaging: () => void;
 	setPagination: (updated: ListControlsPagination) => void;
 	setSelectedRows: (selection: ActionTargetItem[]) => void;

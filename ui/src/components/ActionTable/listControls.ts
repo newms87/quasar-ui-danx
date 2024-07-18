@@ -1,5 +1,6 @@
 import { computed, Ref, ref, shallowRef, watch } from "vue";
-import { RouteLocationNormalizedLoaded, RouteParams, Router } from "vue-router";
+import { RouteParams, Router } from "vue-router";
+import { danxOptions } from "../../config";
 import { getItem, setItem, storeObject, waitForRef } from "../../helpers";
 import {
 	ActionController,
@@ -7,7 +8,6 @@ import {
 	AnyObject,
 	FilterGroup,
 	ListControlsFilter,
-	ListControlsInitializeOptions,
 	ListControlsOptions,
 	ListControlsPagination,
 	PagedItems
@@ -16,8 +16,6 @@ import { getFilterFromUrl } from "./listHelpers";
 
 export function useListControls(name: string, options: ListControlsOptions): ActionController {
 	let isInitialized = false;
-	let vueRoute: RouteLocationNormalizedLoaded | null | undefined;
-	let vueRouter: Router | null | undefined;
 	const PAGE_SETTINGS_KEY = `dx-${name}-pager`;
 	const pagedItems = shallowRef<PagedItems | null>(null);
 	const activeFilter = ref<ListControlsFilter>({});
@@ -114,7 +112,7 @@ export function useListControls(name: string, options: ListControlsOptions): Act
 	 * Loads the filter field options for the current filter.
 	 */
 	async function loadFieldOptions() {
-		if (!options.routes.fieldOptions || !isInitialized) return;
+		if (!options.routes.fieldOptions) return;
 		isLoadingFilters.value = true;
 		try {
 			fieldOptions.value = await options.routes.fieldOptions(activeFilter.value) || {};
@@ -248,9 +246,6 @@ export function useListControls(name: string, options: ListControlsOptions): Act
 	 * Loads the filter and pagination settings from local storage.
 	 */
 	function loadSettings() {
-		// Only load settings when the class is fully initialized
-		if (!isInitialized) return;
-
 		const settings = getItem(PAGE_SETTINGS_KEY);
 
 		// Load the filter settings from local storage
@@ -400,19 +395,17 @@ export function useListControls(name: string, options: ListControlsOptions): Act
 	}
 
 	// Initialize the list actions and load settings, lists, summaries, filter fields, etc.
-	function initialize(initOptions?: ListControlsInitializeOptions) {
-		vueRouter = initOptions?.vueRouter;
-		vueRoute = initOptions?.vueRouter?.currentRoute.value;
+	function initialize() {
+		const vueRouter = getVueRouter();
 		isInitialized = true;
 		loadSettings();
 
 		/**
 		 * Watch the id params in the route and set the active item to the item with the given id.
 		 */
-		if (options.routes.details && vueRoute && vueRouter) {
-			const { params, meta } = vueRoute;
+		if (options.routes.details) {
+			const { params, meta, name: controlRouteName } = vueRouter.currentRoute.value;
 
-			const controlRouteName = vueRoute.name;
 			vueRouter.afterEach((to) => {
 				if (to.name === controlRouteName) {
 					setPanelFromRoute(to.params, to.meta);
@@ -427,12 +420,12 @@ export function useListControls(name: string, options: ListControlsOptions): Act
 	 * Updates the URL bar and route to the given params.
 	 */
 	function updateRouteParams(params: AnyObject) {
-		if (vueRouter && vueRoute) {
-			vueRouter.push({
-				name: (Array.isArray(vueRoute.name) ? vueRoute.name[0] : vueRoute.name) || "home",
-				params
-			});
-		}
+		const vueRouter = getVueRouter();
+		const { name: routeName } = vueRouter.currentRoute.value;
+		vueRouter.push({
+			name: (Array.isArray(routeName) ? routeName[0] : routeName) || "home",
+			params
+		});
 	}
 
 	function setPanelFromRoute(params: RouteParams, meta: AnyObject) {
@@ -441,6 +434,13 @@ export function useListControls(name: string, options: ListControlsOptions): Act
 			const panel = Array.isArray(params?.panel) ? params.panel[0] : params?.panel;
 			activatePanel({ id, __type: "" + meta.type }, panel || activePanel.value || "");
 		}
+	}
+
+	function getVueRouter(): Router {
+		if (!danxOptions.value.router) {
+			throw new Error("Vue Router must be configured in danxOptions");
+		}
+		return danxOptions.value.router;
 	}
 
 	return {

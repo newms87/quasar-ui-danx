@@ -8,10 +8,12 @@
       :key="'nav-item-' + item.label"
       class="nav-menu-item-box"
     >
-      <div
+      <a
         class="nav-menu-item flex flex-nowrap"
+        :href="resolveUrl(item)"
         :class="item.class || itemClass"
-        @click="item.onClick"
+        :target="item.target || '_self'"
+        @click="onClick($event, item)"
       >
         <div
           v-if="item.icon"
@@ -36,7 +38,7 @@
         >
           {{ item.tooltip?.text || item.label }}
         </QTooltip>
-      </div>
+      </a>
       <QSeparator
         v-if="item.separator"
         :key="'separator-' + item.label"
@@ -47,55 +49,96 @@
 </template>
 <script setup>
 import { computed } from "vue";
+import { danxOptions } from "../../config";
 
 const props = defineProps({
-  collapsed: Boolean,
-  itemClass: {
-    type: String,
-    default: "hover:bg-gray-200"
-  },
-  activeClass: {
-    type: String,
-    default: "bg-blue-200"
-  },
-  items: {
-    type: Array,
-    required: true
-  }
+	collapsed: Boolean,
+	itemClass: {
+		type: String,
+		default: "hover:bg-gray-200"
+	},
+	activeClass: {
+		type: String,
+		default: "bg-blue-200"
+	},
+	items: {
+		type: Array,
+		required: true
+	}
 });
 
+const router = danxOptions.value.router;
 const allowedItems = computed(() => props.items.filter((item) => !item.hidden));
+
+function getItemRoute(item) {
+	if (!router) {
+		console.error("Router is not available. Configure in danx options.");
+		return;
+	}
+
+	return typeof item.route === "function" ? item.route() : item.route;
+}
+
+function onClick(e, item) {
+	if (!item.url && !e.ctrlKey) {
+		e.preventDefault();
+	}
+
+	if (item.disabled || e.ctrlKey) {
+		return;
+	}
+
+	if (item.onClick) {
+		item.onClick();
+	}
+
+	if (item.route) {
+		router.push(getItemRoute(item));
+	}
+}
+
+function resolveUrl(item) {
+	if (item.url) {
+		return item.url;
+	}
+
+	if (item.route) {
+		return router.resolve(getItemRoute(item))?.href || "#";
+	}
+
+	return "#";
+}
 </script>
 
 <style lang="scss">
 .nav-menu-item {
-  padding: 1em;
-  border-radius: 0.5em;
-  font-weight: bold;
-  font-size: 14px;
-  transition: all 150ms, color 0ms;
-  cursor: pointer;
+	padding: 1em;
+	border-radius: 0.5em;
+	font-weight: bold;
+	font-size: 14px;
+	transition: all 150ms, color 0ms;
+	cursor: pointer;
 
-  &.is-disabled {
-    @apply bg-inherit;
-  }
+	&.is-disabled {
+		@apply bg-inherit;
+	}
 
-  .label {
-    @apply transition-all;
-  }
+	.label {
+		@apply transition-all;
+	}
 
-  .nav-icon {
-    @apply w-5 h-5 flex-shrink-0;
-  }
+	.nav-icon {
+		@apply w-5 h-5 flex-shrink-0;
+	}
 }
 
 .is-collapsed {
-  .nav-link {
-    width: 3.8em;
-  }
+	.nav-link {
+		width: 3.8em;
+	}
 
-  .label {
-    @apply opacity-0;
-  }
+	.label {
+		@apply opacity-0;
+	}
 }
 </style>

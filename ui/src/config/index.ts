@@ -3,6 +3,7 @@ import { DanxOptions } from "../types";
 
 export const danxOptions = shallowRef<DanxOptions>({
 	tinyMceApiKey: "set-api-key-in-danx-options",
+	router: undefined,
 	request: {
 		baseUrl: "",
 		headers: {},

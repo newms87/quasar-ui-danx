@@ -17,30 +17,28 @@ export function useActions(actions: ActionOptions[], globalOptions: ActionOption
 	/**
 	 * Resolve the action object based on the provided name (or return the object if the name is already an object)
 	 */
-	function getAction(actionName: string | ActionOptions | ResourceAction): ResourceAction {
-		let actionOptions: ActionOptions | ResourceAction;
-
+	function getAction(actionName: string, actionOptions?: ActionOptionsPartial): ResourceAction {
 		/// Resolve the action options or resource action based on the provided input
-		if (typeof actionName === "string") {
-			actionOptions = actions.find(a => a.name === actionName) || { name: actionName };
-		} else {
-			actionOptions = actionName;
+		const baseOptions = actions.find(a => a.name === actionName) || { name: actionName };
+
+		if (actionOptions) {
+			Object.assign(baseOptions, actionOptions);
 		}
 
 		// If the action is already reactive, return it
-		if (isReactive(actionOptions) && "__type" in actionOptions) return actionOptions as ResourceAction;
+		if (isReactive(baseOptions) && "__type" in baseOptions) return baseOptions as ResourceAction;
 
 		const resourceAction: ResourceAction = storeObject({
 			...globalOptions,
-			...actionOptions,
+			...baseOptions,
 			trigger: (target, input) => performAction(resourceAction, target, input),
 			isApplying: false,
 			__type: "__Action:" + namespace
 		});
 
 		// Assign Trigger function if it doesn't exist
-		if (actionOptions.debounce) {
-			resourceAction.trigger = useDebounceFn((target, input) => performAction(resourceAction, target, input), actionOptions.debounce);
+		if (baseOptions.debounce) {
+			resourceAction.trigger = useDebounceFn((target, input) => performAction(resourceAction, target, input), baseOptions.debounce);
 		}
 
 		return resourceAction;
@@ -63,7 +61,7 @@ export function useActions(actions: ActionOptions[], globalOptions: ActionOption
 			}
 		}
 
-		return filteredActions.map((a: ActionOptions) => getAction(a));
+		return filteredActions.map((a: ActionOptions) => getAction(a.name));
 	}
 
 	/**
@@ -122,7 +120,7 @@ export function useActions(actions: ActionOptions[], globalOptions: ActionOption
 		}
 
 		// If the request was aborted (likely due to a newer request), just return immediately without changing state
-		if (result.abort) {
+		if (result?.abort) {
 			return result;
 		}
 

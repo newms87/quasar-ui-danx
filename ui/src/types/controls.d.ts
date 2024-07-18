@@ -29,6 +29,8 @@ export interface ListControlsRoutes {
 
 	details?(target: ActionTargetItem): Promise<ActionTargetItem>;
 
+	detailsAndStore?(target: ActionTargetItem): Promise<ActionTargetItem>;
+
 	more?(pager: ListControlsPagination): Promise<ActionTargetItem[]>;
 
 	fieldOptions?(filter?: AnyObject): Promise<AnyObject>;
@@ -104,6 +106,7 @@ export interface ActionController {
 	loadSummary: (filter?: ListControlsFilter) => Promise<void>;
 	loadListAndSummary: (filter?: ListControlsFilter) => Promise<void>;
 	loadMore: (index: number, perPage?: number) => Promise<boolean>;
+	loadFieldOptions: () => Promise<void>;
 	getActiveItemDetails: () => Promise<void>;
 	refreshAll: () => Promise<void[]>;
 	exportList: (filter?: ListControlsFilter) => Promise<void>;

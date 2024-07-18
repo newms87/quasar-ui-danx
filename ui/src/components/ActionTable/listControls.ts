@@ -112,8 +112,6 @@ export function useListControls(name: string, options: ListControlsOptions): Act
 
 	/**
 	 * Loads the filter field options for the current filter.
-	 *
-	 * @returns {Promise<void>}
 	 */
 	async function loadFieldOptions() {
 		if (!options.routes.fieldOptions || !isInitialized) return;
@@ -474,6 +472,7 @@ export function useListControls(name: string, options: ListControlsOptions): Act
 		loadSummary,
 		loadListAndSummary,
 		loadMore,
+		loadFieldOptions,
 		getActiveItemDetails,
 		refreshAll,
 		exportList,

@@ -1,3 +1,4 @@
+import { storeObject } from "../helpers";
 import { ListControlsRoutes } from "../types";
 import { downloadFile } from "./downloadPdf";
 import { request } from "./request";
@@ -12,6 +13,10 @@ export function useActionRoutes(baseUrl: string): ListControlsRoutes {
 		},
 		details(target) {
 			return request.get(`${baseUrl}/${target.id}/details`);
+		},
+		async detailsAndStore(target) {
+			const item = await request.get(`${baseUrl}/${target.id}/details`);
+			return storeObject(item);
 		},
 		fieldOptions() {
 			return request.get(`${baseUrl}/field-options`);

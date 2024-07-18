@@ -1,6 +1,6 @@
 <template>
   <ContentDrawer
-    position="right"
+    :position="position"
     show
     overlay
     content-class="h-full"
@@ -82,6 +82,7 @@ export interface Props {
 	activeItem: ActionTargetItem;
 	tabsClass?: string | object,
 	panelsClass?: string | object,
+	position?: "standard" | "right" | "left";
 	panels: ActionPanel[]
 }
 
@@ -90,7 +91,8 @@ const props = withDefaults(defineProps<Props>(), {
 	title: "",
 	modelValue: null,
 	tabsClass: "w-[13.5rem]",
-	panelsClass: "w-[35.5rem]"
+	panelsClass: "w-[60rem]",
+	position: "right"
 });
 
 const activePanel = ref(props.modelValue);

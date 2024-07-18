@@ -90,8 +90,8 @@ defineEmits(["update:model-value", "close"]);
 const props = withDefaults(defineProps<Props>(), {
 	title: "",
 	modelValue: null,
-	tabsClass: "w-[13.5rem]",
-	panelsClass: "w-[60rem]",
+	tabsClass: "w-[13.5rem] flex-shrink-0",
+	panelsClass: "w-[80rem]",
 	position: "right"
 });
 

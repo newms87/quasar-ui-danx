@@ -1,7 +1,7 @@
 import { useDebounceFn } from "@vueuse/core";
 import { uid } from "quasar";
 import { isReactive, Ref, shallowRef } from "vue";
-import type { ActionOptions, ActionOptionsPartial, ActionTarget, AnyObject, ResourceAction } from "../types";
+import type { ActionOptions, ActionTarget, AnyObject, ResourceAction } from "../types";
 import { FlashMessages } from "./FlashMessages";
 import { storeObject } from "./objectStore";
 
@@ -11,13 +11,13 @@ export const activeActionVnode: Ref = shallowRef(null);
  * Hook to perform an action on a set of targets
  * This helper allows you to perform actions by name on a set of targets using a provided list of actions
  */
-export function useActions(actions: ActionOptions[], globalOptions: ActionOptionsPartial | null = null) {
+export function useActions(actions: ActionOptions[], globalOptions: Partial<ActionOptions> | null = null) {
 	const namespace = uid();
 
 	/**
 	 * Resolve the action object based on the provided name (or return the object if the name is already an object)
 	 */
-	function getAction(actionName: string, actionOptions?: ActionOptionsPartial): ResourceAction {
+	function getAction(actionName: string, actionOptions?: Partial<ActionOptions>): ResourceAction {
 		/// Resolve the action options or resource action based on the provided input
 		const baseOptions = actions.find(a => a.name === actionName) || { name: actionName };
 

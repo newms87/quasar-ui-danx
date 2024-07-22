@@ -1,66 +1,66 @@
 <template>
-  <div
-    class="dx-action-table overflow-hidden"
-    :class="{'dx-no-data': !hasData, 'dx-is-loading': loadingList || loadingSummary, 'dx-is-loading-list': loadingList}"
-  >
-    <ActionVnode />
-    <QTable
-      ref="actionTable"
-      :selected="selectedRows"
-      :pagination="pagination"
-      :columns="tableColumns"
-      :loading="loadingList || loadingSummary"
-      :rows="pagedItems?.data || []"
-      :binary-state-sort="false"
-      selection="multiple"
-      :rows-per-page-options="rowsPerPageOptions"
-      class="sticky-column sticky-header w-full h-full !border-0"
-      :color="color"
-      @update:selected="$emit('update:selected-rows', $event)"
-      @update:pagination="() => {}"
-      @request="(e) => $emit('update:pagination', {...e.pagination, __sort: mapSortBy(e.pagination, tableColumns)})"
-    >
-      <template #no-data>
-        <slot name="empty">
-          <EmptyTableState :text="`There are no ${label.toLowerCase()} matching the applied filter`" />
-        </slot>
-      </template>
-      <template #top-row>
-        <TableSummaryRow
-          v-if="hasData"
-          :label="label"
-          :item-count="summary?.count || 0"
-          :selected-count="selectedRows.length"
-          :sticky-colspan="summaryColSpan"
-          :loading="loadingSummary"
-          :summary="summary"
-          :columns="tableColumns"
-          @clear="$emit('update:selected-rows', [])"
-        />
-      </template>
-      <template #header-cell="rowProps">
-        <ActionTableHeaderColumn
-          v-model="columnSettings"
-          :row-props="rowProps"
-          :name="name"
-          @update:model-value="onUpdateColumnSettings"
-        />
-      </template>
-      <template #body-cell="rowProps">
-        <ActionTableColumn
-          :key="rowProps.key"
-          :row-props="rowProps"
-          :settings="columnSettings[rowProps.col.name]"
-        >
-          <slot
-            :column-name="rowProps.col.name"
-            :row="rowProps.row"
-            :value="rowProps.value"
-          />
-        </ActionTableColumn>
-      </template>
-    </QTable>
-  </div>
+	<div
+		class="dx-action-table overflow-hidden"
+		:class="{'dx-no-data': !hasData, 'dx-is-loading': loadingList || loadingSummary, 'dx-is-loading-list': loadingList}"
+	>
+		<ActionVnode />
+		<QTable
+			ref="actionTable"
+			:selected="selectedRows"
+			:pagination="pagination"
+			:columns="tableColumns"
+			:loading="loadingList || loadingSummary"
+			:rows="pagedItems?.data || []"
+			:binary-state-sort="false"
+			:selection="selection"
+			:rows-per-page-options="rowsPerPageOptions"
+			class="sticky-column sticky-header w-full h-full !border-0"
+			:color="color"
+			@update:selected="$emit('update:selected-rows', $event)"
+			@update:pagination="() => {}"
+			@request="(e) => $emit('update:pagination', {...e.pagination, __sort: mapSortBy(e.pagination, tableColumns)})"
+		>
+			<template #no-data>
+				<slot name="empty">
+					<EmptyTableState :text="`There are no ${label.toLowerCase()} matching the applied filter`" />
+				</slot>
+			</template>
+			<template #top-row>
+				<TableSummaryRow
+					v-if="hasData"
+					:label="label"
+					:item-count="summary?.count || 0"
+					:selected-count="selectedRows.length"
+					:sticky-colspan="summaryColSpan"
+					:loading="loadingSummary"
+					:summary="summary"
+					:columns="tableColumns"
+					@clear="$emit('update:selected-rows', [])"
+				/>
+			</template>
+			<template #header-cell="rowProps">
+				<ActionTableHeaderColumn
+					v-model="columnSettings"
+					:row-props="rowProps"
+					:name="name"
+					@update:model-value="onUpdateColumnSettings"
+				/>
+			</template>
+			<template #body-cell="rowProps">
+				<ActionTableColumn
+					:key="rowProps.key"
+					:row-props="rowProps"
+					:settings="columnSettings[rowProps.col.name]"
+				>
+					<slot
+						:column-name="rowProps.col.name"
+						:row="rowProps.row"
+						:value="rowProps.value"
+					/>
+				</ActionTableColumn>
+			</template>
+		</QTable>
+	</div>
 </template>
 
 <script setup lang="ts">
@@ -89,6 +89,7 @@ export interface Props {
 	columns: TableColumn[];
 	rowsPerPageOptions?: number[];
 	summaryColSpan?: number;
+	selection: "multiple" | "single";
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -97,7 +98,8 @@ const props = withDefaults(defineProps<Props>(), {
 	summary: null,
 	loadingSummary: false,
 	rowsPerPageOptions: () => [10, 25, 50, 100],
-	summaryColSpan: null
+	summaryColSpan: null,
+	selection: "multiple"
 });
 
 const actionTable = ref(null);

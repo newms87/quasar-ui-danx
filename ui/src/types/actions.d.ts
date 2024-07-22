@@ -42,10 +42,6 @@ export interface ActionOptions {
 	onFinish?: (result: any, targets: ActionTarget, input: any) => any;
 }
 
-export interface ActionOptionsPartial extends ActionOptions {
-	name?: string;
-}
-
 export interface ResourceAction extends ActionOptions {
 	isApplying: boolean;
 	trigger: (target?: ActionTarget, input?: any) => Promise<any>;

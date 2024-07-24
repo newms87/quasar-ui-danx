@@ -94,7 +94,7 @@ export interface ActionController {
 	// Actions
 	initialize: () => void;
 	resetPaging: () => void;
-	setPagination: (updated: ListControlsPagination) => void;
+	setPagination: (updated: Partial<ListControlsPagination>) => void;
 	setSelectedRows: (selection: ActionTargetItem[]) => void;
 	clearSelectedRows: () => void;
 	loadList: (filter?: ListControlsFilter) => Promise<void>;

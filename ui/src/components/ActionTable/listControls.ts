@@ -180,9 +180,9 @@ export function useListControls(name: string, options: ListControlsOptions): Act
 	/**
 	 * Sets the pagination settings to the given values.
 	 */
-	function setPagination(updated: ListControlsPagination) {
+	function setPagination(updated: Partial<ListControlsPagination>) {
 		// @ts-expect-error Seems like a bug in the typescript linting?
-		pagination.value = updated;
+		pagination.value = { ...pagination.value, ...updated };
 	}
 
 	/**
@@ -406,13 +406,15 @@ export function useListControls(name: string, options: ListControlsOptions): Act
 		if (options.routes.details) {
 			const { params, meta, name: controlRouteName } = vueRouter.currentRoute.value;
 
-			vueRouter.afterEach((to) => {
-				if (to.name === controlRouteName) {
-					setPanelFromRoute(to.params, to.meta);
-				}
-			});
+			if (controlRouteName === name) {
+				vueRouter.afterEach((to) => {
+					if (to.name === controlRouteName) {
+						setPanelFromRoute(to.params, to.meta);
+					}
+				});
 
-			setPanelFromRoute(params, meta);
+				setPanelFromRoute(params, meta);
+			}
 		}
 	}
 

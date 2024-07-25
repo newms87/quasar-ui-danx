@@ -375,7 +375,7 @@ export function fMarkdownCode(type: string, string: string | object): string {
 	if (typeof string === "object" || isJSON(string)) {
 		switch (type) {
 			case "yaml":
-				string = stringifyYAML(string);
+				string = stringifyYAML(typeof string === "string" ? JSON.parse(string) : string);
 				break;
 			case "ts":
 				string = "";

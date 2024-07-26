@@ -9,8 +9,8 @@ const store = new Map<string, any>();
  * Returns the stored object that should be used instead of the passed object as the returned object is shared across the system
  */
 export function storeObject<T extends TypedObject>(newObject: T): ShallowReactive<T> {
-	const id = newObject.id || newObject.name;
-	const type = newObject.__type;
+	const id = newObject?.id || newObject?.name;
+	const type = newObject?.__type;
 	if (!id || !type) return shallowReactive(newObject);
 
 	if (!newObject.__id) {

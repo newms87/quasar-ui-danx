@@ -34,9 +34,11 @@ export function storeObject<T extends TypedObject>(newObject: T): ShallowReactiv
 	// Recursively store all the children of the object as well
 	for (const key of Object.keys(newObject)) {
 		const value = newObject[key];
-		if (Array.isArray(value) && value.length > 0 && typeof value[0] === "object") {
+		if (Array.isArray(value) && value.length > 0) {
 			for (const index in value) {
-				newObject[key][index] = storeObject(value[index]);
+				if (value[index] && typeof value[index] === "object") {
+					newObject[key][index] = storeObject(value[index]);
+				}
 			}
 		} else if (value?.__type) {
 			// @ts-expect-error newObject[key] is guaranteed to be a TypedObject

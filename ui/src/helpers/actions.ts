@@ -15,6 +15,25 @@ export function useActions(actions: ActionOptions[], globalOptions: Partial<Acti
 	const namespace = uid();
 
 	/**
+	 * Extend an action so the base action can be modified without affecting other places the action is used.
+	 * This isolates the action to the provided id, so it is still re-usable across the system, but does not affect behavior elsewhere.
+	 *
+	 * For example, when you have a list of items and you want to perform a callback on the action on a single item, you can extend the action
+	 * with the id of the item you want to perform the action on, allowing you to perform behavior on a single item, instead of all instances
+	 * in the list receiving the same callback.
+	 */
+	function extendAction(actionName: string, extendedId: string | number, actionOptions: Partial<ActionOptions>): ResourceAction {
+		const action = getAction(actionName);
+		const extendedAction = { ...action, ...actionOptions, id: extendedId };
+		if (extendedAction.debounce) {
+			extendedAction.trigger = useDebounceFn((target, input) => performAction(extendedAction, target, input), extendedAction.debounce);
+		} else {
+			extendedAction.trigger = (target, input) => performAction(extendedAction, target, input);
+		}
+		return storeObject(extendedAction);
+	}
+
+	/**
 	 * Resolve the action object based on the provided name (or return the object if the name is already an object)
 	 */
 	function getAction(actionName: string, actionOptions?: Partial<ActionOptions>): ResourceAction {
@@ -140,7 +159,8 @@ export function useActions(actions: ActionOptions[], globalOptions: Partial<Acti
 
 	return {
 		getAction,
-		getActions
+		getActions,
+		extendAction
 	};
 }
 

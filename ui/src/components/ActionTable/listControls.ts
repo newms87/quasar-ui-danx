@@ -1,7 +1,7 @@
 import { computed, Ref, ref, shallowRef, watch } from "vue";
 import { RouteParams, Router } from "vue-router";
 import { danxOptions } from "../../config";
-import { getItem, setItem, storeObject, waitForRef } from "../../helpers";
+import { getItem, latestCallOnly, setItem, storeObject, waitForRef } from "../../helpers";
 import {
 	ActionController,
 	ActionTargetItem,
@@ -290,10 +290,16 @@ export function useListControls(name: string, options: ListControlsOptions): Act
 	 * @returns {Promise<void>}
 	 */
 	async function getActiveItemDetails() {
-		if (!activeItem.value || !options.routes.details) return;
-
 		try {
-			const result = await options.routes.details(activeItem.value);
+			const latestResult = latestCallOnly("active-item", async () => {
+				if (!activeItem.value || !options.routes.details) return undefined;
+				return await options.routes.details(activeItem.value);
+			});
+
+			const result = await latestResult();
+
+			// Undefined means we were not the latest, or the request was invalid (ie: activeItem was already cleared)
+			if (result === undefined) return;
 
 			if (!result || !result.__type || !result.id) {
 				return console.error("Invalid response from details route: All responses must include a __type and id field. result =", result);
@@ -354,33 +360,41 @@ export function useListControls(name: string, options: ListControlsOptions): Act
 		const index = pagedItems.value.data.findIndex((i: ActionTargetItem) => i.id === activeItem.value?.id);
 		if (index === undefined || index === null) return;
 
-		let nextIndex = index + offset;
+		const nextIndex = index + offset;
 
-		// Load the previous page if the offset is before index 0
-		if (nextIndex < 0) {
-			if (pagination.value.page > 1) {
-				pagination.value = { ...pagination.value, page: pagination.value.page - 1 };
-				await waitForRef(isLoadingList, false);
-				nextIndex = pagedItems.value.data.length - 1;
-			} else {
+		const latestNextIndex = latestCallOnly("getNextItem", async () => {
+			// Load the previous page if the offset is before index 0
+			if (nextIndex < 0) {
+				if (pagination.value.page > 1) {
+					pagination.value = { ...pagination.value, page: pagination.value.page - 1 };
+					await waitForRef(isLoadingList, false);
+					return pagedItems.value.data.length - 1;
+				}
+
 				// There are no more previous pages
-				return;
+				return -1;
 			}
-		}
 
-		// Load the next page if the offset is past the last index
-		if (nextIndex >= pagedItems.value.data.length) {
-			if (pagination.value.page < (pagedItems.value?.meta?.last_page || 1)) {
-				pagination.value = { ...pagination.value, page: pagination.value.page + 1 };
-				await waitForRef(isLoadingList, false);
-				nextIndex = 0;
-			} else {
+			// Load the next page if the offset is past the last index
+			if (nextIndex >= pagedItems.value.data.length) {
+				if (pagination.value.page < (pagedItems.value?.meta?.last_page || 1)) {
+					pagination.value = { ...pagination.value, page: pagination.value.page + 1 };
+					await waitForRef(isLoadingList, false);
+					return 0;
+				}
+
 				// There are no more next pages
-				return;
+				return -1;
 			}
-		}
 
-		activeItem.value = pagedItems.value?.data[nextIndex];
+			return nextIndex;
+		});
+
+		const resolvedNextIndex = await latestNextIndex();
+
+		if (resolvedNextIndex !== undefined && resolvedNextIndex >= 0) {
+			activeItem.value = pagedItems.value?.data[resolvedNextIndex];
+		}
 	}
 
 	/**

@@ -1,3 +1,4 @@
+import { AnyObject } from "src/types";
 import { Ref, watch } from "vue";
 
 export { useDebounceFn } from "@vueuse/core";
@@ -31,6 +32,21 @@ export function waitForRef(ref: Ref, value: any) {
 			}
 		});
 	});
+}
+
+const currentCalls: AnyObject = {};
+export function latestCallOnly<T extends any[], R>(type: string, fn: (...args: T) => Promise<R>) {
+	if (!currentCalls[type]) {
+		currentCalls[type] = 0;
+	}
+	return async function (...args: T) {
+		const callId = ++currentCalls[type];
+		const result = await fn(...args);
+		if (callId === currentCalls[type]) {
+			return result;
+		}
+		return undefined;
+	};
 }
 
 /**

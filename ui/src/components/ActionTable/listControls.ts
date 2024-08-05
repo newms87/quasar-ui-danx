@@ -363,6 +363,8 @@ export function useListControls(name: string, options: ListControlsOptions): Act
 		const nextIndex = index + offset;
 
 		const latestNextIndex = latestCallOnly("getNextItem", async () => {
+			if (!pagedItems.value?.data) return -1;
+			
 			// Load the previous page if the offset is before index 0
 			if (nextIndex < 0) {
 				if (pagination.value.page > 1) {

@@ -18,6 +18,10 @@ export function useActionRoutes(baseUrl: string): ListControlsRoutes {
 			const item = await request.get(`${baseUrl}/${target.id}/details`);
 			return storeObject(item);
 		},
+		async relation(target, relation) {
+			const item = await request.get(`${baseUrl}/${target.id}/relation/${relation}`);
+			return storeObject(item);
+		},
 		fieldOptions() {
 			return request.get(`${baseUrl}/field-options`);
 		},

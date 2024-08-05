@@ -30,6 +30,8 @@ export interface ListControlsRoutes {
 
 	detailsAndStore?(target: ActionTargetItem): Promise<ActionTargetItem>;
 
+	relation?(target: ActionTargetItem, relation: string): Promise<ActionTargetItem>;
+
 	more?(pager: ListControlsPagination): Promise<ActionTargetItem[]>;
 
 	fieldOptions?(filter?: AnyObject): Promise<AnyObject>;

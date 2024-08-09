@@ -144,6 +144,9 @@ export function fElapsedTime(start: string, end?: string) {
  * Formats an amount into USD currency format
  */
 export function fCurrency(amount: number, options?: object) {
+	if (amount === null || amount === undefined || isNaN(amount)) {
+		return "$-";
+	}
 	return new Intl.NumberFormat("en-US", {
 		style: "currency",
 		currency: "USD",
@@ -179,6 +182,9 @@ export function fShortCurrency(value: string | number, options?: { round: boolea
  * Formats a number into a shorthand human-readable format (ie: 1.2M or 5K)
  */
 export function fShortNumber(value: string | number, options?: { round: boolean }) {
+	if (value === "" || value === null || value === undefined) {
+		return "-";
+	}
 	const shorts = [
 		{ pow: 3, unit: "K" },
 		{ pow: 6, unit: "M" },

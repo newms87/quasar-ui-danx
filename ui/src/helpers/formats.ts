@@ -378,8 +378,6 @@ export function fMarkdownCode(type: string, string: string | object): string {
 				string = stringifyYAML(typeof string === "string" ? JSON.parse(string) : string);
 				break;
 			case "ts":
-				string = "";
-				break;
 			default:
 				string = fJSON(string);
 		}

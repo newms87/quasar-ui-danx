@@ -11,6 +11,7 @@ export interface DanxOptions {
 	flashMessages?: {
 		default?: QNotifyCreateOptions;
 		success?: QNotifyCreateOptions;
+		info?: QNotifyCreateOptions;
 		warning?: QNotifyCreateOptions;
 		error?: QNotifyCreateOptions;
 	};

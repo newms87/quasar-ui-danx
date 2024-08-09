@@ -10,6 +10,10 @@ export class FlashMessages {
 			type: String,
 			default: ""
 		},
+		infoMsg: {
+			type: String,
+			default: ""
+		},
 		errorMsg: {
 			type: String,
 			default: ""
@@ -20,11 +24,12 @@ export class FlashMessages {
 		}
 	};
 
-	static enable(msgProps: { successMsg?: string, errorMsg?: string, warningMsg?: string }) {
+	static enable(msgProps: { successMsg?: string, infoMsg?: string, errorMsg?: string, warningMsg?: string }) {
 		FlashMessages.success(msgProps.successMsg);
 		FlashMessages.error(msgProps.errorMsg);
 		FlashMessages.warning(msgProps.warningMsg);
 		watch(() => msgProps.successMsg, msg => FlashMessages.success(msg));
+		watch(() => msgProps.infoMsg, msg => FlashMessages.info(msg));
 		watch(() => msgProps.errorMsg, msg => FlashMessages.error(msg));
 		watch(() => msgProps.warningMsg, msg => FlashMessages.warning(msg));
 	}
@@ -58,6 +63,15 @@ export class FlashMessages {
 			icon: "check",
 			...options,
 			...danxOptions.value.flashMessages?.success
+		});
+	}
+
+	static info(message?: string, options: QNotifyCreateOptions = {}) {
+		FlashMessages.send(message, {
+			classes: "bg-sky-300 !text-sky-900",
+			icon: "info",
+			...options,
+			...danxOptions.value.flashMessages?.info
 		});
 	}
 

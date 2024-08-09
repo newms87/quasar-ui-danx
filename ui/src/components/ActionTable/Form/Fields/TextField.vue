@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="dx-text-field">
     <FieldLabel
       v-if="!prependLabel"
       :label="label"
@@ -33,7 +33,7 @@
         @update:model-value="$emit('update:model-value', $event)"
       >
         <template
-          v-if="prependLabel"
+          v-if="prependLabel || $slots.prepend"
           #prepend
         >
           <FieldLabel
@@ -43,6 +43,10 @@
             :required-label="requiredLabel"
             :class="labelClass"
           />
+          <slot name="prepend" />
+        </template>
+        <template #append>
+          <slot name="append" />
         </template>
       </QInput>
       <MaxLengthCounter

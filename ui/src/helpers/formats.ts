@@ -228,8 +228,8 @@ export function fShortSize(value: string | number) {
 	return Math.round(n / div) + " " + power.unit;
 }
 
-export function fBoolean(value: boolean) {
-	return value ? "Yes" : "No";
+export function fBoolean(value?: boolean) {
+	return (value === undefined || value === null) ? "-" : (value ? "Yes" : "No");
 }
 
 /**

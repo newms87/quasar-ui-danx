@@ -4,6 +4,15 @@ import { TypedObject } from "../types";
 
 const store = new Map<string, any>();
 
+export function storeObjects<T extends TypedObject>(newObjects: T[]) {
+	for (const index in newObjects) {
+		if (newObjects[index] && typeof newObjects[index] === "object") {
+			newObjects[index] = storeObject(newObjects[index]);
+		}
+	}
+	return newObjects;
+}
+
 /**
  * Store an object in the object store via type + id
  * Returns the stored object that should be used instead of the passed object as the returned object is shared across the system

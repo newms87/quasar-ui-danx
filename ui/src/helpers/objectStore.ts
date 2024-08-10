@@ -1,6 +1,7 @@
 import { uid } from "quasar";
 import { ShallowReactive, shallowReactive } from "vue";
 import { TypedObject } from "../types";
+import { FlashMessages } from "./FlashMessages";
 
 const store = new Map<string, any>();
 
@@ -64,4 +65,23 @@ export function storeObject<T extends TypedObject>(newObject: T): ShallowReactiv
 	const reactiveObject = shallowReactive(newObject);
 	store.set(objectKey, reactiveObject);
 	return reactiveObject;
+}
+
+export async function autoRefreshObject<T extends TypedObject>(object: T, condition: (object: T) => boolean, callback: (object: T) => Promise<T>, interval = 3000) {
+	if (!object?.id || !object?.__type) {
+		throw new Error("Invalid stored object. Cannot auto-refresh");
+	}
+
+	if (condition(object)) {
+		console.log("condition true", object);
+		const refreshedObject = await callback(object);
+
+		if (!refreshedObject.id) {
+			return FlashMessages.error(`Failed to refresh ${object.__type} (${object.id}) status: ` + object.name);
+		}
+
+		storeObject(refreshedObject);
+	}
+
+	setTimeout(() => autoRefreshObject(object, condition, callback), interval);
 }

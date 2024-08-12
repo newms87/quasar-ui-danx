@@ -1,26 +1,22 @@
 <template>
   <NumberField
-    :field="field"
+    v-bind="$props"
     :precision="0"
     :model-value="modelValue"
-    :show-name="showName"
     @update:model-value="$emit('update:model-value', $event)"
   />
 </template>
 
-<script setup>
+<script setup lang="ts">
+import { NumberFieldProps } from "../../../../types";
 import NumberField from "./NumberField";
 
 defineEmits(["update:model-value"]);
-defineProps({
-  modelValue: {
-    type: [String, Number],
-    default: null
-  },
-  field: {
-    type: Object,
-    required: true
-  },
-  showName: Boolean
+withDefaults(defineProps<NumberFieldProps>(), {
+	modelValue: "",
+	label: undefined,
+	delay: 1000,
+	min: undefined,
+	max: undefined
 });
 </script>

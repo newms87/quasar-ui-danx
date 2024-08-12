@@ -3,7 +3,7 @@ import { ListControlsRoutes } from "../types";
 import { downloadFile } from "./downloadPdf";
 import { request } from "./request";
 
-export function useActionRoutes(baseUrl: string): ListControlsRoutes {
+export function useActionRoutes(baseUrl: string, extend?: object): ListControlsRoutes {
 	return {
 		list(pager?) {
 			return request.post(`${baseUrl}/list`, pager);
@@ -33,6 +33,7 @@ export function useActionRoutes(baseUrl: string): ListControlsRoutes {
 		},
 		export(filter, name) {
 			return downloadFile(`${baseUrl}/export`, name || "export.csv", { filter });
-		}
+		},
+		...extend
 	};
 }

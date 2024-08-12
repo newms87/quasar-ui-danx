@@ -73,7 +73,6 @@ export async function autoRefreshObject<T extends TypedObject>(object: T, condit
 	}
 
 	if (condition(object)) {
-		console.log("condition true", object);
 		const refreshedObject = await callback(object);
 
 		if (!refreshedObject.id) {

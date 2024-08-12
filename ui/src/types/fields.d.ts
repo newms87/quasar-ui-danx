@@ -19,3 +19,11 @@ export interface TextFieldProps {
 	readonly?: boolean;
 	debounce?: string | number;
 }
+
+export interface NumberFieldProps extends TextFieldProps {
+	precision?: number;
+	delay?: number;
+	currency?: boolean;
+	min?: number;
+	max?: number;
+}

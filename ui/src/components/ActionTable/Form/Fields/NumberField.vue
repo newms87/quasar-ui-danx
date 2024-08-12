@@ -11,18 +11,11 @@
 import { useDebounceFn } from "@vueuse/core";
 import { nextTick, ref, watch } from "vue";
 import { fNumber } from "../../../../helpers";
-import { AnyObject, TextFieldProps } from "../../../../types";
+import { AnyObject, NumberFieldProps } from "../../../../types";
 import TextField from "./TextField";
 
 const emit = defineEmits(["update:model-value", "update"]);
 
-export interface NumberFieldProps extends TextFieldProps {
-	precision?: number;
-	delay?: number;
-	currency?: boolean;
-	min?: number;
-	max?: number;
-}
 
 const props = withDefaults(defineProps<NumberFieldProps>(), {
 	modelValue: "",

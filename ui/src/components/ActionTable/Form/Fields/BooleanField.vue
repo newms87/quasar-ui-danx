@@ -1,6 +1,6 @@
 <template>
   <QToggle
-    :data-testid="'boolean-field-' + field.id"
+    :data-testid="'boolean-field-' + (name || label)"
     :model-value="modelValue || (toggleIndeterminate ? modelValue : false)"
     :disable="disable || readonly"
     :toggle-indeterminate="toggleIndeterminate"
@@ -8,37 +8,39 @@
     @update:model-value="$emit('update:model-value', $event)"
   >
     <FieldLabel
-      :field="{...field, label: label || field.label}"
+      :label="label || name"
+      :name="name"
       :show-name="showName"
       :class="labelClass"
     />
   </QToggle>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import FieldLabel from "./FieldLabel";
 
 defineEmits(["update:model-value"]);
 defineProps({
-  label: {
-    type: String,
-    default: null
-  },
-  modelValue: {
-    type: [Boolean],
-    default: undefined
-  },
-  field: {
-    type: Object,
-    required: true
-  },
-  labelClass: {
-    type: String,
-    default: "text-sm"
-  },
-  showName: Boolean,
-  toggleIndeterminate: Boolean,
-  disable: Boolean,
-  readonly: Boolean
+	label: {
+		type: String,
+		default: null
+	},
+	name: {
+		type: String,
+		default: null
+	},
+	required: Boolean,
+	modelValue: {
+		type: Boolean,
+		default: undefined
+	},
+	labelClass: {
+		type: String,
+		default: "text-sm"
+	},
+	showName: Boolean,
+	toggleIndeterminate: Boolean,
+	disable: Boolean,
+	readonly: Boolean
 });
 </script>

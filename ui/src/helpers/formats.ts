@@ -234,7 +234,13 @@ export function fShortSize(value: string | number) {
 	return Math.round(n / div) + " " + power.unit;
 }
 
-export function fBoolean(value?: boolean) {
+export function fBoolean(value?: boolean | string | any) {
+	switch (value) {
+		case "Yes":
+		case "No":
+			return value;
+	}
+
 	return (value === undefined || value === null) ? "-" : (value ? "Yes" : "No");
 }
 

@@ -1,7 +1,9 @@
 <template>
   <div>
     <div class="text-xs font-bold">
-      {{ label }}
+      <slot name="label">
+        {{ label }}
+      </slot>
     </div>
     <div :class="valueClass">
       <template v-if="url">

@@ -364,7 +364,7 @@ export function useListControls(name: string, options: ListControlsOptions): Act
 
 		const latestNextIndex = latestCallOnly("getNextItem", async () => {
 			if (!pagedItems.value?.data) return -1;
-			
+
 			// Load the previous page if the offset is before index 0
 			if (nextIndex < 0) {
 				if (pagination.value.page > 1) {
@@ -439,11 +439,21 @@ export function useListControls(name: string, options: ListControlsOptions): Act
 	 */
 	function updateRouteParams(params: AnyObject) {
 		const vueRouter = getVueRouter();
-		const { name: routeName } = vueRouter.currentRoute.value;
-		vueRouter.push({
-			name: (Array.isArray(routeName) ? routeName[0] : routeName) || "home",
-			params
-		});
+		let { name: routeName } = vueRouter.currentRoute.value;
+		routeName = Array.isArray(routeName) ? routeName[0] : routeName;
+
+		if (!routeName) {
+			console.error("No route name found for list controls", name);
+			return;
+		}
+
+		const newRoutePath = vueRouter.resolve({ name: routeName, params }).href;
+		const currentRoutePath = vueRouter.currentRoute.value.fullPath;
+
+		// Only update the route if the route is different (or the currentRoutePath is a child of the newRoutePath)
+		if (currentRoutePath !== newRoutePath && !currentRoutePath.startsWith(newRoutePath)) {
+			vueRouter.push({ name: routeName, params });
+		}
 	}
 
 	function setPanelFromRoute(params: RouteParams, meta: AnyObject) {

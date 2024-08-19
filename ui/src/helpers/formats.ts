@@ -376,7 +376,7 @@ export function parseMarkdownYAML(string: string): object | null | false {
  * Parse a markdown formatted string and return the code block content
  */
 export function parseMarkdownCode(string: string): string {
-	return string.replace(/^```[a-z0-9]{1,6}\s/, "").replace(/```$/, "");
+	return string.replace(/^```[a-z0-9]{0,6}\s/, "").replace(/```$/, "");
 }
 
 /**
@@ -384,6 +384,7 @@ export function parseMarkdownCode(string: string): string {
  * ie: a valid JSON string with a ```json prefix and ``` postfix
  */
 export function fMarkdownCode(type: string, string: string | object): string {
+	console.log("formatting", type, string);
 	if (typeof string === "object" || isJSON(string)) {
 		switch (type) {
 			case "yaml":
@@ -396,7 +397,9 @@ export function fMarkdownCode(type: string, string: string | object): string {
 	}
 
 	const regex = new RegExp(`\`\`\`${type}`, "g");
-	if (!((string || "") as string).match(regex)) {
+	string = (string || "") as string;
+	if (!string.match(regex)) {
+		string = parseMarkdownCode(string as string);
 		return `\`\`\`${type}\n${string}\n\`\`\``;
 	}
 

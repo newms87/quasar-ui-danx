@@ -384,7 +384,6 @@ export function parseMarkdownCode(string: string): string {
  * ie: a valid JSON string with a ```json prefix and ``` postfix
  */
 export function fMarkdownCode(type: string, string: string | object): string {
-	console.log("formatting", type, string);
 	if (typeof string === "object" || isJSON(string)) {
 		switch (type) {
 			case "yaml":

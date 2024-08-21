@@ -6,7 +6,9 @@
     @drop.prevent="onDrop"
   >
     <FieldLabel
-      :field="field"
+      v-if="label || (name || showName)"
+      :label="label"
+      :name="name"
       :show-name="showName"
       class="text-sm font-semibold"
     />
@@ -35,7 +37,7 @@
       v-if="!readonly || uploadedFile"
       class="w-32 cursor-pointer mt-2"
       :class="{'border border-dashed border-blue-600': !uploadedFile, 'mx-auto': !readonly}"
-      :file="uploadedFile"
+      :file="uploadedFile || undefined"
       downloadable
       @click="!disable && $refs.file.click()"
     />
@@ -48,26 +50,22 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { onMounted } from "vue";
 import { useSingleFileUpload } from "../../../../helpers";
+import { UploadedFile } from "../../../../types";
 import { FilePreview } from "../../../Utility";
 import FieldLabel from "./FieldLabel";
 
 const emit = defineEmits(["update:model-value"]);
-const props = defineProps({
-	modelValue: {
-		type: [Object, String],
-		default: null
-	},
-	field: {
-		type: Object,
-		required: true
-	},
-	showName: Boolean,
-	disable: Boolean,
-	readonly: Boolean
-});
+const props = defineProps<{
+	modelValue?: UploadedFile;
+	label?: string;
+	name?: string;
+	showName?: boolean;
+	disable?: boolean;
+	readonly?: boolean;
+}>();
 const { onComplete, onDrop, onFileSelected, uploadedFile, clearUploadedFile } = useSingleFileUpload();
 onComplete(() => emit("update:model-value", uploadedFile.value));
 

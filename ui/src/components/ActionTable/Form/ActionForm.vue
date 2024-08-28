@@ -1,16 +1,16 @@
 <template>
-	<div>
-		<RenderedForm
-			v-bind="renderedFormProps"
-			v-model:values="input"
-			empty-value=""
-			:saved-at="target.updated_at"
-			:saving="action.isApplying"
-			@update:values="action.trigger(target, input)"
-		>
-			<slot />
-		</RenderedForm>
-	</div>
+  <div>
+    <RenderedForm
+      v-bind="renderedFormProps"
+      v-model:values="input"
+      empty-value=""
+      :saved-at="hideSavedAt ? undefined : target.updated_at"
+      :saving="action.isApplying"
+      @update:values="onUpdate"
+    >
+      <slot />
+    </RenderedForm>
+  </div>
 </template>
 <script setup lang="ts">
 import { Ref, ref, watch } from "vue";
@@ -28,8 +28,10 @@ interface ActionFormProps {
 	clearable?: boolean;
 	fieldClass?: string;
 	savingClass?: string;
+	hideSavedAt?: boolean;
 }
 
+const emit = defineEmits(["saved"]);
 const props = withDefaults(defineProps<ActionFormProps>(), {
 	fieldClass: "",
 	savingClass: undefined
@@ -58,4 +60,9 @@ watch(() => props.target, (target: ActionTargetItem) => {
 		}
 	}
 });
+
+async function onUpdate() {
+	await props.action.trigger(props.target, input.value);
+	emit("saved");
+}
 </script>

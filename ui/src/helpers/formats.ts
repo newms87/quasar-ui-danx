@@ -111,7 +111,7 @@ export function dbDateTime(dateTime: string | DateTime | null = null) {
  * @param format
  * @returns {string}
  */
-export function fDate(dateTime: string, { empty = "--", format = "M/d/yy" }: fDateOptions = {}) {
+export function fDate(dateTime: string | DateTime | null, { empty = "--", format = "M/d/yy" }: fDateOptions = {}) {
 	const formatted = parseDateTime(dateTime).toFormat(format || "M/d/yy");
 	return ["Invalid DateTime", "invalid datetime"].includes(formatted) ? empty : formatted;
 }

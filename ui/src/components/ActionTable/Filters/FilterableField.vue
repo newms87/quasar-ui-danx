@@ -1,6 +1,15 @@
 <template>
   <div>
-    <template v-if="field.type === 'multi-select'">
+    <template v-if="field.type === 'text'">
+      <TextField
+        :model-value="modelValue"
+        :label="field.label"
+        :placeholder="field.placeholder"
+        :debounce="1000"
+        @update:model-value="onUpdate"
+      />
+    </template>
+    <template v-else-if="field.type === 'multi-select'">
       <SelectField
         v-if="field.options?.length > 0 || loading"
         :model-value="modelValue"
@@ -41,6 +50,7 @@
       v-else-if="field.type === 'date'"
       :model-value="modelValue"
       :label="field.label"
+      :clearable="field.clearable === undefined ? true : field.clearable"
       class="mt-2"
       @update:model-value="onUpdate"
     />
@@ -49,6 +59,7 @@
       :model-value="modelValue"
       :label="field.label"
       :inline="!!field.inline"
+      :clearable="field.clearable === undefined ? true : field.clearable"
       with-time
       class="mt-2 reactive"
       @update:model-value="onUpdate"
@@ -117,7 +128,8 @@ import {
 	MultiKeywordField,
 	NumberRangeField,
 	SelectField,
-	SelectWithChildrenField
+	SelectWithChildrenField,
+	TextField
 } from "../Form/Fields";
 
 const emit = defineEmits(["update:model-value"]);

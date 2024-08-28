@@ -22,7 +22,7 @@
 
 <script setup lang="ts">
 defineProps<{
-	label?: string;
+	label?: string | null;
 	name?: string;
 	required?: boolean;
 	requiredLabel?: string;

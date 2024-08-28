@@ -7,231 +7,261 @@ import { DragAndDrop } from "./dragAndDrop";
  * @class
  */
 export class ListDragAndDrop extends DragAndDrop {
-    listPosition = 0;
-    cursorPosition = 0;
-    initialPosition = 0;
-    onPositionChangeCb = null;
-    onDragPositionChangeCb = null;
-    placeholder = null;
+	listPosition = 0;
+	cursorPosition = 0;
+	initialPosition = 0;
+	initialDropZone: HTMLElement | null = null;
+	onPositionChangeCb = null;
+	onDragPositionChangeCb = null;
+	onDropZoneChangeCb = null;
+	placeholder = null;
 
-    constructor(options = {}) {
-        super({
-            showPlaceholder: true,
-            ...options
-        });
-    }
+	constructor(options = {}) {
+		super({
+			showPlaceholder: true,
+			...options
+		});
+	}
 
-    /**
-     * Callback that fires after dragging has ended and the list position has changed from the original
-     * @param cb
-     * @returns {ListDragAndDrop}
-     */
-    onPositionChange(cb) {
-        this.onPositionChangeCb = cb;
-        return this;
-    }
+	/**
+	 * Callback that fires after dragging has ended and the list position has changed from the original
+	 */
+	onPositionChange(cb): ListDragAndDrop {
+		this.onPositionChangeCb = cb;
+		return this;
+	}
 
-    /**
-     * Callback that fires while dragging the element when the cursor's position has changed in the list
-     * @param cb
-     * @returns {ListDragAndDrop}
-     */
-    onDragPositionChange(cb) {
-        this.onDragPositionChangeCb = cb;
-        return this;
-    }
+	/**
+	 * Callback that fires when the drop zone has changed
+	 */
+	onDropZoneChange(cb): ListDragAndDrop {
+		this.onDropZoneChangeCb = cb;
+		return this;
+	}
 
-    /**
-     * Start listening for drag events and prepare an element for drag/drop
-     * @param e
-     * @param data
-     */
-    dragStart(e, data) {
-        super.dragStart(e, data);
+	/**
+	 * Callback that fires while dragging the element when the cursor's position has changed in the list
+	 * @param cb
+	 * @returns {ListDragAndDrop}
+	 */
+	onDragPositionChange(cb) {
+		this.onDragPositionChangeCb = cb;
+		return this;
+	}
 
-        if (this.currentDropZone) {
-            this.listPosition = this.getListPosition(e.target);
-            this.initialPosition = this.listPosition;
-            this.updateScrollPosition();
-        }
-    }
+	/**
+	 * Start listening for drag events and prepare an element for drag/drop
+	 * @param e
+	 * @param data
+	 */
+	dragStart(e, data) {
+		super.dragStart(e, data);
 
-    /**
-     * When dragging has ended, check for list position changes and fire the onPositionChange callback if it has
-     */
-    dragEnd(e) {
-        const draggableData = this.draggableData;
-        this.placeholder?.remove();
-        super.dragEnd(e);
+		if (this.currentDropZone) {
+			this.listPosition = this.getListPosition(e.target);
+			this.initialPosition = this.listPosition;
+			this.initialDropZone = this.currentDropZone;
+			this.updateScrollPosition();
+		}
+	}
 
-        // If our list position has changed, trigger the drop callback
-        if (this.listPosition !== this.initialPosition) {
-            this.onPositionChangeCb &&
-            this.onPositionChangeCb(this.listPosition, this.initialPosition, draggableData);
-        }
-    }
+	/**
+	 * When dragging has ended, check for list position changes and fire the onPositionChange callback if it has
+	 */
+	dragEnd(e) {
+		const draggableData = this.draggableData;
+		this.placeholder?.remove();
+		const newDropZone = this.currentDropZone;
+		super.dragEnd(e);
 
-    /**
-     * The dragging element is moving
-     * @param e
-     */
-    dragOver(e) {
-        super.dragOver(e);
-        this.updateListPosition(e);
-    }
+		// If our list position has changed, trigger the drop callback
+		if (this.listPosition !== this.initialPosition) {
+			this.onPositionChangeCb &&
+			this.onPositionChangeCb(this.listPosition, this.initialPosition, draggableData);
+		}
 
-    /**
-     * Notify if the targeted position of the cursor is different from the current position
-     * @param e
-     */
-    updateListPosition(e) {
-        const prevPosition = this.listPosition;
-        const newPosition = this.getListPositionOfPoint({
-            x: e.clientX,
-            y: e.clientY
-        });
+		if (newDropZone && newDropZone !== this.initialDropZone) {
+			this.onDropZoneChangeCb && this.onDropZoneChangeCb(e, newDropZone, this.listPosition, this.initialPosition, draggableData);
+		}
+	}
 
-        // If the cursor position has changed, we should update the rendering and see if our actual list position has
-        // changed
-        if (this.cursorPosition !== newPosition) {
-            this.cursorPosition = newPosition;
-            this.listPosition =
-                this.initialPosition < this.cursorPosition
-                    ? this.cursorPosition - 1
-                    : this.cursorPosition;
-            if (this.options.showPlaceholder) {
-                this.renderPlaceholder();
-            }
+	/**
+	 * The dragging element is moving
+	 * @param e
+	 */
+	dragOver(e) {
+		super.dragOver(e);
+		this.updateListPosition(e);
+	}
 
-            // The position has changed, trigger the callback
-            if (this.listPosition !== prevPosition) {
-                this.onDragPositionChangeCb &&
-                this.onDragPositionChangeCb(this.listPosition, this.draggableData);
-            }
-        }
-    }
+	/**
+	 * Notify if the targeted position of the cursor is different from the current position
+	 * @param e
+	 */
+	updateListPosition(e: MouseEvent) {
+		const point = {
+			x: e.clientX,
+			y: e.clientY
+		};
+		const newDropZone = this.getDropZoneForTarget(e.target as HTMLElement);
+		if (newDropZone !== this.currentDropZone) {
+			this.currentDropZone = newDropZone;
+			this.cursorPosition = 0;
+			this.listPosition = 0;
+			this.placeholder?.remove();
+		}
 
-    /**
-     * Find the numeric position of the element in the children of the list
-     * @returns {Number|null}
-     * @param item
-     */
-    getListPosition(item) {
-        let index = 0;
-        for (const child of this.getChildren()) {
-            if (child === item) {
-                return index;
-            }
-            index++;
-        }
+		const prevPosition = this.listPosition;
+		const newPosition = this.getListPositionOfPoint(point);
 
-        return null;
-    }
+		// If the cursor position has changed, we should update the rendering and see if our actual list position has
+		// changed
+		if (this.cursorPosition !== newPosition) {
+			this.cursorPosition = newPosition;
+			this.listPosition =
+					this.initialPosition < this.cursorPosition
+							? this.cursorPosition - 1
+							: this.cursorPosition;
+			if (this.options.showPlaceholder) {
+				this.renderPlaceholder();
+			}
 
-    /**
-     * Get all the children of the current drop zone, excluding the placeholder
-     * @returns {*}
-     */
-    getChildren() {
-        return [...this.currentDropZone.children].filter(
-            (c) => c.className.match(/drag-placeholder/) === null
-        );
-    }
+			// The position has changed, trigger the callback
+			if (this.listPosition !== prevPosition) {
+				this.onDragPositionChangeCb &&
+				this.onDragPositionChangeCb(this.listPosition, this.draggableData);
+			}
+		}
+	}
 
-    /**
-     * Find the element at the current cursor position in the given drop zone
-     * @param point
-     * @returns {null}
-     */
-    getListPositionOfPoint(point) {
-        let index = 0;
-        const children = this.getChildren();
+	/**
+	 * Find the numeric position of the element in the children of the list
+	 * @returns {Number|null}
+	 * @param item
+	 */
+	getListPosition(item) {
+		let index = 0;
+		for (const child of this.getChildren()) {
+			if (child === item) {
+				return index;
+			}
+			index++;
+		}
 
-        while (index < children.length) {
-            const rect = children[index].getBoundingClientRect();
-            if (this.isVertical()) {
-                if (point.y < rect.top + rect.height / 2) {
-                    break;
-                }
-            } else {
-                if (point.x < rect.left + rect.width / 2) {
-                    break;
-                }
-            }
-            index++;
-        }
+		return null;
+	}
 
-        return index;
-    }
+	/**
+	 * Get all the children of the current drop zone, excluding the placeholder
+	 * @returns {*}
+	 */
+	getChildren() {
+		return [...(this.currentDropZone?.children || [])].filter(
+				(c) => c.className.match(/drag-placeholder/) === null
+		);
+	}
 
-    /**
-     * Updates the scroll position while dragging an element so a user can navigate a longer list while dragging
-     */
-    updateScrollPosition() {
-        if (this.currentDropZone) {
-            const rect = this.currentDropZone.getBoundingClientRect();
-            const threshold = 100;
-            let velocity = 0;
-            const velocityFn = (x) => x * 5;
-            const cursorPos = this.isVertical() ? this.cursorY : this.cursorX;
-            const rectStart = this.isVertical() ? rect.top : rect.left;
-            const rectEnd = this.isVertical() ? rect.bottom : rect.right;
-            const beforeDiff = rectStart + threshold - cursorPos;
-            const afterDiff = cursorPos - (rectEnd - threshold);
+	/**
+	 * Get the list element that is the parent of the target element
+	 */
+	getDropZoneForTarget(target: HTMLElement): HTMLElement | null {
+		return target.closest(`[data-drop-zone]`);
+	}
 
-            if (beforeDiff > 0) {
-                velocity = -velocityFn(beforeDiff);
-            } else if (afterDiff > 0) {
-                velocity = velocityFn(afterDiff);
-            }
+	/**
+	 * Find the element at the current cursor position in the given drop zone
+	 * @param point
+	 * @returns {null}
+	 */
+	getListPositionOfPoint(point) {
+		let index = 0;
+		const children = this.getChildren();
 
-            if (velocity) {
-                if (this.isVertical()) {
-                    this.currentDropZone.scrollTo({
-                        top: this.currentDropZone.scrollTop + velocity,
-                        behavior: "smooth"
-                    });
-                } else {
-                    this.currentDropZone.scrollTo({
-                        left: this.currentDropZone.scrollLeft + velocity,
-                        behavior: "smooth"
-                    });
-                }
-            }
+		while (index < children.length) {
+			const rect = children[index].getBoundingClientRect();
+			if (this.isVertical()) {
+				if (point.y < rect.top + rect.height / 2) {
+					break;
+				}
+			} else {
+				if (point.x < rect.left + rect.width / 2) {
+					break;
+				}
+			}
+			index++;
+		}
 
-            setTimeout(() => this.updateScrollPosition(), 500);
-        }
-    }
+		return index;
+	}
 
-    /**
-     * Render a placeholder element at the given position (in between the elements)
-     */
-    renderPlaceholder() {
-        if (!this.placeholder) {
-            this.placeholder = document.createElement("div");
-            this.placeholder.classList.add("drag-placeholder");
-        }
+	/**
+	 * Updates the scroll position while dragging an element so a user can navigate a longer list while dragging
+	 */
+	updateScrollPosition() {
+		if (this.currentDropZone) {
+			const rect = this.currentDropZone.getBoundingClientRect();
+			const threshold = 100;
+			let velocity = 0;
+			const velocityFn = (x) => x * 5;
+			const cursorPos = this.isVertical() ? this.cursorY : this.cursorX;
+			const rectStart = this.isVertical() ? rect.top : rect.left;
+			const rectEnd = this.isVertical() ? rect.bottom : rect.right;
+			const beforeDiff = rectStart + threshold - cursorPos;
+			const afterDiff = cursorPos - (rectEnd - threshold);
 
-        // Make sure the placeholder is oriented correctly
-        if (this.isVertical()) {
-            this.placeholder.classList.add("direction-vertical");
-            this.placeholder.classList.remove("direction-horizontal");
-            this.placeholder.style.height = undefined;
-        } else {
-            this.placeholder.classList.add("direction-horizontal");
-            this.placeholder.classList.remove("direction-vertical");
-            this.placeholder.style.height =
-                this.currentDropZone.getBoundingClientRect().height + "px";
-        }
+			if (beforeDiff > 0) {
+				velocity = -velocityFn(beforeDiff);
+			} else if (afterDiff > 0) {
+				velocity = velocityFn(afterDiff);
+			}
 
-        const children = this.getChildren();
-        if (this.cursorPosition < children.length) {
-            this.currentDropZone.insertBefore(
-                this.placeholder,
-                children[this.cursorPosition]
-            );
-        } else {
-            this.currentDropZone.appendChild(this.placeholder);
-        }
-    }
+			if (velocity) {
+				if (this.isVertical()) {
+					this.currentDropZone.scrollTo({
+						top: this.currentDropZone.scrollTop + velocity,
+						behavior: "smooth"
+					});
+				} else {
+					this.currentDropZone.scrollTo({
+						left: this.currentDropZone.scrollLeft + velocity,
+						behavior: "smooth"
+					});
+				}
+			}
+
+			setTimeout(() => this.updateScrollPosition(), 500);
+		}
+	}
+
+	/**
+	 * Render a placeholder element at the given position (in between the elements)
+	 */
+	renderPlaceholder() {
+		if (!this.placeholder) {
+			this.placeholder = document.createElement("div");
+			this.placeholder.classList.add("drag-placeholder");
+		}
+
+		// Make sure the placeholder is oriented correctly
+		if (this.isVertical()) {
+			this.placeholder.classList.add("direction-vertical");
+			this.placeholder.classList.remove("direction-horizontal");
+			this.placeholder.style.height = undefined;
+		} else {
+			this.placeholder.classList.add("direction-horizontal");
+			this.placeholder.classList.remove("direction-vertical");
+			this.placeholder.style.height =
+					this.currentDropZone.getBoundingClientRect().height + "px";
+		}
+
+		const children = this.getChildren();
+		if (this.cursorPosition < children.length) {
+			this.currentDropZone.insertBefore(
+					this.placeholder,
+					children[this.cursorPosition]
+			);
+		} else {
+			this.currentDropZone.appendChild(this.placeholder);
+		}
+	}
 }

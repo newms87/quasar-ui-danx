@@ -51,7 +51,7 @@ import FieldLabel from "./FieldLabel";
 
 const emit = defineEmits(["update:model-value"]);
 const props = defineProps<{
-	modelValue: { from: string; to: string } | null;
+	modelValue?: { from: string; to: string } | null;
 	label: string | null;
 	inline: boolean;
 	clearable: boolean;

@@ -42,7 +42,7 @@ import { fDate, parseQDate } from "../../../../helpers";
 
 const emit = defineEmits(["update:model-value"]);
 const props = defineProps<{
-	modelValue: string | null;
+	modelValue?: string | null;
 	label: string | null;
 	clearable: boolean;
 }>();

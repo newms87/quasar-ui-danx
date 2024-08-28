@@ -36,8 +36,9 @@ export function storeObject<T extends TypedObject>(newObject: T): ShallowReactiv
 	const oldObject = store.get(objectKey);
 
 	// If an old object exists, and it is newer than the new object, do not store the new object, just return the old
+	// NOTE: If the timestamp is the same, its possible the intention is to update the existing object, so DO NOT return old object in this case
 	// @ts-expect-error __timestamp is guaranteed to be set in this case on both old and new
-	if (oldObject && newObject.__timestamp <= oldObject.__timestamp) {
+	if (oldObject && newObject.__timestamp < oldObject.__timestamp) {
 		return oldObject;
 	}
 

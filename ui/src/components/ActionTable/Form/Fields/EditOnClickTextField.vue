@@ -10,9 +10,9 @@
       :contenteditable="!readonly && isEditing"
       class="flex-grow p-2 rounded outline-none border-none"
       :class="{[editingClass]: isEditing, [inputClass]: true}"
-      @input="text = $event.target.innerText"
+      @input="onUpdate($event.target.innerText)"
     >
-      {{ text }}
+      {{ isEditing ? editingText : text }}
     </div>
     <div v-if="!readonly">
       <QBtn
@@ -43,6 +43,7 @@ export interface EditOnClickTextFieldProps {
 
 const editableBox = ref<HTMLElement | null>(null);
 const text = defineModel({ type: String });
+const editingText = ref(text.value);
 const props = withDefaults(defineProps<EditOnClickTextFieldProps>(), {
 	class: "hover:bg-slate-300",
 	editingClass: "bg-slate-500",
@@ -52,9 +53,15 @@ const isEditing = ref(false);
 function onEdit() {
 	if (props.readonly) return;
 	isEditing.value = true;
+	editingText.value = text.value;
 	nextTick(() => {
 		editableBox.value?.focus();
 	});
+}
+
+function onUpdate(newText: string) {
+	editingText.value = newText;
+	text.value = newText;
 }
 
 </script>

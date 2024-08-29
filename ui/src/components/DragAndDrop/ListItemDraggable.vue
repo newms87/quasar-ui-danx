@@ -28,6 +28,7 @@ import { SvgImg } from "../Utility";
 import { ListDragAndDrop } from "./listDragAndDrop";
 
 const emit = defineEmits(["position", "update:list-items", "drop-zone"]);
+const dragging = defineModel<boolean>();
 const props = withDefaults(defineProps<{
 	dropZone: string | (() => string);
 	direction?: "vertical" | "horizontal";
@@ -36,7 +37,6 @@ const props = withDefaults(defineProps<{
 	listItems?: any[];
 }>(), {
 	direction: "vertical",
-	showHandle: true,
 	handleClass: "",
 	listItems: () => []
 });
@@ -44,15 +44,17 @@ const props = withDefaults(defineProps<{
 const dragAndDrop = new ListDragAndDrop()
 	.setDropZone(props.dropZone)
 	.setOptions({ showPlaceholder: true, direction: props.direction })
+	.onStart(() => dragging.value = true)
+	.onEnd(() => dragging.value = false)
 	.onDropZoneChange((target, dropZone, newPosition, oldPosition, data) => {
 		let item = null;
+		let items = [];
 		if (props.listItems) {
-			const items = [...props.listItems];
+			items = [...props.listItems];
 			item = items.splice(oldPosition, 1)[0];
-			emit("update:list-items", items);
 		}
 
-		emit("drop-zone", { target, item, dropZone, oldPosition, newPosition, data });
+		emit("drop-zone", { target, item, items, dropZone, oldPosition, newPosition, data });
 	})
 	.onPositionChange((newPosition, oldPosition) => {
 		emit("position", newPosition);

@@ -74,14 +74,13 @@ export class ListDragAndDrop extends DragAndDrop {
 		const newDropZone = this.currentDropZone;
 		super.dragEnd(e);
 
-		// If our list position has changed, trigger the drop callback
-		if (this.listPosition !== this.initialPosition) {
-			this.onPositionChangeCb &&
-			this.onPositionChangeCb(this.listPosition, this.initialPosition, draggableData);
-		}
-
+		// If the list drop zone has changed, trigger the callback for drop zone change
 		if (newDropZone && newDropZone !== this.initialDropZone) {
 			this.onDropZoneChangeCb && this.onDropZoneChangeCb(e, newDropZone, this.listPosition, this.initialPosition, draggableData);
+		} else if (this.listPosition !== this.initialPosition) {
+			// If our list position has changed, trigger the position change callback
+			this.onPositionChangeCb &&
+			this.onPositionChangeCb(this.listPosition, this.initialPosition, draggableData);
 		}
 	}
 

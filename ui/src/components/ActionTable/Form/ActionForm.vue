@@ -1,16 +1,14 @@
 <template>
-  <div>
-    <RenderedForm
-      v-bind="renderedFormProps"
-      v-model:values="input"
-      empty-value=""
-      :saved-at="hideSavedAt ? undefined : target.updated_at"
-      :saving="action.isApplying"
-      @update:values="onUpdate"
-    >
-      <slot />
-    </RenderedForm>
-  </div>
+  <RenderedForm
+    v-bind="renderedFormProps"
+    v-model:values="input"
+    empty-value=""
+    :saved-at="hideSavedAt ? undefined : target.updated_at"
+    :saving="action.isApplying"
+    @update:values="onUpdate"
+  >
+    <slot />
+  </RenderedForm>
 </template>
 <script setup lang="ts">
 import { Ref, ref, watch } from "vue";

@@ -26,7 +26,7 @@ import { ShowHideButton } from "../../../Utility/Buttons";
 import SelectField from "./SelectField";
 
 defineEmits(["create"]);
-const selected = defineModel<string>("selected");
+const selected = defineModel<string | number | null>("selected");
 const editing = defineModel<boolean>("editing");
 defineProps<{
 	options: QSelectOption[],

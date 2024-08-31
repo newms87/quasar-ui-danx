@@ -1,6 +1,6 @@
 import { uid } from "quasar";
 import { ShallowReactive, shallowReactive } from "vue";
-import { TypedObject } from "../types";
+import { AnyObject, TypedObject } from "../types";
 import { FlashMessages } from "./FlashMessages";
 
 const store = new Map<string, any>();
@@ -18,7 +18,7 @@ export function storeObjects<T extends TypedObject>(newObjects: T[]) {
  * Store an object in the object store via type + id
  * Returns the stored object that should be used instead of the passed object as the returned object is shared across the system
  */
-export function storeObject<T extends TypedObject>(newObject: T): ShallowReactive<T> {
+export function storeObject<T extends TypedObject>(newObject: T, recentlyStoredObjects: AnyObject = {}): ShallowReactive<T> {
 	const id = newObject?.id || newObject?.name;
 	const type = newObject?.__type;
 	if (!id || !type) return shallowReactive(newObject);
@@ -32,6 +32,11 @@ export function storeObject<T extends TypedObject>(newObject: T): ShallowReactiv
 
 	const objectKey = `${type}:${id}`;
 
+	// If the object was recently stored, return the recently stored object to avoid infinite recursion
+	if (recentlyStoredObjects[objectKey]) {
+		return recentlyStoredObjects[objectKey];
+	}
+
 	// Retrieve the existing object if it already exists in the store
 	const oldObject = store.get(objectKey);
 
@@ -39,8 +44,15 @@ export function storeObject<T extends TypedObject>(newObject: T): ShallowReactiv
 	// NOTE: If the timestamp is the same, its possible the intention is to update the existing object, so DO NOT return old object in this case
 	// @ts-expect-error __timestamp is guaranteed to be set in this case on both old and new
 	if (oldObject && newObject.__timestamp < oldObject.__timestamp) {
+		recentlyStoredObjects[objectKey] = oldObject;
 		return oldObject;
 	}
+
+	// Reference to the reactive version of the object so we can update all the child relationships and return the reactive object
+	const reactiveObject = oldObject || shallowReactive(newObject);
+
+	// Make sure to store the object in the recently stored objects to avoid infinite recursion
+	recentlyStoredObjects[objectKey] = reactiveObject;
 
 	// Recursively store all the children of the object as well
 	for (const key of Object.keys(newObject)) {
@@ -48,23 +60,22 @@ export function storeObject<T extends TypedObject>(newObject: T): ShallowReactiv
 		if (Array.isArray(value) && value.length > 0) {
 			for (const index in value) {
 				if (value[index] && typeof value[index] === "object") {
-					newObject[key][index] = storeObject(value[index]);
+					newObject[key][index] = storeObject(value[index], recentlyStoredObjects);
 				}
 			}
 		} else if (value?.__type) {
-			// @ts-expect-error newObject[key] is guaranteed to be a TypedObject
-			newObject[key] = storeObject(value);
+			// @ts-expect-error __type is guaranteed to be set in this case
+			newObject[key] = storeObject(value as TypedObject, recentlyStoredObjects);
 		}
 	}
 
-	// Update the old object with the new object properties
-	if (oldObject) {
-		Object.assign(oldObject, newObject);
-		return oldObject;
+	Object.assign(reactiveObject, newObject);
+
+	if (!oldObject) {
+		// Store the reactive object in the store if there was not already one existing
+		store.set(objectKey, reactiveObject);
 	}
 
-	const reactiveObject = shallowReactive(newObject);
-	store.set(objectKey, reactiveObject);
 	return reactiveObject;
 }
 

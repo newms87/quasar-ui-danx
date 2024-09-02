@@ -1,6 +1,7 @@
 <template>
   <QBtn
     class="py-1 px-2"
+    :disable="disable"
     @click="onToggle"
   >
     <div class="flex items-center flex-nowrap whitespace-nowrap">
@@ -37,6 +38,7 @@ export interface Props {
 	labelClass?: string;
 	label?: string;
 	tooltip?: string;
+	disable?: boolean;
 }
 
 const emit = defineEmits(["show", "hide"]);

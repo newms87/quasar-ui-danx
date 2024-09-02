@@ -13,7 +13,7 @@
         <RenderVnode
           v-if="panel.tabVnode"
           :key="panel.name"
-          :vnode="panel.tabVnode(activeItem, modelValue)"
+          :vnode="panel.tabVnode(target, modelValue)"
           :is-active="modelValue === panel.name"
           :name="panel.name"
           :label="panel.label"
@@ -37,7 +37,7 @@ defineEmits(["update:model-value"]);
 
 interface Props {
 	modelValue?: string | number;
-	activeItem: ActionTargetItem;
+	target: ActionTargetItem;
 	panels: ActionPanel[];
 }
 
@@ -51,7 +51,7 @@ function isEnabled(panel) {
 	if (!panel.enabled) return false;
 
 	if (typeof panel.enabled === "function") {
-		return panel.enabled(props.activeItem);
+		return panel.enabled(props.target);
 	}
 
 	return true;

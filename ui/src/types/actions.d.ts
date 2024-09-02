@@ -6,9 +6,9 @@ export interface ActionPanel {
 	label: string;
 	category?: string;
 	class?: string | object;
-	enabled?: boolean | ((activeItem: ActionTargetItem) => boolean);
-	tabVnode?: (activeItem: ActionTargetItem | null | undefined, activePanel: string | number) => VNode | any;
-	vnode: (activeItem: ActionTargetItem | null | undefined) => VNode | any;
+	enabled?: boolean | ((target: ActionTargetItem) => boolean);
+	tabVnode?: (target: ActionTargetItem | null | undefined, activePanel: string | number) => VNode | any;
+	vnode: (target: ActionTargetItem | null | undefined) => VNode | any;
 }
 
 export interface ActionTargetItem extends TypedObject {

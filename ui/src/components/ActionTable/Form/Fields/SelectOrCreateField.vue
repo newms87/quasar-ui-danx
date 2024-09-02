@@ -10,6 +10,7 @@
     <ShowHideButton
       v-if="showEdit"
       v-model="editing"
+      :disable="!canEdit"
       label="Edit"
       class="bg-sky-800 w-1/5 ml-4"
     />
@@ -24,6 +25,7 @@
 </template>
 <script setup lang="ts">
 import { QSelectOption } from "quasar";
+import { ActionTargetItem } from "src/types";
 import { ShowHideButton } from "../../../Utility/Buttons";
 import SelectField from "./SelectField";
 
@@ -31,8 +33,9 @@ defineEmits(["create"]);
 const selected = defineModel<string | number | object | null>("selected");
 const editing = defineModel<boolean>("editing");
 defineProps<{
-	options: QSelectOption[];
+	options: QSelectOption[] | ActionTargetItem[];
 	showEdit?: boolean;
+	canEdit?: boolean;
 	loading?: boolean;
 	selectByObject?: boolean;
 	optionLabel?: string;

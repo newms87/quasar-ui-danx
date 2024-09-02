@@ -16,7 +16,7 @@
             <h2 v-if="title">
               {{ title }}
             </h2>
-            <div v-if="!activeItem">
+            <div v-if="!target">
               Loading
               <QSpinnerHourglass />
             </div>
@@ -39,22 +39,22 @@
       </div>
       <div class="dx-panels-drawer-body flex-grow overflow-hidden h-full">
         <div
-          v-if="activeItem.__timestamp > 0"
+          v-if="target.__timestamp > 0"
           class="flex items-stretch flex-nowrap h-full"
         >
           <PanelsDrawerTabs
-            :key="'pd-tabs:' + activeItem.id"
+            :key="'pd-tabs:' + target.id"
             v-model="activePanel"
-            :active-item="activeItem"
+            :target="target"
             :class="tabsClass"
             :panels="panels"
             @update:model-value="$emit('update:model-value', $event)"
           />
           <PanelsDrawerPanels
-            :key="'pd-panels:' + activeItem.id"
+            :key="'pd-panels:' + target.id"
             :panels="panels"
             :active-panel="activePanel"
-            :active-item="activeItem"
+            :active-item="target"
             :class="activePanelOptions?.class || panelsClass"
           />
           <div
@@ -79,7 +79,7 @@ import PanelsDrawerTabs from "./PanelsDrawerTabs";
 export interface Props {
 	title?: string,
 	modelValue?: string | number,
-	activeItem: ActionTargetItem;
+	target: ActionTargetItem;
 	tabsClass?: string | object,
 	panelsClass?: string | object,
 	position?: "standard" | "right" | "left";

@@ -271,9 +271,9 @@ function onUpdate(value) {
 
 	if (props.selectByObject && value !== null && value !== undefined && typeof value !== "object") {
 		if (props.multiple) {
-			value = computedOptions.value.filter((o) => value.includes(o.value)).map((o) => o.value);
+			value = props.options.filter((o) => value.includes(resolveValue(o)));
 		} else {
-			value = computedOptions.value.find((o) => o.value === value);
+			value = props.options.find((o) => resolveValue(o) === value);
 		}
 	}
 	emit("update:model-value", value);

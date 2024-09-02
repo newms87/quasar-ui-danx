@@ -20,7 +20,6 @@ export interface FilterGroup {
 	fields: FilterableField[];
 }
 
-
 export interface ListControlsRoutes {
 	list(pager?: ListControlsPagination): Promise<ActionTargetItem[]>;
 

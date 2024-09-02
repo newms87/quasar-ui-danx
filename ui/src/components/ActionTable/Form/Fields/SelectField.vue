@@ -86,6 +86,8 @@ export interface Props extends QSelectProps {
 	options?: unknown[];
 	filterable?: boolean;
 	filterFn?: (val: string) => void;
+	selectByObject?: boolean;
+	optionLabel?: string | ((option) => string);
 }
 
 const emit = defineEmits(["update:model-value", "search", "update"]);
@@ -97,7 +99,8 @@ const props = withDefaults(defineProps<Props>(), {
 	inputClass: "",
 	selectionClass: "",
 	options: () => [],
-	filterFn: null
+	filterFn: null,
+	optionLabel: "label"
 });
 
 const selectField = ref(null);
@@ -146,7 +149,11 @@ const selectedValue = computed(() => {
 			return v === null ? "__null__" : v;
 		}) || [];
 	} else {
-		return props.modelValue === null ? "__null__" : props.modelValue;
+		if (props.modelValue === null) return "__null__";
+
+		if (props.selectByObject) return props.modelValue.value || props.modelValue.id;
+
+		return props.modelValue;
 	}
 });
 
@@ -159,8 +166,14 @@ const selectedOptions = computed(() => {
 	if (!props.multiple) {
 		values = (values || values === 0) ? [values] : [];
 	}
+
+	const comparableValues = values.map((v) => {
+		if (v === "__null__") return null;
+		if (typeof v === "object") return v.value || v.id;
+		return v;
+	});
 	return computedOptions.value.filter((o) => {
-		return values.includes(o.value) || values.map(v => typeof v === "object" && v.id).includes(o.value?.id);
+		return comparableValues.includes(o.value);
 	});
 });
 
@@ -175,6 +188,7 @@ const selectedLabel = computed(() => {
 	if (!selectedOptions.value || selectedOptions.value.length === 0) {
 		return props.placeholder || "(Select Option)";
 	}
+
 	return selectedOptions.value[0].selectionLabel;
 });
 
@@ -220,7 +234,7 @@ function resolveSelectionLabel(option) {
 	if (typeof props.selectionLabel === "function") {
 		return props.selectionLabel(option);
 	}
-	return option?.selectionLabel || option?.label;
+	return option?.selectionLabel || option?.label || (option && option[props.optionLabel]);
 }
 
 /**
@@ -232,7 +246,7 @@ function resolveValue(option) {
 	if (!option || typeof option === "string") {
 		return option;
 	}
-	let value = option.value;
+	let value = option.value || option.id;
 	if (typeof props.optionValue === "string") {
 		value = option[props.optionValue];
 	} else if (typeof props.optionValue === "function") {
@@ -255,6 +269,13 @@ function onUpdate(value) {
 
 	value = value === "__null__" ? null : value;
 
+	if (props.selectByObject && value !== null && value !== undefined && typeof value !== "object") {
+		if (props.multiple) {
+			value = computedOptions.value.filter((o) => value.includes(o.value)).map((o) => o.value);
+		} else {
+			value = computedOptions.value.find((o) => o.value === value);
+		}
+	}
 	emit("update:model-value", value);
 	emit("update", value);
 }
@@ -275,7 +296,7 @@ async function onFilter(val, update) {
 		await nextTick(update);
 	} else {
 		update();
-		if (shouldFilter.value === false) return;
+		if (!shouldFilter.value) return;
 		if (val !== null && val !== filter.value) {
 			filter.value = val;
 			if (props.filterFn) {

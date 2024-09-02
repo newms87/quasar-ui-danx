@@ -4,6 +4,8 @@
       v-model="selected"
       class="flex-grow"
       :options="options"
+      :select-by-object="selectByObject"
+      :option-label="optionLabel"
     />
     <ShowHideButton
       v-if="showEdit"
@@ -26,11 +28,13 @@ import { ShowHideButton } from "../../../Utility/Buttons";
 import SelectField from "./SelectField";
 
 defineEmits(["create"]);
-const selected = defineModel<string | number | null>("selected");
+const selected = defineModel<string | number | object | null>("selected");
 const editing = defineModel<boolean>("editing");
 defineProps<{
-	options: QSelectOption[],
-	showEdit?: boolean,
-	loading?: boolean
+	options: QSelectOption[];
+	showEdit?: boolean;
+	loading?: boolean;
+	selectByObject?: boolean;
+	optionLabel?: string;
 }>();
 </script>

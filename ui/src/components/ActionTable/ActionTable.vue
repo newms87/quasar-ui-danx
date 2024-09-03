@@ -3,7 +3,6 @@
     class="dx-action-table overflow-hidden"
     :class="{'dx-no-data': !hasData, 'dx-is-loading': loadingList || loadingSummary, 'dx-is-loading-list': loadingList}"
   >
-    <ActionVnode />
     <QTable
       ref="actionTable"
       :selected="selectedRows"
@@ -68,7 +67,6 @@ import { QTable } from "quasar";
 import { computed, ref } from "vue";
 import { getItem, setItem } from "../../helpers";
 import { ActionTargetItem, ListControlsPagination, TableColumn } from "../../types";
-import { ActionVnode } from "../Utility";
 import { ActionTableColumn, ActionTableHeaderColumn } from "./Columns";
 import EmptyTableState from "./EmptyTableState.vue";
 import { mapSortBy, registerStickyScrolling } from "./listHelpers";

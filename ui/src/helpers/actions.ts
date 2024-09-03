@@ -1,7 +1,9 @@
 import { useDebounceFn } from "@vueuse/core";
+import { FaSolidCopy as CopyIcon, FaSolidPencil as EditIcon, FaSolidTrash as DeleteIcon } from "danx-icon";
 import { uid } from "quasar";
-import { isReactive, Ref, shallowRef } from "vue";
-import type { ActionOptions, ActionTarget, AnyObject, ResourceAction } from "../types";
+import { h, isReactive, Ref, shallowRef } from "vue";
+import { ConfirmActionDialog, CreateNewWithNameDialog } from "../components";
+import type { ActionController, ActionOptions, ActionTarget, AnyObject, ResourceAction } from "../types";
 import { FlashMessages } from "./FlashMessages";
 import { storeObject } from "./objectStore";
 
@@ -94,7 +96,7 @@ export function useActions(actions: ActionOptions[], globalOptions: Partial<Acti
 		// Resolve the original action, if the current action is an alias
 		const aliasedAction = action.alias ? getAction(action.alias) : null;
 
-		const vnode = action.vnode && action.vnode(target);
+		const vnode = action.vnode && action.vnode(target, input);
 		let result: any;
 
 		// Run the onStart handler if it exists and quit the operation if it returns false
@@ -270,4 +272,59 @@ async function onConfirmAction(action: ActionOptions, target: ActionTarget, inpu
 	}
 
 	return result;
+}
+
+export function withDefaultActions(dxController: ActionController): ActionOptions[] {
+	const label = dxController.label;
+
+	return [
+		{
+			name: "create",
+			label: "Create " + label,
+			vnode: () => h(CreateNewWithNameDialog, { title: "Create " + label }),
+			onFinish: (result) => {
+				dxController.activatePanel(result.item, "edit");
+				dxController.loadListAndSummary();
+			}
+		},
+		{
+			name: "update",
+			optimistic: true
+		},
+		{
+			name: "update-debounced",
+			alias: "update",
+			debounce: 1000
+		},
+		{
+			name: "copy",
+			label: "Copy",
+			icon: CopyIcon,
+			menu: true,
+			onSuccess: dxController.loadListAndSummary
+		},
+		{
+			label: "Edit",
+			name: "edit",
+			icon: EditIcon,
+			menu: true,
+			onAction: (action, target) => dxController.activatePanel(target, "edit")
+		},
+		{
+			name: "delete",
+			label: "Delete",
+			class: "text-red-500",
+			iconClass: "text-red-500",
+			icon: DeleteIcon,
+			menu: true,
+			batch: true,
+			onFinish: dxController.loadListAndSummary,
+			vnode: (target: ActionTarget) => h(ConfirmActionDialog, {
+				action: "Delete",
+				label,
+				target,
+				confirmClass: "bg-red-900"
+			})
+		}
+	];
 }

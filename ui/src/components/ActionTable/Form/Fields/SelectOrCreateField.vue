@@ -1,5 +1,13 @@
 <template>
-  <div class="flex items-stretch flex-nowrap">
+  <div class="flex items-stretch flex-nowrap gap-x-4">
+    <QBtn
+      class="bg-green-900 px-4"
+      :loading="loading"
+      @click="$emit('create')"
+    >
+      <CreateIcon class="w-4 mr-2" />
+      {{ createText }}
+    </QBtn>
     <SelectField
       v-model="selected"
       class="flex-grow"
@@ -11,33 +19,33 @@
       v-if="showEdit"
       v-model="editing"
       :disable="!canEdit"
-      label="Edit"
-      class="bg-sky-800 w-1/5 ml-4"
+      :label="editText"
+      class="bg-sky-800 w-1/5"
     />
-    <QBtn
-      class="bg-green-900 ml-4 w-1/5"
-      :loading="loading"
-      @click="$emit('create')"
-    >
-      Create Schema
-    </QBtn>
   </div>
 </template>
 <script setup lang="ts">
+import { FaSolidPlus as CreateIcon } from "danx-icon";
 import { QSelectOption } from "quasar";
-import { ActionTargetItem } from "src/types";
+import { ActionTargetItem } from "../../../../types";
 import { ShowHideButton } from "../../../Utility/Buttons";
 import SelectField from "./SelectField";
 
 defineEmits(["create"]);
 const selected = defineModel<string | number | object | null>("selected");
 const editing = defineModel<boolean>("editing");
-defineProps<{
+withDefaults(defineProps<{
 	options: QSelectOption[] | ActionTargetItem[];
 	showEdit?: boolean;
 	canEdit?: boolean;
 	loading?: boolean;
 	selectByObject?: boolean;
 	optionLabel?: string;
-}>();
+	createText?: string;
+	editText?: string;
+}>(), {
+	optionLabel: "label",
+	createText: "Create",
+	editText: "Edit"
+});
 </script>

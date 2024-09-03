@@ -118,11 +118,11 @@ export interface ListController {
 
 export interface ActionController extends ListController {
 	// Actions
-	action: (actionName: string, target?: ActionTargetItem | null, input?: any) => Promise<any | void>;
-	getAction: (actionName: string, actionOptions?: Partial<ActionOptions>) => ResourceAction;
-	getActions: (names?: string[]) => ResourceAction[];
-	extendAction: (actionName: string, extendedId: string | number, actionOptions: Partial<ActionOptions>) => ResourceAction;
-	modifyAction: (actionName: string, actionOptions: Partial<ActionOptions>) => ResourceAction;
+	action?: (actionName: string, target?: ActionTargetItem | null, input?: any) => Promise<any | void>;
+	getAction?: (actionName: string, actionOptions?: Partial<ActionOptions>) => ResourceAction;
+	getActions?: (names?: string[]) => ResourceAction[];
+	extendAction?: (actionName: string, extendedId: string | number, actionOptions: Partial<ActionOptions>) => ResourceAction;
+	modifyAction?: (actionName: string, actionOptions: Partial<ActionOptions>) => ResourceAction;
 	batchActions?: ResourceAction[];
 	menuActions?: ResourceAction[];
 	columns?: TableColumn[];

@@ -72,6 +72,9 @@ export function useActions(actions: ActionOptions[], globalOptions: ActionGlobal
 			resourceAction.trigger = useDebounceFn((target, input) => performAction(resourceAction, target, input), baseOptions.debounce);
 		}
 
+		// Splice the resourceAction in place of the action in the actions list
+		actions.splice(actions.findIndex(a => a.name === actionName), 1, resourceAction);
+
 		return resourceAction;
 	}
 

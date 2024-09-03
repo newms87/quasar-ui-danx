@@ -1,5 +1,6 @@
+import { TableColumn } from "src/types/tables";
 import { ComputedRef, Ref, ShallowRef } from "vue";
-import { ActionTargetItem } from "./actions";
+import { ActionOptions, ActionTargetItem, ResourceAction } from "./actions";
 import { AnyObject, LabelValueItem } from "./shared";
 
 export interface ListControlsFilter {
@@ -35,9 +36,9 @@ export interface ListControlsRoutes {
 
 	fieldOptions?(filter?: AnyObject): Promise<AnyObject>;
 
-	applyAction?(action: string, target: ActionTargetItem | null, data?: object): Promise<AnyObject>;
+	applyAction?(action: string | ResourceAction | ActionOptions, target: ActionTargetItem | null, data?: object): Promise<AnyObject>;
 
-	batchAction?(action: string, targets: ActionTargetItem[], data: object): Promise<AnyObject>;
+	batchAction?(action: string | ResourceAction | ActionOptions, targets: ActionTargetItem[], data: object): Promise<AnyObject>;
 
 	export?(filter?: ListControlsFilter, name?: string): Promise<void>;
 }
@@ -69,7 +70,7 @@ export interface PagedItems {
 	} | undefined;
 }
 
-export interface ActionController {
+export interface ListController {
 	name: string;
 	label: string;
 	pagedItems: Ref<PagedItems | null>;
@@ -92,7 +93,7 @@ export interface ActionController {
 	activeItem: ShallowRef<ActionTargetItem | null>;
 	activePanel: ShallowRef<string | null>;
 
-	// Actions
+	// List Controls
 	initialize: () => void;
 	resetPaging: () => void;
 	setPagination: (updated: Partial<ListControlsPagination>) => void;
@@ -112,4 +113,12 @@ export interface ActionController {
 	setActiveFilter: (filter?: ListControlsFilter) => void;
 	applyFilterFromUrl: (url: string, filters?: Ref<FilterGroup[]> | null) => void;
 	getFieldOptions: (field: string) => any[];
+}
+
+export interface ActionController extends ListController {
+	// Actions
+	getAction: (actionName: string, actionOptions?: Partial<ActionOptions>) => ResourceAction;
+	getActions: (filters?: AnyObject) => ResourceAction[];
+	extendAction: (actionName: string, extendedId: string | number, actionOptions: Partial<ActionOptions>) => ResourceAction;
+	columns: TableColumn[];
 }

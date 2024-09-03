@@ -3,10 +3,10 @@ import { RouteParams, Router } from "vue-router";
 import { danxOptions } from "../../config";
 import { getItem, latestCallOnly, setItem, storeObject, waitForRef } from "../../helpers";
 import {
-	ActionController,
 	ActionTargetItem,
 	AnyObject,
 	FilterGroup,
+	ListController,
 	ListControlsFilter,
 	ListControlsOptions,
 	ListControlsPagination,
@@ -14,7 +14,7 @@ import {
 } from "../../types";
 import { getFilterFromUrl } from "./listHelpers";
 
-export function useListControls(name: string, options: ListControlsOptions): ActionController {
+export function useListControls(name: string, options: ListControlsOptions): ListController {
 	let isInitialized = false;
 	const PAGE_SETTINGS_KEY = `dx-${name}-pager`;
 	const pagedItems = shallowRef<PagedItems | null>(null);
@@ -490,7 +490,7 @@ export function useListControls(name: string, options: ListControlsOptions): Act
 		activeItem,
 		activePanel,
 
-		// Actions
+		// List controls
 		initialize,
 		resetPaging,
 		setPagination,

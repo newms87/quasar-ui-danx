@@ -3,7 +3,14 @@ import { FaSolidCopy as CopyIcon, FaSolidPencil as EditIcon, FaSolidTrash as Del
 import { uid } from "quasar";
 import { h, isReactive, Ref, shallowRef } from "vue";
 import { ConfirmActionDialog, CreateNewWithNameDialog } from "../components";
-import type { ActionController, ActionOptions, ActionTarget, AnyObject, ResourceAction } from "../types";
+import type {
+	ActionGlobalOptions,
+	ActionOptions,
+	ActionTarget,
+	AnyObject,
+	ListController,
+	ResourceAction
+} from "../types";
 import { FlashMessages } from "./FlashMessages";
 import { storeObject } from "./objectStore";
 
@@ -13,7 +20,7 @@ export const activeActionVnode: Ref = shallowRef(null);
  * Hook to perform an action on a set of targets
  * This helper allows you to perform actions by name on a set of targets using a provided list of actions
  */
-export function useActions(actions: ActionOptions[], globalOptions: Partial<ActionOptions> | null = null) {
+export function useActions(actions: ActionOptions[], globalOptions: ActionGlobalOptions | null = null) {
 	const namespace = uid();
 
 	/**
@@ -50,6 +57,8 @@ export function useActions(actions: ActionOptions[], globalOptions: Partial<Acti
 		if (isReactive(baseOptions) && "__type" in baseOptions) return baseOptions as ResourceAction;
 
 		const resourceAction: ResourceAction = storeObject({
+			onAction: globalOptions?.routes?.applyAction,
+			onBatchAction: globalOptions?.routes?.batchAction,
 			...globalOptions,
 			...baseOptions,
 			trigger: (target, input) => performAction(resourceAction, target, input),
@@ -274,8 +283,8 @@ async function onConfirmAction(action: ActionOptions, target: ActionTarget, inpu
 	return result;
 }
 
-export function withDefaultActions(dxController: ActionController): ActionOptions[] {
-	const label = dxController.label;
+export function withDefaultActions(listController: ListController): ActionOptions[] {
+	const label = listController.label;
 
 	return [
 		{
@@ -283,8 +292,8 @@ export function withDefaultActions(dxController: ActionController): ActionOption
 			label: "Create " + label,
 			vnode: () => h(CreateNewWithNameDialog, { title: "Create " + label }),
 			onFinish: (result) => {
-				dxController.activatePanel(result.item, "edit");
-				dxController.loadListAndSummary();
+				listController.activatePanel(result.item, "edit");
+				listController.loadListAndSummary();
 			}
 		},
 		{
@@ -301,14 +310,14 @@ export function withDefaultActions(dxController: ActionController): ActionOption
 			label: "Copy",
 			icon: CopyIcon,
 			menu: true,
-			onSuccess: dxController.loadListAndSummary
+			onSuccess: listController.loadListAndSummary
 		},
 		{
 			label: "Edit",
 			name: "edit",
 			icon: EditIcon,
 			menu: true,
-			onAction: (action, target) => dxController.activatePanel(target, "edit")
+			onAction: (action, target) => listController.activatePanel(target, "edit")
 		},
 		{
 			name: "delete",
@@ -318,7 +327,7 @@ export function withDefaultActions(dxController: ActionController): ActionOption
 			icon: DeleteIcon,
 			menu: true,
 			batch: true,
-			onFinish: dxController.loadListAndSummary,
+			onFinish: listController.loadListAndSummary,
 			vnode: (target: ActionTarget) => h(ConfirmActionDialog, {
 				action: "Delete",
 				label,

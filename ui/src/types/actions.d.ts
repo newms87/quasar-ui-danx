@@ -1,5 +1,6 @@
+import { ListControlsRoutes } from "src/types/controls";
 import { VNode } from "vue";
-import { TypedObject } from "./shared";
+import { AnyObject, TypedObject } from "./shared";
 
 export interface ActionPanel {
 	name: string | number;
@@ -33,13 +34,17 @@ export interface ActionOptions {
 	vnode?: ((target: ActionTarget) => VNode) | any;
 	enabled?: (target: object) => boolean;
 	batchEnabled?: (targets: object[]) => boolean;
-	onAction?: (action: string | null | undefined, target: ActionTargetItem | null, input: any) => Promise<any> | void;
-	onBatchAction?: (action: string | null | undefined, targets: ActionTargetItem[], input: any) => Promise<any>;
+	onAction?: (action: string | ResourceAction | ActionOptions, target: ActionTargetItem | null, input?: AnyObject | any) => Promise<AnyObject> | void;
+	onBatchAction?: (action: string | ResourceAction | ActionOptions, targets: ActionTargetItem[], input: any) => Promise<AnyObject> | void;
 	onStart?: (action: ActionOptions | null, targets: ActionTarget, input: any) => boolean;
 	onSuccess?: (result: any, targets: ActionTarget, input: any) => any;
 	onBatchSuccess?: (result: any, targets: ActionTargetItem[], input: any) => any;
 	onError?: (result: any, targets: ActionTarget, input: any) => any;
 	onFinish?: (result: any, targets: ActionTarget, input: any) => any;
+}
+
+export interface ActionGlobalOptions extends Partial<ActionOptions> {
+	routes: ListControlsRoutes;
 }
 
 export interface ResourceAction extends ActionOptions {

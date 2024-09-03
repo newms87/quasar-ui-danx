@@ -1,6 +1,7 @@
+import { FormField } from "src/types/forms";
 import { TableColumn } from "src/types/tables";
 import { ComputedRef, Ref, ShallowRef } from "vue";
-import { ActionOptions, ActionTargetItem, ResourceAction } from "./actions";
+import { ActionOptions, ActionPanel, ActionTargetItem, ResourceAction } from "./actions";
 import { AnyObject, LabelValueItem } from "./shared";
 
 export interface ListControlsFilter {
@@ -117,8 +118,16 @@ export interface ListController {
 
 export interface ActionController extends ListController {
 	// Actions
+	action: (actionName: string, target?: ActionTargetItem | null, input?: any) => Promise<any | void>;
 	getAction: (actionName: string, actionOptions?: Partial<ActionOptions>) => ResourceAction;
-	getActions: (filters?: AnyObject) => ResourceAction[];
+	getActions: (names?: string[]) => ResourceAction[];
 	extendAction: (actionName: string, extendedId: string | number, actionOptions: Partial<ActionOptions>) => ResourceAction;
-	columns: TableColumn[];
+	modifyAction: (actionName: string, actionOptions: Partial<ActionOptions>) => ResourceAction;
+	batchActions?: ResourceAction[];
+	menuActions?: ResourceAction[];
+	columns?: TableColumn[];
+	filters?: ComputedRef<FilterGroup[]>;
+	fields?: FormField[];
+	panels?: ActionPanel[];
+	routes?: ListControlsRoutes;
 }

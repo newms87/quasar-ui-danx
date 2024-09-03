@@ -6,11 +6,13 @@
         v-if="!hideToolbar"
         :title="title"
         :refresh-button="refreshButton"
-        :actions="actions?.filter(a => a.batch)"
+        :create-button="createButton"
+        :actions="controller.batchActions"
         :action-target="controller.selectedRows.value"
         :exporter="controller.exportList"
         :loading="controller.isLoadingList.value || controller.isLoadingSummary.value"
         @refresh="controller.refreshAll"
+        @create="controller.action('create')"
       >
         <template #default>
           <slot name="action-toolbar" />
@@ -23,7 +25,7 @@
           v-if="activeFilter"
           :name="controller.name"
           :show-filters="showFilters"
-          :filters="filters"
+          :filters="controller.filters.value"
           :active-filter="activeFilter"
           class="dx-action-table-filters"
           @update:active-filter="controller.setActiveFilter"
@@ -37,11 +39,12 @@
           :label="controller.label"
           :name="controller.name"
           :class="tableClass"
+          :menu-actions="controller.menuActions"
           :summary="controller.summary.value"
           :loading-list="controller.isLoadingList.value"
           :loading-summary="controller.isLoadingSummary.value"
           :paged-items="controller.pagedItems.value"
-          :columns="columns"
+          :columns="controller.columns || []"
           :selection="selection"
           @update:selected-rows="controller.setSelectedRows"
           @update:pagination="controller.setPagination"
@@ -49,11 +52,11 @@
       </slot>
       <slot name="panels">
         <PanelsDrawer
-          v-if="activeItem && panels"
+          v-if="activeItem && controller.panels"
           :title="panelTitle"
           :model-value="activePanel"
           :target="activeItem"
-          :panels="panels"
+          :panels="controller.panels"
           @update:model-value="panel => controller.activatePanel(activeItem, panel)"
           @close="controller.setActiveItem(null)"
         >
@@ -70,7 +73,7 @@
 </template>
 <script setup lang="ts">
 import { computed } from "vue";
-import { ActionController, ActionPanel, FilterGroup, ResourceAction, TableColumn } from "../../../types";
+import { ActionController } from "../../../types";
 import { PanelsDrawer } from "../../PanelsDrawer";
 import { PreviousNextControls } from "../../Utility";
 import ActionTable from "../ActionTable.vue";
@@ -78,30 +81,24 @@ import { CollapsableFiltersSidebar } from "../Filters";
 import { ActionToolbar } from "../Toolbars";
 
 export interface ActionTableLayoutProps {
-	title?: string;
 	controller: ActionController;
-	columns: TableColumn[];
-	filters?: FilterGroup[];
-	panels?: ActionPanel[];
-	actions?: ResourceAction[];
 	exporter?: () => Promise<void>;
-	panelTitleField?: string;
-	tableClass?: string;
-	refreshButton?: boolean;
-	showFilters?: boolean;
 	hideToolbar?: boolean;
+	panelTitleField?: string;
+	refreshButton?: boolean;
+	createButton?: boolean;
 	selection?: "multiple" | "single";
+	showFilters?: boolean;
+	tableClass?: string;
+	title?: string;
 }
 
 const props = withDefaults(defineProps<ActionTableLayoutProps>(), {
-	title: "",
-	tableClass: "",
-	selection: "multiple",
-	filters: undefined,
-	panels: undefined,
-	actions: undefined,
 	exporter: undefined,
-	panelTitleField: ""
+	panelTitleField: "",
+	selection: "multiple",
+	tableClass: "",
+	title: ""
 });
 
 const activeFilter = computed(() => props.controller.activeFilter.value);

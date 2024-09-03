@@ -3,14 +3,7 @@ import { FaSolidCopy as CopyIcon, FaSolidPencil as EditIcon, FaSolidTrash as Del
 import { uid } from "quasar";
 import { h, isReactive, Ref, shallowRef } from "vue";
 import { ConfirmActionDialog, CreateNewWithNameDialog } from "../components";
-import type {
-	ActionGlobalOptions,
-	ActionOptions,
-	ActionTarget,
-	AnyObject,
-	ListController,
-	ResourceAction
-} from "../types";
+import type { ActionGlobalOptions, ActionOptions, ActionTarget, ListController, ResourceAction } from "../types";
 import { FlashMessages } from "./FlashMessages";
 import { storeObject } from "./objectStore";
 
@@ -40,6 +33,14 @@ export function useActions(actions: ActionOptions[], globalOptions: ActionGlobal
 			extendedAction.trigger = (target, input) => performAction(extendedAction, target, input);
 		}
 		return storeObject(extendedAction);
+	}
+
+	/**
+	 * Updates an action replacing the old options with the new options
+	 */
+	function modifyAction(actionName: string, actionOptions: Partial<ActionOptions>): ResourceAction {
+		const action = getAction(actionName);
+		return storeObject({ ...action, ...actionOptions });
 	}
 
 	/**
@@ -75,23 +76,15 @@ export function useActions(actions: ActionOptions[], globalOptions: ActionGlobal
 	}
 
 	/**
-	 * Filter the list of actions based on the provided filters in key-value pairs
-	 * You can filter on any ActionOptions property by matching the value exactly or by providing an array of values
-	 *
-	 * @param filters
-	 * @returns {ActionOptions[]}
+	 * Returns a filtered list of actions. Useful for building ordered menus.
+	 * NOTE: If an action doesn't already exist, it will be created.
 	 */
-	function getActions(filters?: AnyObject): ResourceAction[] {
-		let filteredActions = [...actions];
-
-		if (filters) {
-			for (const filterKey of Object.keys(filters)) {
-				const filterValue = filters[filterKey];
-				filteredActions = filteredActions.filter((a: AnyObject) => a[filterKey] === filterValue || (Array.isArray(filterValue) && filterValue.includes(a[filterKey])));
-			}
+	function getActions(names: string[]): ResourceAction[] {
+		const filteredActions = [];
+		for (const name of names) {
+			filteredActions.push(getAction(name));
 		}
-
-		return filteredActions.map((a: ActionOptions) => getAction(a.name));
+		return filteredActions;
 	}
 
 	/**
@@ -101,7 +94,11 @@ export function useActions(actions: ActionOptions[], globalOptions: ActionGlobal
 	 * @param {object[]|object} target - an array of targets or a single target object
 	 * @param {any} input - The input data to pass to the action handler
 	 */
-	async function performAction(action: ResourceAction, target: ActionTarget = null, input: any = null) {
+	async function performAction(action: ResourceAction | string, target: ActionTarget = null, input: any = null): Promise<any | void> {
+		if (typeof action === "string") {
+			action = getAction(action);
+		}
+
 		// Resolve the original action, if the current action is an alias
 		const aliasedAction = action.alias ? getAction(action.alias) : null;
 
@@ -171,6 +168,8 @@ export function useActions(actions: ActionOptions[], globalOptions: ActionGlobal
 	return {
 		getAction,
 		getActions,
+		action: performAction,
+		modifyAction,
 		extendAction
 	};
 }
@@ -283,18 +282,16 @@ async function onConfirmAction(action: ActionOptions, target: ActionTarget, inpu
 	return result;
 }
 
-export function withDefaultActions(listController: ListController): ActionOptions[] {
-	const label = listController.label;
-
+export function withDefaultActions(label: string, listController?: ListController): ActionOptions[] {
 	return [
 		{
 			name: "create",
 			label: "Create " + label,
 			vnode: () => h(CreateNewWithNameDialog, { title: "Create " + label }),
-			onFinish: (result) => {
+			onFinish: listController && ((result) => {
 				listController.activatePanel(result.item, "edit");
 				listController.loadListAndSummary();
-			}
+			})
 		},
 		{
 			name: "update",
@@ -303,21 +300,22 @@ export function withDefaultActions(listController: ListController): ActionOption
 		{
 			name: "update-debounced",
 			alias: "update",
-			debounce: 1000
+			debounce: 1000,
+			optimistic: true
 		},
 		{
 			name: "copy",
 			label: "Copy",
 			icon: CopyIcon,
 			menu: true,
-			onSuccess: listController.loadListAndSummary
+			onSuccess: listController?.loadListAndSummary
 		},
 		{
 			label: "Edit",
 			name: "edit",
 			icon: EditIcon,
 			menu: true,
-			onAction: (action, target) => listController.activatePanel(target, "edit")
+			onAction: (action, target) => listController?.activatePanel(target, "edit")
 		},
 		{
 			name: "delete",
@@ -327,7 +325,7 @@ export function withDefaultActions(listController: ListController): ActionOption
 			icon: DeleteIcon,
 			menu: true,
 			batch: true,
-			onFinish: listController.loadListAndSummary,
+			onFinish: listController?.loadListAndSummary,
 			vnode: (target: ActionTarget) => h(ConfirmActionDialog, {
 				action: "Delete",
 				label,

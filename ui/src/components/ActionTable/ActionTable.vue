@@ -66,7 +66,7 @@
 import { QTable } from "quasar";
 import { computed, ref } from "vue";
 import { getItem, setItem } from "../../helpers";
-import { ActionTargetItem, ListControlsPagination, TableColumn } from "../../types";
+import { ActionTargetItem, ListControlsPagination, ResourceAction, TableColumn } from "../../types";
 import { ActionTableColumn, ActionTableHeaderColumn } from "./Columns";
 import EmptyTableState from "./EmptyTableState.vue";
 import { mapSortBy, registerStickyScrolling } from "./listHelpers";
@@ -84,6 +84,7 @@ export interface Props {
 	loadingSummary?: boolean;
 	pagedItems?: any;
 	summary: any;
+	menuActions?: ResourceAction[];
 	columns: TableColumn[];
 	rowsPerPageOptions?: number[];
 	summaryColSpan?: number;
@@ -103,10 +104,33 @@ const props = withDefaults(defineProps<Props>(), {
 const actionTable = ref(null);
 registerStickyScrolling(actionTable);
 
-const tableColumns = computed<TableColumn[]>(() => props.columns.map((column) => ({
-	...column,
-	field: column.field || column.name
-})));
+const tableColumns = computed<TableColumn[]>(() => {
+	const columns = [...props.columns].map((column: TableColumn) => ({
+		...column,
+		field: column.field || column.name
+	}));
+
+	// Inject the Action Menu column if there are menu actions
+	if (props.menuActions?.length) {
+		const menuColumn = columns.find((column) => column.name === "menu");
+		const menuColumnOptions: TableColumn = {
+			name: "menu",
+			label: "",
+			required: true,
+			hideContent: true,
+			shrink: true,
+			actionMenu: props.menuActions
+		};
+
+		if (menuColumn) {
+			Object.assign(menuColumn, menuColumnOptions);
+		} else {
+			columns.unshift(menuColumnOptions);
+		}
+	}
+
+	return columns;
+});
 const hasData = computed(() => props.pagedItems?.data?.length);
 const COLUMN_SETTINGS_KEY = `column-settings-${props.name}`;
 const columnSettings = ref(getItem(COLUMN_SETTINGS_KEY) || {});

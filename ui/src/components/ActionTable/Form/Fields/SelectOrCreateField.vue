@@ -12,6 +12,7 @@
       v-model="selected"
       class="flex-grow"
       :options="options"
+      :clearable="clearable"
       :select-by-object="selectByObject"
       :option-label="optionLabel"
     />
@@ -43,6 +44,7 @@ withDefaults(defineProps<{
 	optionLabel?: string;
 	createText?: string;
 	editText?: string;
+	clearable?: boolean;
 }>(), {
 	optionLabel: "label",
 	createText: "Create",

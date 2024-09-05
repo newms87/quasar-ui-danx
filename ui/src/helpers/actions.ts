@@ -60,6 +60,7 @@ export function useActions(actions: ActionOptions[], globalOptions: ActionGlobal
 		const resourceAction: ResourceAction = storeObject({
 			onAction: globalOptions?.routes?.applyAction,
 			onBatchAction: globalOptions?.routes?.batchAction,
+			onBatchSuccess: globalOptions?.controls?.clearSelectedRows,
 			...globalOptions,
 			...baseOptions,
 			trigger: (target, input) => performAction(resourceAction, target, input),

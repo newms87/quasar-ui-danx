@@ -5,7 +5,10 @@
       :loading="loading"
       @click="$emit('create')"
     >
-      <CreateIcon class="w-4 mr-2" />
+      <CreateIcon
+        class="w-4"
+        :class="createText ? 'mr-2' : ''"
+      />
       {{ createText }}
     </QBtn>
     <SelectField

@@ -51,7 +51,7 @@ const formattedDate = computed(() => {
 	if (props.modelValue) {
 		return fDate(parseDateTime(props.modelValue || "0000-00-00"));
 	}
-	return null;
+	return "- -";
 });
 
 const date = ref(parseDateTime(props.modelValue));

@@ -311,14 +311,12 @@ export function withDefaultActions(label: string, listController?: ListControlle
 			name: "copy",
 			label: "Copy",
 			icon: CopyIcon,
-			menu: true,
 			onSuccess: listController?.loadListAndSummary
 		},
 		{
-			label: "Edit",
 			name: "edit",
+			label: "Edit",
 			icon: EditIcon,
-			menu: true,
 			onAction: (action, target) => listController?.activatePanel(target, "edit")
 		},
 		{
@@ -327,8 +325,6 @@ export function withDefaultActions(label: string, listController?: ListControlle
 			class: "text-red-500",
 			iconClass: "text-red-500",
 			icon: DeleteIcon,
-			menu: true,
-			batch: true,
 			onFinish: listController?.loadListAndSummary,
 			vnode: (target: ActionTarget) => h(ConfirmActionDialog, {
 				action: "Delete",

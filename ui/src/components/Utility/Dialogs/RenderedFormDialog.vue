@@ -16,8 +16,7 @@
   </ConfirmDialog>
 </template>
 <script setup lang="ts">
-import { ref } from "vue";
-import { Form } from "../../../types";
+import { AnyObject, Form } from "../../../types";
 import { RenderedForm } from "../../ActionTable/Form";
 import ConfirmDialog from "./ConfirmDialog";
 
@@ -36,7 +35,7 @@ const props = defineProps<{
 	hideSavedAt?: boolean;
 	contentClass?: string;
 }>();
-const input = ref({});
+const input = defineModel<AnyObject>();
 
 const renderedFormProps = {
 	form: props.form,

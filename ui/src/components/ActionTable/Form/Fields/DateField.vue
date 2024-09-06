@@ -38,7 +38,7 @@
 <script setup lang="ts">
 import { CalendarIcon as DateIcon } from "@heroicons/vue/outline";
 import { computed, ref, watch } from "vue";
-import { fDate, parseQDate } from "../../../../helpers";
+import { fDate, parseDateTime } from "../../../../helpers";
 
 const emit = defineEmits(["update:model-value"]);
 const props = defineProps<{
@@ -49,12 +49,12 @@ const props = defineProps<{
 
 const formattedDate = computed(() => {
 	if (props.modelValue) {
-		return fDate(parseQDate(props.modelValue || "0000-00-00"));
+		return fDate(parseDateTime(props.modelValue || "0000-00-00"));
 	}
 	return null;
 });
 
-const date = ref(props.modelValue);
+const date = ref(parseDateTime(props.modelValue));
 watch(() => props.modelValue, val => date.value = val);
 
 function onSave() {

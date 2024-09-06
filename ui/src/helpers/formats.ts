@@ -32,32 +32,35 @@ export function remoteDateTime(dateTimeString: string) {
 /**
  * Parses a date string into a Luxon DateTime object
  */
-export function parseDateTime(dateTime: string | DateTime | null): DateTime {
+export function parseDateTime(dateTime: string | DateTime | null): DateTime<boolean> | null {
 	if (typeof dateTime === "string") {
-		dateTime = dateTime.replace("T", " ").replace(/\//g, "-");
-		return DateTime.fromSQL(dateTime);
+		return parseSqlDateTime(dateTime) || parseQDate(dateTime) || parseQDateTime(dateTime);
 	}
 	return dateTime || DateTime.fromSQL("0000-00-00 00:00:00");
 }
 
 /**
- * Parses a Quasar formatted date string into a Luxon DateTime object
- * @param date
- * @param format
- * @returns {DateTime}
+ *  Parses a SQL formatted date string into a Luxon DateTime object
  */
-export function parseQDate(date: string, format = "yyyy/MM/dd") {
-	return DateTime.fromFormat(date, format);
+export function parseSqlDateTime(dateTime: string) {
+	const parsed = DateTime.fromSQL(dateTime.replace("T", " ").replace(/\//g, "-"));
+	return parsed.isValid ? parsed : null;
+}
+
+/**
+ * Parses a Quasar formatted date string into a Luxon DateTime object
+ */
+export function parseQDate(date: string, format = "yyyy/MM/dd"): DateTime<boolean> | null {
+	const parsed = DateTime.fromFormat(date, format);
+	return parsed.isValid ? parsed : null;
 }
 
 /**
  * Parses a Quasar formatted date/time string into a Luxon DateTime object
- * @param date
- * @param format
- * @returns {DateTime}
  */
-export function parseQDateTime(date: string, format = "yyyy/MM/dd HH:mm:ss") {
-	return DateTime.fromFormat(date, format);
+export function parseQDateTime(date: string, format = "yyyy/MM/dd HH:mm:ss"): DateTime<boolean> | null {
+	const parsed = DateTime.fromFormat(date, format);
+	return parsed.isValid ? parsed : null;
 }
 
 /**
@@ -91,8 +94,8 @@ export function fDateTime(
 		dateTime: string | DateTime | null = null,
 		{ format = "M/d/yy h:mma", empty = "- -" }: fDateOptions = {}
 ) {
-	const formatted = parseDateTime(dateTime).toFormat(format).toLowerCase();
-	return ["Invalid DateTime", "invalid datetime"].includes(formatted) ? empty : formatted;
+	const formatted = parseDateTime(dateTime)?.toFormat(format).toLowerCase();
+	return formatted || empty;
 }
 
 /**
@@ -112,8 +115,8 @@ export function dbDateTime(dateTime: string | DateTime | null = null) {
  * @returns {string}
  */
 export function fDate(dateTime: string | DateTime | null, { empty = "--", format = "M/d/yy" }: fDateOptions = {}) {
-	const formatted = parseDateTime(dateTime).toFormat(format || "M/d/yy");
-	return ["Invalid DateTime", "invalid datetime"].includes(formatted) ? empty : formatted;
+	const formatted = parseDateTime(dateTime)?.toFormat(format || "M/d/yy");
+	return formatted || empty;
 }
 
 /**
@@ -130,8 +133,8 @@ export function fSecondsToTime(second: number) {
 
 export function fElapsedTime(start: string, end?: string) {
 	const endDateTime = end ? parseDateTime(end) : DateTime.now();
-	const diff = endDateTime.diff(parseDateTime(start), ["hours", "minutes", "seconds"]);
-	if (!diff.isValid) {
+	const diff = endDateTime?.diff(parseDateTime(start) || DateTime.now(), ["hours", "minutes", "seconds"]);
+	if (!diff?.isValid) {
 		return "-";
 	}
 	const hours = Math.floor(diff.hours);

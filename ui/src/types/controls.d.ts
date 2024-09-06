@@ -116,7 +116,7 @@ export interface ListController {
 	getFieldOptions: (field: string) => any[];
 }
 
-export interface ActionController extends ListController {
+export interface ActionController {
 	// Actions
 	action?: (actionName: string, target?: ActionTargetItem | null, input?: any) => Promise<any | void>;
 	getAction?: (actionName: string, actionOptions?: Partial<ActionOptions>) => ResourceAction;

@@ -12,7 +12,7 @@
         :exporter="controller.exportList"
         :loading="controller.isLoadingList.value || controller.isLoadingSummary.value"
         @refresh="controller.refreshAll"
-        @create="controller.action('create')"
+        @create="controller.action && controller.action('create')"
       >
         <template #default>
           <slot name="action-toolbar" />
@@ -73,7 +73,7 @@
 </template>
 <script setup lang="ts">
 import { computed } from "vue";
-import { ActionController } from "../../../types";
+import { ActionController, ListController } from "../../../types";
 import { PanelsDrawer } from "../../PanelsDrawer";
 import { PreviousNextControls } from "../../Utility";
 import ActionTable from "../ActionTable.vue";
@@ -81,7 +81,7 @@ import { CollapsableFiltersSidebar } from "../Filters";
 import { ActionToolbar } from "../Toolbars";
 
 export interface ActionTableLayoutProps {
-	controller: ActionController;
+	controller: ListController & ActionController;
 	exporter?: () => Promise<void>;
 	hideToolbar?: boolean;
 	panelTitleField?: string;

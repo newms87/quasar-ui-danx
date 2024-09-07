@@ -1,4 +1,4 @@
-import { computed, Ref, ref, shallowRef, watch } from "vue";
+import { computed, ref, shallowRef, watch } from "vue";
 import { RouteParams, Router } from "vue-router";
 import { danxOptions } from "../../config";
 import { getItem, latestCallOnly, setItem, storeObject, waitForRef } from "../../helpers";
@@ -10,11 +10,12 @@ import {
 	ListControlsFilter,
 	ListControlsOptions,
 	ListControlsPagination,
-	PagedItems
+	PagedItems,
+	Ref
 } from "../../types";
 import { getFilterFromUrl } from "./listHelpers";
 
-export function useListControls(name: string, options: ListControlsOptions): ListController {
+export function useControls(name: string, options: ListControlsOptions): ListController {
 	let isInitialized = false;
 	const PAGE_SETTINGS_KEY = `dx-${name}-pager`;
 	const pagedItems = shallowRef<PagedItems | null>(null);
@@ -72,12 +73,13 @@ export function useListControls(name: string, options: ListControlsOptions): Lis
 
 	async function loadList() {
 		if (!isInitialized) return;
-		isLoadingList.value = true;
+		// isLoadingList.value = true;
 		try {
 			setPagedItems(await options.routes.list(pager.value));
-			isLoadingList.value = false;
 		} catch (e) {
 			// Fail silently
+		} finally {
+			isLoadingList.value = false;
 		}
 	}
 
@@ -91,9 +93,10 @@ export function useListControls(name: string, options: ListControlsOptions): Lis
 		}
 		try {
 			summary.value = await options.routes.summary(summaryFilter);
-			isLoadingSummary.value = false;
 		} catch (e) {
 			// Fail silently
+		} finally {
+			isLoadingSummary.value = false;
 		}
 	}
 
@@ -116,9 +119,10 @@ export function useListControls(name: string, options: ListControlsOptions): Lis
 		isLoadingFilters.value = true;
 		try {
 			fieldOptions.value = await options.routes.fieldOptions(activeFilter.value) || {};
-			isLoadingFilters.value = false;
 		} catch (e) {
 			// Fail silently
+		} finally {
+			isLoadingFilters.value = false;
 		}
 	}
 

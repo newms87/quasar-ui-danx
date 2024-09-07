@@ -1,8 +1,8 @@
 import { VNode } from "vue";
-import { ActionOptions } from "./actions";
+import { ActionOptions, ActionTargetItem } from "./actions";
 
-export interface TableColumn {
-	actionMenu?: ActionOptions[];
+export interface TableColumn<T = ActionTargetItem> {
+	actionMenu?: ActionOptions<T>[];
 	align?: string;
 	category?: string;
 	class?: string | object;

@@ -1,25 +1,27 @@
-import { ListController, ListControlsRoutes } from "src/types/controls";
+import { FilterGroup, ListController, ListControlsRoutes } from "src/types/controls";
+import { FormField } from "src/types/forms";
+import { TableColumn } from "src/types/tables";
 import { VNode } from "vue";
-import { AnyObject, TypedObject } from "./shared";
-
-export interface ActionPanel {
-	name: string | number;
-	label: string;
-	category?: string;
-	class?: string | object;
-	enabled?: boolean | ((target: ActionTargetItem) => boolean);
-	tabVnode?: (target: ActionTargetItem | null | undefined, activePanel: string | number) => VNode | any;
-	vnode: (target: ActionTargetItem | null | undefined) => VNode | any;
-}
+import { AnyObject, ComputedRef, TypedObject } from "./shared";
 
 export interface ActionTargetItem extends TypedObject {
 	isSaving?: boolean;
 	updated_at?: string;
 }
 
-export type ActionTarget = ActionTargetItem[] | ActionTargetItem | null;
+export type ActionTarget<T = ActionTargetItem> = T[] | T | null;
 
-export interface ActionOptions {
+export interface ActionPanel<T = ActionTargetItem> {
+	name: string | number;
+	label: string;
+	category?: string;
+	class?: string | object;
+	enabled?: boolean | ((target: T) => boolean);
+	tabVnode?: (target: T | null | undefined, activePanel: string | number) => VNode | any;
+	vnode: (target: T | null | undefined) => VNode | any;
+}
+
+export interface ActionOptions<T = ActionTargetItem> {
 	name: string;
 	alias?: string;
 	label?: string;
@@ -30,17 +32,17 @@ export interface ActionOptions {
 	category?: string;
 	class?: string;
 	debounce?: number;
-	optimistic?: boolean | ((action: ActionOptions, target: ActionTargetItem | null, input: any) => void);
-	vnode?: ((target: ActionTarget) => VNode) | any;
-	enabled?: (target: object) => boolean;
-	batchEnabled?: (targets: object[]) => boolean;
-	onAction?: (action: string | ResourceAction | ActionOptions, target: ActionTargetItem | null, input?: AnyObject | any) => Promise<AnyObject | any> | void;
-	onBatchAction?: (action: string | ResourceAction | ActionOptions, targets: ActionTargetItem[], input: any) => Promise<AnyObject | any> | void;
-	onStart?: (action: ActionOptions | null, targets: ActionTarget, input: any) => boolean;
-	onSuccess?: (result: any, targets: ActionTarget, input: any) => any;
-	onBatchSuccess?: (result: any, targets: ActionTargetItem[], input: any) => any;
-	onError?: (result: any, targets: ActionTarget, input: any) => any;
-	onFinish?: (result: any, targets: ActionTarget, input: any) => any;
+	optimistic?: boolean | ((action: ActionOptions<T>, target: T | null, input: any) => void);
+	vnode?: (target: ActionTarget<T>, data: any) => VNode | any;
+	enabled?: (target: ActionTarget<T>) => boolean;
+	batchEnabled?: (targets: T[]) => boolean;
+	onAction?: (action: string | ResourceAction<T> | ActionOptions<T>, target: T | null, input?: AnyObject | any) => Promise<AnyObject | any> | void;
+	onBatchAction?: (action: string | ResourceAction<T> | ActionOptions<T>, targets: T[], input: any) => Promise<AnyObject | any> | void;
+	onStart?: (action: ActionOptions<T> | null, targets: ActionTarget<T>, input: any) => boolean;
+	onSuccess?: (result: any, targets: ActionTarget<T>, input: any) => any;
+	onBatchSuccess?: (result: any, targets: T[], input: any) => any;
+	onError?: (result: any, targets: ActionTarget<T>, input: any) => any;
+	onFinish?: (result: any, targets: ActionTarget<T>, input: any) => any;
 }
 
 export interface ActionGlobalOptions extends Partial<ActionOptions> {
@@ -48,8 +50,24 @@ export interface ActionGlobalOptions extends Partial<ActionOptions> {
 	controls?: ListController;
 }
 
-export interface ResourceAction extends ActionOptions {
+export interface ResourceAction<T = ActionTargetItem> extends ActionOptions<T> {
 	isApplying: boolean;
-	trigger: (target?: ActionTarget, input?: any) => Promise<any>;
+	trigger: (target?: ActionTarget<T>, input?: any) => Promise<any>;
 	__type: string;
+}
+
+export interface ActionController<T = ActionTargetItem> {
+	// Actions
+	action?: (actionName: string, target?: T | null, input?: any) => Promise<any | void>;
+	getAction?: (actionName: string, actionOptions?: Partial<ActionOptions>) => ResourceAction;
+	getActions?: (names?: string[]) => ResourceAction[];
+	extendAction?: (actionName: string, extendedId: string | number, actionOptions: Partial<ActionOptions>) => ResourceAction;
+	modifyAction?: (actionName: string, actionOptions: Partial<ActionOptions>) => ResourceAction;
+	batchActions?: ResourceAction[];
+	menuActions?: ResourceAction[];
+	columns?: TableColumn[];
+	filters?: ComputedRef<FilterGroup[]>;
+	fields?: FormField[];
+	panels?: ActionPanel[];
+	routes?: ListControlsRoutes;
 }

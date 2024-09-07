@@ -1,3 +1,6 @@
+import { ActionController, ActionTargetItem } from "./actions";
+import { ListController } from "./controls";
+
 export * from "./actions";
 export * from "./config";
 export * from "./controls";
@@ -9,3 +12,5 @@ export * from "./forms";
 export * from "./requests";
 export * from "./shared";
 export * from "./tables";
+
+export type DanxController<T = ActionTargetItem> = ActionController<T> & ListController<T>;

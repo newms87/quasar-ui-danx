@@ -25,7 +25,7 @@
           v-if="activeFilter"
           :name="controller.name"
           :show-filters="showFilters"
-          :filters="controller.filters.value"
+          :filters="controller.filters?.value"
           :active-filter="activeFilter"
           class="dx-action-table-filters"
           @update:active-filter="controller.setActiveFilter"
@@ -73,7 +73,7 @@
 </template>
 <script setup lang="ts">
 import { computed } from "vue";
-import { ActionController, ListController } from "../../../types";
+import { DanxController } from "../../../types";
 import { PanelsDrawer } from "../../PanelsDrawer";
 import { PreviousNextControls } from "../../Utility";
 import ActionTable from "../ActionTable.vue";
@@ -81,7 +81,7 @@ import { CollapsableFiltersSidebar } from "../Filters";
 import { ActionToolbar } from "../Toolbars";
 
 export interface ActionTableLayoutProps {
-	controller: ListController & ActionController;
+	controller: DanxController;
 	exporter?: () => Promise<void>;
 	hideToolbar?: boolean;
 	panelTitleField?: string;

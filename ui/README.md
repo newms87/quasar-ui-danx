@@ -14,20 +14,20 @@
 ```vue
 
 <template>
-  <ActionTable
-      label="Danx"
-      name="danx"
-      v-model:quasar-pagination="quasarPagination"
-      v-model:selected-rows="selectedRows"
-      :columns="columns"
-  />
+	<ActionTable
+		label="Danx"
+		name="danx"
+		v-model:quasar-pagination="quasarPagination"
+		v-model:selected-rows="selectedRows"
+		:columns="columns"
+	/>
 </template>
 <script setup>
-  import 'quasar-ui-danx/dist/index.css';
-  import { ActionTable, useTableColumns, useListControls } from 'quasar-ui-danx';
+	import 'quasar-ui-danx/dist/index.css';
+	import { ActionTable, useTableColumns, useControls } from 'quasar-ui-danx';
 
-  const { columns } = useTableColumns([{ name: 'name', label: 'Name' }, { name: 'age', label: 'Age' }]);
-  const { quasarPagination, selectedRows } = useListControls({});
+	const { columns } = useTableColumns([{ name: 'name', label: 'Name' }, { name: 'age', label: 'Age' }]);
+	const { quasarPagination, selectedRows } = useControls({});
 </script>
 ```
 
@@ -57,23 +57,23 @@ yarn add -D sass vite-svg-loader tailwindcss eslint eslint-plugin-import autopre
 
 ```ts
 export default ({ command }) => {
-    // For development w/ HMR, load the danx library + styles directly from the directory
-    // NOTE: These are the paths relative to the mounted quasar-ui-danx directory inside the mva docker container
-    const danx = (command === "serve" ? {
-        "quasar-ui-danx": resolve(__dirname, "../quasar-ui-danx/ui/src"),
-        "quasar-ui-danx-styles": resolve(__dirname, "../quasar-ui-danx/src/styles/index.scss")
-    } : {
-        // Import from quasar-ui-danx module for production
-        "quasar-ui-danx-styles": "quasar-ui-danx/dist/style.css"
-    });
+	// For development w/ HMR, load the danx library + styles directly from the directory
+	// NOTE: These are the paths relative to the mounted quasar-ui-danx directory inside the mva docker container
+	const danx = (command === "serve" ? {
+		"quasar-ui-danx": resolve(__dirname, "../quasar-ui-danx/ui/src"),
+		"quasar-ui-danx-styles": resolve(__dirname, "../quasar-ui-danx/src/styles/index.scss")
+	} : {
+		// Import from quasar-ui-danx module for production
+		"quasar-ui-danx-styles": "quasar-ui-danx/dist/style.css"
+	});
 
-    return defineConfig({
-        resolve: {
-            alias: {
-                ...danx
-            }
-        },
-    });
+	return defineConfig({
+		resolve: {
+			alias: {
+				...danx
+			}
+		},
+	});
 }
 ```
 
@@ -123,13 +123,13 @@ npx tailwindcss init -p
 export const colors = {}
 
 export default {
-    content: [],
-    theme: {
-        extend: {
-            colors
-        }
-    },
-    plugins: []
+	content: [],
+	theme: {
+		extend: {
+			colors
+		}
+	},
+	plugins: []
 }
 ```
 

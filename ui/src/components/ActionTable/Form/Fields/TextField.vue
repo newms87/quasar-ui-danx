@@ -12,6 +12,7 @@
       :input-class="inputClass"
       :class="parentClass"
       stack-label
+      :rows="rows"
       :type="type"
       :model-value="modelValue"
       :debounce="debounce"
@@ -42,41 +43,45 @@ import LabelValueBlock from "./LabelValueBlock";
 
 defineEmits(["update:model-value", "submit"]);
 defineProps({
-  modelValue: {
-    type: [String, Number],
-    default: ""
-  },
-  field: {
-    type: Object,
-    default: null
-  },
-  type: {
-    type: String,
-    default: "text"
-  },
-  label: {
-    type: String,
-    default: null
-  },
-  labelClass: {
-    type: String,
-    default: "text-sm text-gray-700"
-  },
-  parentClass: {
-    type: String,
-    default: ""
-  },
-  inputClass: {
-    type: String,
-    default: ""
-  },
-  noLabel: Boolean,
-  showName: Boolean,
-  disabled: Boolean,
-  readonly: Boolean,
-  debounce: {
-    type: [String, Number],
-    default: 0
-  }
+	modelValue: {
+		type: [String, Number],
+		default: ""
+	},
+	field: {
+		type: Object,
+		default: null
+	},
+	type: {
+		type: String,
+		default: "text"
+	},
+	label: {
+		type: String,
+		default: null
+	},
+	labelClass: {
+		type: String,
+		default: "text-sm text-gray-700"
+	},
+	parentClass: {
+		type: String,
+		default: ""
+	},
+	inputClass: {
+		type: String,
+		default: ""
+	},
+	rows: {
+		type: Number,
+		default: 3
+	},
+	noLabel: Boolean,
+	showName: Boolean,
+	disabled: Boolean,
+	readonly: Boolean,
+	debounce: {
+		type: [String, Number],
+		default: 0
+	}
 });
 </script>

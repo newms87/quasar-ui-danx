@@ -12,6 +12,7 @@ export interface TextFieldProps {
 	inputClass?: string | object;
 	allowOverMax?: boolean;
 	maxLength?: number;
+	rows?: number;
 	autogrow?: boolean;
 	noLabel?: boolean;
 	showName?: boolean;

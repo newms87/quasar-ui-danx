@@ -23,6 +23,7 @@
         :disable="disabled"
         :label-slot="!noLabel"
         :input-class="inputClass"
+        :rows="rows"
         :class="{'dx-input-prepend-label': prependLabel}"
         stack-label
         :type="type"
@@ -71,6 +72,7 @@ withDefaults(defineProps<TextFieldProps>(), {
 	labelClass: "",
 	inputClass: "",
 	maxLength: null,
+	rows: 3,
 	debounce: 0,
 	placeholder: null
 });

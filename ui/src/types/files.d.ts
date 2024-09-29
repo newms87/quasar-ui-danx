@@ -3,7 +3,7 @@ import { AnyObject, TypedObject } from "src/types/shared";
 export interface FileUploadOptions {
 	directory?: string,
 	createPresignedUpload?: ((path: string, name: string, mime?: string) => Promise<UploadedFile>) | null;
-	completePresignedUpload?: ((fileId: string) => Promise<UploadedFile>) | null;
+	completePresignedUpload?: ((fileId: string, file: XHRFileUpload) => Promise<UploadedFile>) | null;
 	refreshFile?: ((fileId: string) => Promise<UploadedFile>) | null;
 }
 
@@ -25,7 +25,7 @@ export interface UploadedFile extends TypedObject {
 	mimeType?: string;
 	mime?: string;
 	progress?: number;
-	location?: string;
+	location?: string | Partial<GeolocationCoordinates> | null;
 	blobUrl?: string;
 	url?: string;
 	thumb?: UploadedFile;

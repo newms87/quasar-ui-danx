@@ -243,11 +243,11 @@ export class FileUpload {
 	/**
 	 * Mark the presigned upload as completed and return the file resource from the platform server
 	 */
-	async completePresignedUpload(fileUpload: XHRFileUpload) {
+	async completePresignedUpload(xhrFile: XHRFileUpload) {
 		// Show 95% as the last 5% will be to complete the presigned upload
-		this.fireProgressCallback(fileUpload, .95);
+		this.fireProgressCallback(xhrFile, .95);
 
-		if (!fileUpload.file.resource_id) {
+		if (!xhrFile.file.resource_id) {
 			throw new Error("File resource ID is required to complete presigned upload");
 		}
 
@@ -256,7 +256,7 @@ export class FileUpload {
 		}
 
 		// Let the platform know the presigned upload is complete
-		return await this.options.completePresignedUpload(fileUpload.file.resource_id);
+		return await this.options.completePresignedUpload(xhrFile.file.resource_id, xhrFile);
 	}
 
 	/**

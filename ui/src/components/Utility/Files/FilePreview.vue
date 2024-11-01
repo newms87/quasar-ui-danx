@@ -170,7 +170,6 @@ const isPdf = computed(() => !!mimeType.value.match(/^application\/pdf/));
 const previewUrl = computed(() => {
 	const transcodes = computedImage.value?.transcodes;
 
-	console.log("calc preview", transcodes, computedImage.value);
 	if (isVideo.value && transcodes?.mp4?.url) {
 		return transcodes.mp4.url;
 	}

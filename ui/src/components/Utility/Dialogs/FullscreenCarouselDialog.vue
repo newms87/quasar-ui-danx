@@ -73,7 +73,8 @@ function isVideo(file) {
 }
 
 function getPreviewUrl(file) {
-	return file.transcodes?.compress?.url || file.blobUrl || file.url;
+	const transcodes = file?.transcodes;
+	return transcodes?.mp4?.url || transcodes?.compress?.url || file.blobUrl || file.url;
 }
 
 function getThumbUrl(file) {

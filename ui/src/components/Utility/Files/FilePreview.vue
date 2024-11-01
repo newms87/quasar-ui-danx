@@ -167,9 +167,16 @@ const mimeType = computed(
 const isImage = computed(() => !!mimeType.value.match(/^image\//));
 const isVideo = computed(() => !!mimeType.value.match(/^video\//));
 const isPdf = computed(() => !!mimeType.value.match(/^application\/pdf/));
-const previewUrl = computed(
-	() => computedImage.value?.transcodes?.compress?.url || computedImage.value?.blobUrl || computedImage.value?.url
-);
+const previewUrl = computed(() => {
+	const transcodes = computedImage.value?.transcodes;
+
+	console.log("calc preview", transcodes, computedImage.value);
+	if (isVideo.value && transcodes?.mp4?.url) {
+		return transcodes.mp4.url;
+	}
+
+	return transcodes?.compress?.url || computedImage.value?.blobUrl || computedImage.value?.url;
+});
 const thumbUrl = computed(() => {
 	return computedImage.value?.transcodes?.thumb?.url;
 });

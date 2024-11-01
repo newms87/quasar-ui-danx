@@ -161,20 +161,20 @@ const computedImage = computed(() => {
 	}
 	return null;
 });
+const previewFile = computed(() => {
+	const transcodes = computedImage.value?.transcodes;
+	return transcodes?.mp4 || transcodes?.compress || computedImage.value;
+});
+
 const mimeType = computed(
-	() => computedImage.value?.type || computedImage.value?.mime || ""
+	() => previewFile.value?.type || previewFile.value?.mime || (computedImage.value?.transcodes?.mp4 ? "video/mp4" : "")
 );
 const isImage = computed(() => !!mimeType.value.match(/^image\//));
 const isVideo = computed(() => !!mimeType.value.match(/^video\//));
 const isPdf = computed(() => !!mimeType.value.match(/^application\/pdf/));
+
 const previewUrl = computed(() => {
-	const transcodes = computedImage.value?.transcodes;
-
-	if (isVideo.value && transcodes?.mp4?.url) {
-		return transcodes.mp4.url;
-	}
-
-	return transcodes?.compress?.url || computedImage.value?.blobUrl || computedImage.value?.url;
+	return previewFile.value?.blobUrl || previewFile.value?.url;
 });
 const thumbUrl = computed(() => {
 	return computedImage.value?.transcodes?.thumb?.url;

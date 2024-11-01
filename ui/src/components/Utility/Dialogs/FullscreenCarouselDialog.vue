@@ -31,7 +31,7 @@
               >
                 <source
                   :src="getPreviewUrl(file) + '#t=0.1'"
-                  :type="file.mime"
+                  :type="getPreviewFileMime(file)"
                 >
               </video>
             </template>
@@ -72,9 +72,16 @@ function isVideo(file) {
 	return file.mime?.startsWith("video");
 }
 
+function getPreviewFile(file) {
+	return file.transcodes?.mp4 || file.transcodes?.compress || file;
+}
+function getPreviewFileMime(file) {
+	return getPreviewFile(file).mime || (isVideo(file) ? "video/mp4" : "");
+}
+
 function getPreviewUrl(file) {
-	const transcodes = file?.transcodes;
-	return transcodes?.mp4?.url || transcodes?.compress?.url || file.blobUrl || file.url;
+	file = getPreviewFile(file);
+	return file.blobUrl || file.url;
 }
 
 function getThumbUrl(file) {

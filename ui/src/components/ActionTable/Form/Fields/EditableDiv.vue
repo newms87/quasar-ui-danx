@@ -1,27 +1,26 @@
 <template>
   <div
     contenteditable
-    class="inline-block hover:bg-blue-200 focus:bg-blue-200 transition duration-300 outline-none"
+    class="inline-block transition duration-300 outline-none outline-offset-0"
+    :class="contentClass"
     @input="onInput"
   >
     {{ text }}
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { useDebounceFn } from "@vueuse/core";
 import { ref } from "vue";
 
 const emit = defineEmits(["update:model-value", "change"]);
-const props = defineProps({
-	modelValue: {
-		type: String,
-		required: true
-	},
-	debounceDelay: {
-		type: Number,
-		default: 1000
-	}
+const props = withDefaults(defineProps<{
+	modelValue: string;
+	contentClass?: string;
+	debounceDelay?: number;
+}>(), {
+	contentClass: "hover:bg-blue-200 focus:bg-blue-200",
+	debounceDelay: 1000
 });
 
 const text = ref(props.modelValue);

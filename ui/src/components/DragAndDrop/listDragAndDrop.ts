@@ -156,7 +156,7 @@ export class ListDragAndDrop extends DragAndDrop {
 	 */
 	getChildren() {
 		return [...(this.currentDropZone?.children || [])].filter(
-				(c) => c.className.match(/drag-placeholder/) === null
+				(c) => c.className.match(/dx-drag-placeholder/) === null
 		);
 	}
 
@@ -238,17 +238,17 @@ export class ListDragAndDrop extends DragAndDrop {
 	renderPlaceholder() {
 		if (!this.placeholder) {
 			this.placeholder = document.createElement("div");
-			this.placeholder.classList.add("drag-placeholder");
+			this.placeholder.classList.add("dx-drag-placeholder");
 		}
 
 		// Make sure the placeholder is oriented correctly
 		if (this.isVertical()) {
-			this.placeholder.classList.add("direction-vertical");
-			this.placeholder.classList.remove("direction-horizontal");
+			this.placeholder.classList.add("dx-direction-vertical");
+			this.placeholder.classList.remove("dx-direction-horizontal");
 			this.placeholder.style.height = undefined;
 		} else {
-			this.placeholder.classList.add("direction-horizontal");
-			this.placeholder.classList.remove("direction-vertical");
+			this.placeholder.classList.add("dx-direction-horizontal");
+			this.placeholder.classList.remove("dx-direction-vertical");
 			this.placeholder.style.height =
 					this.currentDropZone.getBoundingClientRect().height + "px";
 		}

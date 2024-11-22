@@ -1,6 +1,6 @@
 <template>
   <div
-    class="cursor-move"
+    :class="{'cursor-move': !showHandle}"
     draggable="true"
     @dragstart="dragAndDrop.dragStart"
     @dragend="dragAndDrop.dragEnd"
@@ -8,6 +8,7 @@
     <div class="flex items-center">
       <div
         v-if="showHandle"
+        class="cursor-move"
         :class="handleClass"
       >
         <SvgImg

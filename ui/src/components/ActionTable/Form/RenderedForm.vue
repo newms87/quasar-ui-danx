@@ -93,25 +93,11 @@
       </div>
     </template>
     <slot />
-    <div
-      v-if="savedAt"
-      :class="savingClass"
-      class="dx-saving-indicator flex items-center flex-nowrap"
-    >
-      <slot
-        v-if="saving"
-        name="saving"
-      >
-        Saving...
-        <QSpinnerPie class="ml-2" />
-      </slot>
-      <slot
-        v-else
-        name="saved"
-      >
-        Saved at {{ fDateTime(savedAt, { format: "M/d/yy h:mm:ssa" }) }}
-      </slot>
-    </div>
+    <SaveStateIndicator
+      :saving="saving"
+      :saved-at="savedAt"
+      :saving-class="savingClass"
+    />
     <ConfirmDialog
       v-if="variationToEdit !== false"
       title="Change variation name"
@@ -139,7 +125,7 @@
 <script setup lang="ts">
 import { ExclamationCircleIcon as MissingIcon, PencilIcon as EditIcon } from "@heroicons/vue/solid";
 import { computed, onBeforeUnmount, onMounted, ref } from "vue";
-import { fDateTime, FlashMessages, incrementName, replace } from "../../../helpers";
+import { FlashMessages, incrementName, replace } from "../../../helpers";
 import { TrashIcon as RemoveIcon } from "../../../svg";
 import { AnyObject, FormFieldValue, RenderedFormProps } from "../../../types";
 import { ConfirmDialog, RenderVnode } from "../../Utility";
@@ -154,6 +140,7 @@ import {
 	TextField,
 	WysiwygField
 } from "./Fields";
+import SaveStateIndicator from "./Utilities/SaveStateIndicator";
 
 const props = withDefaults(defineProps<RenderedFormProps>(), {
 	values: null,

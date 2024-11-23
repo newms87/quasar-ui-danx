@@ -6,6 +6,8 @@
       :style="{minWidth, minHeight}"
       :class="contentClass"
       @input="onInput"
+      @focusin="hasFocus = true"
+      @focusout="hasFocus = false"
     >
       {{ text }}
     </div>
@@ -21,7 +23,7 @@
 
 <script setup lang="ts">
 import { useDebounceFn } from "@vueuse/core";
-import { computed, onMounted, ref } from "vue";
+import { computed, onMounted, ref, watch } from "vue";
 
 const emit = defineEmits(["update:model-value", "change"]);
 const props = withDefaults(defineProps<{
@@ -42,6 +44,7 @@ const text = ref(props.modelValue);
 const placeholderDiv = ref(null);
 const minWidth = ref(0);
 const minHeight = ref(0);
+const hasFocus = ref(false);
 
 onMounted(() => {
 	// Set the min-width to the width of the placeholder
@@ -49,6 +52,11 @@ onMounted(() => {
 		minWidth.value = placeholderDiv.value.offsetWidth + "px";
 		minHeight.value = placeholderDiv.value.offsetHeight + "px";
 	}
+});
+
+watch(() => props.modelValue, (value) => {
+	if (!hasFocus.value)
+		text.value = value;
 });
 
 const debouncedChange = useDebounceFn(() => {

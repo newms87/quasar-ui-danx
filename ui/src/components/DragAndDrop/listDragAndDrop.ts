@@ -19,6 +19,7 @@ export class ListDragAndDrop extends DragAndDrop {
 	constructor(options = {}) {
 		super({
 			showPlaceholder: true,
+			allowDropZoneChange: true,
 			...options
 		});
 	}
@@ -168,6 +169,13 @@ export class ListDragAndDrop extends DragAndDrop {
 	}
 
 	/**
+	 * Check if the current drop zone is the same as the initial drop zone
+	 */
+	isSameDropZone() {
+		return this.currentDropZone === this.initialDropZone;
+	}
+
+	/**
 	 * Find the element at the current cursor position in the given drop zone
 	 * @param point
 	 * @returns {null}
@@ -236,6 +244,11 @@ export class ListDragAndDrop extends DragAndDrop {
 	 * Render a placeholder element at the given position (in between the elements)
 	 */
 	renderPlaceholder() {
+		// If we're not allowed to change drop zones and we're not in the same drop zone, don't render the placeholder
+		if (!this.options.allowDropZoneChange && !this.isSameDropZone()) {
+			return;
+		}
+
 		if (!this.placeholder) {
 			this.placeholder = document.createElement("div");
 			this.placeholder.classList.add("dx-drag-placeholder");

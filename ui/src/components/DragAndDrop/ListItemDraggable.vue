@@ -2,10 +2,10 @@
   <div
     :class="{'cursor-move': !showHandle}"
     draggable="true"
-    @dragstart="dragAndDrop.dragStart"
+    @dragstart.stop="dragAndDrop.dragStart"
     @dragend="dragAndDrop.dragEnd"
   >
-    <div class="flex items-center">
+    <div :class="contentClass">
       <div
         v-if="showHandle"
         class="cursor-move"
@@ -34,17 +34,20 @@ const props = withDefaults(defineProps<{
 	dropZone: string | (() => string);
 	direction?: "vertical" | "horizontal";
 	showHandle?: boolean;
+	changeDropZone?: boolean;
+	contentClass?: string | object;
 	handleClass?: string | object;
 	listItems?: any[];
 }>(), {
 	direction: "vertical",
 	handleClass: "",
+	contentClass: "flex flex-nowrap items-center",
 	listItems: () => []
 });
 
 const dragAndDrop = new ListDragAndDrop()
 	.setDropZone(props.dropZone)
-	.setOptions({ showPlaceholder: true, direction: props.direction })
+	.setOptions({ showPlaceholder: true, allowDropZoneChange: props.changeDropZone, direction: props.direction })
 	.onStart(() => dragging.value = true)
 	.onEnd(() => dragging.value = false)
 	.onDropZoneChange((target, dropZone, newPosition, oldPosition, data) => {

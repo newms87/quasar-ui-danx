@@ -6,6 +6,7 @@ export class DragAndDrop {
 		direction?: string,
 		hideDragImage?: boolean,
 		showPlaceholder?: boolean,
+		allowDropZoneChange?: boolean,
 	} = { direction: "vertical", hideDragImage: false };
 
 	// State
@@ -138,7 +139,7 @@ export class DragAndDrop {
 	 */
 	dragEnd(e) {
 		this.currentDropZone = null;
-		this.abortController.abort();
+		this.abortController?.abort();
 		this.draggableData = null;
 		this.onEndCb && this.onEndCb(e);
 	}

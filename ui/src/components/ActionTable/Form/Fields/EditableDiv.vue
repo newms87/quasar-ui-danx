@@ -27,8 +27,9 @@ import { computed, onMounted, ref, watch } from "vue";
 
 const emit = defineEmits(["update:model-value", "change"]);
 const props = withDefaults(defineProps<{
-	modelValue: string;
+	modelValue?: string;
 	color?: string;
+	textColor?: string;
 	debounceDelay?: number;
 	placeholder?: string;
 }>(), {
@@ -72,6 +73,7 @@ function onInput(e) {
 const contentClass = computed(() => [
 	`hover:bg-${props.color} focus:bg-${props.color}`,
 	`hover:text-${props.textColor} focus:text-${props.textColor}`,
-	`hover:outline-${props.color} focus:outline-${props.color}`
+	`hover:outline-${props.color} focus:outline-${props.color}`,
+	text.value ? "" : "opacity-0"
 ]);
 </script>

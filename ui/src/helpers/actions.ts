@@ -166,6 +166,10 @@ export function useActions(actions: ActionOptions[], globalOptions: ActionGlobal
 			result.item = storeObject(result.item);
 		}
 
+		if (result?.result?.__type) {
+			result.result = storeObject(result.result);
+		}
+
 		return result;
 	}
 

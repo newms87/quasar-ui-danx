@@ -13,6 +13,13 @@ export function sleep(delay: number) {
 }
 
 /**
+ * Deep clone an object
+ */
+export function cloneDeep(obj: any) {
+	return JSON.parse(JSON.stringify(obj));
+}
+
+/**
  * Poll a callback function until the result is true
  */
 export async function pollUntil(callback: () => any, interval = 1000) {

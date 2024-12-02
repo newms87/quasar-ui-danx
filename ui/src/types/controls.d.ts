@@ -20,7 +20,7 @@ export interface FilterGroup {
 }
 
 export interface ListControlsRoutes<T = ActionTargetItem> {
-	list(pager?: ListControlsPagination): Promise<T[]>;
+	list(pager?: ListControlsPagination): Promise<PagedItems>;
 
 	summary?(filter?: ListControlsFilter): Promise<AnyObject>;
 

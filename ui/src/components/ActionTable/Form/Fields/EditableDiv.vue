@@ -2,7 +2,7 @@
   <div class="inline-block relative">
     <div
       contenteditable
-      class="relative inline-block transition duration-300 outline-none outline-offset-0 border-none focus:outline-4 hover:outline-4 rounded-sm z-10"
+      class="relative inline-block transition duration-300 outline-none outline-offset-0 border-none focus:outline-4 hover:outline-4 rounded-sm z-10 min-w-10 min-h-10"
       :style="{minWidth, minHeight}"
       :class="contentClass"
       @input="onInput"
@@ -12,9 +12,9 @@
       {{ text }}
     </div>
     <div
-      v-if="!text && placeholder"
+      v-if="!text && placeholder && !hasFocus"
       ref="placeholderDiv"
-      class="text-gray-600 absolute-top-left whitespace-nowrap z-1"
+      class="text-gray-600 absolute-top-left whitespace-nowrap z-1 pointer-events-none"
     >
       {{ placeholder }}
     </div>
@@ -33,6 +33,7 @@ const props = withDefaults(defineProps<{
 	debounceDelay?: number;
 	placeholder?: string;
 }>(), {
+	modelValue: "",
 	// NOTE: You must safe-list required colors in tailwind.config.js
 	//       Add text-blue-900, hover:bg-blue-200, hover:outline-blue-200, focus:outline-blue-200 and focus:bg-blue-200 for the following config
 	color: "blue-200",
@@ -74,6 +75,6 @@ const contentClass = computed(() => [
 	`hover:bg-${props.color} focus:bg-${props.color}`,
 	`hover:text-${props.textColor} focus:text-${props.textColor}`,
 	`hover:outline-${props.color} focus:outline-${props.color}`,
-	text.value ? "" : "opacity-0"
+	text.value ? "" : "!bg-none"
 ]);
 </script>

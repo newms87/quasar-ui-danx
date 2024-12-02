@@ -24,7 +24,9 @@
       <FilePreview
         v-for="file in uploadedFiles"
         :key="'file-upload-' + file.id"
-        class="w-32 h-32 m-2 cursor-pointer bg-gray-200"
+        class="m-2 cursor-pointer bg-gray-200"
+        :class="filePreviewClass"
+        :style="styleSize"
         :file="file"
         :related-files="file.transcodes || uploadedFiles"
         downloadable
@@ -33,14 +35,19 @@
       />
       <div
         v-if="!disable && !readonly"
-        class="dx-add-remove-files w-32 h-32 m-2 rounded-2xl flex flex-col flex-nowrap items-center overflow-hidden cursor-pointer"
+        class="dx-add-remove-files m-2 flex flex-col flex-nowrap items-center overflow-hidden cursor-pointer"
+        :class="filePreviewClass"
+        :style="styleSize"
       >
         <div
           class="dx-add-file flex-grow p-1 pt-3 flex justify-center items-center bg-green-200 text-green-700 w-full hover:bg-green-100"
           @click="$refs.file.click()"
         >
           <div>
-            <AddFileIcon class="w-10 m-auto" />
+            <AddFileIcon
+              class="m-auto"
+              :class="addIconClass"
+            />
             <div class="mt-1 text-center">
               Add
             </div>
@@ -66,7 +73,7 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted } from "vue";
+import { computed, onMounted } from "vue";
 import { useMultiFileUpload } from "../../../../helpers";
 import { ImageIcon as AddFileIcon, TrashIcon as RemoveFileIcon } from "../../../../svg";
 import { FormField, UploadedFile } from "../../../../types";
@@ -74,14 +81,28 @@ import { FilePreview } from "../../../Utility";
 import FieldLabel from "./FieldLabel";
 
 const emit = defineEmits(["update:model-value"]);
-const props = defineProps<{
+const props = withDefaults(defineProps<{
 	modelValue?: UploadedFile[];
 	field?: FormField;
 	label?: string;
 	showName?: boolean;
 	disable?: boolean;
 	readonly?: boolean;
-}>();
+	width?: number | string;
+	height?: number | string;
+	addIconClass?: string;
+	filePreviewClass?: string;
+	filePreviewBtnSize?: string;
+}>(), {
+	modelValue: null,
+	field: null,
+	label: "",
+	width: 128,
+	height: 128,
+	addIconClass: "w-10",
+	filePreviewClass: "rounded-2xl",
+	filePreviewBtnSize: "sm"
+});
 
 const { onComplete, onDrop, onFilesSelected, uploadedFiles, clearUploadedFiles, onRemove } = useMultiFileUpload();
 onMounted(() => {
@@ -90,4 +111,11 @@ onMounted(() => {
 	}
 });
 onComplete(() => emit("update:model-value", uploadedFiles.value));
+
+const styleSize = computed(() => {
+	return {
+		width: typeof props.width === "number" ? `${props.width}px` : props.width,
+		height: typeof props.height === "number" ? `${props.height}px` : props.height
+	};
+});
 </script>

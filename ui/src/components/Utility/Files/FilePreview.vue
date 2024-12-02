@@ -1,6 +1,6 @@
 <template>
   <div
-    class="relative flex justify-center bg-gray-100 overflow-hidden"
+    class="group relative flex justify-center bg-gray-100 overflow-hidden"
     :class="{'rounded-2xl': !square}"
   >
     <template v-if="computedImage">
@@ -91,10 +91,10 @@
       </slot>
     </template>
 
-    <div class="absolute top-1 right-1 flex items-center justify-between space-x-1">
+    <div class="absolute top-1 right-1 flex items-center flex-nowrap justify-between space-x-1 transition-all opacity-0 group-hover:opacity-100">
       <QBtn
         v-if="downloadable && computedImage?.url"
-        size="sm"
+        :size="btnSize"
         class="dx-file-preview-download py-1 px-2 opacity-70 hover:opacity-100"
         :class="downloadButtonClass"
         @click.stop="download(computedImage.url)"
@@ -104,7 +104,7 @@
 
       <QBtn
         v-if="removable"
-        size="sm"
+        :size="btnSize"
         class="dx-file-preview-remove bg-red-900 text-white opacity-50 hover:opacity-100 py-1 px-2"
         @click.stop="onRemove"
       >
@@ -158,6 +158,7 @@ export interface FilePreviewProps {
 	removable?: boolean;
 	disabled?: boolean;
 	square?: boolean;
+	btnSize?: "xs" | "sm" | "md" | "lg";
 }
 
 const emit = defineEmits(["remove"]);
@@ -172,7 +173,8 @@ const props = withDefaults(defineProps<FilePreviewProps>(), {
 	downloadable: false,
 	removable: false,
 	disabled: false,
-	square: false
+	square: false,
+	btnSize: "sm"
 });
 
 

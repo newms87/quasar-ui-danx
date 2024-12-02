@@ -79,6 +79,12 @@ export function storeObject<T extends TypedObject>(newObject: T, recentlyStoredO
 	return reactiveObject;
 }
 
+/**
+ * Auto refresh an object based on a condition and a callback. Returns the timeout ID for the auto-refresh.
+ * NOTE: Use the timeout ID to clear the auto-refresh when the object is no longer needed (eg: when the component is unmounted)
+ */
+const registeredAutoRefreshes: AnyObject = {};
+
 export async function autoRefreshObject<T extends TypedObject>(object: T, condition: (object: T) => boolean, callback: (object: T) => Promise<T>, interval = 3000) {
 	if (!object?.id || !object?.__type) {
 		throw new Error("Invalid stored object. Cannot auto-refresh");
@@ -88,11 +94,21 @@ export async function autoRefreshObject<T extends TypedObject>(object: T, condit
 		const refreshedObject = await callback(object);
 
 		if (!refreshedObject.id) {
-			return FlashMessages.error(`Failed to refresh ${object.__type} (${object.id}) status: ` + object.name);
+			FlashMessages.error(`Failed to refresh ${object.__type} (${object.id}) status: ` + object.name);
+			return null;
 		}
 
 		storeObject(refreshedObject);
 	}
 
-	setTimeout(() => autoRefreshObject(object, condition, callback), interval);
+
+	const timeoutId = setTimeout(() => autoRefreshObject(object, condition, callback, interval), interval);
+
+	registeredAutoRefreshes[object.__type + ":" + object.id] = timeoutId;
+}
+
+export async function stopAutoRefreshObject<T extends TypedObject>(object: T) {
+	const timeoutId = registeredAutoRefreshes[object.__type + ":" + object.id];
+
+	timeoutId && clearTimeout(timeoutId);
 }

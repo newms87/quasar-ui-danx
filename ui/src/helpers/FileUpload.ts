@@ -270,36 +270,43 @@ export class FileUpload {
 	async upload() {
 		console.log && console.log("FileUploader@upload():", this.fileUploads, this.options);
 		for (const fileUpload of this.fileUploads) {
-			const mimeType = fileUpload.file.mimeType || fileUpload.file.type;
-			const presignedUrl = this.options.presignedUploadUrl(this.options.directory, fileUpload.file.name, mimeType);
+			try {
+				const mimeType = fileUpload.file.mimeType || fileUpload.file.type;
+				const presignedUrl = this.options.presignedUploadUrl(this.options.directory, fileUpload.file.name, mimeType);
 
-			// Fetch presigned upload URL
-			const fileResource = await fetch(presignedUrl).then(r => r.json());
+				console.log("calling presigned URL", presignedUrl);
 
-			if (!fileResource.url) {
-				FlashMessages.error("Could not fetch presigned upload URL for file " + fileUpload.file.name);
-				continue;
+				// Fetch presigned upload URL
+				const fileResource = await fetch(presignedUrl).then(r => r.json());
+
+				if (!fileResource.url) {
+					FlashMessages.error("Could not fetch presigned upload URL for file " + fileUpload.file.name);
+					continue;
+				}
+
+				const isS3Upload = !fileResource.url.match("upload-presigned-url-contents");
+
+				// We need the file resource ID to complete the presigned upload
+				fileUpload.file.resource_id = fileResource.id;
+
+				// Prepare XHR request
+				const xhr = new XMLHttpRequest();
+
+				// The XHR request is different based on weather we're sending to S3 or the platform server
+				if (isS3Upload) {
+					xhr.open("PUT", fileResource.url);
+					xhr.setRequestHeader("Content-Type", mimeType);
+					fileUpload.body = fileUpload.file;
+				} else {
+					xhr.open("POST", fileResource.url);
+					fileUpload.body = fileUpload.formData;
+				}
+
+				fileUpload.xhr = xhr;
+			} catch (error) {
+				console.error && console.error("FileUploader@upload():", "Failed to fetch presigned upload URL", error);
+				this.errorHandler(null, fileUpload.file, error);
 			}
-
-			const isS3Upload = !fileResource.url.match("upload-presigned-url-contents");
-
-			// We need the file resource ID to complete the presigned upload
-			fileUpload.file.resource_id = fileResource.id;
-
-			// Prepare XHR request
-			const xhr = new XMLHttpRequest();
-
-			// The XHR request is different based on weather we're sending to S3 or the platform server
-			if (isS3Upload) {
-				xhr.open("PUT", fileResource.url);
-				xhr.setRequestHeader("Content-Type", mimeType);
-				fileUpload.body = fileUpload.file;
-			} else {
-				xhr.open("POST", fileResource.url);
-				fileUpload.body = fileUpload.formData;
-			}
-
-			fileUpload.xhr = xhr;
 		}
 
 		// Set all the callbacks on the XHR requests

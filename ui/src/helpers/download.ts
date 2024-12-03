@@ -114,58 +114,49 @@ export function download(data, strFileName, strMimeType) {
 	}
 
 	function saver(url, winMode) {
+		// Detect Chrome on iPhone (or any iOS device using WebKit)
+		const isIOSChrome =
+				/CriOS/.test(navigator.userAgent) && /iP(hone|od|ad)/.test(navigator.platform);
+
+		if (isIOSChrome) {
+			window.open(url, "_blank");
+
+			return true;
+		}
+
 		if ("download" in anchor) {
-			// html5 A[download]
+			// HTML5 A[download]
 			anchor.href = url;
 			anchor.setAttribute("download", fileName);
-			anchor.className = "download-js-link";
-			anchor.innerHTML = "downloading...";
 			anchor.style.display = "none";
-			anchor.target = "_blank";
 			document.body.appendChild(anchor);
-			setTimeout(function () {
+
+			setTimeout(() => {
 				anchor.click();
 				document.body.removeChild(anchor);
+
 				if (winMode === true) {
-					setTimeout(function () {
-						self.URL.revokeObjectURL(anchor.href);
+					setTimeout(() => {
+						URL.revokeObjectURL(anchor.href); // Release the Object URL
 					}, 250);
 				}
-			}, 66);
+			}, 0);
+
 			return true;
 		}
 
-		// handle non-a[download] safari as best we can:
-		if (
-				/(Version)\/(\d+)\.(\d+)(?:\.(\d+))?.*Safari\//.test(navigator.userAgent)
-		) {
-			url = url.replace(/^data:([\w/\-+]+)/, defaultMime);
-			if (!window.open(url)) {
-				// popup blocked, offer direct download:
-				if (
-						confirm(
-								"Displaying New Document\n\nUse Save As... to download, then click back to return to this page."
-						)
-				) {
-					location.href = url;
-				}
-			}
-			return true;
-		}
+		// General fallback for unsupported browsers
+		const fallbackIframe = document.createElement("iframe");
+		fallbackIframe.style.display = "none";
+		fallbackIframe.src = url;
+		document.body.appendChild(fallbackIframe);
 
-		// do iframe dataURL download (old ch+FF):
-		var f = document.createElement("iframe");
-		document.body.appendChild(f);
+		setTimeout(() => {
+			document.body.removeChild(fallbackIframe);
+		}, 5000); // Clean up iframe after 5 seconds
 
-		if (!winMode) {
-			// force a mime that will download:
-			url = "data:" + url.replace(/^data:([\w/\-+]+)/, defaultMime);
-		}
-		f.src = url;
-		setTimeout(function () {
-			document.body.removeChild(f);
-		}, 333);
-	} // end saver
+		return true;
+	}
 
 	// @ts-ignore
 	if (navigator.msSaveBlob) {

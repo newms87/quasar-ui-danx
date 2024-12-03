@@ -60,6 +60,7 @@ function upload() {
  * @returns {Promise<void>}
  */
 async function onAttachFiles({ target: { files } }) {
+	console.log("files attached", files);
 	emit("uploading", files);
 	let fileUpload = new FileUpload(files)
 		.onProgress(({ file, progress }) => {
@@ -73,6 +74,9 @@ async function onAttachFiles({ target: { files } }) {
 			emit("complete", fileUpload.files);
 		});
 
+	console.log("created fileUpload", fileUpload);
+
+	debugger;
 	if (props.geolocation) {
 		await fileUpload.resolveLocation(props.locationWaitMessage);
 	}

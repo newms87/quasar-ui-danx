@@ -268,7 +268,7 @@ export class FileUpload {
 	 * Start uploading all files
 	 */
 	async upload() {
-		console.log && console.log("FileUploader@upload()", this.fileUploads, this.options);
+		console.log && console.log("FileUploader@upload():", this.fileUploads, this.options);
 		for (const fileUpload of this.fileUploads) {
 			const mimeType = fileUpload.file.mimeType || fileUpload.file.type;
 			const presignedUrl = this.options.presignedUploadUrl(this.options.directory, fileUpload.file.name, mimeType);
@@ -304,6 +304,8 @@ export class FileUpload {
 
 		// Set all the callbacks on the XHR requests
 		this.setXhrCallbacks();
+
+		console.log && console.log("FileUploader@upload():", "sending uploads");
 
 		// Send all the XHR file uploads
 		for (const fileUpload of this.fileUploads) {

@@ -31,5 +31,6 @@ export interface RequestOptions {
 
 export interface RequestCallOptions extends RequestInit {
 	abortOn?: string;
+	params?: AnyObject;
 }
 

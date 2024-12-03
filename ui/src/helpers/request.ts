@@ -35,6 +35,11 @@ export const request: RequestApi = {
 			options.signal = abort.signal;
 		}
 
+		if (options.params) {
+			url += (url.match("?") ? "&" : "?") + new URLSearchParams(options.params).toString();
+			delete options.params;
+		}
+
 		const response = await fetch(request.url(url), options);
 
 		// Verify the app version of the client and server are matching

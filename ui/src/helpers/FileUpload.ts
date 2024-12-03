@@ -279,6 +279,8 @@ export class FileUpload {
 				// Fetch presigned upload URL
 				const fileResource = await fetch(presignedUrl).then(r => r.json());
 
+				console.log("loaded presignedUrl: fileResource", fileResource);
+
 				if (!fileResource.url) {
 					FlashMessages.error("Could not fetch presigned upload URL for file " + fileUpload.file.name);
 					continue;
@@ -294,7 +296,9 @@ export class FileUpload {
 
 				// The XHR request is different based on weather we're sending to S3 or the platform server
 				if (isS3Upload) {
+					console.log("uploading S3", xhr);
 					xhr.open("PUT", fileResource.url);
+					console.log("setting content type to", mimeType);
 					xhr.setRequestHeader("Content-Type", mimeType);
 					fileUpload.body = fileUpload.file;
 				} else {

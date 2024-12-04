@@ -1,5 +1,6 @@
 import { uid } from "quasar";
 import { danxOptions } from "../config";
+import { sleep } from "../helpers";
 import { resolveFileLocation } from "./files";
 import { FlashMessages } from "./FlashMessages";
 
@@ -277,7 +278,16 @@ export class FileUpload {
 				console.log("calling presigned URL", presignedUrl);
 
 				// Fetch presigned upload URL
-				const fileResource = await fetch(presignedUrl).then(r => r.json());
+				let fileResource;
+
+				try {
+					fileResource = await fetch(presignedUrl).then(r => r.json());
+				} catch (error) {
+					console.log("First upload attempt failed. waiting and trying again:", error);
+					await sleep(3000);
+					console.log("upload attempt 2...");
+					fileResource = await fetch(presignedUrl).then(r => r.json());
+				}
 
 				console.log("loaded presignedUrl: fileResource", fileResource);
 

@@ -105,7 +105,9 @@ async function saveFilesLocally(files) {
 		} else {
 			fileName += "." + (file.mime || file.type).split("/").pop() || "jpg";
 		}
+		console.log("downloading ", fileName);
 		await downloadFile(file.blobUrl, fileName);
+		console.log("downloaded");
 	}
 }
 </script>

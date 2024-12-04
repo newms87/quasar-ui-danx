@@ -269,29 +269,25 @@ export class FileUpload {
 	 * Start uploading all files
 	 */
 	async upload() {
-		console.log && console.log("FileUploader@upload():", this.fileUploads, this.options);
 		for (const fileUpload of this.fileUploads) {
 			try {
 				const mimeType = fileUpload.file.mimeType || fileUpload.file.type;
 				const presignedUrl = this.options.presignedUploadUrl(this.options.directory, fileUpload.file.name, mimeType);
 
-				console.log("calling presigned URL", presignedUrl);
-
 				// Fetch presigned upload URL
-				let fileResource;
+				let fileResource = null;
+				let count = 60;
 
-				try {
-					fileResource = await fetch(presignedUrl).then(r => r.json());
-				} catch (error) {
-					console.log("First upload attempt failed. waiting and trying again:", error);
-					await sleep(3000);
-					console.log("upload attempt 2...");
-					fileResource = await fetch(presignedUrl).then(r => r.json());
+				while (!fileResource && count-- > 0) {
+					try {
+						fileResource = await fetch(presignedUrl).then(r => r.json());
+					} catch (error) {
+						console.warn(`Upload failed, trying ${count} more times....`, error);
+						await sleep(1000);
+					}
 				}
 
-				console.log("loaded presignedUrl: fileResource", fileResource);
-
-				if (!fileResource.url) {
+				if (!fileResource?.url) {
 					FlashMessages.error("Could not fetch presigned upload URL for file " + fileUpload.file.name);
 					continue;
 				}
@@ -306,9 +302,7 @@ export class FileUpload {
 
 				// The XHR request is different based on weather we're sending to S3 or the platform server
 				if (isS3Upload) {
-					console.log("uploading S3", xhr);
 					xhr.open("PUT", fileResource.url);
-					console.log("setting content type to", mimeType);
 					xhr.setRequestHeader("Content-Type", mimeType);
 					fileUpload.body = fileUpload.file;
 				} else {
@@ -325,8 +319,6 @@ export class FileUpload {
 
 		// Set all the callbacks on the XHR requests
 		this.setXhrCallbacks();
-
-		console.log && console.log("FileUploader@upload():", "sending uploads");
 
 		// Send all the XHR file uploads
 		for (const fileUpload of this.fileUploads) {

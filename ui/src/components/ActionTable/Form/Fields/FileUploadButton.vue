@@ -24,7 +24,7 @@
 import { PlusIcon } from "@heroicons/vue/outline";
 import { QBtn } from "quasar";
 import { ref } from "vue";
-import { downloadFile, fDateTime, FileUpload, sleep } from "../../../../helpers";
+import { downloadBlobOrUrl, fDateTime, FileUpload, sleep } from "../../../../helpers";
 
 defineExpose({ upload });
 const emit = defineEmits([
@@ -65,11 +65,9 @@ function upload() {
  * @returns {Promise<void>}
  */
 async function onAttachFiles({ target: { files } }) {
-	console.log("files attached", files);
 	if (props.autoDownloadCapture) {
 		await saveFilesLocally(files);
 	}
-	console.log("uploading files");
 	emit("uploading", files);
 	let fileUpload = new FileUpload(files)
 		.onProgress(({ file, progress }) => {
@@ -83,9 +81,6 @@ async function onAttachFiles({ target: { files } }) {
 			emit("complete", fileUpload.files);
 		});
 
-	console.log("created fileUpload", fileUpload);
-
-	debugger;
 	if (props.geolocation) {
 		await fileUpload.resolveLocation(props.locationWaitMessage);
 	}
@@ -105,9 +100,12 @@ async function saveFilesLocally(files) {
 		} else {
 			fileName += "." + (file.mime || file.type).split("/").pop() || "jpg";
 		}
-		console.log("downloading ", fileName);
-		await downloadFile(file.blobUrl, fileName);
-		console.log("downloaded");
+
+		try {
+			await downloadBlobOrUrl(file, fileName);
+		} catch (e) {
+			console.error("Failed to download file", e);
+		}
 	}
 }
 </script>

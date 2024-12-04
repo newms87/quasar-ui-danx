@@ -24,7 +24,7 @@
 import { PlusIcon } from "@heroicons/vue/outline";
 import { QBtn } from "quasar";
 import { ref } from "vue";
-import { FileUpload } from "../../../../helpers";
+import { downloadFile, fDateTime, FileUpload, sleep } from "../../../../helpers";
 
 defineExpose({ upload });
 const emit = defineEmits([
@@ -44,7 +44,12 @@ const props = defineProps({
 		default: "Waiting for location..."
 	},
 	cameraOnly: Boolean,
-	geolocation: Boolean
+	geolocation: Boolean,
+	autoDownloadCapture: Boolean,
+	downloadName: {
+		type: String,
+		default: "Upload"
+	}
 });
 
 const fileUpload = ref(null);
@@ -61,6 +66,10 @@ function upload() {
  */
 async function onAttachFiles({ target: { files } }) {
 	console.log("files attached", files);
+	if (props.autoDownloadCapture) {
+		await saveFilesLocally(files);
+	}
+	console.log("uploading files");
 	emit("uploading", files);
 	let fileUpload = new FileUpload(files)
 		.onProgress(({ file, progress }) => {
@@ -82,5 +91,21 @@ async function onAttachFiles({ target: { files } }) {
 	}
 
 	fileUpload.upload();
+}
+
+
+async function saveFilesLocally(files) {
+	// Make sure the blob URL is set before saving
+	await sleep(10);
+
+	for (let file of files) {
+		let fileName = props.downloadName + "-" + fDateTime(null, { format: " M-d-yy h:mm a" });
+		if (file.name) {
+			fileName += "__" + file.name;
+		} else {
+			fileName += "." + (file.mime || file.type).split("/").pop() || "jpg";
+		}
+		await downloadFile(file.blobUrl, fileName);
+	}
 }
 </script>

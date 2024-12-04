@@ -7,6 +7,8 @@
 // semantic variable names, long (over 2MB) dataURL support, and hidden by default temp anchors
 // https://github.com/rndme/download
 
+import { FlashMessages } from "../helpers";
+
 export async function downloadBlobOrUrl(blobOrUrl, filename = "download") {
 	// Create a Promise that resolves to a Blob URL
 	const blobUrlPromise = new Promise((resolve, reject) => {
@@ -28,36 +30,25 @@ export async function downloadBlobOrUrl(blobOrUrl, filename = "download") {
 	});
 
 	return await blobUrlPromise.then((blobUrl) => {
-		// Create a temporary anchor element
-		const anchor = document.createElement("a");
-		anchor.style.display = "none";
-		anchor.href = blobUrl as string;
-		anchor.download = filename;
-		anchor.target = "_blank";
+		const downloadTimeout = 60000;
 
-		// Append the anchor to the body
-		document.body.appendChild(anchor);
-
-		// Programmatically trigger a click event on the anchor
-		const clickEvent = new MouseEvent("click", {
-			view: window,
-			bubbles: true,
-			cancelable: true
+		FlashMessages.success(`Click to save photo to phone: <a target="_blank" href='${blobUrl}' download="${filename}">${filename.replace(/.*\//, "")}</a>`, {
+			html: true,
+			timeout: downloadTimeout
 		});
-		anchor.dispatchEvent(clickEvent);
-
-		// Remove the anchor from the document
-		document.body.removeChild(anchor);
 
 		// Revoke the object URL if we created one
 		if (blobOrUrl instanceof Blob) {
-			setTimeout(() => URL.revokeObjectURL(blobUrl), 100);
+			setTimeout(() => URL.revokeObjectURL(blobUrl), downloadTimeout);
 		}
 	}).catch((error) => {
 		console.error("An error occurred while downloading the file:", error);
 	});
 }
 
+/**
+ * @deprecated Use downloadBlobOrUrl instead
+ */
 /* eslint-disable */
 export function download(data, strFileName, strMimeType) {
 	var self = window;

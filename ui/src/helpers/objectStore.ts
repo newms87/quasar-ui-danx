@@ -76,7 +76,29 @@ export function storeObject<T extends TypedObject>(newObject: T, recentlyStoredO
 		store.set(objectKey, reactiveObject);
 	}
 
+	if (reactiveObject.__deleted_at) {
+		removeObjectFromLists(reactiveObject);
+	}
+
 	return reactiveObject;
+}
+
+/**
+ * Remove an object from all lists in the store
+ */
+function removeObjectFromLists<T extends TypedObject>(object: T) {
+	for (const storedObject of store.values()) {
+		for (const key of Object.keys(storedObject)) {
+			const value = storedObject[key];
+			if (Array.isArray(value) && value.length > 0) {
+				const index = value.findIndex(v => v.__id === object.__id && v.__type === object.__type);
+				if (index !== -1) {
+					value.splice(index, 1);
+					storedObject[key] = [...value];
+				}
+			}
+		}
+	}
 }
 
 /**
@@ -101,9 +123,8 @@ export async function autoRefreshObject<T extends TypedObject>(object: T, condit
 		storeObject(refreshedObject);
 	}
 
-
+	// Save the timeoutId to the object so it can be cleared when the object refresh is no longer needed
 	const timeoutId = setTimeout(() => autoRefreshObject(object, condition, callback, interval), interval);
-
 	registeredAutoRefreshes[object.__type + ":" + object.id] = timeoutId;
 }
 

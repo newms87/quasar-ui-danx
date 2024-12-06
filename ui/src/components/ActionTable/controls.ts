@@ -72,7 +72,7 @@ export function useControls(name: string, options: ListControlsOptions): ListCon
 	}
 
 	async function loadList() {
-		if (!isInitialized) return;
+		if (!isInitialized || options.isListEnabled === false) return;
 		// isLoadingList.value = true;
 		try {
 			setPagedItems(await options.routes.list(pager.value));
@@ -84,7 +84,7 @@ export function useControls(name: string, options: ListControlsOptions): ListCon
 	}
 
 	async function loadSummary() {
-		if (!options.routes.summary || !isInitialized) return;
+		if (!options.routes.summary || !isInitialized || options.isSummaryEnabled === false) return;
 
 		isLoadingSummary.value = true;
 		const summaryFilter: ListControlsFilter = { id: null, ...activeFilter.value, ...globalFilter.value };
@@ -115,7 +115,8 @@ export function useControls(name: string, options: ListControlsOptions): ListCon
 	 * Loads the filter field options for the current filter.
 	 */
 	async function loadFieldOptions() {
-		if (!options.routes.fieldOptions) return;
+		if (!options.routes.fieldOptions || options.isFieldOptionsEnabled === false) return;
+
 		isLoadingFilters.value = true;
 		try {
 			fieldOptions.value = await options.routes.fieldOptions(activeFilter.value) || {};
@@ -207,7 +208,7 @@ export function useControls(name: string, options: ListControlsOptions): ListCon
 	 * Loads more items into the list.
 	 */
 	async function loadMore(index: number, perPage: number | undefined = undefined) {
-		if (!options.routes.more) return false;
+		if (!options.routes.more || options.isListEnabled === false) return false;
 
 		try {
 			const newItems = await options.routes.more({
@@ -296,7 +297,7 @@ export function useControls(name: string, options: ListControlsOptions): ListCon
 	async function getActiveItemDetails() {
 		try {
 			const latestResult = latestCallOnly("active-item", async () => {
-				if (!activeItem.value || !options.routes.details) return undefined;
+				if (!activeItem.value || !options.routes.details || options.isDetailsEnabled === false) return undefined;
 				return await options.routes.details(activeItem.value);
 			});
 
@@ -414,11 +415,21 @@ export function useControls(name: string, options: ListControlsOptions): ListCon
 		options.routes.export && await options.routes.export(filter);
 	}
 
+	function setOptions(newOptions: Partial<ListControlsOptions>) {
+		options = { ...options, ...newOptions };
+	}
+
 	// Initialize the list actions and load settings, lists, summaries, filter fields, etc.
-	function initialize() {
+	function initialize(updateOptions?: Partial<ListControlsOptions>) {
 		const vueRouter = getVueRouter();
 		isInitialized = true;
+
+		if (updateOptions) {
+			options = { ...options, ...updateOptions };
+		}
+
 		loadSettings();
+
 
 		/**
 		 * Watch the id params in the route and set the active item to the item with the given id.
@@ -496,6 +507,7 @@ export function useControls(name: string, options: ListControlsOptions): ListCon
 
 		// List controls
 		initialize,
+		setOptions,
 		resetPaging,
 		setPagination,
 		setSelectedRows,

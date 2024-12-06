@@ -47,6 +47,10 @@ export interface ListControlsOptions {
 	urlPattern?: RegExp | null;
 	filterDefaults?: Record<string, object>;
 	refreshFilters?: boolean;
+	isListEnabled?: boolean;
+	isSummaryEnabled?: boolean;
+	isDetailsEnabled?: boolean;
+	isFieldOptionsEnabled?: boolean;
 }
 
 export interface ListControlsPagination {
@@ -92,7 +96,8 @@ export interface ListController<T = ActionTargetItem> {
 	activePanel: Ref<string | null>;
 
 	// List Controls
-	initialize: () => void;
+	initialize: (updateOptions?: Partial<ListControlsOptions>) => void;
+	setOptions: (updateOptions: Partial<ListControlsOptions>) => void;
 	resetPaging: () => void;
 	setPagination: (updated: Partial<ListControlsPagination>) => void;
 	setSelectedRows: (selection: T[]) => void;

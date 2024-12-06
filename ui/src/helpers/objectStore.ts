@@ -19,6 +19,10 @@ export function storeObjects<T extends TypedObject>(newObjects: T[]) {
  * Returns the stored object that should be used instead of the passed object as the returned object is shared across the system
  */
 export function storeObject<T extends TypedObject>(newObject: T, recentlyStoredObjects: AnyObject = {}): ShallowReactive<T> {
+	if (typeof newObject !== "object") {
+		return newObject;
+	}
+	
 	const id = newObject?.id || newObject?.name;
 	const type = newObject?.__type;
 	if (!id || !type) return shallowReactive(newObject);

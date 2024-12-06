@@ -36,7 +36,14 @@ export const request: RequestApi = {
 		}
 
 		if (options.params) {
-			url += (url.match("?") ? "&" : "?") + new URLSearchParams(options.params).toString();
+			// Transform object values in params to JSON strings
+			for (const [key, value] of Object.entries(options.params)) {
+				if (typeof value === "object" && value !== null) {
+					options.params[key] = JSON.stringify(value);
+				}
+			}
+			
+			url += (url.match(/\?/) ? "&" : "?") + new URLSearchParams(options.params).toString();
 			delete options.params;
 		}
 

@@ -133,7 +133,19 @@ export function useActions(actions: ActionOptions[], globalOptions: ActionGlobal
 				activeActionVnode.value = {
 					vnode,
 					confirm: async (confirmInput: any) => {
-						const result = await onConfirmAction(action, target, { ...input, ...confirmInput });
+
+						// Resolve the input based on the useInputFromConfirm option
+						// Not setting useInputFromConfirm will merge the input from the confirm dialog with the input from the action
+						let resolvedInput;
+						if (action.useInputFromConfirm === false) {
+							resolvedInput = input;
+						} else if (action.useInputFromConfirm === true) {
+							resolvedInput = confirmInput;
+						} else {
+							resolvedInput = { ...input, ...confirmInput };
+						}
+
+						const result = await onConfirmAction(action, target, resolvedInput);
 
 						// Only resolve when we have a non-error response, so we can show the error message w/o
 						// hiding the dialog / vnode

@@ -32,6 +32,7 @@ export interface ActionOptions<T = ActionTargetItem> {
 	category?: string;
 	class?: string;
 	debounce?: number;
+	useInputFromConfirm?: boolean;
 	optimistic?: boolean | ((action: ActionOptions<T>, target: T | null, input: any) => void);
 	vnode?: (target: ActionTarget<T>, data: any) => VNode | any;
 	enabled?: (target: ActionTarget<T>) => boolean;

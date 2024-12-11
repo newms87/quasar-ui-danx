@@ -43,16 +43,16 @@ const props = withDefaults(defineProps<{
 });
 
 const text = ref(props.modelValue);
-const placeholderDiv = ref(null);
-const minWidth = ref(0);
-const minHeight = ref(0);
+const placeholderDiv = ref<Element | null>(null);
+const minWidth = ref<string>("0");
+const minHeight = ref<string>("0");
 const hasFocus = ref(false);
 
 onMounted(() => {
 	// Set the min-width to the width of the placeholder
 	if (placeholderDiv.value) {
-		minWidth.value = placeholderDiv.value.offsetWidth + "px";
-		minHeight.value = placeholderDiv.value.offsetHeight + "px";
+		minWidth.value = placeholderDiv.value?.offsetWidth + "px";
+		minHeight.value = placeholderDiv.value?.offsetHeight + "px";
 	}
 });
 

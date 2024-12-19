@@ -1,8 +1,8 @@
 <template>
   <div class="inline-block relative">
     <div
-      contenteditable
-      class="relative inline-block transition duration-300 outline-none outline-offset-0 border-none focus:outline-4 hover:outline-4 rounded-sm z-10 min-w-10 min-h-10"
+      :contenteditable="readonly ? 'false' : 'true'"
+      class="relative inline-block transition duration-300 outline-none outline-offset-0 border-none rounded-sm z-10 min-w-10 min-h-10"
       :style="{minWidth, minHeight}"
       :class="contentClass"
       @input="onInput"
@@ -12,7 +12,7 @@
       {{ text }}
     </div>
     <div
-      v-if="!text && placeholder && !hasFocus"
+      v-if="!text && placeholder && !hasFocus && !readonly"
       ref="placeholderDiv"
       class="text-gray-600 absolute-top-left whitespace-nowrap z-1 pointer-events-none"
     >
@@ -31,6 +31,7 @@ const props = withDefaults(defineProps<{
 	color?: string;
 	textColor?: string;
 	debounceDelay?: number;
+	readonly?: boolean;
 	placeholder?: string;
 }>(), {
 	modelValue: "",
@@ -72,9 +73,12 @@ function onInput(e) {
 }
 
 const contentClass = computed(() => [
-	`hover:bg-${props.color} focus:bg-${props.color}`,
-	`hover:text-${props.textColor} focus:text-${props.textColor}`,
-	`hover:outline-${props.color} focus:outline-${props.color}`,
+	...(props.readonly ? [] : [
+		`hover:bg-${props.color} focus:bg-${props.color}`,
+		`hover:text-${props.textColor} focus:text-${props.textColor}`,
+		`hover:outline-${props.color} focus:outline-${props.color}`,
+		"focus:outline-4 hover:outline-4"
+	]),
 	text.value ? "" : "!bg-none"
 ]);
 </script>

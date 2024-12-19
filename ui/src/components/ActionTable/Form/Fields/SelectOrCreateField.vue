@@ -1,7 +1,7 @@
 <template>
   <div class="flex items-stretch flex-nowrap gap-x-4">
     <QBtn
-      class="bg-green-900 px-4"
+      :class="createClass"
       :loading="loading"
       @click="$emit('create')"
     >
@@ -11,6 +11,14 @@
       />
       {{ createText }}
     </QBtn>
+    <ShowHideButton
+      v-if="showEdit"
+      v-model="editing"
+      :disable="!canEdit"
+      :label="editText"
+      :class="editClass"
+      :show-icon="EditIcon"
+    />
     <SelectField
       v-model="selected"
       class="flex-grow"
@@ -19,17 +27,10 @@
       :select-by-object="selectByObject"
       :option-label="optionLabel"
     />
-    <ShowHideButton
-      v-if="showEdit"
-      v-model="editing"
-      :disable="!canEdit"
-      :label="editText"
-      class="bg-sky-800 w-1/5"
-    />
   </div>
 </template>
 <script setup lang="ts">
-import { FaSolidPlus as CreateIcon } from "danx-icon";
+import { FaSolidPencil as EditIcon, FaSolidPlus as CreateIcon } from "danx-icon";
 import { QSelectOption } from "quasar";
 import { ActionTargetItem } from "../../../../types";
 import { ShowHideButton } from "../../../Utility/Buttons";
@@ -47,10 +48,14 @@ withDefaults(defineProps<{
 	optionLabel?: string;
 	createText?: string;
 	editText?: string;
+	createClass?: string;
+	editClass?: string;
 	clearable?: boolean;
 }>(), {
 	optionLabel: "label",
-	createText: "Create",
-	editText: "Edit"
+	createText: "",
+	editText: "",
+	createClass: "bg-green-900 px-4",
+	editClass: "bg-sky-800 px-4"
 });
 </script>

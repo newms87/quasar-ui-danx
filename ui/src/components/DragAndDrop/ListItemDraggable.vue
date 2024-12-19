@@ -1,19 +1,23 @@
 <template>
   <div
-    :class="{'cursor-move': !showHandle}"
-    draggable="true"
-    @dragstart.stop="dragAndDrop.dragStart"
-    @dragend="dragAndDrop.dragEnd"
+    :class="{'cursor-move': !showHandle && !disabled}"
+    :draggable="disabled ? undefined : 'true'"
+    @dragstart.stop="disabled ? null : dragAndDrop.dragStart"
+    @dragend="disabled ? null : dragAndDrop.dragEnd"
   >
     <div :class="contentClass">
       <div
         v-if="showHandle"
-        class="cursor-move"
-        :class="handleClass"
+        :class="resolvedHandleClass"
       >
+        <div
+          v-if="disabled"
+          :class="handleSize"
+        />
         <SvgImg
+          v-else
           :svg="DragHandleIcon"
-          class="w-4 h-4"
+          :class="handleSize"
           alt="drag-handle"
         />
       </div>
@@ -24,6 +28,7 @@
   </div>
 </template>
 <script setup lang="ts">
+import { computed } from "vue";
 import { DragHandleDotsIcon as DragHandleIcon } from "../../svg";
 import { SvgImg } from "../Utility";
 import { ListDragAndDrop } from "./listDragAndDrop";
@@ -37,14 +42,21 @@ const props = withDefaults(defineProps<{
 	changeDropZone?: boolean;
 	contentClass?: string | object;
 	handleClass?: string | object;
+	handleSize?: string;
 	listItems?: any[];
+	disabled?: boolean;
 }>(), {
 	direction: "vertical",
+	handleSize: "w-4 h-4",
 	handleClass: "",
 	contentClass: "flex flex-nowrap items-center",
 	listItems: () => []
 });
 
+const resolvedHandleClass = computed(() => ({
+	"cursor-move": !props.disabled,
+	...(typeof props.handleClass === "string" ? { [props.handleClass]: true } : props.handleClass)
+}));
 const dragAndDrop = new ListDragAndDrop()
 	.setDropZone(props.dropZone)
 	.setOptions({ showPlaceholder: true, allowDropZoneChange: props.changeDropZone, direction: props.direction })

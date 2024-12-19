@@ -22,6 +22,7 @@
       label=""
       :input-class="{'is-hidden': !isShowing, [inputClass]: true}"
       class="max-w-full dx-select-field"
+      :class="selectClass"
       @filter="onFilter"
       @clear="onClear"
       @popup-show="onShow"
@@ -82,6 +83,7 @@ export interface Props extends QSelectProps {
 	selectionLabel?: string | ((option) => string);
 	chipLimit?: number;
 	inputClass?: string;
+	selectClass?: string;
 	selectionClass?: string;
 	options?: unknown[];
 	filterable?: boolean;
@@ -97,6 +99,7 @@ const props = withDefaults(defineProps<Props>(), {
 	selectionLabel: null,
 	chipLimit: 3,
 	inputClass: "",
+	selectClass: "",
 	selectionClass: "",
 	options: () => [],
 	filterFn: null,

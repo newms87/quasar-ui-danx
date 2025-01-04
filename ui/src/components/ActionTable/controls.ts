@@ -73,7 +73,7 @@ export function useControls(name: string, options: ListControlsOptions): ListCon
 
 	async function loadList() {
 		if (!isInitialized || options.isListEnabled === false) return;
-		// isLoadingList.value = true;
+		isLoadingList.value = true;
 		try {
 			setPagedItems(await options.routes.list(pager.value));
 		} catch (e) {

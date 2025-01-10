@@ -11,15 +11,11 @@ export function useActionRoutes(baseUrl: string, extend?: object): ListControlsR
 		summary(filter) {
 			return request.post(`${baseUrl}/summary`, { filter });
 		},
-		details(target) {
-			return request.get(`${baseUrl}/${target.id}/details`);
+		details(target, fields) {
+			return request.get(`${baseUrl}/${target.id}/details`, { params: { fields } });
 		},
-		async detailsAndStore(target) {
-			const item = await request.get(`${baseUrl}/${target.id}/details`);
-			return storeObject(item);
-		},
-		async relation(target, relation) {
-			const item = await request.get(`${baseUrl}/${target.id}/relation/${relation}`);
+		async detailsAndStore(target, fields) {
+			const item = await request.get(`${baseUrl}/${target.id}/details`, { params: { fields } });
 			return storeObject(item);
 		},
 		fieldOptions() {

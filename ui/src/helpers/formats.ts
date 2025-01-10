@@ -30,40 +30,6 @@ export function remoteDateTime(dateTimeString: string) {
 }
 
 /**
- * Parses a date string into a Luxon DateTime object
- */
-export function parseDateTime(dateTime: string | DateTime | null): DateTime<boolean> | null {
-	if (typeof dateTime === "string") {
-		return parseSqlDateTime(dateTime) || parseQDate(dateTime) || parseQDateTime(dateTime);
-	}
-	return dateTime || DateTime.fromSQL("0000-00-00 00:00:00");
-}
-
-/**
- *  Parses a SQL formatted date string into a Luxon DateTime object
- */
-export function parseSqlDateTime(dateTime: string) {
-	const parsed = DateTime.fromSQL(dateTime.replace("T", " ").replace(/\//g, "-"));
-	return parsed.isValid ? parsed : null;
-}
-
-/**
- * Parses a Quasar formatted date string into a Luxon DateTime object
- */
-export function parseQDate(date: string, format = "yyyy/MM/dd"): DateTime<boolean> | null {
-	const parsed = DateTime.fromFormat(date, format);
-	return parsed.isValid ? parsed : null;
-}
-
-/**
- * Parses a Quasar formatted date/time string into a Luxon DateTime object
- */
-export function parseQDateTime(date: string, format = "yyyy/MM/dd HH:mm:ss"): DateTime<boolean> | null {
-	const parsed = DateTime.fromFormat(date, format);
-	return parsed.isValid ? parsed : null;
-}
-
-/**
  * Formats a Luxon DateTime object into a Quasar formatted date string
  * @param date
  * @returns {string}
@@ -117,6 +83,89 @@ export function dbDateTime(dateTime: string | DateTime | null = null) {
 export function fDate(dateTime: string | DateTime | null, { empty = "--", format = "M/d/yy" }: fDateOptions = {}) {
 	const formatted = parseDateTime(dateTime)?.toFormat(format || "M/d/yy");
 	return formatted || empty;
+}
+
+
+/**
+ * Parses a date string into a Luxon DateTime object
+ */
+export function parseDateTime(dateTime: string | DateTime | null): DateTime<boolean> | null {
+	if (typeof dateTime === "string") {
+		return parseGenericDateTime(dateTime);
+	}
+	return dateTime || DateTime.fromSQL("0000-00-00 00:00:00");
+}
+
+/**
+ *  Parses a SQL formatted date string into a Luxon DateTime object
+ */
+export function parseSqlDateTime(dateTime: string) {
+	const parsed = DateTime.fromSQL(dateTime.replace("T", " ").replace(/\//g, "-"));
+	return parsed.isValid ? parsed : null;
+}
+
+/**
+ * Parses a Quasar formatted date string into a Luxon DateTime object
+ */
+export function parseQDate(date: string, format = "yyyy/MM/dd"): DateTime<boolean> | null {
+	const parsed = DateTime.fromFormat(date, format);
+	return parsed.isValid ? parsed : null;
+}
+
+/**
+ * Parses a Quasar formatted date/time string into a Luxon DateTime object
+ */
+export function parseQDateTime(date: string, format = "yyyy/MM/dd HH:mm:ss"): DateTime<boolean> | null {
+	const parsed = DateTime.fromFormat(date, format);
+	return parsed.isValid ? parsed : null;
+}
+
+/**
+ * Parses a date string in various formats into a Luxon DateTime object.
+ * Tries a list of common formats until one works.
+ *
+ * @param {string} dateTimeString - The date string to parse.
+ * @param {string} [defaultZone="local"] - The default time zone to use if not specified.
+ * @returns {DateTime | null} - A Luxon DateTime object if parsing succeeds, otherwise null.
+ */
+export function parseGenericDateTime(dateTimeString: string, defaultZone = "local"): DateTime | null {
+	if (!dateTimeString) return null;
+
+	const formats = [
+		"yyyy-MM-dd",            // ISO date
+		"yyyy-MM-dd HH:mm:ss",   // ISO date with time
+		"MM/dd/yyyy",            // US-style date
+		"dd/MM/yyyy",            // European-style date
+		"MM/dd/yy",              // US short date
+		"dd/MM/yy",              // European short date
+		"yyyy/MM/dd",            // Alternative ISO
+		"MM-dd-yyyy",            // US with dashes
+		"dd-MM-yyyy",            // European with dashes
+		"M/d/yyyy",              // US date without leading zeros
+		"d/M/yyyy",              // European date without leading zeros
+		"yyyyMMdd"              // Compact ISO
+	];
+
+	for (const format of formats) {
+		const parsed = DateTime.fromFormat(dateTimeString, format, { zone: defaultZone });
+		if (parsed.isValid) {
+			return parsed;
+		}
+	}
+
+	// Fallback to ISO parsing for strings like "2022-11-18T10:10:10Z"
+	const isoParsed = DateTime.fromISO(dateTimeString, { zone: defaultZone });
+	if (isoParsed.isValid) {
+		return isoParsed;
+	}
+
+	// Fallback to SQL parsing for strings like "2022-11-18 10:10:10"
+	const sqlParsed = DateTime.fromSQL(dateTimeString, { zone: defaultZone });
+	if (sqlParsed.isValid) {
+		return sqlParsed;
+	}
+
+	return null;
 }
 
 /**

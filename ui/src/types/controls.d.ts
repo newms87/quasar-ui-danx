@@ -62,6 +62,7 @@ export interface ListControlsPagination {
 	rowsPerPage?: number;
 	perPage?: number;
 	filter?: ListControlsFilter;
+	fields?: ControlsFieldsList;
 }
 
 export interface PagedItems<T = ActionTargetItem> {
@@ -116,4 +117,8 @@ export interface ListController<T = ActionTargetItem> {
 	setActiveFilter: (filter?: ListControlsFilter) => void;
 	applyFilterFromUrl: (url: string, filters?: Ref<FilterGroup[]> | null) => void;
 	getFieldOptions: (field: string) => any[];
+}
+
+export interface ControlsFieldsList {
+	[key: string]: boolean;
 }

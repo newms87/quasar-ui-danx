@@ -154,7 +154,7 @@ const selectedValue = computed(() => {
 	} else {
 		if (props.modelValue === null) return "__null__";
 
-		if (props.selectByObject) return props.modelValue.value || props.modelValue.id;
+		if (props.selectByObject) return props.modelValue?.value || props.modelValue?.id;
 
 		return props.modelValue;
 	}

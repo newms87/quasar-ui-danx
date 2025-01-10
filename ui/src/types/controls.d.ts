@@ -65,6 +65,10 @@ export interface ListControlsPagination {
 	fields?: ControlsFieldsList;
 }
 
+export interface ControlsFieldsList {
+	[key: string]: boolean | ControlsFieldsList;
+}
+
 export interface PagedItems<T = ActionTargetItem> {
 	data: T[] | undefined;
 	meta: {
@@ -117,8 +121,4 @@ export interface ListController<T = ActionTargetItem> {
 	setActiveFilter: (filter?: ListControlsFilter) => void;
 	applyFilterFromUrl: (url: string, filters?: Ref<FilterGroup[]> | null) => void;
 	getFieldOptions: (field: string) => any[];
-}
-
-export interface ControlsFieldsList {
-	[key: string]: boolean;
 }

@@ -57,6 +57,8 @@ export class ListDragAndDrop extends DragAndDrop {
 	 * Start listening for drag events and prepare an element for drag/drop
 	 */
 	dragStart(e: DragEvent, data: DraggableData) {
+		if (this.options.disabled) return;
+
 		super.dragStart(e, data);
 
 		if (this.currentDropZone) {
@@ -71,6 +73,8 @@ export class ListDragAndDrop extends DragAndDrop {
 	 * When dragging has ended, check for list position changes and fire the onPositionChange callback if it has
 	 */
 	dragEnd(e: DragEvent) {
+		if (this.options.disabled) return;
+
 		const draggableData = this.draggableData;
 		this.placeholder?.remove();
 		const newDropZone = this.currentDropZone;
@@ -90,6 +94,7 @@ export class ListDragAndDrop extends DragAndDrop {
 	 * The dragging element is moving
 	 */
 	dragOver(e: DragEvent) {
+		if (this.options.disabled) return;
 		super.dragOver(e);
 		this.updateListPosition(e);
 	}
@@ -240,7 +245,7 @@ export class ListDragAndDrop extends DragAndDrop {
 	 */
 	renderPlaceholder() {
 		if (!this.currentDropZone) return;
-		
+
 		// If we're not allowed to change drop zones and we're not in the same drop zone, don't render the placeholder
 		if (!this.options.allowDropZoneChange && !this.isSameDropZone()) {
 			return;

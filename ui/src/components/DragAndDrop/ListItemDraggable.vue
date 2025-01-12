@@ -2,8 +2,8 @@
   <div
     :class="{'cursor-move': !showHandle && !disabled}"
     :draggable="disabled ? undefined : 'true'"
-    @dragstart.stop="disabled ? null : dragAndDrop.dragStart"
-    @dragend="disabled ? null : dragAndDrop.dragEnd"
+    @dragstart.stop="dragAndDrop.dragStart"
+    @dragend="dragAndDrop.dragEnd"
   >
     <div :class="contentClass">
       <div
@@ -28,7 +28,8 @@
   </div>
 </template>
 <script setup lang="ts">
-import { computed } from "vue";
+import { DropZoneResolver } from "src/components/DragAndDrop/dragAndDrop";
+import { computed, watch } from "vue";
 import { DragHandleDotsIcon as DragHandleIcon } from "../../svg";
 import { SvgImg } from "../Utility";
 import { ListDragAndDrop } from "./listDragAndDrop";
@@ -36,7 +37,7 @@ import { ListDragAndDrop } from "./listDragAndDrop";
 const emit = defineEmits(["position", "update:list-items", "drop-zone"]);
 const dragging = defineModel<boolean>();
 const props = withDefaults(defineProps<{
-	dropZone: string | (() => string);
+	dropZone: DropZoneResolver;
 	direction?: "vertical" | "horizontal";
 	showHandle?: boolean;
 	changeDropZone?: boolean;
@@ -53,13 +54,21 @@ const props = withDefaults(defineProps<{
 	listItems: () => []
 });
 
+watch(() => props.disabled, (value) => dragAndDrop.setOptions({ disabled: value }));
+
 const resolvedHandleClass = computed(() => ({
 	"cursor-move": !props.disabled,
 	...(typeof props.handleClass === "string" ? { [props.handleClass]: true } : props.handleClass)
 }));
+
 const dragAndDrop = new ListDragAndDrop()
 	.setDropZone(props.dropZone)
-	.setOptions({ showPlaceholder: true, allowDropZoneChange: props.changeDropZone, direction: props.direction })
+	.setOptions({
+		showPlaceholder: true,
+		allowDropZoneChange: props.changeDropZone,
+		direction: props.direction,
+		disabled: props.disabled
+	})
 	.onStart(() => dragging.value = true)
 	.onEnd(() => dragging.value = false)
 	.onDropZoneChange((target, dropZone, newPosition, oldPosition, data) => {

@@ -13,6 +13,7 @@ export class DragAndDrop {
 		hideDragImage?: boolean,
 		showPlaceholder?: boolean,
 		allowDropZoneChange?: boolean,
+		disabled?: boolean,
 	} = { direction: "vertical", hideDragImage: false };
 
 	// State
@@ -34,6 +35,7 @@ export class DragAndDrop {
 	constructor(options = {}) {
 		// Options
 		options = {
+			disabled: false,
 			direction: "vertical",
 			hideDragImage: false,
 			...options
@@ -101,6 +103,7 @@ export class DragAndDrop {
 	 * Start listening for drag events and prepare an element for drag/drop
 	 */
 	dragStart(e: DragEvent, data: DraggableData) {
+		if (this.options.disabled) return;
 		this.currentDropZone = this.getDropZone(e);
 
 		if (this.currentDropZone) {
@@ -131,6 +134,7 @@ export class DragAndDrop {
 	 * Clean up event listeners after dragging is done
 	 */
 	dragEnd(e: DragEvent) {
+		if (this.options.disabled) return;
 		this.currentDropZone = null;
 		this.abortController?.abort();
 		this.onEndCb && this.onEndCb(e, this.draggableData);
@@ -148,6 +152,7 @@ export class DragAndDrop {
 	 * The dragging element is moving
 	 */
 	dragOver(e: DragEvent) {
+		if (this.options.disabled) return;
 		e.preventDefault();
 		this.cursorY = e.clientY;
 		this.cursorX = e.clientX;
@@ -158,6 +163,7 @@ export class DragAndDrop {
 	 * Handle dropping the element into its correct position
 	 */
 	drop(e: DragEvent) {
+		if (this.options.disabled) return;
 		e.dataTransfer && (e.dataTransfer.dropEffect = "move");
 		e.preventDefault();
 		this.onDropCb && this.onDropCb(e, this.draggableData);

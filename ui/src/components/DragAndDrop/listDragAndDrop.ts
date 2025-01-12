@@ -1,20 +1,25 @@
-import { DragAndDrop } from "./dragAndDrop";
+import { DragAndDrop, DraggableData } from "./dragAndDrop";
+
+export type DragPositionChangeCallback =
+		((position: number, initialPosition: number, data: DraggableData) => void)
+		| null;
+export type DropZoneChangeCallback =
+		((e: DragEvent, dropZone: HTMLElement, position: number, initialPosition: number, data: DraggableData) => void)
+		| null;
 
 /**
  * ListDragAndDrop supports dragging elements in a list to new positions in the same list.
  * A placeholder is rendered to show the position the list item will be dropped.
- *
- * @class
  */
 export class ListDragAndDrop extends DragAndDrop {
 	listPosition = 0;
 	cursorPosition = 0;
 	initialPosition = 0;
 	initialDropZone: HTMLElement | null = null;
-	onPositionChangeCb = null;
-	onDragPositionChangeCb = null;
-	onDropZoneChangeCb = null;
-	placeholder = null;
+	onPositionChangeCb: DragPositionChangeCallback = null;
+	onDragPositionChangeCb: DragPositionChangeCallback = null;
+	onDropZoneChangeCb: DropZoneChangeCallback = null;
+	placeholder: HTMLElement | null = null;
 
 	constructor(options = {}) {
 		super({
@@ -27,7 +32,7 @@ export class ListDragAndDrop extends DragAndDrop {
 	/**
 	 * Callback that fires after dragging has ended and the list position has changed from the original
 	 */
-	onPositionChange(cb): ListDragAndDrop {
+	onPositionChange(cb: DragPositionChangeCallback): ListDragAndDrop {
 		this.onPositionChangeCb = cb;
 		return this;
 	}
@@ -35,31 +40,27 @@ export class ListDragAndDrop extends DragAndDrop {
 	/**
 	 * Callback that fires when the drop zone has changed
 	 */
-	onDropZoneChange(cb): ListDragAndDrop {
+	onDropZoneChange(cb: DropZoneChangeCallback): ListDragAndDrop {
 		this.onDropZoneChangeCb = cb;
 		return this;
 	}
 
 	/**
 	 * Callback that fires while dragging the element when the cursor's position has changed in the list
-	 * @param cb
-	 * @returns {ListDragAndDrop}
 	 */
-	onDragPositionChange(cb) {
+	onDragPositionChange(cb: DragPositionChangeCallback) {
 		this.onDragPositionChangeCb = cb;
 		return this;
 	}
 
 	/**
 	 * Start listening for drag events and prepare an element for drag/drop
-	 * @param e
-	 * @param data
 	 */
-	dragStart(e, data) {
+	dragStart(e: DragEvent, data: DraggableData) {
 		super.dragStart(e, data);
 
 		if (this.currentDropZone) {
-			this.listPosition = this.getListPosition(e.target);
+			this.listPosition = this.getListPosition(e.target as HTMLElement);
 			this.initialPosition = this.listPosition;
 			this.initialDropZone = this.currentDropZone;
 			this.updateScrollPosition();
@@ -69,7 +70,7 @@ export class ListDragAndDrop extends DragAndDrop {
 	/**
 	 * When dragging has ended, check for list position changes and fire the onPositionChange callback if it has
 	 */
-	dragEnd(e) {
+	dragEnd(e: DragEvent) {
 		const draggableData = this.draggableData;
 		this.placeholder?.remove();
 		const newDropZone = this.currentDropZone;
@@ -87,16 +88,14 @@ export class ListDragAndDrop extends DragAndDrop {
 
 	/**
 	 * The dragging element is moving
-	 * @param e
 	 */
-	dragOver(e) {
+	dragOver(e: DragEvent) {
 		super.dragOver(e);
 		this.updateListPosition(e);
 	}
 
 	/**
 	 * Notify if the targeted position of the cursor is different from the current position
-	 * @param e
 	 */
 	updateListPosition(e: MouseEvent) {
 		const point = {
@@ -129,17 +128,15 @@ export class ListDragAndDrop extends DragAndDrop {
 			// The position has changed, trigger the callback
 			if (this.listPosition !== prevPosition) {
 				this.onDragPositionChangeCb &&
-				this.onDragPositionChangeCb(this.listPosition, this.draggableData);
+				this.onDragPositionChangeCb(this.listPosition, this.initialPosition, this.draggableData);
 			}
 		}
 	}
 
 	/**
 	 * Find the numeric position of the element in the children of the list
-	 * @returns {Number|null}
-	 * @param item
 	 */
-	getListPosition(item) {
+	getListPosition(item: HTMLElement): number {
 		let index = 0;
 		for (const child of this.getChildren()) {
 			if (child === item) {
@@ -148,14 +145,14 @@ export class ListDragAndDrop extends DragAndDrop {
 			index++;
 		}
 
-		return null;
+		return 0;
 	}
 
 	/**
 	 * Get all the children of the current drop zone, excluding the placeholder
-	 * @returns {*}
 	 */
 	getChildren() {
+		// @ts-expect-error HTMLCollection is iterable
 		return [...(this.currentDropZone?.children || [])].filter(
 				(c) => c.className.match(/dx-drag-placeholder/) === null
 		);
@@ -177,10 +174,8 @@ export class ListDragAndDrop extends DragAndDrop {
 
 	/**
 	 * Find the element at the current cursor position in the given drop zone
-	 * @param point
-	 * @returns {null}
 	 */
-	getListPositionOfPoint(point) {
+	getListPositionOfPoint(point: { x: number, y: number }) {
 		let index = 0;
 		const children = this.getChildren();
 
@@ -205,45 +200,47 @@ export class ListDragAndDrop extends DragAndDrop {
 	 * Updates the scroll position while dragging an element so a user can navigate a longer list while dragging
 	 */
 	updateScrollPosition() {
-		if (this.currentDropZone) {
-			const rect = this.currentDropZone.getBoundingClientRect();
-			const threshold = 100;
-			let velocity = 0;
-			const velocityFn = (x) => x * 5;
-			const cursorPos = this.isVertical() ? this.cursorY : this.cursorX;
-			const rectStart = this.isVertical() ? rect.top : rect.left;
-			const rectEnd = this.isVertical() ? rect.bottom : rect.right;
-			const beforeDiff = rectStart + threshold - cursorPos;
-			const afterDiff = cursorPos - (rectEnd - threshold);
+		if (!this.currentDropZone) return;
 
-			if (beforeDiff > 0) {
-				velocity = -velocityFn(beforeDiff);
-			} else if (afterDiff > 0) {
-				velocity = velocityFn(afterDiff);
-			}
+		const rect = this.currentDropZone.getBoundingClientRect();
+		const threshold = 100;
+		let velocity = 0;
+		const velocityFn = (x: number) => x * 5;
+		const cursorPos = this.isVertical() ? this.cursorY : this.cursorX;
+		const rectStart = this.isVertical() ? rect.top : rect.left;
+		const rectEnd = this.isVertical() ? rect.bottom : rect.right;
+		const beforeDiff = rectStart + threshold - cursorPos;
+		const afterDiff = cursorPos - (rectEnd - threshold);
 
-			if (velocity) {
-				if (this.isVertical()) {
-					this.currentDropZone.scrollTo({
-						top: this.currentDropZone.scrollTop + velocity,
-						behavior: "smooth"
-					});
-				} else {
-					this.currentDropZone.scrollTo({
-						left: this.currentDropZone.scrollLeft + velocity,
-						behavior: "smooth"
-					});
-				}
-			}
-
-			setTimeout(() => this.updateScrollPosition(), 500);
+		if (beforeDiff > 0) {
+			velocity = -velocityFn(beforeDiff);
+		} else if (afterDiff > 0) {
+			velocity = velocityFn(afterDiff);
 		}
+
+		if (velocity) {
+			if (this.isVertical()) {
+				this.currentDropZone.scrollTo({
+					top: this.currentDropZone.scrollTop + velocity,
+					behavior: "smooth"
+				});
+			} else {
+				this.currentDropZone.scrollTo({
+					left: this.currentDropZone.scrollLeft + velocity,
+					behavior: "smooth"
+				});
+			}
+		}
+
+		setTimeout(() => this.updateScrollPosition(), 500);
 	}
 
 	/**
 	 * Render a placeholder element at the given position (in between the elements)
 	 */
 	renderPlaceholder() {
+		if (!this.currentDropZone) return;
+		
 		// If we're not allowed to change drop zones and we're not in the same drop zone, don't render the placeholder
 		if (!this.options.allowDropZoneChange && !this.isSameDropZone()) {
 			return;
@@ -258,7 +255,7 @@ export class ListDragAndDrop extends DragAndDrop {
 		if (this.isVertical()) {
 			this.placeholder.classList.add("dx-direction-vertical");
 			this.placeholder.classList.remove("dx-direction-horizontal");
-			this.placeholder.style.height = undefined;
+			this.placeholder.style.height = "";
 		} else {
 			this.placeholder.classList.add("dx-direction-horizontal");
 			this.placeholder.classList.remove("dx-direction-vertical");

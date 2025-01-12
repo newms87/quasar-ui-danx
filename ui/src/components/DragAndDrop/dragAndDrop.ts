@@ -1,3 +1,9 @@
+import { AnyObject } from "src/types";
+
+export type DropZoneResolver = ((e: DragEvent) => HTMLElement) | string | null;
+export type DragAndDropCallback = ((e: DragEvent, data: DraggableData) => void) | null;
+export type DraggableData = AnyObject | string | number | null;
+
 /**
  * Drag and Drop basic functionality for dragging elements and firing events on drag start, drag over and drag end
  */
@@ -15,15 +21,15 @@ export class DragAndDrop {
 	startSize = 0;
 	cursorY = 0;
 	cursorX = 0;
-	onStartCb = null;
-	onEndCb = null;
-	onDropCb = null;
-	onDraggingCb = null;
-	dropZoneResolver = null;
+	onStartCb: DragAndDropCallback = null;
+	onEndCb: DragAndDropCallback = null;
+	onDropCb: DragAndDropCallback = null;
+	onDraggingCb: DragAndDropCallback = null;
+	dropZoneResolver: DropZoneResolver = null;
 	currentDropZone: HTMLElement | null = null;
-	draggableData = null;
+	draggableData: DraggableData = null;
 	// Used to abort dragging event listeners on the element
-	abortController = null;
+	abortController: AbortController | null = null;
 
 	constructor(options = {}) {
 		// Options
@@ -38,8 +44,6 @@ export class DragAndDrop {
 
 	/**
 	 * Set the options for the drag and drop instance
-	 * @param options
-	 * @returns {DragAndDrop}
 	 */
 	setOptions(options = {}) {
 		this.options = { ...this.options, ...options };
@@ -48,7 +52,6 @@ export class DragAndDrop {
 
 	/**
 	 * Returns if the list is stacked vertically or horizontally
-	 * @returns {boolean}
 	 */
 	isVertical() {
 		return this.options.direction === "vertical";
@@ -56,77 +59,67 @@ export class DragAndDrop {
 
 	/**
 	 * Set the target drop zone for draggable elements
-	 * @param dropZone
-	 * @returns {DragAndDrop}
 	 */
-	setDropZone(dropZone) {
+	setDropZone(dropZone: DropZoneResolver) {
 		this.dropZoneResolver = dropZone;
 		return this;
 	}
 
 	/**
 	 * Callback that fires when an element has started dragging
-	 * @param cb
-	 * @returns {DragAndDrop}
 	 */
-	onStart(cb) {
+	onStart(cb: DragAndDropCallback) {
 		this.onStartCb = cb;
 		return this;
 	}
 
 	/**
 	 * Callback that fires when an element has stopped dragging
-	 * @param cb
-	 * @returns {DragAndDrop}
 	 */
-	onEnd(cb) {
+	onEnd(cb: DragAndDropCallback) {
 		this.onEndCb = cb;
 		return this;
 	}
 
 	/**
 	 * Callback that fires when the dragging element is moved
-	 * @param cb
-	 * @returns {DragAndDrop}
 	 */
-	onDragging(cb) {
+	onDragging(cb: DragAndDropCallback) {
 		this.onDraggingCb = cb;
 		return this;
 	}
 
 	/**
 	 * Callback that fires when the dragging element has been dropped
-	 * @param cb
-	 * @returns {DragAndDrop}
 	 */
-	onDrop(cb) {
+	onDrop(cb: DragAndDropCallback) {
 		this.onDropCb = cb;
 		return this;
 	}
 
 	/**
 	 * Start listening for drag events and prepare an element for drag/drop
-	 * @param e
-	 * @param data
 	 */
-	dragStart(e, data) {
+	dragStart(e: DragEvent, data: DraggableData) {
 		this.currentDropZone = this.getDropZone(e);
 
 		if (this.currentDropZone) {
 			this.startY = e.clientY;
 			this.startX = e.clientX;
 			this.startSize = this.getDropZoneSize();
-			e.dataTransfer.effectAllowed = "move";
-			e.dataTransfer.dropEffect = "move";
+			if (e.dataTransfer) {
+				e.dataTransfer.effectAllowed = "move";
+				e.dataTransfer.dropEffect = "move";
+			}
 			this.draggableData = data;
 			this.abortController = new AbortController();
 			const options = { signal: this.abortController.signal };
 			document.addEventListener("dragenter", (e) => this.dragEnter(e), options);
 			document.addEventListener("dragover", (e) => this.dragOver(e), options);
 			document.addEventListener("drop", (e) => this.drop(e), options);
-			this.onStartCb && this.onStartCb(e);
+			this.onStartCb && this.onStartCb(e, this.draggableData);
 
-			if (this.options.hideDragImage) {
+			if (e.dataTransfer && this.options.hideDragImage) {
 				e.dataTransfer.setDragImage(new Image(), 0, 0);
 			}
 		} else {
@@ -137,55 +130,50 @@ export class DragAndDrop {
 	/**
 	 * Clean up event listeners after dragging is done
 	 */
-	dragEnd(e) {
+	dragEnd(e: DragEvent) {
 		this.currentDropZone = null;
 		this.abortController?.abort();
+		this.onEndCb && this.onEndCb(e, this.draggableData);
 		this.draggableData = null;
-		this.onEndCb && this.onEndCb(e);
 	}
 
 	/**
 	 * The dragging element has entered a new target
-	 * @param e
 	 */
-	dragEnter(e) {
+	dragEnter(e: DragEvent) {
 		e.preventDefault();
 	}
 
 	/**
 	 * The dragging element is moving
-	 * @param e
 	 */
-	dragOver(e) {
+	dragOver(e: DragEvent) {
 		e.preventDefault();
 		this.cursorY = e.clientY;
 		this.cursorX = e.clientX;
-		this.onDraggingCb && this.onDraggingCb(e);
+		this.onDraggingCb && this.onDraggingCb(e, this.draggableData);
 	}
 
 	/**
 	 * Handle dropping the element into its correct position
-	 * @param e
 	 */
-	drop(e) {
-		e.dataTransfer.dropEffect = "move";
+	drop(e: DragEvent) {
+		e.dataTransfer && (e.dataTransfer.dropEffect = "move");
 		e.preventDefault();
 		this.onDropCb && this.onDropCb(e, this.draggableData);
 	}
 
 	/**
 	 * Returns the drop zone if the current target element is or is inside the drop zone
-	 * @param e
-	 * @returns {HTMLElement|null}
 	 */
-	getDropZone(e) {
+	getDropZone(e: DragEvent): HTMLElement | null {
 		if (typeof this.dropZoneResolver === "string") {
-			let target = e.target;
+			let target = e.target as HTMLElement;
 			while (target) {
 				if (target.dataset?.dropZone === this.dropZoneResolver) {
 					return target;
 				}
-				target = target.parentNode;
+				target = target.parentNode as HTMLElement;
 			}
 			return null;
 		} else if (typeof this.dropZoneResolver === "function") {
@@ -197,9 +185,8 @@ export class DragAndDrop {
 
 	/**
 	 * Returns the distance between the start and current cursor position
-	 * @returns {number}
 	 */
-	getDistance() {
+	getDistance(): number {
 		return this.isVertical()
 				? this.cursorY - this.startY
 				: this.cursorX - this.startX;
@@ -208,19 +195,17 @@ export class DragAndDrop {
 	/**
 	 * Returns the size of the drop zone
 	 */
-	getDropZoneSize() {
-		return this.isVertical()
+	getDropZoneSize(): number {
+		return (this.isVertical()
 				? this.currentDropZone?.offsetHeight
-				: this.currentDropZone?.offsetWidth;
+				: this.currentDropZone?.offsetWidth) || 0;
 	}
 
 	/**
 	 * Returns the percent change between the start and current cursor position relative to the drop zone size
-	 *
-	 * @returns {number}
 	 */
 	getPercentChange() {
 		const distance = this.getDistance();
-		return (distance / this.startSize) * 100;
+		return (distance / (this.startSize || 1)) * 100;
 	}
 }

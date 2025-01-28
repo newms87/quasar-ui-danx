@@ -24,9 +24,9 @@ export interface ListControlsRoutes<T = ActionTargetItem> {
 
 	summary?(filter?: ListControlsFilter): Promise<AnyObject>;
 
-	details?(target: T, fields: ControlsFieldsList): Promise<T>;
+	details?(target: T, fields?: ControlsFieldsList): Promise<T>;
 
-	detailsAndStore?(target: T, fields: ControlsFieldsList): Promise<T>;
+	detailsAndStore?(target: T, fields?: ControlsFieldsList): Promise<T>;
 
 	more?(pager: ListControlsPagination): Promise<T[]>;
 

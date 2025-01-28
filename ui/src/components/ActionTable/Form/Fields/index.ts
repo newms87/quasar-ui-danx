@@ -19,6 +19,7 @@ export { default as NumberField } from "./NumberField.vue";
 export { default as NumberRangeField } from "./NumberRangeField.vue";
 export { default as SelectDrawer } from "./SelectDrawer.vue";
 export { default as SelectField } from "./SelectField.vue";
+export { default as SelectionMenuField } from "./SelectionMenuField.vue";
 export { default as SelectOrCreateField } from "./SelectOrCreateField.vue";
 export { default as SelectWithChildrenField } from "./SelectWithChildrenField.vue";
 export { default as SingleFileField } from "./SingleFileField.vue";

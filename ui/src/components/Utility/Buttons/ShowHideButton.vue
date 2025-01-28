@@ -10,6 +10,11 @@
           :is="isShowing ? (hideIcon || DefaultHideIcon) : (showIcon || DefaultShowIcon)"
           :class="iconClass"
         />
+      </slot>
+      <slot
+        name="label"
+        :is-showing="isShowing"
+      >
         <div
           v-if="label"
           :class="labelClass"

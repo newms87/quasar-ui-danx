@@ -14,6 +14,7 @@ export { default as LabelValueBlock } from "./LabelValueBlock.vue";
 export { default as MultiFileField } from "./MultiFileField.vue";
 export { default as MultiKeywordField } from "./MultiKeywordField.vue";
 export { default as NewPasswordField } from "./NewPasswordField.vue";
+export { default as NoInputField } from "./NoInputField.vue";
 export { default as NumberField } from "./NumberField.vue";
 export { default as NumberRangeField } from "./NumberRangeField.vue";
 export { default as SelectDrawer } from "./SelectDrawer.vue";

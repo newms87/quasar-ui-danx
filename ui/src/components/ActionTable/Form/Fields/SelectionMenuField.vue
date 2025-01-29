@@ -20,7 +20,7 @@
               v-for="option in options"
               :key="option.id"
               v-ripple
-              class="cursor-pointer flex items-center"
+              class="cursor-pointer flex items-center relative"
               :class="{'bg-sky-900 hover:bg-sky-800': selected?.id === option.id, 'hover:bg-slate-600': selected?.id !== option.id}"
               @click="selected = option"
             >
@@ -72,12 +72,13 @@
 
 
     <ShowHideButton
-      v-if="editable"
+      v-if="editable && selected"
       v-model="editing"
       :label="editText"
       :class="editClass"
       class="ml-1"
       :show-icon="EditIcon"
+      :hide-icon="DoneEditingIcon"
     />
 
     <QBtn
@@ -93,6 +94,7 @@
 </template>
 <script setup lang="ts">
 import {
+	FaSolidCheck as DoneEditingIcon,
 	FaSolidCircleXmark as ClearIcon,
 	FaSolidListCheck as DefaultSelectIcon,
 	FaSolidPencil as EditIcon,

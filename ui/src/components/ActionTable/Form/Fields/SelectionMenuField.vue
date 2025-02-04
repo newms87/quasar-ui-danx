@@ -66,7 +66,9 @@
         </template>
       </template>
       <template v-else>
-        (No selection)
+        <slot name="no-selection">
+          (No selection)
+        </slot>
       </template>
     </div>
 

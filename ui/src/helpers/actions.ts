@@ -309,6 +309,10 @@ async function onConfirmAction(action: ActionOptions, target: ActionTarget, inpu
 export function withDefaultActions(label: string, listController?: ListController): ActionOptions[] {
 	return [
 		{
+			name: "quick-create",
+			alias: "create"
+		},
+		{
 			name: "create",
 			label: "Create " + label,
 			vnode: () => h(CreateNewWithNameDialog, { title: "Create " + label }),

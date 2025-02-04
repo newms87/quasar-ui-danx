@@ -1,3 +1,4 @@
+import { RequestCallOptions } from "src/types/requests";
 import { ActionOptions, ActionTargetItem, ResourceAction } from "./actions";
 import { AnyObject, ComputedRef, LabelValueItem, Ref } from "./shared";
 
@@ -20,21 +21,21 @@ export interface FilterGroup {
 }
 
 export interface ListControlsRoutes<T = ActionTargetItem> {
-	list(pager?: ListControlsPagination): Promise<PagedItems>;
+	list(pager?: ListControlsPagination, options?: RequestCallOptions): Promise<PagedItems>;
 
-	summary?(filter?: ListControlsFilter): Promise<AnyObject>;
+	summary?(filter?: ListControlsFilter, options?: RequestCallOptions): Promise<AnyObject>;
 
-	details?(target: T, fields?: ControlsFieldsList): Promise<T>;
+	details?(target: T, fields?: ControlsFieldsList, options?: RequestCallOptions): Promise<T>;
 
-	detailsAndStore?(target: T, fields?: ControlsFieldsList): Promise<T>;
+	detailsAndStore?(target: T, fields?: ControlsFieldsList, options?: RequestCallOptions): Promise<T>;
 
-	more?(pager: ListControlsPagination): Promise<T[]>;
+	more?(pager: ListControlsPagination, options?: RequestCallOptions): Promise<T[]>;
 
-	fieldOptions?(filter?: AnyObject): Promise<AnyObject>;
+	fieldOptions?(filter?: AnyObject, options?: RequestCallOptions): Promise<AnyObject>;
 
-	applyAction?(action: string | ResourceAction | ActionOptions, target: T | null, data?: object): Promise<AnyObject>;
+	applyAction?(action: string | ResourceAction | ActionOptions, target: T | null, data?: object, options?: RequestCallOptions): Promise<AnyObject>;
 
-	batchAction?(action: string | ResourceAction | ActionOptions, targets: T[], data: object): Promise<AnyObject>;
+	batchAction?(action: string | ResourceAction | ActionOptions, targets: T[], data: object, options?: RequestCallOptions): Promise<AnyObject>;
 
 	export?(filter?: ListControlsFilter, name?: string): Promise<void>;
 }

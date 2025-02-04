@@ -5,27 +5,27 @@ import { request } from "./request";
 
 export function useActionRoutes(baseUrl: string, extend?: object): ListControlsRoutes {
 	return {
-		list(pager?) {
-			return request.post(`${baseUrl}/list`, pager);
+		list(pager?, options?) {
+			return request.post(`${baseUrl}/list`, pager, options);
 		},
-		summary(filter) {
-			return request.post(`${baseUrl}/summary`, { filter });
+		summary(filter, options?) {
+			return request.post(`${baseUrl}/summary`, { filter }, options);
 		},
-		details(target, fields) {
-			return request.get(`${baseUrl}/${target.id}/details`, { params: { fields } });
+		details(target, fields, options?) {
+			return request.get(`${baseUrl}/${target.id}/details`, { params: { fields }, ...options });
 		},
-		async detailsAndStore(target, fields) {
-			const item = await request.get(`${baseUrl}/${target.id}/details`, { params: { fields } });
+		async detailsAndStore(target, fields, options?) {
+			const item = await request.get(`${baseUrl}/${target.id}/details`, { params: { fields }, ...options });
 			return storeObject(item);
 		},
-		fieldOptions() {
-			return request.get(`${baseUrl}/field-options`);
+		fieldOptions(options?) {
+			return request.get(`${baseUrl}/field-options`, options);
 		},
-		applyAction(action, target, data) {
-			return request.post(`${baseUrl}/${target ? target.id : "new"}/apply-action`, { action, data });
+		applyAction(action, target, data, options?) {
+			return request.post(`${baseUrl}/${target ? target.id : "new"}/apply-action`, { action, data }, options);
 		},
-		batchAction(action, targets, data) {
-			return request.post(`${baseUrl}/batch-action`, { action, filter: { id: targets.map(r => r.id) }, data });
+		batchAction(action, targets, data, options?) {
+			return request.post(`${baseUrl}/batch-action`, { action, filter: { id: targets.map(r => r.id) }, data }, options);
 		},
 		export(filter, name) {
 			return downloadFile(`${baseUrl}/export`, name || "export.csv", { filter });

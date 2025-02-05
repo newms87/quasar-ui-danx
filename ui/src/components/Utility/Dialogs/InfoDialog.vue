@@ -4,6 +4,7 @@
     v-bind="$props"
     @close="onClose"
   >
+    <slot />
     <template
       v-if="$slots.title"
       #title

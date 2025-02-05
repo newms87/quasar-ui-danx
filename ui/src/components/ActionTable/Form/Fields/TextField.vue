@@ -30,6 +30,7 @@
         :model-value="modelValue"
         :maxlength="allowOverMax ? undefined : maxLength"
         :debounce="debounce"
+        :loading="loading"
         @keydown.enter="$emit('submit')"
         @update:model-value="$emit('update:model-value', $event)"
       >

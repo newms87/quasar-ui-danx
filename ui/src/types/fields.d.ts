@@ -19,6 +19,7 @@ export interface TextFieldProps {
 	disabled?: boolean;
 	readonly?: boolean;
 	debounce?: string | number;
+	loading?: boolean;
 }
 
 export interface NumberFieldProps extends TextFieldProps {

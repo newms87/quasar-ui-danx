@@ -6,9 +6,8 @@
     @drop.prevent="onDrop"
   >
     <FieldLabel
-      :field="field"
+      v-if="label"
       :label="label"
-      :show-name="showName"
     />
 
     <input

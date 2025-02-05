@@ -1,5 +1,11 @@
 <template>
-  <div class="group flex items-center flex-nowrap gap-x-1">
+  <div class="group flex items-center flex-nowrap gap-x-1 relative">
+    <QInnerLoading
+      v-if="loading"
+      showing
+      class="bg-sky-900 opacity-50 z-10 rounded"
+      color="teal"
+    />
     <ShowHideButton
       v-if="selectable"
       v-model="isSelecting"

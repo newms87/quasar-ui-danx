@@ -180,16 +180,27 @@ export function fSecondsToTime(second: number) {
 	return (hours ? hours + ":" : "") + time.toFormat("mm:ss");
 }
 
-export function fElapsedTime(start: string, end?: string) {
+/**
+ *  Formats a number of seconds into a duration string in 00h 00m 00s format
+ */
+export function fSecondsToDuration(seconds: number) {
+	const hours = Math.floor(seconds / 3600);
+	const minutes = Math.floor((seconds % 3600) / 60);
+	const secs = Math.floor(seconds % 60);
+	return `${hours ? hours + "h " : ""}${minutes ? minutes + "m " : ""}${secs}s`;
+}
+
+/**
+ *  Formats a duration between two date strings in 00h 00m 00s format
+ */
+export function fDuration(start: string, end?: string) {
 	const endDateTime = end ? parseDateTime(end) : DateTime.now();
 	const diff = endDateTime?.diff(parseDateTime(start) || DateTime.now(), ["hours", "minutes", "seconds"]);
 	if (!diff?.isValid) {
 		return "-";
 	}
-	const hours = Math.floor(diff.hours);
-	const minutes = Math.floor(diff.minutes);
-	const seconds = Math.floor(diff.seconds);
-	return `${hours ? hours + "h " : ""}${minutes ? minutes + "m " : ""}${seconds}s`;
+	const totalSeconds = diff.as("seconds");
+	return fSecondsToDuration(totalSeconds);
 }
 
 /**

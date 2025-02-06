@@ -12,10 +12,14 @@ export function useActionRoutes(baseUrl: string, extend?: object): ListControlsR
 			return request.post(`${baseUrl}/summary`, { filter }, options);
 		},
 		details(target, fields, options?) {
-			return request.get(`${baseUrl}/${target.id}/details`, { params: { fields }, ...options });
+			options = options || {};
+			fields && (options.params = { fields });
+			return request.get(`${baseUrl}/${target.id}/details`, options);
 		},
 		async detailsAndStore(target, fields, options?) {
-			const item = await request.get(`${baseUrl}/${target.id}/details`, { params: { fields }, ...options });
+			options = options || {};
+			fields && (options.params = { fields });
+			const item = await request.get(`${baseUrl}/${target.id}/details`, options);
 			return storeObject(item);
 		},
 		fieldOptions(options?) {

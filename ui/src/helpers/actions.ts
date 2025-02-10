@@ -344,6 +344,10 @@ export function withDefaultActions(label: string, listController?: ListControlle
 			onAction: (action, target) => listController?.activatePanel(target, "edit")
 		},
 		{
+			name: "quick-delete",
+			alias: "delete"
+		},
+		{
 			name: "delete",
 			label: "Delete",
 			class: "text-red-500",

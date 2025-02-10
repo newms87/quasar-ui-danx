@@ -28,10 +28,10 @@
   </div>
 </template>
 <script setup lang="ts">
-import { DropZoneResolver } from "src/components/DragAndDrop/dragAndDrop";
 import { computed, watch } from "vue";
 import { DragHandleDotsIcon as DragHandleIcon } from "../../svg";
 import { SvgImg } from "../Utility";
+import { DropZoneResolver } from "./dragAndDrop";
 import { ListDragAndDrop } from "./listDragAndDrop";
 
 const emit = defineEmits(["position", "update:list-items", "drop-zone"]);

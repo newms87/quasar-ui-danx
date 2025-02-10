@@ -40,20 +40,22 @@
                 @click.stop.prevent="$emit('delete', option)"
               />
             </div>
-            <QSeparator class="bg-slate-400 my-2" />
-            <div class="px-4 mb-2">
-              <QBtn
-                :class="createClass"
-                :loading="loading"
-                @click="$emit('create')"
-              >
-                <CreateIcon
-                  class="w-3"
-                  :class="createText ? 'mr-2' : ''"
-                />
-                {{ createText }}
-              </QBtn>
-            </div>
+            <template v-if="creatable">
+              <QSeparator class="bg-slate-400 my-2" />
+              <div class="px-4 mb-2">
+                <QBtn
+                  :class="createClass"
+                  :loading="loading"
+                  @click="$emit('create')"
+                >
+                  <CreateIcon
+                    class="w-3"
+                    :class="createText ? 'mr-2' : ''"
+                  />
+                  {{ createText }}
+                </QBtn>
+              </div>
+            </template>
           </div>
         </QMenu>
       </template>
@@ -73,7 +75,7 @@
       </template>
       <template v-else>
         <slot name="no-selection">
-          (No selection)
+          {{ placeholder }}
         </slot>
       </template>
     </div>
@@ -125,6 +127,7 @@ withDefaults(defineProps<{
 	createText?: string;
 	editText?: string;
 	clearText?: string;
+	placeholder?: string;
 	selectClass?: string;
 	createClass?: string;
 	editClass?: string;
@@ -143,6 +146,7 @@ withDefaults(defineProps<{
 	createText: "",
 	editText: "",
 	clearText: "",
+	placeholder: "(No selection)",
 	selectClass: "bg-sky-800",
 	createClass: "bg-green-900",
 	editClass: "",

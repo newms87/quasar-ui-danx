@@ -80,13 +80,12 @@
       </template>
     </div>
 
-
     <ShowHideButton
       v-if="editable && selected"
       v-model="editing"
       :label="editText"
       :class="editClass"
-      class="ml-1"
+      class="opacity-0 group-hover:opacity-100 transition-all"
       :show-icon="EditIcon"
       :hide-icon="DoneEditingIcon"
     />

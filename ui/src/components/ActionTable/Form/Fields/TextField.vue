@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="dx-text-field">
     <QInput
       v-if="!readonly"
       :data-dusk="'text-field-' + field?.id"
@@ -12,8 +12,9 @@
       :input-class="inputClass"
       :class="parentClass"
       stack-label
-      :rows="rows"
-      :type="type"
+      :autogrow="rows > 1"
+      :type="rows > 1 ? 'textarea' : type"
+      :input-style="rows ? {minHeight: rows * 1.5 + 'rem'} : {}"
       :model-value="modelValue"
       :debounce="debounce"
       @keydown.enter="$emit('submit')"

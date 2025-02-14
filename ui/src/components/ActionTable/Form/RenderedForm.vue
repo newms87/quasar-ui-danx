@@ -75,6 +75,7 @@
         :label="field.label || undefined"
         :no-label="noLabel"
         :show-name="showName"
+        :rows="field.type === 'TEXTAREA' ? 5 : 1"
         :clearable="field.clearable || clearable"
         :disable="disable"
         :readonly="readonly"
@@ -154,6 +155,7 @@ const FORM_FIELD_MAP = {
 	INTEGER: IntegerField,
 	NUMBER: NumberField,
 	TEXT: TextField,
+	TEXTAREA: TextField,
 	NO_INPUT: NoInputField,
 	SINGLE_FILE: SingleFileField,
 	MULTI_FILE: MultiFileField,

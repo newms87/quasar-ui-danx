@@ -89,11 +89,14 @@ export function fDate(dateTime: string | DateTime | null, { empty = "--", format
 /**
  * Parses a date string into a Luxon DateTime object
  */
-export function parseDateTime(dateTime: string | DateTime | null): DateTime<boolean> | null {
+export function parseDateTime(dateTime: string | DateTime | number | null): DateTime<boolean> | null {
+	if (typeof dateTime === "number") {
+		return DateTime.fromMillis(dateTime as number);
+	}
 	if (typeof dateTime === "string") {
 		return parseGenericDateTime(dateTime);
 	}
-	return dateTime || DateTime.fromSQL("0000-00-00 00:00:00");
+	return dateTime as DateTime<boolean> || DateTime.fromSQL("0000-00-00 00:00:00");
 }
 
 /**
@@ -193,7 +196,7 @@ export function fSecondsToDuration(seconds: number) {
 /**
  *  Formats a duration between two date strings in 00h 00m 00s format
  */
-export function fDuration(start: string, end?: string) {
+export function fDuration(start: string | number, end?: string | number) {
 	const endDateTime = end ? parseDateTime(end) : DateTime.now();
 	const diff = endDateTime?.diff(parseDateTime(start) || DateTime.now(), ["hours", "minutes", "seconds"]);
 	if (!diff?.isValid) {

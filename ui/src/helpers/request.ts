@@ -19,7 +19,7 @@ export const request: RequestApi = {
 
 	async call(url, options) {
 		options = options || {};
-		const abortKey = options?.abortOn !== undefined ? options.abortOn : url;
+		const abortKey = options?.abortOn !== undefined ? options.abortOn : url + JSON.stringify(options.params || "");
 		const timestamp = new Date().getTime();
 
 		if (abortKey) {
@@ -42,7 +42,7 @@ export const request: RequestApi = {
 					options.params[key] = JSON.stringify(value);
 				}
 			}
-			
+
 			url += (url.match(/\?/) ? "&" : "?") + new URLSearchParams(options.params).toString();
 			delete options.params;
 		}

@@ -39,18 +39,23 @@
         >
           <PdfIcon
             v-if="isPdf"
-            class="w-24"
+            class="w-3/4"
           />
           <TextFileIcon
             v-else
-            class="w-24"
+            class="w-3/4"
           />
-          <div
-            v-if="filename"
-            class="text-[.7rem] bg-slate-900 text-slate-300 opacity-80 h-[2.25rem] py-.5 px-1 absolute-bottom"
-          >
-            {{ filename }}
-          </div>
+          <template v-if="filename">
+            <div
+              v-if="showFilename"
+              class="text-[.7rem] bg-slate-900 text-slate-300 opacity-80 h-[2.25rem] py-.5 px-1 absolute-bottom"
+            >
+              {{ filename }}
+            </div>
+            <QTooltip v-else>
+              {{ filename }}
+            </QTooltip>
+          </template>
         </div>
       </div>
       <div
@@ -152,6 +157,7 @@ export interface FilePreviewProps {
 	file?: UploadedFile;
 	relatedFiles?: UploadedFile[];
 	missingIcon?: any;
+	showFilename?: boolean;
 	downloadButtonClass?: string;
 	imageFit?: "cover" | "contain" | "fill" | "none" | "scale-down";
 	downloadable?: boolean;

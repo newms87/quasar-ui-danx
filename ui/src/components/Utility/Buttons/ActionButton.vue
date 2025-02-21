@@ -2,8 +2,9 @@
   <QBtn
     :loading="isSaving"
     class="shadow-none"
-    :class="colorClass"
-    @click="onAction"
+    :class="disabled ? 'text-slate-800 bg-slate-500 opacity-50' : colorClass"
+    :disable="disabled"
+    @click="()=> onAction()"
   >
     <div class="flex items-center flex-nowrap">
       <component
@@ -26,11 +27,36 @@
     >
       {{ tooltip }}
     </QTooltip>
+    <QMenu
+      v-if="isConfirming"
+      :model-value="true"
+    >
+      <div class="p-4 bg-slate-600">
+        <div>{{ confirmText }}</div>
+        <div class="flex items-center flex-nowrap mt-2">
+          <div class="flex-grow">
+            <ActionButton
+              type="cancel"
+              color="gray"
+              @click="isConfirming = false"
+            />
+          </div>
+          <ActionButton
+            type="confirm"
+            color="green"
+            @click="()=> onAction(true)"
+          />
+        </div>
+      </div>
+    </QMenu>
   </QBtn>
 </template>
 <script setup lang="ts">
 import {
 	FaSolidArrowsRotate as RefreshIcon,
+	FaSolidCircleCheck as ConfirmIcon,
+	FaSolidCircleXmark as CancelIcon,
+	FaSolidCopy as CopyIcon,
 	FaSolidPause as PauseIcon,
 	FaSolidPencil as EditIcon,
 	FaSolidPlay as PlayIcon,
@@ -38,11 +64,11 @@ import {
 	FaSolidStop as StopIcon,
 	FaSolidTrash as TrashIcon
 } from "danx-icon";
-import { computed } from "vue";
+import { computed, ref } from "vue";
 import { ActionTarget, ResourceAction } from "../../../types";
 
 export interface ActionButtonProps {
-	type?: "trash" | "trash-red" | "create" | "edit" | "play" | "stop" | "pause" | "refresh";
+	type?: "trash" | "trash-red" | "create" | "edit" | "copy" | "play" | "stop" | "pause" | "refresh" | "confirm" | "cancel";
 	color?: "red" | "blue" | "sky" | "green" | "green-invert" | "lime" | "white" | "gray";
 	icon?: object | string;
 	iconClass?: string;
@@ -52,6 +78,9 @@ export interface ActionButtonProps {
 	action?: ResourceAction;
 	target?: ActionTarget;
 	input?: object;
+	disabled?: boolean;
+	confirm?: boolean;
+	confirmText?: string;
 }
 
 const emit = defineEmits(["success", "error", "always"]);
@@ -64,7 +93,8 @@ const props = withDefaults(defineProps<ActionButtonProps>(), {
 	tooltip: "",
 	action: null,
 	target: null,
-	input: null
+	input: null,
+	confirmText: "Are you sure?"
 });
 
 const colorClass = computed(() => {
@@ -101,9 +131,24 @@ const typeOptions = computed(() => {
 				icon: CreateIcon,
 				iconClass: "w-3"
 			};
+		case "confirm":
+			return {
+				icon: ConfirmIcon,
+				iconClass: "w-3"
+			};
+		case "cancel":
+			return {
+				icon: CancelIcon,
+				iconClass: "w-3"
+			};
 		case "edit":
 			return {
 				icon: EditIcon,
+				iconClass: "w-3"
+			};
+		case "copy":
+			return {
+				icon: CopyIcon,
 				iconClass: "w-3"
 			};
 		case "play":
@@ -136,19 +181,27 @@ const typeOptions = computed(() => {
 
 const isSaving = computed(() => {
 	if (props.saving) return true;
+	if (props.action) {
+		return props.action.isApplying;
+	}
 	if (props.target) {
 		if (Array.isArray(props.target)) {
 			return props.target.some((t) => t.isSaving);
 		}
 		return props.target.isSaving;
 	}
-	if (props.action) {
-		return props.action.isApplying;
-	}
 	return false;
 });
 
-function onAction() {
+const isConfirming = ref(false);
+function onAction(isConfirmed = false) {
+	// Make sure this action is confirmed if the confirm prop is set
+	if (props.confirm && !isConfirmed) {
+		isConfirming.value = true;
+		return false;
+	}
+	isConfirming.value = false;
+	if (props.disabled) return;
 	if (props.action) {
 		props.action.trigger(props.target, props.input).then(async (response) => {
 			emit("success", typeof response.json === "function" ? await response.json() : response);
@@ -158,6 +211,8 @@ function onAction() {
 		}).finally(() => {
 			emit("always");
 		});
+	} else {
+		emit("always");
 	}
 }
 </script>

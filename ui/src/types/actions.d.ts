@@ -34,6 +34,7 @@ export interface ActionOptions<T = ActionTargetItem> {
 	debounce?: number;
 	useInputFromConfirm?: boolean;
 	optimistic?: boolean | ((action: ActionOptions<T>, target: T | null, input: any) => void);
+	optimisticDelete?: boolean;
 	vnode?: (target: ActionTarget<T>, data: any) => VNode | any;
 	enabled?: (target: ActionTarget<T>) => boolean;
 	batchEnabled?: (targets: T[]) => boolean;

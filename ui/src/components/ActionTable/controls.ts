@@ -119,7 +119,7 @@ export function useControls(name: string, options: ListControlsOptions): ListCon
 
 		isLoadingFilters.value = true;
 		try {
-			fieldOptions.value = await options.routes.fieldOptions(activeFilter.value) || {};
+			fieldOptions.value = await options.routes.fieldOptions() || {};
 		} catch (e) {
 			// Fail silently
 		} finally {

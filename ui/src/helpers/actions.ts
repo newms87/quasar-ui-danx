@@ -3,7 +3,14 @@ import { FaSolidCopy as CopyIcon, FaSolidPencil as EditIcon, FaSolidTrash as Del
 import { uid } from "quasar";
 import { h, isReactive, Ref, shallowReactive, shallowRef } from "vue";
 import { ConfirmActionDialog, CreateNewWithNameDialog } from "../components";
-import type { ActionGlobalOptions, ActionOptions, ActionTarget, ListController, ResourceAction } from "../types";
+import type {
+	ActionGlobalOptions,
+	ActionOptions,
+	ActionTarget,
+	ActionTargetItem,
+	ListController,
+	ResourceAction
+} from "../types";
 import { FlashMessages } from "./FlashMessages";
 import { storeObject } from "./objectStore";
 
@@ -233,12 +240,18 @@ async function onConfirmAction(action: ActionOptions, target: ActionTarget, inpu
 				result = { error: `Action ${action.name} does not support batch actions` };
 			}
 		} else {
+			const __timestamp = Date.now();
+			if (action.optimisticDelete) {
+				storeObject({ ...target, __deleted_at: new Date().toISOString(), __timestamp } as ActionTargetItem);
+			}
+
 			// If the action has an optimistic callback, we call it before the actual action to immediately
 			// update the UI
 			if (typeof action.optimistic === "function") {
 				action.optimistic(action, target, input);
+				storeObject({ ...target, __timestamp } as ActionTargetItem);
 			} else if (action.optimistic) {
-				storeObject({ ...target, ...input });
+				storeObject({ ...target, ...input, __timestamp });
 			}
 
 			result = await action.onAction(action.alias || action.name, target, input);

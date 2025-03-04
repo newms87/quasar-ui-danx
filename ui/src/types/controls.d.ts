@@ -31,7 +31,7 @@ export interface ListControlsRoutes<T = ActionTargetItem> {
 
 	more?(pager: ListControlsPagination, options?: RequestCallOptions): Promise<T[]>;
 
-	fieldOptions?(filter?: AnyObject, options?: RequestCallOptions): Promise<AnyObject>;
+	fieldOptions?(options?: RequestCallOptions): Promise<AnyObject>;
 
 	applyAction?(action: string | ResourceAction | ActionOptions, target: T | null, data?: object, options?: RequestCallOptions): Promise<AnyObject>;
 

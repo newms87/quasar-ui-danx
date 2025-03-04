@@ -20,7 +20,7 @@ export const request: RequestApi = {
 	async call(url, options) {
 		options = options || {};
 		const abortKey = options?.abortOn !== undefined ? options.abortOn : url + JSON.stringify(options.params || "");
-		const timestamp = new Date().getTime();
+		const timestamp = Date.now();
 
 		if (abortKey) {
 			const abort = new AbortController();
@@ -47,7 +47,15 @@ export const request: RequestApi = {
 			delete options.params;
 		}
 
-		const response = await fetch(request.url(url), options);
+		let response = null;
+		try {
+			response = await fetch(request.url(url), options);
+		} catch (e) {
+			if (options.ignoreAbort && (e + "").match(/Request was aborted/)) {
+				return { abort: true };
+			}
+			throw e;
+		}
 
 		// Verify the app version of the client and server are matching
 		checkAppVersion(response);
@@ -97,12 +105,13 @@ export const request: RequestApi = {
 	async get(url, options) {
 		return await request.call(url, {
 			method: "get",
+			...options,
 			headers: {
 				Accept: "application/json",
 				"Content-Type": "application/json",
-				...danxOptions.value.request?.headers
-			},
-			...options
+				...danxOptions.value.request?.headers,
+				...options?.headers
+			}
 		});
 	},
 
@@ -110,12 +119,13 @@ export const request: RequestApi = {
 		return await request.call(url, {
 			method: "post",
 			body: data && JSON.stringify(data),
+			...options,
 			headers: {
 				Accept: "application/json",
 				"Content-Type": "application/json",
-				...danxOptions.value.request?.headers
-			},
-			...options
+				...danxOptions.value.request?.headers,
+				...options?.headers
+			}
 		});
 	}
 };

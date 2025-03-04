@@ -9,7 +9,10 @@
     no-route-dismiss
     @update:show="$emit('close')"
   >
-    <div class="flex flex-col flex-nowrap h-full">
+    <div
+      class="flex flex-col flex-nowrap h-full dx-panels-drawer-content"
+      :class="drawerClass"
+    >
       <div class="dx-panels-drawer-header flex items-center px-6 py-4">
         <div class="flex-grow">
           <slot name="header">
@@ -64,6 +67,12 @@
             <slot name="right-sidebar" />
           </div>
         </div>
+        <div
+          v-else
+          class="p-8"
+        >
+          <QSkeleton class="h-96" />
+        </div>
       </div>
     </div>
   </ContentDrawer>
@@ -76,22 +85,24 @@ import { ContentDrawer } from "../Utility";
 import PanelsDrawerPanels from "./PanelsDrawerPanels";
 import PanelsDrawerTabs from "./PanelsDrawerTabs";
 
-export interface Props {
+export interface PanelsDrawerProps {
 	title?: string,
 	modelValue?: string | number,
 	target: ActionTargetItem;
 	tabsClass?: string | object,
 	panelsClass?: string | object,
+	drawerClass?: string | object,
 	position?: "standard" | "right" | "left";
 	panels: ActionPanel[]
 }
 
 defineEmits(["update:model-value", "close"]);
-const props = withDefaults(defineProps<Props>(), {
+const props = withDefaults(defineProps<PanelsDrawerProps>(), {
 	title: "",
 	modelValue: null,
 	tabsClass: "w-[13.5rem] flex-shrink-0",
-	panelsClass: "w-[80rem]",
+	panelsClass: "w-full",
+	drawerClass: "",
 	position: "right"
 });
 

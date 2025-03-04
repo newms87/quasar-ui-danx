@@ -57,6 +57,7 @@
           :model-value="activePanel"
           :target="activeItem"
           :panels="controller.panels"
+          :drawer-class="drawerClass"
           @update:model-value="panel => controller.activatePanel(activeItem, panel)"
           @close="controller.setActiveItem(null)"
         >
@@ -91,6 +92,7 @@ export interface ActionTableLayoutProps {
 	showFilters?: boolean;
 	tableClass?: string;
 	title?: string;
+	drawerClass?: string;
 }
 
 const props = withDefaults(defineProps<ActionTableLayoutProps>(), {
@@ -98,7 +100,8 @@ const props = withDefaults(defineProps<ActionTableLayoutProps>(), {
 	panelTitleField: "",
 	selection: "multiple",
 	tableClass: "",
-	title: ""
+	title: "",
+	drawerClass: ""
 });
 
 const activeFilter = computed(() => props.controller.activeFilter.value);

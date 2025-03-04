@@ -1,6 +1,6 @@
 <template>
   <div
-    class="dx-collapsable-sidebar overflow-y-auto overflow-x-hidden scroll-smooth flex-shrink-0 transition-all relative"
+    class="dx-collapsable-sidebar overflow-hidden scroll-smooth flex-shrink-0 flex-nowrap transition-all relative"
     :class="{
       'is-collapsed': isCollapsed,
       'is-right-side': rightSide,
@@ -8,13 +8,13 @@
     }"
     :style="style"
   >
-    <div class="flex-grow max-w-full">
+    <div class="flex-grow max-w-full overflow-y-auto overflow-x-hidden">
       <slot :is-collapsed="isCollapsed" />
     </div>
     <template v-if="!disabled && (!hideToggleOnCollapse || !isCollapsed)">
       <div
         v-if="!toggleAtTop"
-        class="flex w-full p-4"
+        class="flex w-full p-4 flex-shrink-0"
         :class="{'justify-start': rightSide, 'justify-end': !rightSide, ...resolveToggleClass}"
       >
         <slot name="toggle">

@@ -2,7 +2,7 @@
   <QBtn
     :loading="isSaving"
     class="shadow-none"
-    :class="disabled ? 'text-slate-800 bg-slate-500 opacity-50' : colorClass"
+    :class="disabled ? disabledClass : colorClass"
     :disable="disabled"
     @click="()=> onAction()"
   >
@@ -79,6 +79,7 @@ export interface ActionButtonProps {
 	target?: ActionTarget;
 	input?: object;
 	disabled?: boolean;
+	disabledClass?: string;
 	confirm?: boolean;
 	confirmText?: string;
 }
@@ -94,7 +95,8 @@ const props = withDefaults(defineProps<ActionButtonProps>(), {
 	action: null,
 	target: null,
 	input: null,
-	confirmText: "Are you sure?"
+	confirmText: "Are you sure?",
+	disabledClass: "text-slate-800 bg-slate-500 opacity-50"
 });
 
 const colorClass = computed(() => {
@@ -195,13 +197,14 @@ const isSaving = computed(() => {
 
 const isConfirming = ref(false);
 function onAction(isConfirmed = false) {
+	if (props.disabled) return;
+
 	// Make sure this action is confirmed if the confirm prop is set
 	if (props.confirm && !isConfirmed) {
 		isConfirming.value = true;
 		return false;
 	}
 	isConfirming.value = false;
-	if (props.disabled) return;
 	if (props.action) {
 		props.action.trigger(props.target, props.input).then(async (response) => {
 			emit("success", typeof response.json === "function" ? await response.json() : response);

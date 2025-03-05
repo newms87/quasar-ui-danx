@@ -27,13 +27,11 @@ export interface ListControlsRoutes<T = ActionTargetItem> {
 
 	details?(target: T, fields?: ControlsFieldsList, options?: RequestCallOptions): Promise<T>;
 
-	detailsAndStore?(target: T, fields?: ControlsFieldsList, options?: RequestCallOptions): Promise<T>;
-
 	more?(pager: ListControlsPagination, options?: RequestCallOptions): Promise<T[]>;
 
 	fieldOptions?(options?: RequestCallOptions): Promise<AnyObject>;
 
-	applyAction?(action: string | ResourceAction | ActionOptions, target: T | null, data?: object, options?: RequestCallOptions): Promise<AnyObject>;
+	applyAction?(action: string | ResourceAction | ActionOptions, target: T | null, data?: object, options?: RequestCallOptions): Promise<>;
 
 	batchAction?(action: string | ResourceAction | ActionOptions, targets: T[], data: object, options?: RequestCallOptions): Promise<AnyObject>;
 
@@ -120,4 +118,10 @@ export interface ListController<T = ActionTargetItem> {
 	setActiveFilter: (filter?: ListControlsFilter) => void;
 	applyFilterFromUrl: (url: string, filters?: Ref<FilterGroup[]> | null) => void;
 	getFieldOptions: (field: string) => any[];
+}
+
+export interface ApplyActionResponse<T = ActionTargetItem> {
+	item?: T;
+	result?: T | AnyObject;
+	success: boolean;
 }

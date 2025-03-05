@@ -22,7 +22,7 @@ export function storeObject<T extends TypedObject>(newObject: T, recentlyStoredO
 	if (typeof newObject !== "object") {
 		return newObject;
 	}
-	
+
 	const id = newObject?.id || newObject?.name;
 	const type = newObject?.__type;
 	if (!id || !type) return shallowReactive(newObject);
@@ -49,6 +49,9 @@ export function storeObject<T extends TypedObject>(newObject: T, recentlyStoredO
 	// @ts-expect-error __timestamp is guaranteed to be set in this case on both old and new
 	if (oldObject && newObject.__timestamp < oldObject.__timestamp) {
 		recentlyStoredObjects[objectKey] = oldObject;
+
+		// Recursively store all the children of the object as well
+		storeObjectChildren(newObject, recentlyStoredObjects, oldObject);
 		return oldObject;
 	}
 
@@ -59,19 +62,7 @@ export function storeObject<T extends TypedObject>(newObject: T, recentlyStoredO
 	recentlyStoredObjects[objectKey] = reactiveObject;
 
 	// Recursively store all the children of the object as well
-	for (const key of Object.keys(newObject)) {
-		const value = newObject[key];
-		if (Array.isArray(value) && value.length > 0) {
-			for (const index in value) {
-				if (value[index] && typeof value[index] === "object") {
-					newObject[key][index] = storeObject(value[index], recentlyStoredObjects);
-				}
-			}
-		} else if (value?.__type) {
-			// @ts-expect-error __type is guaranteed to be set in this case
-			newObject[key] = storeObject(value as TypedObject, recentlyStoredObjects);
-		}
-	}
+	storeObjectChildren(newObject, recentlyStoredObjects);
 
 	Object.assign(reactiveObject, newObject);
 
@@ -85,6 +76,29 @@ export function storeObject<T extends TypedObject>(newObject: T, recentlyStoredO
 	}
 
 	return reactiveObject;
+}
+
+/**
+ *  A recursive way to store all the child TypedObjects of a TypedObject.
+ *  recentlyStoredObjects is used to avoid infinite recursion
+ *  applyToObject is used to apply the stored objects to a different object than the one being stored.
+ *  The apply to object is the current object being returned by storeObject() - Normally, the oldObject if it has a more recent timestamp than the newObject being stored.
+ */
+function storeObjectChildren<T extends TypedObject>(object: T, recentlyStoredObjects: AnyObject = {}, applyToObject: T | null = null) {
+	applyToObject = applyToObject || object;
+	for (const key of Object.keys(object)) {
+		const value = object[key];
+		if (Array.isArray(value) && value.length > 0) {
+			for (const index in value) {
+				if (value[index] && typeof value[index] === "object") {
+					applyToObject[key][index] = storeObject(value[index], recentlyStoredObjects);
+				}
+			}
+		} else if (value?.__type) {
+			// @ts-expect-error __type is guaranteed to be set in this case
+			applyToObject[key] = storeObject(value as TypedObject, recentlyStoredObjects);
+		}
+	}
 }
 
 /**

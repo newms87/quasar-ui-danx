@@ -91,6 +91,9 @@ function storeObjectChildren<T extends TypedObject>(object: T, recentlyStoredObj
 		if (Array.isArray(value) && value.length > 0) {
 			for (const index in value) {
 				if (value[index] && typeof value[index] === "object") {
+					if (!applyToObject[key]) {
+						applyToObject[key] = [];
+					}
 					applyToObject[key][index] = storeObject(value[index], recentlyStoredObjects);
 				}
 			}

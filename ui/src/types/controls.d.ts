@@ -31,7 +31,7 @@ export interface ListControlsRoutes<T = ActionTargetItem> {
 
 	fieldOptions?(options?: RequestCallOptions): Promise<AnyObject>;
 
-	applyAction?(action: string | ResourceAction | ActionOptions, target: T | null, data?: object, options?: RequestCallOptions): Promise<>;
+	applyAction?(action: string | ResourceAction | ActionOptions, target: T | null, data?: object, options?: RequestCallOptions): Promise<AnyObject>;
 
 	batchAction?(action: string | ResourceAction | ActionOptions, targets: T[], data: object, options?: RequestCallOptions): Promise<AnyObject>;
 

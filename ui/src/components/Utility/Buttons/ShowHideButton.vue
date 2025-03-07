@@ -41,7 +41,7 @@ export interface Props {
 	hideIcon?: object | string;
 	iconClass?: string;
 	labelClass?: string;
-	label?: string;
+	label?: string | number;
 	tooltip?: string;
 	disable?: boolean;
 }

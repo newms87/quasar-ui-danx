@@ -92,6 +92,7 @@ function storeObjectChildren<T extends TypedObject>(object: T, recentlyStoredObj
 			for (const index in value) {
 				if (value[index] && typeof value[index] === "object") {
 					if (!applyToObject[key]) {
+						// @ts-expect-error this is fine... T is generic, but not sure why the matter to write to an object?
 						applyToObject[key] = [];
 					}
 					applyToObject[key][index] = storeObject(value[index], recentlyStoredObjects);
@@ -128,7 +129,10 @@ function removeObjectFromLists<T extends TypedObject>(object: T) {
  */
 const registeredAutoRefreshes: AnyObject = {};
 
-export async function autoRefreshObject<T extends TypedObject>(object: T, condition: (object: T) => boolean, callback: (object: T) => Promise<T>, interval = 3000) {
+export async function autoRefreshObject<T extends TypedObject>(name: string, object: T, condition: (object: T) => boolean, callback: (object: T) => Promise<T>, interval = 3000) {
+	// Always clear any previously registered auto refreshes before creating a new timeout
+	stopAutoRefreshObject(name);
+
 	if (!object?.id || !object?.__type) {
 		throw new Error("Invalid stored object. Cannot auto-refresh");
 	}
@@ -144,13 +148,11 @@ export async function autoRefreshObject<T extends TypedObject>(object: T, condit
 		storeObject(refreshedObject);
 	}
 
-	// Save the timeoutId to the object so it can be cleared when the object refresh is no longer needed
-	const timeoutId = setTimeout(() => autoRefreshObject(object, condition, callback, interval), interval);
-	registeredAutoRefreshes[object.__type + ":" + object.id] = timeoutId;
+	// Save the autoRefreshId for the object so it can be cleared when the object refresh is no longer needed
+	registeredAutoRefreshes[name] = setTimeout(() => autoRefreshObject(name, object, condition, callback, interval), interval);
 }
 
-export async function stopAutoRefreshObject<T extends TypedObject>(object: T) {
-	const timeoutId = registeredAutoRefreshes[object.__type + ":" + object.id];
-
+export function stopAutoRefreshObject(name: string) {
+	const timeoutId = registeredAutoRefreshes[name];
 	timeoutId && clearTimeout(timeoutId);
 }

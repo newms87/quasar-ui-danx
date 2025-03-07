@@ -8,3 +8,4 @@ export * from "./Popovers";
 export * from "./Tabs";
 export * from "./Tools";
 export * from "./Transitions";
+export * from "./Widgets";

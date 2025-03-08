@@ -138,7 +138,7 @@
 <script setup lang="ts">
 import { DocumentTextIcon as TextFileIcon, DownloadIcon, PlayIcon } from "@heroicons/vue/outline";
 import { computed, ComputedRef, onMounted, ref } from "vue";
-import { download, FileUpload } from "../../../helpers";
+import { download, FileUpload, uniqueBy } from "../../../helpers";
 import { ImageIcon, PdfIcon, TrashIcon as RemoveIcon } from "../../../svg";
 import { UploadedFile } from "../../../types";
 import { FullScreenCarouselDialog } from "../Dialogs";
@@ -202,9 +202,17 @@ const computedImage: ComputedRef<UploadedFile | null> = computed(() => {
 });
 
 const isUploading = computed(() => !props.file || props.file?.progress !== undefined);
-const previewableFiles: ComputedRef<[UploadedFile | null]> = computed(() => {
-	return props.relatedFiles?.length > 0 ? props.relatedFiles : [computedImage.value];
+const previewableFiles: ComputedRef<(UploadedFile | null)[] | null> = computed(() => {
+	return props.relatedFiles?.length > 0 ? uniqueBy([computedImage.value, ...props.relatedFiles], filesHaveSameUrl) : [computedImage.value];
 });
+
+function filesHaveSameUrl(a: UploadedFile, b: UploadedFile) {
+	return a.id === b.id ||
+		[b.url, b.optimized?.url, b.thumb?.url].includes(a.url) ||
+		[a.url, a.optimized?.url, a.thumb?.url].includes(b.url);
+}
+
+console.log("previewableFiles", previewableFiles.value);
 
 const filename = computed(() => computedImage.value?.name || computedImage.value?.filename || "");
 const mimeType = computed(

@@ -33,6 +33,9 @@ export async function pollUntil(callback: () => any, interval = 1000) {
  */
 export function waitForRef(ref: Ref, value: any) {
 	return new Promise<void>((resolve) => {
+		if (ref.value === value) {
+			resolve();
+		}
 		watch(ref, (newValue) => {
 			if (newValue === value) {
 				resolve();

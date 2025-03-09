@@ -26,6 +26,7 @@ const colorClasses = {
 };
 
 const sizeClasses = {
+	xxs: "text-xs px-1 py-.5",
 	xs: "text-xs px-2 py-1",
 	sm: "text-sm px-3 py-1.5",
 	md: "text-base px-3 py-2",

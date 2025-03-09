@@ -212,8 +212,6 @@ function filesHaveSameUrl(a: UploadedFile, b: UploadedFile) {
 		[a.url, a.optimized?.url, a.thumb?.url].includes(b.url);
 }
 
-console.log("previewableFiles", previewableFiles.value);
-
 const filename = computed(() => computedImage.value?.name || computedImage.value?.filename || "");
 const mimeType = computed(
 	() => computedImage.value?.type || computedImage.value?.mime || ""

@@ -115,7 +115,7 @@ export function useControls(name: string, options: ListControlsOptions): ListCon
 	 * Loads the filter field options for the current filter.
 	 */
 	async function loadFieldOptions() {
-		if (!options.routes.fieldOptions || options.isFieldOptionsEnabled === false) return;
+		if (isLoadingFilters.value || !options.routes.fieldOptions || options.isFieldOptionsEnabled === false) return;
 
 		isLoadingFilters.value = true;
 		try {

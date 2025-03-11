@@ -36,6 +36,7 @@
               v-if="deletable"
               type="trash"
               class="ml-4 mr-2"
+              size="sm"
               @click.stop.prevent="$emit('delete', option)"
             />
           </div>

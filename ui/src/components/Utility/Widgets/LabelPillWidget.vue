@@ -21,6 +21,7 @@ const colorClasses = {
 	yellow: "bg-yellow-950 text-yellow-400",
 	blue: "bg-blue-950 text-blue-400",
 	slate: "bg-slate-950 text-slate-400",
+	"slate-mid": "bg-slate-800 text-slate-400",
 	gray: "bg-slate-700 text-gray-300",
 	none: ""
 };

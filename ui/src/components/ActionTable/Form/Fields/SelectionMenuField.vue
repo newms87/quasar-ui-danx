@@ -15,50 +15,48 @@
       :show-icon="selectIcon || DefaultSelectIcon"
       class="mr-2"
     >
-      <template #label>
-        <QMenu
-          :model-value="isSelecting"
-          @before-hide="isSelecting = false"
-          @hide="isSelecting = false"
-        >
-          <div>
-            <div
-              v-for="option in options"
-              :key="option.id"
-              v-ripple
-              class="cursor-pointer flex items-center relative"
-              :class="{'bg-sky-900 hover:bg-sky-800': selected?.id === option.id, 'hover:bg-slate-600': selected?.id !== option.id}"
-              @click="selected = option"
-            >
-              <div class="flex-grow px-4 py-2">
-                {{ option.name }}
-              </div>
-              <ActionButton
-                v-if="deletable"
-                type="trash"
-                class="ml-4 mr-2"
-                @click.stop.prevent="$emit('delete', option)"
-              />
+      <QMenu
+        :model-value="isSelecting"
+        @before-hide="isSelecting = false"
+        @hide="isSelecting = false"
+      >
+        <div>
+          <div
+            v-for="option in options"
+            :key="option.id"
+            v-ripple
+            class="cursor-pointer flex items-center relative"
+            :class="{'bg-sky-900 hover:bg-sky-800': selected?.id === option.id, 'hover:bg-slate-600': selected?.id !== option.id}"
+            @click="selected = option"
+          >
+            <div class="flex-grow px-4 py-2">
+              {{ option.name }}
             </div>
-            <template v-if="creatable">
-              <QSeparator class="bg-slate-400 my-2" />
-              <div class="px-4 mb-2">
-                <QBtn
-                  :class="createClass"
-                  :loading="loading"
-                  @click="$emit('create')"
-                >
-                  <CreateIcon
-                    class="w-3"
-                    :class="createText ? 'mr-2' : ''"
-                  />
-                  {{ createText }}
-                </QBtn>
-              </div>
-            </template>
+            <ActionButton
+              v-if="deletable"
+              type="trash"
+              class="ml-4 mr-2"
+              @click.stop.prevent="$emit('delete', option)"
+            />
           </div>
-        </QMenu>
-      </template>
+          <template v-if="creatable">
+            <QSeparator class="bg-slate-400 my-2" />
+            <div class="px-4 mb-2">
+              <QBtn
+                :class="createClass"
+                :loading="loading"
+                @click="$emit('create')"
+              >
+                <CreateIcon
+                  class="w-3"
+                  :class="createText ? 'mr-2' : ''"
+                />
+                {{ createText }}
+              </QBtn>
+            </div>
+          </template>
+        </div>
+      </QMenu>
     </ShowHideButton>
 
     <div :class="labelClass">

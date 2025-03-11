@@ -39,14 +39,12 @@ const props = withDefaults(defineProps<Props>(), {
 	label: ""
 });
 
-console.log("isShowing", isShowing.value);
 const SETTINGS_KEY = "show-hide-button";
 const settings = getItem(SETTINGS_KEY, {});
 
 if (props.name) {
 	if (settings[props.name] !== undefined) {
 		isShowing.value = settings[props.name];
-		console.log("setting is sowing to", isShowing.value);
 	}
 }
 

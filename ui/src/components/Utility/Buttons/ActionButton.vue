@@ -1,8 +1,8 @@
 <template>
   <QBtn
     :loading="isSaving"
-    class="shadow-none"
-    :class="disabled ? disabledClass : colorClass"
+    class="shadow-none py-0"
+    :class="buttonClass"
     :disable="disabled"
     @click="()=> onAction()"
   >
@@ -16,6 +16,7 @@
         <div
           v-if="label"
           class="ml-2"
+          :class="labelClass"
         >
           {{ label }}
         </div>
@@ -25,7 +26,9 @@
       v-if="tooltip"
       class="whitespace-nowrap"
     >
-      {{ tooltip }}
+      <slot name="tooltip">
+        {{ tooltip }}
+      </slot>
     </QTooltip>
     <QMenu
       v-if="isConfirming"
@@ -70,9 +73,11 @@ import { ActionTarget, ResourceAction } from "../../../types";
 export interface ActionButtonProps {
 	type?: "trash" | "trash-red" | "create" | "edit" | "copy" | "play" | "stop" | "pause" | "refresh" | "confirm" | "cancel";
 	color?: "red" | "blue" | "sky" | "green" | "green-invert" | "lime" | "white" | "gray";
+	size?: "xxs" | "xs" | "sm" | "md" | "lg";
 	icon?: object | string;
 	iconClass?: string;
-	label?: string;
+	label?: string | number;
+	labelClass?: string;
 	tooltip?: string;
 	saving?: boolean;
 	action?: ResourceAction;
@@ -90,13 +95,45 @@ const props = withDefaults(defineProps<ActionButtonProps>(), {
 	color: null,
 	icon: null,
 	iconClass: "",
+	size: "md",
 	label: "",
+	labelClass: "",
 	tooltip: "",
 	action: null,
 	target: null,
 	input: null,
 	confirmText: "Are you sure?",
 	disabledClass: "text-slate-800 bg-slate-500 opacity-50"
+});
+
+const mappedSizeClass = {
+	xxs: {
+		icon: "w-2",
+		button: "px-.5 h-5"
+	},
+	xs: {
+		icon: "w-3",
+		button: "px-1.5 h-6"
+	},
+	sm: {
+		icon: "w-4",
+		button: "px-2 h-8"
+	},
+	md: {
+		icon: "w-5",
+		button: "px-2.5 h-10"
+	},
+	lg: {
+		icon: "w-6",
+		button: "px-3 h-12"
+	}
+};
+
+const buttonClass = computed(() => {
+	return {
+		[props.disabled ? props.disabledClass : colorClass.value]: true,
+		[mappedSizeClass[props.size].button]: true
+	};
 });
 
 const colorClass = computed(() => {
@@ -122,61 +159,62 @@ const colorClass = computed(() => {
 	}
 });
 const typeOptions = computed(() => {
+	const iconClass = mappedSizeClass[props.size].icon;
 	switch (props.type) {
 		case "trash":
 			return {
 				icon: TrashIcon,
-				iconClass: "w-3"
+				iconClass
 			};
 		case "create":
 			return {
 				icon: CreateIcon,
-				iconClass: "w-3"
+				iconClass
 			};
 		case "confirm":
 			return {
 				icon: ConfirmIcon,
-				iconClass: "w-3"
+				iconClass
 			};
 		case "cancel":
 			return {
 				icon: CancelIcon,
-				iconClass: "w-3"
+				iconClass
 			};
 		case "edit":
 			return {
 				icon: EditIcon,
-				iconClass: "w-3"
+				iconClass
 			};
 		case "copy":
 			return {
 				icon: CopyIcon,
-				iconClass: "w-3"
+				iconClass
 			};
 		case "play":
 			return {
 				icon: PlayIcon,
-				iconClass: "w-3"
+				iconClass
 			};
 		case "stop":
 			return {
 				icon: StopIcon,
-				iconClass: "w-3"
+				iconClass
 			};
 		case "pause":
 			return {
 				icon: PauseIcon,
-				iconClass: "w-3"
+				iconClass
 			};
 		case "refresh":
 			return {
 				icon: RefreshIcon,
-				iconClass: "w-4"
+				iconClass
 			};
 		default:
 			return {
 				icon: EditIcon,
-				iconClass: "w-3"
+				iconClass
 			};
 	}
 });

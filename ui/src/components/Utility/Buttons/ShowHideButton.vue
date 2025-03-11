@@ -1,37 +1,21 @@
 <template>
-  <QBtn
-    class="py-1 px-2"
-    :disable="disable"
+  <ActionButton
+    :icon="isShowing ? (hideIcon || DefaultHideIcon) : (showIcon || DefaultShowIcon)"
+    :label="(isShowing ? hideLabel : showLabel) || label"
+    :label-class="labelClass"
     @click="onToggle"
   >
-    <div class="flex items-center flex-nowrap whitespace-nowrap">
-      <slot :is-showing="isShowing">
-        <component
-          :is="isShowing ? (hideIcon || DefaultHideIcon) : (showIcon || DefaultShowIcon)"
-          :class="iconClass"
-        />
-      </slot>
-      <slot
-        name="label"
-        :is-showing="isShowing"
-      >
-        <div
-          v-if="label"
-          :class="labelClass"
-        >
-          {{ (isShowing ? hideLabel : showLabel) || label }}
-        </div>
-      </slot>
-    </div>
-    <QTooltip v-if="tooltip">
-      {{ tooltip }}
-    </QTooltip>
-  </QBtn>
+    <slot />
+    <template #tooltip>
+      <slot name="tooltip" />
+    </template>
+  </ActionButton>
 </template>
 <script lang="ts" setup>
 import { FaSolidEye as DefaultShowIcon, FaSolidEyeSlash as DefaultHideIcon } from "danx-icon";
 import { nextTick } from "vue";
 import { getItem, setItem } from "../../../helpers";
+import ActionButton from "./ActionButton";
 
 export interface Props {
 	name?: string;
@@ -39,14 +23,11 @@ export interface Props {
 	hideLabel?: string;
 	showIcon?: object | string;
 	hideIcon?: object | string;
-	iconClass?: string;
 	labelClass?: string;
 	label?: string | number;
-	tooltip?: string;
-	disable?: boolean;
 }
 
-const emit = defineEmits(["show", "hide"]);
+const emit = defineEmits<{ show: void, hide: void }>();
 const isShowing = defineModel<boolean>();
 const props = withDefaults(defineProps<Props>(), {
 	name: "",
@@ -54,24 +35,23 @@ const props = withDefaults(defineProps<Props>(), {
 	hideLabel: "",
 	showIcon: null,
 	hideIcon: null,
-	iconClass: "w-4 h-6",
 	labelClass: "ml-2",
-	label: "",
-	tooltip: ""
+	label: ""
 });
 
+console.log("isShowing", isShowing.value);
 const SETTINGS_KEY = "show-hide-button";
 const settings = getItem(SETTINGS_KEY, {});
 
 if (props.name) {
 	if (settings[props.name] !== undefined) {
 		isShowing.value = settings[props.name];
+		console.log("setting is sowing to", isShowing.value);
 	}
 }
 
 function onToggle() {
 	isShowing.value = !isShowing.value;
-
 
 	// NOTE: use nextTick to ensure the value is updated before saving (if the parent does not pass a value for modelValue, this can cause a desync)
 	nextTick(() => {

@@ -155,7 +155,7 @@ const colorClass = computed(() => {
 		case "gray":
 			return "text-slate-200 bg-slate-800 hover:bg-slate-900";
 		default:
-			return "text-slate-200 hover:bg-slate-800";
+			return "";
 	}
 });
 const typeOptions = computed(() => {

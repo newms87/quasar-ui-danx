@@ -3,6 +3,7 @@
     class="dx-confirm-dialog"
     v-bind="layoutProps"
     @close="onClose"
+    @keyup.enter="onConfirm"
   >
     <template
       v-for="slotName in childSlots"

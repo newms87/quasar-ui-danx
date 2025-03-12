@@ -85,7 +85,8 @@ export interface ListController<T = ActionTargetItem> {
 	summary: Ref<object | null>;
 	selectedRows: Ref<T[]>;
 	isLoadingList: Ref<boolean>;
-	isLoadingFilters: Ref<boolean>;
+	isLoadingFieldOptions: Ref<boolean>;
+	hasLoadedFieldOptions: Ref<boolean>;
 	isLoadingSummary: Ref<boolean>;
 	pager: ComputedRef<{
 		perPage: number;

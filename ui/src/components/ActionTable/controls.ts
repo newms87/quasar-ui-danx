@@ -35,7 +35,8 @@ export function useControls(name: string, options: ListControlsOptions): ListCon
 	// Field options are the lists of field values available given the applied filter on the list query. These are used for drop-downs / options in forms, filters, etc.
 	// (ie: all states available under the current filter)
 	const fieldOptions = ref<AnyObject>({});
-	const isLoadingFilters = ref(false);
+	const isLoadingFieldOptions = ref(false);
+	const hasLoadedFieldOptions = ref(false);
 
 	const filterActiveCount = computed(() => Object.keys(activeFilter.value).filter(key => activeFilter.value[key] !== undefined).length);
 
@@ -108,6 +109,9 @@ export function useControls(name: string, options: ListControlsOptions): ListCon
 	 * Gets the field options for the given field name.
 	 */
 	function getFieldOptions(field: string): any[] {
+		if (!hasLoadedFieldOptions.value) {
+			loadFieldOptions();
+		}
 		return fieldOptions.value[field] || [];
 	}
 
@@ -115,15 +119,16 @@ export function useControls(name: string, options: ListControlsOptions): ListCon
 	 * Loads the filter field options for the current filter.
 	 */
 	async function loadFieldOptions() {
-		if (isLoadingFilters.value || !options.routes.fieldOptions || options.isFieldOptionsEnabled === false) return;
+		if (isLoadingFieldOptions.value || !options.routes.fieldOptions || options.isFieldOptionsEnabled === false) return;
 
-		isLoadingFilters.value = true;
+		isLoadingFieldOptions.value = true;
 		try {
 			fieldOptions.value = await options.routes.fieldOptions() || {};
+			hasLoadedFieldOptions.value = true;
 		} catch (e) {
 			// Fail silently
 		} finally {
-			isLoadingFilters.value = false;
+			isLoadingFieldOptions.value = false;
 		}
 	}
 
@@ -271,7 +276,7 @@ export function useControls(name: string, options: ListControlsOptions): ListCon
 				loadSummary();
 			}
 
-			if (!isLoadingFilters.value) {
+			if (!isLoadingFieldOptions.value) {
 				loadFieldOptions();
 			}
 		}, 1);
@@ -498,7 +503,8 @@ export function useControls(name: string, options: ListControlsOptions): ListCon
 		summary,
 		selectedRows,
 		isLoadingList,
-		isLoadingFilters,
+		isLoadingFieldOptions,
+		hasLoadedFieldOptions,
 		isLoadingSummary,
 		pager,
 		pagination,

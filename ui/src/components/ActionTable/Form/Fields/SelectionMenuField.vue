@@ -1,19 +1,15 @@
 <template>
   <div class="group flex items-center flex-nowrap gap-x-1 relative">
-    <QInnerLoading
-      v-if="loading"
-      showing
-      class="bg-sky-900 opacity-50 z-10 rounded"
-      color="teal"
-    />
     <ShowHideButton
       v-if="selectable"
       v-model="isSelecting"
       :disable="disable"
       :label="selectText"
+      :saving="loading"
       :class="selectClass"
       :show-icon="selectIcon || DefaultSelectIcon"
       class="mr-2"
+      :size="size"
     >
       <QMenu
         :model-value="isSelecting"
@@ -36,24 +32,22 @@
               v-if="deletable"
               type="trash"
               class="ml-4 mr-2"
-              size="sm"
+              :size="size"
               @click.stop.prevent="$emit('delete', option)"
             />
           </div>
           <template v-if="creatable">
             <QSeparator class="bg-slate-400 my-2" />
             <div class="px-4 mb-2">
-              <QBtn
+              <ActionButton
+                type="create"
+                color="green"
                 :class="createClass"
-                :loading="loading"
+                :label="createText"
+                :saving="loading"
+                :size="size"
                 @click="$emit('create')"
-              >
-                <CreateIcon
-                  class="w-3"
-                  :class="createText ? 'mr-2' : ''"
-                />
-                {{ createText }}
-              </QBtn>
+              />
             </div>
           </template>
         </div>
@@ -84,6 +78,7 @@
       v-model="editing"
       :label="editText"
       :class="editClass"
+      :size="size"
       class="opacity-0 group-hover:opacity-100 transition-all"
       :show-icon="EditIcon"
       :hide-icon="DoneEditingIcon"
@@ -105,13 +100,12 @@ import {
 	FaSolidCheck as DoneEditingIcon,
 	FaSolidCircleXmark as ClearIcon,
 	FaSolidListCheck as DefaultSelectIcon,
-	FaSolidPencil as EditIcon,
-	FaSolidPlus as CreateIcon
+	FaSolidPencil as EditIcon
 } from "danx-icon";
 import { ref } from "vue";
 import { ActionTargetItem } from "../../../../types";
 import { ShowHideButton } from "../../../Utility/Buttons";
-import ActionButton from "../../../Utility/Buttons/ActionButton";
+import { ActionButtonProps, default as ActionButton } from "../../../Utility/Buttons/ActionButton";
 import EditableDiv from "./EditableDiv";
 
 defineEmits(["create", "update", "delete"]);
@@ -139,6 +133,7 @@ withDefaults(defineProps<{
 	nameEditable?: boolean;
 	clearable?: boolean;
 	disable?: boolean;
+	size?: ActionButtonProps["size"];
 }>(), {
 	selectText: "",
 	createText: "",
@@ -146,11 +141,12 @@ withDefaults(defineProps<{
 	clearText: "",
 	placeholder: "(No selection)",
 	selectClass: "bg-sky-800",
-	createClass: "bg-green-900",
+	createClass: "",
 	editClass: "",
 	clearClass: "rounded-full",
 	labelClass: "text-slate-600",
-	selectIcon: null
+	selectIcon: null,
+	size: "md"
 });
 
 const isSelecting = ref(false);

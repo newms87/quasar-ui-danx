@@ -145,7 +145,7 @@ const colorClass = computed(() => {
 		case "green":
 			return "text-green-900 bg-green-300 hover:bg-green-400";
 		case "green-invert":
-			return "text-lime-800 bg-green-200 hover:bg-lime-800 hover:text-green-200";
+			return "text-green-300 bg-green-900 hover:bg-green-800";
 		case "blue":
 			return "text-blue-900 bg-blue-300 hover:bg-blue-400";
 		case "sky":

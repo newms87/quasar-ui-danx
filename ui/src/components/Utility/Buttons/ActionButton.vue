@@ -14,7 +14,7 @@
       />
       <slot>
         <div
-          v-if="label"
+          v-if="label || label === 0"
           class="ml-2"
           :class="labelClass"
         >

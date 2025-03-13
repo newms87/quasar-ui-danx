@@ -1,5 +1,6 @@
 <template>
   <QDialog
+    class="full-screen-dialog"
     :model-value="modelValue"
     maximized
     transition-show="slide-up"
@@ -22,28 +23,31 @@
   </QDialog>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { computed } from "vue";
 import { XIcon } from "../../../svg";
 
 const emit = defineEmits(["update:model-value", "close"]);
-const props = defineProps({
-  modelValue: Boolean,
-  center: Boolean,
-  blue: Boolean,
-  closeable: Boolean
+const props = withDefaults(defineProps<{
+	modelValue: boolean;
+	center?: boolean;
+	blue?: boolean;
+	closeable?: boolean;
+	contentClass?: string;
+}>(), {
+	contentClass: "bg-white text-gray-400"
 });
 
 let computedClass = computed(() => {
-  return {
-    "bg-blue-600 text-white": props.blue,
-    "bg-white text-gray-400": !props.blue,
-    "items-center": props.center
-  };
+	return {
+		"bg-blue-600 text-white": props.blue,
+		"items-center": props.center,
+		[props.contentClass]: !props.blue
+	};
 });
 
 function onClose() {
-  emit("update:model-value", false);
-  emit("close");
+	emit("update:model-value", false);
+	emit("close");
 }
 </script>

@@ -72,7 +72,7 @@ import { ActionTarget, ResourceAction } from "../../../types";
 
 export interface ActionButtonProps {
 	type?: "trash" | "trash-red" | "create" | "edit" | "copy" | "play" | "stop" | "pause" | "refresh" | "confirm" | "cancel";
-	color?: "red" | "blue" | "sky" | "green" | "green-invert" | "lime" | "white" | "gray";
+	color?: "red" | "blue" | "sky" | "sky-invert" | "green" | "green-invert" | "lime" | "white" | "gray";
 	size?: "xxs" | "xs" | "sm" | "md" | "lg";
 	icon?: object | string;
 	iconClass?: string;
@@ -150,6 +150,8 @@ const colorClass = computed(() => {
 			return "text-blue-900 bg-blue-300 hover:bg-blue-400";
 		case "sky":
 			return "text-sky-900 bg-sky-300 hover:bg-sky-400";
+		case "sky-invert":
+			return "text-sky-400 bg-sky-800 hover:bg-sky-900";
 		case "white":
 			return "text-white bg-gray-800 hover:bg-gray-200";
 		case "gray":

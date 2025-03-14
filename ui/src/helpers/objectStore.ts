@@ -44,10 +44,10 @@ export function storeObject<T extends TypedObject>(newObject: T, recentlyStoredO
 	// Retrieve the existing object if it already exists in the store
 	const oldObject = store.get(objectKey);
 
-	// If an old object exists, and it is newer than the new object, do not store the new object, just return the old
+	// If an old object exists, and it is newer than the new object, and all the child objects are not newer than the original do not store the new object,
+	// just return the old
 	// NOTE: If the timestamp is the same, its possible the intention is to update the existing object, so DO NOT return old object in this case
-	// @ts-expect-error __timestamp is guaranteed to be set in this case on both old and new
-	if (oldObject && newObject.__timestamp < oldObject.__timestamp) {
+	if (!hasRecentUpdates(newObject, oldObject)) {
 		recentlyStoredObjects[objectKey] = oldObject;
 
 		// Recursively store all the children of the object as well
@@ -103,6 +103,55 @@ function storeObjectChildren<T extends TypedObject>(object: T, recentlyStoredObj
 			applyToObject[key] = storeObject(value as TypedObject, recentlyStoredObjects);
 		}
 	}
+}
+
+/**
+ * Recursively check the current object and all its child objects
+ * to see if any of the objects are newer than the currently stored objects
+ */
+function hasRecentUpdates(newObject: TypedObject, oldObject: TypedObject | null) {
+	// If there are no timestamps to compare, assume there are updates
+	if (!newObject.__timestamp || !oldObject?.__timestamp) return true;
+
+	// If the new object has a newer timestamp than the old then there are updates
+	if (newObject.__timestamp > oldObject.__timestamp) return true;
+
+	for (const key of Object.keys(newObject)) {
+		const newObjectValue = newObject[key];
+		const oldObjectValue = oldObject[key];
+
+		// If the old object does not have this key, this is new information, therefore there are updates
+		if (!oldObjectValue?.__timestamp) {
+			return true;
+		}
+
+		if (Array.isArray(newObjectValue) && newObjectValue.length > 0) {
+			for (const newObjectItem of newObjectValue as TypedObject[]) {
+				// Only compare the object if it is a TypedObject
+				if (newObjectItem?.__type) {
+					const oldObjectItem = (oldObjectValue as TypedObject[]).find((v: TypedObject) => v.id === newObjectItem.id && v.__type === newObjectItem.__type);
+
+					// If the oldObject does not have this entry, then there is new information, therefore there are updates
+					if (!oldObjectItem?.__timestamp) {
+						return true;
+					}
+
+					// Compare the child objects to see if there are updates
+					if (hasRecentUpdates(newObjectItem, oldObjectItem)) {
+						return true;
+					}
+				}
+			}
+		} else if (newObjectValue?.__type) {
+			// Only compare the object if it is a TypedObject
+			if (hasRecentUpdates(newObjectValue, oldObjectValue)) {
+				return true;
+			}
+		}
+	}
+
+	// If no updates were found, return false
+	return false;
 }
 
 /**

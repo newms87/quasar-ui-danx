@@ -69,7 +69,7 @@
         class="absolute-bottom w-full bg-slate-800"
       >
         <QLinearProgress
-          :value="isUploading ? file.progress : (transcodingStatus.progress / 100)"
+          :value="isUploading ? file.progress : ((transcodingStatus?.progress || 0) / 100)"
           size="36px"
           :color="isUploading ? 'green-800' : 'blue-800'"
           :animation-speed="transcodingStatus?.estimate_ms || 3000"
@@ -77,12 +77,18 @@
         >
           <div class="absolute-full flex items-center flex-nowrap text-[.7rem] text-slate-200 justify-start px-1">
             <QSpinnerPie
-              class="mr-2 text-slate-50 ml-1"
-              size="20"
+              class="mr-2 text-slate-50 ml-1 flex-shrink-0"
+              :size="btnSize === 'xs' ? 10 : 20"
             />
-            <div>
-              {{ isUploading ? "Uploading..." : transcodingStatus.message }}
+            <div class="whitespace-nowrap overflow-hidden ellipsis">
+              {{ isUploading ? "Uploading..." : transcodingStatus?.message }}
             </div>
+            <QTooltip
+              v-if="transcodingStatus?.message"
+              class="text-sm"
+            >
+              {{ transcodingStatus?.message }}
+            </QTooltip>
           </div>
         </QLinearProgress>
       </div>

@@ -41,6 +41,14 @@
               :alt="file.filename"
               :src="getPreviewUrl(file)"
             >
+            <div
+              v-else-if="isText(file)"
+              class="w-[60vw] min-w-96 bg-slate-800 rounded-lg"
+            >
+              <div class="whitespace-pre-wrap p-4">
+                {{ fileTexts[file.id] }}
+              </div>
+            </div>
             <div v-else>
               <h3 class="text-center mb-4">
                 No Preview Available
@@ -71,8 +79,9 @@
     </div>
   </QDialog>
 </template>
-<script setup>
-import { ref } from "vue";
+<script setup lang="ts">
+import { QCarousel } from "quasar";
+import { onMounted, ref, shallowRef } from "vue";
 import { XIcon as CloseIcon } from "../../../svg";
 
 defineEmits(["close"]);
@@ -97,6 +106,10 @@ function isImage(file) {
 	return file.mime?.startsWith("image");
 }
 
+function isText(file) {
+	return file.mime?.startsWith("text");
+}
+
 function getPreviewUrl(file) {
 	// Use the optimized URL first if available. If not, use the URL directly if its an image, otherwise use the thumb URL
 	return file.optimized?.url || (isImage(file) ? (file.blobUrl || file.url) : file.thumb?.url);
@@ -111,8 +124,26 @@ function getThumbUrl(file) {
 			`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="white"><path d="M0 0h24v24H0z" fill="none"/><path d="M8 5v14l11-7z"/></svg>`
 		)}`;
 	} else {
-		return getPreviewUrl(file);
+		return getPreviewUrl(file) || "https://placehold.co/40x50?text=T";
 	}
+}
+
+onMounted(() => {
+	for (let file of props.files) {
+		if (isText(file)) {
+			loadFileText(file);
+		}
+	}
+});
+
+const fileTexts = shallowRef<{ [key: string]: string }>({});
+
+async function loadFileText(file) {
+	if (fileTexts.value[file.id]) {
+		return fileTexts.value[file.id];
+	}
+
+	fileTexts.value[file.id] = await fetch(file.url).then((res) => res.text());
 }
 </script>
 <style module="cls" lang="scss">

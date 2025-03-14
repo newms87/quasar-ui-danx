@@ -69,6 +69,7 @@
         class="absolute-bottom w-full bg-slate-800"
       >
         <QLinearProgress
+          :key="'progress-' + isUploading ? 'uploading' : 'transcoding'"
           :value="isUploading ? file.progress : ((transcodingStatus?.progress || 0) / 100)"
           size="36px"
           :color="isUploading ? 'green-800' : 'blue-800'"
@@ -80,15 +81,14 @@
               class="mr-2 text-slate-50 ml-1 flex-shrink-0"
               :size="btnSize === 'xs' ? 10 : 20"
             />
-            <div class="whitespace-nowrap overflow-hidden ellipsis">
-              {{ isUploading ? "Uploading..." : transcodingStatus?.message }}
-            </div>
-            <QTooltip
-              v-if="transcodingStatus?.message"
-              class="text-sm"
-            >
-              {{ transcodingStatus?.message }}
-            </QTooltip>
+            <template v-if="statusMessage">
+              <div class="whitespace-nowrap overflow-hidden ellipsis">
+                {{ statusMessage }}
+              </div>
+              <QTooltip class="text-sm">
+                {{ statusMessage }}
+              </QTooltip>
+            </template>
           </div>
         </QLinearProgress>
       </div>
@@ -208,6 +208,7 @@ const computedImage: ComputedRef<UploadedFile | null> = computed(() => {
 });
 
 const isUploading = computed(() => !props.file || props.file?.progress !== undefined);
+const statusMessage = computed(() => isUploading.value ? "Uploading..." : transcodingStatus.value?.message);
 const previewableFiles: ComputedRef<(UploadedFile | null)[] | null> = computed(() => {
 	return props.relatedFiles?.length > 0 ? uniqueBy([computedImage.value, ...props.relatedFiles], filesHaveSameUrl) : [computedImage.value];
 });

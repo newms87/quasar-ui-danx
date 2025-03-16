@@ -10,6 +10,7 @@ export * from "./FileUpload";
 export * from "./FlashMessages";
 export * from "./formats";
 export * from "./hotkeys";
+export * from "./importFile";
 export * from "./multiFileUpload";
 export * from "./objectStore";
 export * from "./request";

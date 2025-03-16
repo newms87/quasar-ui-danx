@@ -10,7 +10,7 @@
       <component
         :is="icon || typeOptions.icon"
         class="transition-all"
-        :class="iconClass + ' ' + typeOptions.iconClass"
+        :class="resolvedIconClass"
       />
       <slot>
         <div
@@ -60,6 +60,8 @@ import {
 	FaSolidCircleCheck as ConfirmIcon,
 	FaSolidCircleXmark as CancelIcon,
 	FaSolidCopy as CopyIcon,
+	FaSolidFileExport as ExportIcon,
+	FaSolidFileImport as ImportIcon,
 	FaSolidPause as PauseIcon,
 	FaSolidPencil as EditIcon,
 	FaSolidPlay as PlayIcon,
@@ -71,7 +73,7 @@ import { computed, ref } from "vue";
 import { ActionTarget, ResourceAction } from "../../../types";
 
 export interface ActionButtonProps {
-	type?: "trash" | "trash-red" | "create" | "edit" | "copy" | "play" | "stop" | "pause" | "refresh" | "confirm" | "cancel";
+	type?: "trash" | "trash-red" | "create" | "edit" | "copy" | "play" | "stop" | "pause" | "refresh" | "confirm" | "cancel" | "export" | "import";
 	color?: "red" | "blue" | "sky" | "sky-invert" | "green" | "green-invert" | "lime" | "white" | "gray";
 	size?: "xxs" | "xs" | "sm" | "md" | "lg";
 	icon?: object | string;
@@ -160,64 +162,37 @@ const colorClass = computed(() => {
 			return "";
 	}
 });
+
+const resolvedIconClass = computed(() => props.iconClass + " " + mappedSizeClass[props.size].icon);
+
 const typeOptions = computed(() => {
-	const iconClass = mappedSizeClass[props.size].icon;
 	switch (props.type) {
 		case "trash":
-			return {
-				icon: TrashIcon,
-				iconClass
-			};
+			return { icon: TrashIcon };
+		case "export":
+			return { icon: ExportIcon };
+		case "import":
+			return { icon: ImportIcon };
 		case "create":
-			return {
-				icon: CreateIcon,
-				iconClass
-			};
+			return { icon: CreateIcon };
 		case "confirm":
-			return {
-				icon: ConfirmIcon,
-				iconClass
-			};
+			return { icon: ConfirmIcon };
 		case "cancel":
-			return {
-				icon: CancelIcon,
-				iconClass
-			};
+			return { icon: CancelIcon };
 		case "edit":
-			return {
-				icon: EditIcon,
-				iconClass
-			};
+			return { icon: EditIcon };
 		case "copy":
-			return {
-				icon: CopyIcon,
-				iconClass
-			};
+			return { icon: CopyIcon };
 		case "play":
-			return {
-				icon: PlayIcon,
-				iconClass
-			};
+			return { icon: PlayIcon };
 		case "stop":
-			return {
-				icon: StopIcon,
-				iconClass
-			};
+			return { icon: StopIcon };
 		case "pause":
-			return {
-				icon: PauseIcon,
-				iconClass
-			};
+			return { icon: PauseIcon };
 		case "refresh":
-			return {
-				icon: RefreshIcon,
-				iconClass
-			};
+			return { icon: RefreshIcon };
 		default:
-			return {
-				icon: EditIcon,
-				iconClass
-			};
+			return { icon: EditIcon };
 	}
 });
 

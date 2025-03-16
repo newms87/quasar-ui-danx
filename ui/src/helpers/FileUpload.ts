@@ -1,5 +1,6 @@
 import { uid } from "quasar";
 import { danxOptions } from "../config";
+import { DateTime, parseDateTime } from "../helpers/formats";
 import {
 	FileUploadAllCompleteCallback,
 	FileUploadCompleteCallback,
@@ -278,11 +279,15 @@ export class FileUpload {
 	 */
 	isTranscoding(file: UploadedFile) {
 		const metaTranscodes = file?.meta?.transcodes || [];
-
 		for (const transcodeName of Object.keys(metaTranscodes)) {
 			const transcode = metaTranscodes[transcodeName];
+
 			if (transcode.status === "Pending" || transcode.status === "In Progress") {
-				return true;
+				const startedAt = parseDateTime(transcode.started_at);
+				const duration = startedAt && DateTime.now().diff(startedAt, "minutes");
+				if (!duration?.minutes || duration.minutes < 30) {
+					return true;
+				}
 			}
 		}
 		return false;

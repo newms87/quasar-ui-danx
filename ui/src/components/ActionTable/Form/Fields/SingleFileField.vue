@@ -13,7 +13,7 @@
       class="text-sm font-semibold"
     />
     <div
-      v-if="!disable && !readonly"
+      v-if="!disabled && !readonly"
       class="text-sm mt-2"
     >
       <a
@@ -39,7 +39,7 @@
       :class="{'border border-dashed border-blue-600': !uploadedFile, 'mx-auto': !readonly}"
       :file="uploadedFile || undefined"
       downloadable
-      @click="!disable && $refs.file.click()"
+      @click="!disabled && $refs.file.click()"
     />
     <div
       v-else-if="readonly"
@@ -63,7 +63,7 @@ const props = defineProps<{
 	label?: string;
 	name?: string;
 	showName?: boolean;
-	disable?: boolean;
+	disabled?: boolean;
 	readonly?: boolean;
 }>();
 const { onComplete, onDrop, onFileSelected, uploadedFile, clearUploadedFile } = useSingleFileUpload();

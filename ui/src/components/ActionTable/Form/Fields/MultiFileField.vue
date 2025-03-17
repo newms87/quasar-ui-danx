@@ -11,7 +11,7 @@
     />
 
     <input
-      v-if="!disable && !readonly"
+      v-if="!disabled && !readonly"
       ref="file"
       class="hidden"
       type="file"
@@ -29,11 +29,11 @@
         :file="file"
         :related-files="file.transcodes || uploadedFiles"
         downloadable
-        :removable="!readonly && !disable"
+        :removable="!readonly && !disabled"
         @remove="onRemove(file)"
       />
       <div
-        v-if="!disable && !readonly"
+        v-if="!disabled && !readonly"
         class="dx-add-remove-files m-2 flex flex-col flex-nowrap items-center overflow-hidden cursor-pointer"
         :class="filePreviewClass"
         :style="styleSize"
@@ -85,7 +85,7 @@ const props = withDefaults(defineProps<{
 	field?: FormField;
 	label?: string;
 	showName?: boolean;
-	disable?: boolean;
+	disabled?: boolean;
 	readonly?: boolean;
 	width?: number | string;
 	height?: number | string;

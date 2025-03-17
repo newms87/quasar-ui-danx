@@ -2,7 +2,7 @@
   <QToggle
     :data-testid="'boolean-field-' + (name || label)"
     :model-value="modelValue || (toggleIndeterminate ? modelValue : false)"
-    :disable="disable || readonly"
+    :disable="disabled || readonly"
     :toggle-indeterminate="toggleIndeterminate"
     :indeterminate-value="undefined"
     @update:model-value="$emit('update:model-value', $event)"
@@ -40,7 +40,7 @@ defineProps({
 	},
 	showName: Boolean,
 	toggleIndeterminate: Boolean,
-	disable: Boolean,
+	disabled: Boolean,
 	readonly: Boolean
 });
 </script>

@@ -27,7 +27,7 @@
               {{ name || "1" }}
             </div>
             <div
-              v-if="!disable && !readonly && canModifyVariations"
+              v-if="!disabled && !readonly && canModifyVariations"
               class="flex flex-nowrap items-center mr-2"
             >
               <a
@@ -86,7 +86,8 @@
           :no-label="noLabel"
           :show-name="showName"
           :clearable="field.clearable || clearable"
-          :disable="disable"
+          :disabled="disabled"
+          :disable="disabled"
           :readonly="readonly"
           @update:model-value="onInput(field.name, $event)"
         />
@@ -206,7 +207,8 @@ function getVnodeProps(field) {
 		label: field.label,
 		clearable: field.clearable || props.clearable,
 		readonly: props.readonly,
-		disable: props.disable,
+		disabled: props.disabled,
+		disable: props.disabled,
 		showName: props.showName,
 		noLabel: props.noLabel
 	};
@@ -225,7 +227,7 @@ const currentVariation = ref(variationNames.value[0] || "");
 const newVariationName = ref("");
 const variationToEdit = ref<boolean | string>(false);
 const variationToDelete = ref("");
-const canAddVariation = computed(() => props.canModifyVariations && !props.readonly && !props.disable && variationNames.value.length < (props.form.variations || 0));
+const canAddVariation = computed(() => props.canModifyVariations && !props.readonly && !props.disabled && variationNames.value.length < (props.form.variations || 0));
 
 function getFieldResponse(name: string, variation?: string) {
 	if (!fieldResponses.value) return undefined;

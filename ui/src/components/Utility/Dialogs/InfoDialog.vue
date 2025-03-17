@@ -23,7 +23,7 @@
           :label="doneText"
           class="dx-dialog-button dx-dialog-button-done"
           :class="doneClass"
-          :disable="disable"
+          :disable="disabled"
           @click="onClose"
         >
           <slot name="done-text" />
@@ -40,7 +40,7 @@ import DialogLayout from "./DialogLayout";
 const emit = defineEmits(["update:model-value", "close"]);
 defineProps({
 	...DialogLayout.props,
-	disable: Boolean,
+	disabled: Boolean,
 	doneClass: {
 		type: [String, Object],
 		default: ""

@@ -3,7 +3,7 @@
     <ShowHideButton
       v-if="selectable"
       v-model="isSelecting"
-      :disable="disable"
+      :disabled="disabled"
       :label="selectText"
       :saving="loading"
       :class="selectClass"
@@ -79,9 +79,11 @@
       :label="editText"
       :class="editClass"
       :size="size"
+      :disabled="editDisabled"
       class="opacity-0 group-hover:opacity-100 transition-all"
       :show-icon="EditIcon"
       :hide-icon="DoneEditingIcon"
+      :tooltip="editDisabled ? 'You are not allowed to edit' : ''"
     />
 
     <QBtn
@@ -132,7 +134,8 @@ withDefaults(defineProps<{
 	deletable?: boolean;
 	nameEditable?: boolean;
 	clearable?: boolean;
-	disable?: boolean;
+	disabled?: boolean;
+	editDisabled?: boolean;
 	size?: ActionButtonProps["size"];
 }>(), {
 	selectText: "",

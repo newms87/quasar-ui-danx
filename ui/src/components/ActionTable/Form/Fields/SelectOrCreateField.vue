@@ -14,7 +14,7 @@
     <ShowHideButton
       v-if="showEdit"
       v-model="editing"
-      :disable="!canEdit"
+      :disabled="!canEdit"
       :label="editText"
       :class="editClass"
       :show-icon="EditIcon"

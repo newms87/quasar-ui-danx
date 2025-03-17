@@ -15,7 +15,7 @@
       v-else
       class="mt-2"
       :api-key="danxOptions.tinyMceApiKey"
-      :disabled="disable"
+      :disabled="disabled"
       :model-value="modelValue"
       @update:model-value="$emit('update:model-value', $event)"
     />
@@ -39,7 +39,7 @@ defineProps({
 	},
 	noLabel: Boolean,
 	showName: Boolean,
-	disable: Boolean,
+	disabled: Boolean,
 	readonly: Boolean
 });
 </script>

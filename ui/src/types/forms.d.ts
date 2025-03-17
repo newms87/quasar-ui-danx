@@ -44,7 +44,7 @@ export interface RenderedFormProps {
 	form: Form;
 	noLabel?: boolean;
 	showName?: boolean;
-	disable?: boolean;
+	disabled?: boolean;
 	readonly?: boolean;
 	saving?: boolean;
 	clearable?: boolean;

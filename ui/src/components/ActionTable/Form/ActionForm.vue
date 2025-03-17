@@ -21,7 +21,7 @@ interface ActionFormProps {
 	form: Form;
 	noLabel?: boolean;
 	showName?: boolean;
-	disable?: boolean;
+	disabled?: boolean;
 	readonly?: boolean;
 	clearable?: boolean;
 	fieldClass?: string;
@@ -38,7 +38,7 @@ const renderedFormProps = {
 	form: props.form,
 	noLabel: props.noLabel,
 	showName: props.showName,
-	disable: props.disable,
+	disabled: props.disabled,
 	readonly: props.readonly,
 	clearable: props.clearable,
 	fieldClass: props.fieldClass,

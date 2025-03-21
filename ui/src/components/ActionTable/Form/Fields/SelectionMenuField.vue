@@ -18,7 +18,7 @@
       >
         <div>
           <div
-            v-for="option in options"
+            v-for="option in optionsPlusSelected"
             :key="option.id"
             v-ripple
             class="cursor-pointer flex items-center relative"
@@ -104,7 +104,7 @@ import {
 	FaSolidListCheck as DefaultSelectIcon,
 	FaSolidPencil as EditIcon
 } from "danx-icon";
-import { ref } from "vue";
+import { computed, ref } from "vue";
 import { ActionTargetItem } from "../../../../types";
 import { ShowHideButton } from "../../../Utility/Buttons";
 import { ActionButtonProps, default as ActionButton } from "../../../Utility/Buttons/ActionButton";
@@ -113,7 +113,7 @@ import EditableDiv from "./EditableDiv";
 defineEmits(["create", "update", "delete"]);
 const selected = defineModel<ActionTargetItem | null>("selected");
 const editing = defineModel<boolean>("editing");
-withDefaults(defineProps<{
+const props = withDefaults(defineProps<{
 	options: ActionTargetItem[];
 	showEdit?: boolean;
 	loading?: boolean;
@@ -153,4 +153,10 @@ withDefaults(defineProps<{
 });
 
 const isSelecting = ref(false);
+
+// If the selected option is not in the options list, it should be added in
+const optionsPlusSelected = computed(() => {
+	if (!selected.value || props.options.find((o) => o.id === selected.value?.id)) return props.options;
+	return [selected.value, ...props.options];
+});
 </script>

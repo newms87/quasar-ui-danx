@@ -46,6 +46,7 @@
           class="flex items-stretch flex-nowrap h-full"
         >
           <PanelsDrawerTabs
+            v-if="!hideTabs"
             :key="'pd-tabs:' + target.id"
             v-model="activePanel"
             :target="target"
@@ -53,13 +54,31 @@
             :panels="panels"
             @update:model-value="$emit('update:model-value', $event)"
           />
-          <PanelsDrawerPanels
+
+          <QTabPanels
             :key="'pd-panels:' + target.id"
-            :panels="panels"
-            :active-panel="activePanel"
-            :active-item="target"
+            :model-value="activePanel"
             :class="activePanelOptions?.class || panelsClass"
-          />
+            class="dx-panels-drawer-panels overflow-y-auto h-full transition-all"
+          >
+            <slot
+              name="panels"
+              :active-panel="activePanel"
+            >
+              <QTabPanel
+                v-for="panel in panels"
+                :key="panel.name"
+                :name="panel.name"
+              >
+                <RenderVnode
+                  v-if="panel.vnode"
+                  :vnode="panel.vnode"
+                  :props="target"
+                />
+              </QTabPanel>
+            </slot>
+          </QTabPanels>
+
           <div
             v-if="$slots['right-sidebar']"
             class="border-l overflow-y-auto"
@@ -81,8 +100,7 @@
 import { computed, onMounted, ref, watch } from "vue";
 import { XIcon as CloseIcon } from "../../svg";
 import { ActionPanel, ActionTargetItem } from "../../types";
-import { ContentDrawer } from "../Utility";
-import PanelsDrawerPanels from "./PanelsDrawerPanels";
+import { ContentDrawer, RenderVnode } from "../Utility";
 import PanelsDrawerTabs from "./PanelsDrawerTabs";
 
 export interface PanelsDrawerProps {
@@ -93,7 +111,8 @@ export interface PanelsDrawerProps {
 	panelsClass?: string | object,
 	drawerClass?: string | object,
 	position?: "standard" | "right" | "left";
-	panels: ActionPanel[]
+	panels: ActionPanel[];
+	hideTabs?: boolean;
 }
 
 defineEmits(["update:model-value", "close"]);

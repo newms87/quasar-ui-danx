@@ -11,7 +11,7 @@
       class="text-sm font-semibold"
     />
     <div
-      v-if="!disable && !readonly"
+      v-if="!disable && !readonly && !hideControls"
       class="text-sm my-2"
     >
       <a
@@ -23,20 +23,21 @@
         class="ml-3 text-red-900"
         @click="clearUploadedFiles"
       >Clear</a>
-      <input
-        ref="file"
-        class="hidden"
-        type="file"
-        multiple
-        @change="onFilesSelected"
-      >
     </div>
+
+    <input
+      ref="file"
+      class="hidden"
+      type="file"
+      multiple
+      @change="onFilesSelected"
+    >
 
     <div class="max-w-[50em] flex items-stretch justify-start">
       <FilePreview
         v-for="file in uploadedFiles"
         :key="'file-upload-' + file.id"
-        class="w-32 m-2 cursor-pointer bg-gray-200"
+        class="w-32 h-32 m-2 cursor-pointer bg-gray-200"
         :class="{'border border-dashed border-blue-600': !uploadedFiles.length}"
         :image="file"
         :related-files="uploadedFiles"
@@ -46,7 +47,7 @@
       />
       <FilePreview
         v-if="!disable && !readonly"
-        class="w-32 m-2 cursor-pointer border border-dashed border-blue-600"
+        class="w-32 h-32 m-2 cursor-pointer border border-dashed border-blue-600"
         disabled
         @click="$refs.file.click()"
       />
@@ -61,31 +62,33 @@
 </template>
 
 <script setup>
-import { onMounted } from "vue";
+import { onMounted, watch } from "vue";
 import { useMultiFileUpload } from "../../../../helpers";
 import { FilePreview } from "../../../Utility";
 import FieldLabel from "./FieldLabel";
 
 const emit = defineEmits(["update:model-value"]);
 const props = defineProps({
-  modelValue: {
-    type: [Object, String],
-    default: null
-  },
-  field: {
-    type: Object,
-    required: true
-  },
-  showName: Boolean,
-  disable: Boolean,
-  readonly: Boolean
+	modelValue: {
+		type: [Object, String],
+		default: null
+	},
+	field: {
+		type: Object,
+		required: true
+	},
+	showName: Boolean,
+	disable: Boolean,
+	readonly: Boolean,
+	hideControls: Boolean
 });
 
 const { onComplete, onDrop, onFilesSelected, uploadedFiles, clearUploadedFiles, onRemove } = useMultiFileUpload();
 onMounted(() => {
-  if (props.modelValue) {
-    uploadedFiles.value = props.modelValue;
-  }
+	if (props.modelValue) {
+		uploadedFiles.value = props.modelValue;
+	}
 });
+watch(() => props.modelValue, () => uploadedFiles.value = props.modelValue);
 onComplete(() => emit("update:model-value", uploadedFiles.value));
 </script>

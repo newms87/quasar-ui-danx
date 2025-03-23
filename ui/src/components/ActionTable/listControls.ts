@@ -156,7 +156,7 @@ export function useListControls({
 		}
 
 		// Add a reactive isSaving property to each item (for performance reasons in checking saving state)
-		data = data.map((item: any) => {
+		data = data?.map((item: any) => {
 			// We want to keep the isSaving state if it is already set, as optimizations prevent reloading the
 			// components, and therefore reactivity is not responding to the new isSaving state
 			const oldItem = pagedItems.value?.data?.find(i => i.id === item.id);
@@ -182,7 +182,7 @@ export function useListControls({
 		const data = pagedItems.value?.data?.map(item => (item.id === updatedItem.id && (item.updated_at === null || item.updated_at <= updatedItem.updated_at)) ? updatedItem : item);
 		setPagedItems({
 			data,
-			meta: { total: pagedItems.value.meta.total }
+			meta: { total: pagedItems.value?.meta?.total || 0 }
 		});
 
 		// Update the active item as well if it is set
@@ -205,8 +205,8 @@ export function useListControls({
 
 		if (newItems && newItems.length > 0) {
 			setPagedItems({
-				data: [...pagedItems.value.data, ...newItems],
-				meta: { total: pagedItems.value.meta.total }
+				data: [...pagedItems.value?.data || [], ...newItems],
+				meta: { total: pagedItems.value?.meta?.total || 0 }
 			});
 			return true;
 		}

@@ -34,6 +34,7 @@
         <slot>{{ content }}</slot>
       </QCardSection>
       <div
+        v-if="!hideButtons"
         class="flex items-center justify-center px-6 py-4 border-t border-gray-300"
       >
         <div class="flex-grow text-right">
@@ -61,35 +62,36 @@ import { XIcon as CloseIcon } from "@heroicons/vue/outline";
 
 const emit = defineEmits(["update:model-value", "close"]);
 defineProps({
-  modelValue: { type: [Boolean, Object], default: true },
-  title: {
-    type: String,
-    default: ""
-  },
-  titleClass: {
-    type: String,
-    default: ""
-  },
-  subtitle: {
-    type: String,
-    default: ""
-  },
-  content: {
-    type: String,
-    default: ""
-  },
-  backdropDismiss: Boolean,
-  maximized: Boolean,
-  fullWidth: Boolean,
-  fullHeight: Boolean,
-  doneText: {
-    type: String,
-    default: "Done"
-  }
+	modelValue: { type: [Boolean, Object], default: true },
+	title: {
+		type: String,
+		default: ""
+	},
+	titleClass: {
+		type: String,
+		default: ""
+	},
+	subtitle: {
+		type: String,
+		default: ""
+	},
+	content: {
+		type: String,
+		default: ""
+	},
+	backdropDismiss: Boolean,
+	hideButtons: Boolean,
+	maximized: Boolean,
+	fullWidth: Boolean,
+	fullHeight: Boolean,
+	doneText: {
+		type: String,
+		default: "Done"
+	}
 });
 
 function onClose() {
-  emit("update:model-value", false);
-  emit("close");
+	emit("update:model-value", false);
+	emit("close");
 }
 </script>

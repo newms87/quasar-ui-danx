@@ -25,6 +25,7 @@
     <QTooltip
       v-if="tooltip"
       class="whitespace-nowrap"
+      :class="tooltipClass"
     >
       <slot name="tooltip">
         {{ tooltip }}
@@ -89,6 +90,7 @@ export interface ActionButtonProps {
 	disabledClass?: string;
 	confirm?: boolean;
 	confirmText?: string;
+	tooltipClass?: string;
 }
 
 const emit = defineEmits(["success", "error", "always"]);
@@ -105,7 +107,8 @@ const props = withDefaults(defineProps<ActionButtonProps>(), {
 	target: null,
 	input: null,
 	confirmText: "Are you sure?",
-	disabledClass: "text-slate-800 bg-slate-500 opacity-50"
+	disabledClass: "text-slate-800 bg-slate-500 opacity-50",
+	tooltipClass: ""
 });
 
 const mappedSizeClass = {

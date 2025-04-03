@@ -1,4 +1,5 @@
 export * from "./actions";
+export * from "./actionStore";
 export * from "./app";
 export * from "./array";
 export * from "./compatibility";

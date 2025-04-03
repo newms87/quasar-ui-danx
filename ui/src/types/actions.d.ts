@@ -62,8 +62,8 @@ export interface ActionStore {
 	listItems: ShallowRef<ActionTargetItem[]>;
 	isRefreshing: Ref<boolean>;
 	hasLoadedItems: Ref<boolean>;
-	loadItems: () => Promise<ActionTargetItem[]>;
-	refreshItems: () => Promise<ActionTargetItem[]>;
+	loadItems: () => Promise<void>;
+	refreshItems: () => Promise<void>;
 }
 
 export interface ActionController<T = ActionTargetItem> {

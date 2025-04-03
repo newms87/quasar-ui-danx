@@ -33,8 +33,7 @@
     // Enables source map generation for the compiled files (useful for debugging)
     "sourceMap": true,
     // Base directory to resolve non-relative module names,
-    "baseUrl": "./",
-    "paths": {}
+    "baseUrl": "./"
   },
   "include": [
     "src/**/*.ts",

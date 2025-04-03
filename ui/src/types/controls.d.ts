@@ -1,6 +1,7 @@
 import { RequestCallOptions } from "src/types/requests";
+import { ComputedRef, Ref, ShallowRef } from "vue";
 import { ActionOptions, ActionTargetItem, ResourceAction } from "./actions";
-import { AnyObject, ComputedRef, LabelValueItem, Ref } from "./shared";
+import { AnyObject, LabelValueItem } from "./shared";
 
 export interface ListControlsFilter {
 	[key: string]: object | object[] | null | undefined | string | number | boolean;
@@ -52,6 +53,7 @@ export interface ListControlsOptions {
 
 export interface ListControlsPagination {
 	__sort?: object[] | null;
+	sort?: object[] | null;
 	sortBy?: string | null;
 	descending?: boolean;
 	page?: number;
@@ -77,7 +79,7 @@ export interface PagedItems<T = ActionTargetItem> {
 export interface ListController<T = ActionTargetItem> {
 	name: string;
 	label: string;
-	pagedItems: Ref<PagedItems<T> | null>;
+	pagedItems: ShallowRef<PagedItems<T> | null>;
 	activeFilter: Ref<ListControlsFilter>;
 	globalFilter: Ref<ListControlsFilter>;
 	filterActiveCount: ComputedRef<number>;

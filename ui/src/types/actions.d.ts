@@ -1,8 +1,8 @@
 import { FilterGroup, ListController, ListControlsRoutes } from "src/types/controls";
 import { FormField } from "src/types/forms";
 import { TableColumn } from "src/types/tables";
-import { VNode } from "vue";
-import { AnyObject, ComputedRef, TypedObject } from "./shared";
+import { ComputedRef, Ref, ShallowRef, VNode } from "vue";
+import { AnyObject, TypedObject } from "./shared";
 
 export interface ActionTargetItem extends TypedObject {
 	isSaving?: boolean;
@@ -58,6 +58,14 @@ export interface ResourceAction<T = ActionTargetItem> extends ActionOptions<T> {
 	__type: string;
 }
 
+export interface ActionStore {
+	listItems: ShallowRef<ActionTargetItem[]>;
+	isRefreshing: Ref<boolean>;
+	hasLoadedItems: Ref<boolean>;
+	loadItems: () => Promise<ActionTargetItem[]>;
+	refreshItems: () => Promise<ActionTargetItem[]>;
+}
+
 export interface ActionController<T = ActionTargetItem> {
 	// Actions
 	action?: (actionName: string, target?: T | null, input?: any) => Promise<any | void>;
@@ -72,4 +80,5 @@ export interface ActionController<T = ActionTargetItem> {
 	fields?: FormField[];
 	panels?: ActionPanel[];
 	routes?: ListControlsRoutes;
+	store?: ActionStore;
 }

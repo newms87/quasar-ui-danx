@@ -1,4 +1,4 @@
-import { computed, ref, shallowRef, watch } from "vue";
+import { computed, Ref, ref, shallowRef, watch } from "vue";
 import { RouteParams, Router } from "vue-router";
 import { danxOptions } from "../../config";
 import { getItem, latestCallOnly, setItem, storeObject, waitForRef } from "../../helpers";
@@ -10,8 +10,7 @@ import {
 	ListControlsFilter,
 	ListControlsOptions,
 	ListControlsPagination,
-	PagedItems,
-	Ref
+	PagedItems
 } from "../../types";
 import { getFilterFromUrl } from "./listHelpers";
 

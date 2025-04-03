@@ -14,12 +14,3 @@ export interface LabelValueItem {
 	label: string;
 	value: string | number | boolean;
 }
-
-/** Define Vue 3 Types here for better type checking in PHPStorm */
-export interface Ref<T = any> {
-	value: T;
-}
-
-export interface ComputedRef<T = any> {
-	readonly value: T;
-}

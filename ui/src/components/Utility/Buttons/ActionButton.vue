@@ -1,59 +1,58 @@
 <template>
-  <QBtn
-    :loading="isSaving"
-    class="shadow-none py-0"
-    :class="buttonClass"
-    :disable="disabled"
-    @click="()=> onAction()"
-  >
-    <div class="flex items-center flex-nowrap">
-      <component
-        :is="icon || typeOptions.icon"
-        class="transition-all"
-        :class="resolvedIconClass"
-      />
-      <slot>
-        <div
-          v-if="label || label === 0"
-          class="ml-2"
-          :class="labelClass"
-        >
-          {{ label }}
-        </div>
-      </slot>
-    </div>
-    <QTooltip
-      v-if="tooltip"
-      class="whitespace-nowrap"
-      :class="tooltipClass"
-    >
-      <slot name="tooltip">
-        {{ tooltip }}
-      </slot>
-    </QTooltip>
-    <QMenu
-      v-if="isConfirming"
-      :model-value="true"
-    >
-      <div class="p-4 bg-slate-600">
-        <div>{{ confirmText }}</div>
-        <div class="flex items-center flex-nowrap mt-2">
-          <div class="flex-grow">
-            <ActionButton
-              type="cancel"
-              color="gray"
-              @click="isConfirming = false"
-            />
-          </div>
-          <ActionButton
-            type="confirm"
-            color="green"
-            @click="()=> onAction(true)"
-          />
-        </div>
-      </div>
-    </QMenu>
-  </QBtn>
+	<QBtn
+		:loading="isSaving"
+		class="shadow-none py-0"
+		:class="buttonClass"
+		:disable="disabled"
+		@click="()=> onAction()"
+	>
+		<div class="flex items-center flex-nowrap">
+			<component
+				:is="icon || typeOptions.icon"
+				class="transition-all"
+				:class="resolvedIconClass"
+			/>
+			<div
+				v-if="label || label === 0"
+				class="ml-2"
+				:class="labelClass"
+			>
+				{{ label }}
+			</div>
+			<slot />
+		</div>
+		<QTooltip
+			v-if="tooltip"
+			class="whitespace-nowrap"
+			:class="tooltipClass"
+		>
+			<slot name="tooltip">
+				{{ tooltip }}
+			</slot>
+		</QTooltip>
+		<QMenu
+			v-if="isConfirming"
+			:model-value="true"
+		>
+			<div class="p-4 bg-slate-600">
+				<div>{{ confirmText }}</div>
+				<div class="flex items-center flex-nowrap mt-2">
+					<div class="flex-grow">
+						<ActionButton
+							type="cancel"
+							color="gray"
+							@click="isConfirming = false"
+						/>
+					</div>
+					<ActionButton
+						type="confirm"
+						color="green"
+						@click="()=> onAction(true)"
+					/>
+				</div>
+			</div>
+		</QMenu>
+	</QBtn>
 </template>
 <script setup lang="ts">
 import {
@@ -63,6 +62,7 @@ import {
 	FaSolidCopy as CopyIcon,
 	FaSolidFileExport as ExportIcon,
 	FaSolidFileImport as ImportIcon,
+	FaSolidMinus as MinusIcon,
 	FaSolidPause as PauseIcon,
 	FaSolidPencil as EditIcon,
 	FaSolidPlay as PlayIcon,
@@ -74,8 +74,8 @@ import { computed, ref } from "vue";
 import { ActionTarget, ResourceAction } from "../../../types";
 
 export interface ActionButtonProps {
-	type?: "trash" | "trash-red" | "create" | "edit" | "copy" | "play" | "stop" | "pause" | "refresh" | "confirm" | "cancel" | "export" | "import";
-	color?: "red" | "blue" | "sky" | "sky-invert" | "green" | "green-invert" | "lime" | "white" | "gray";
+	type?: "trash" | "create" | "edit" | "copy" | "play" | "stop" | "pause" | "refresh" | "confirm" | "cancel" | "export" | "import" | "minus";
+	color?: "red" | "blue" | "sky" | "sky-invert" | "green" | "green-invert" | "lime" | "white" | "gray" | "yellow" | "orange";
 	size?: "xxs" | "xs" | "sm" | "md" | "lg";
 	icon?: object | string;
 	iconClass?: string;
@@ -159,6 +159,10 @@ const colorClass = computed(() => {
 			return "text-sky-400 bg-sky-800 hover:bg-sky-900";
 		case "white":
 			return "text-white bg-gray-800 hover:bg-gray-200";
+		case "yellow":
+			return "text-yellow-300 bg-yellow-800 hover:bg-yellow-700";
+		case "orange":
+			return "text-orange-400 bg-orange-900 hover:bg-orange-800";
 		case "gray":
 			return "text-slate-200 bg-slate-800 hover:bg-slate-900";
 		default:
@@ -194,6 +198,8 @@ const typeOptions = computed(() => {
 			return { icon: PauseIcon };
 		case "refresh":
 			return { icon: RefreshIcon };
+		case "minus":
+			return { icon: MinusIcon };
 		default:
 			return { icon: EditIcon };
 	}

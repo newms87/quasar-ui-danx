@@ -76,7 +76,7 @@ export interface ActionController<T = ActionTargetItem> {
 	batchActions?: ResourceAction[];
 	menuActions?: ResourceAction[];
 	columns?: TableColumn[];
-	filters?: ComputedRef<FilterGroup[]>;
+	filters?: ComputedRef<FilterGroup[]> | FilterGroup[];
 	fields?: FormField[];
 	panels?: ActionPanel[];
 	routes?: ListControlsRoutes;

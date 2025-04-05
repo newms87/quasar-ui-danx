@@ -11,7 +11,7 @@
   </RenderedForm>
 </template>
 <script setup lang="ts">
-import { Ref, ref, watch } from "vue";
+import { computed, Ref, ref, watch } from "vue";
 import { ActionTargetItem, AnyObject, Form, ResourceAction } from "../../../types";
 import RenderedForm from "./RenderedForm.vue";
 
@@ -59,8 +59,21 @@ watch(() => props.target, (target: ActionTargetItem) => {
 	}
 });
 
+const isValid = computed(() => {
+	for (let field of props.form.fields) {
+		const value = input.value[field.name];
+
+		if (field.required && !value && value !== false) {
+			return false;
+		}
+	}
+	return true;
+});
+
 async function onUpdate() {
-	await props.action.trigger(props.target, input.value);
-	emit("saved");
+	if (isValid.value) {
+		await props.action.trigger(props.target, input.value);
+		emit("saved");
+	}
 }
 </script>

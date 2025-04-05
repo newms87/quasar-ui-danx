@@ -63,7 +63,7 @@ const isValid = computed(() => {
 	for (let field of props.form.fields) {
 		const value = input.value[field.name];
 
-		if (field.required && !value && value !== false) {
+		if (field.required && !value && value !== false && value !== 0) {
 			return false;
 		}
 	}

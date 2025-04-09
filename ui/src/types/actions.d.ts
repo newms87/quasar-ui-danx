@@ -1,8 +1,8 @@
-import { FilterGroup, ListController, ListControlsRoutes } from "src/types/controls";
-import { FormField } from "src/types/forms";
-import { TableColumn } from "src/types/tables";
 import { ComputedRef, Ref, ShallowRef, VNode } from "vue";
+import { FilterGroup, ListController, ListControlsRoutes } from "./controls";
+import { FormField } from "./forms";
 import { AnyObject, TypedObject } from "./shared";
+import { TableColumn } from "./tables";
 
 export interface ActionTargetItem extends TypedObject {
 	isSaving?: boolean;

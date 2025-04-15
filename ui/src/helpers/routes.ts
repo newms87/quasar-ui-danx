@@ -59,7 +59,6 @@ export function useActionRoutes(baseUrl: string, extend?: object): ListControlsR
 				ignoreAbort: true,
 				headers: {
 					...options?.headers,
-					// @ts-expect-error This header is fine
 					"X-Timestamp": Date.now()
 				}
 			};

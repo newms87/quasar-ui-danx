@@ -1,5 +1,5 @@
 <template>
-  <div class="group flex items-center flex-nowrap gap-x-1 relative">
+  <div class="group flex items-center flex-nowrap gap-x-2 relative">
     <ShowHideButton
       v-if="selectable"
       v-model="isSelecting"
@@ -8,7 +8,6 @@
       :saving="loading"
       :class="selectClass"
       :show-icon="selectIcon || DefaultSelectIcon"
-      class="mr-2"
       :size="size"
     >
       <QMenu
@@ -19,14 +18,14 @@
         <div>
           <div
             v-for="option in optionsPlusSelected"
-            :key="option.id"
+            :key="getId(option)"
             v-ripple
             class="cursor-pointer flex items-center relative"
-            :class="{'bg-sky-900 hover:bg-sky-800': selected?.id === option.id, 'hover:bg-slate-600': selected?.id !== option.id}"
-            @click="selected = option"
+            :class="{'bg-sky-900 hover:bg-sky-800': getId(selected) === getId(option), 'hover:bg-slate-600': getId(selected) !== getId(option)}"
+            @click="selected = selectionType === 'object' ? option : getId(option)"
           >
             <div class="flex-grow px-4 py-2">
-              {{ option.name }}
+              {{ getName(option) }}
             </div>
             <ActionButton
               v-if="deletable"
@@ -58,12 +57,12 @@
       <template v-if="selected">
         <EditableDiv
           v-if="nameEditable"
-          :model-value="selected.name"
+          :model-value="getName(selected)"
           color="slate-600"
           @update:model-value="name => $emit('update', {name})"
         />
         <template v-else>
-          {{ selected.name }}
+          {{ getName(selected) }}
         </template>
       </template>
       <template v-else>
@@ -104,16 +103,17 @@ import {
 	FaSolidPencil as EditIcon
 } from "danx-icon";
 import { computed, ref } from "vue";
-import { ActionTargetItem } from "../../../../types";
+import { ActionTargetItem, LabelValueItem } from "../../../../types";
 import { ShowHideButton } from "../../../Utility/Buttons";
 import { ActionButtonProps, default as ActionButton } from "../../../Utility/Buttons/ActionButton";
 import EditableDiv from "./EditableDiv";
 
 defineEmits(["create", "update", "delete"]);
-const selected = defineModel<ActionTargetItem | null>("selected");
+const selected = defineModel<ActionTargetItem | string | null>("selected");
 const editing = defineModel<boolean>("editing");
 const props = withDefaults(defineProps<{
-	options: ActionTargetItem[];
+	options: ActionTargetItem[] | LabelValueItem[];
+	selectionType?: "object" | "string";
 	showEdit?: boolean;
 	loading?: boolean;
 	selectText?: string;
@@ -137,6 +137,7 @@ const props = withDefaults(defineProps<{
 	editDisabled?: boolean;
 	size?: ActionButtonProps["size"];
 }>(), {
+	selectionType: "object",
 	selectText: "",
 	createText: "",
 	editText: "",
@@ -154,8 +155,32 @@ const props = withDefaults(defineProps<{
 const isSelecting = ref(false);
 
 // If the selected option is not in the options list, it should be added in
-const optionsPlusSelected = computed(() => {
-	if (!selected.value || props.options.find((o) => o.id === selected.value?.id)) return props.options;
+const optionsPlusSelected = computed<ActionTargetItem[]>(() => {
+	if (!selected.value || props.options.find((o) => getId(o) === getId(selected.value))) return props.options;
 	return [selected.value, ...props.options];
 });
+
+function resolveOption(option) {
+	if (typeof option === "object") {
+		return option;
+	}
+
+	return props.options.find((o) => {
+		if (typeof o === "object") {
+			return getId(o) === option;
+		}
+		return o === option;
+	});
+}
+
+function getId(option) {
+	option = resolveOption(option);
+
+	return option?.id || option?.value || option?.name || option;
+}
+
+function getName(option) {
+	option = resolveOption(option);
+	return option?.name || option?.label || option?.value || option;
+}
 </script>

@@ -175,6 +175,7 @@ const selectedOptions = computed(() => {
 		if (typeof v === "object") return v.value || v.id;
 		return v;
 	});
+
 	return computedOptions.value.filter((o) => {
 		return comparableValues.includes(o.value);
 	});
@@ -249,7 +250,7 @@ function resolveValue(option) {
 	if (!option || typeof option === "string") {
 		return option;
 	}
-	let value = option.value || option.id;
+	let value = option.value !== undefined ? option.value : option.id;
 	if (typeof props.optionValue === "string") {
 		value = option[props.optionValue];
 	} else if (typeof props.optionValue === "function") {

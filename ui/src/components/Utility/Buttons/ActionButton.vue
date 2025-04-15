@@ -62,6 +62,7 @@ import {
 	FaSolidCopy as CopyIcon,
 	FaSolidFileExport as ExportIcon,
 	FaSolidFileImport as ImportIcon,
+	FaSolidFolder as FolderIcon,
 	FaSolidMinus as MinusIcon,
 	FaSolidPause as PauseIcon,
 	FaSolidPencil as EditIcon,
@@ -74,7 +75,7 @@ import { computed, ref } from "vue";
 import { ActionTarget, ResourceAction } from "../../../types";
 
 export interface ActionButtonProps {
-	type?: "trash" | "create" | "edit" | "copy" | "play" | "stop" | "pause" | "refresh" | "confirm" | "cancel" | "export" | "import" | "minus";
+	type?: "trash" | "create" | "edit" | "copy" | "folder" | "play" | "stop" | "pause" | "refresh" | "confirm" | "cancel" | "export" | "import" | "minus";
 	color?: "red" | "blue" | "sky" | "sky-invert" | "green" | "green-invert" | "lime" | "white" | "gray" | "yellow" | "orange";
 	size?: "xxs" | "xs" | "sm" | "md" | "lg";
 	icon?: object | string;
@@ -190,6 +191,8 @@ const typeOptions = computed(() => {
 			return { icon: EditIcon };
 		case "copy":
 			return { icon: CopyIcon };
+		case "folder":
+			return { icon: FolderIcon };
 		case "play":
 			return { icon: PlayIcon };
 		case "stop":

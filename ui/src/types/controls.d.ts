@@ -1,5 +1,5 @@
-import { RequestCallOptions } from "src/types/requests";
 import { ComputedRef, Ref, ShallowRef } from "vue";
+import { RequestCallOptions } from "../types";
 import { ActionOptions, ActionTargetItem, ResourceAction } from "./actions";
 import { AnyObject, LabelValueItem } from "./shared";
 

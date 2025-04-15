@@ -6,7 +6,7 @@ module.exports = {
 		ecmaVersion: "latest",
 		sourceType: "module",
 		parser: "@typescript-eslint/parser",
-		project: "./tsconfig.json", // Specify it only for TypeScript files
+		project: "./tsconfig.build.json", // Specify it only for TypeScript files
 		extraFileExtensions: [".vue"]
 	},
 

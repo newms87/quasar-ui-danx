@@ -94,9 +94,12 @@ export const request: RequestApi = {
 
 	async poll(url: string, options, interval, fnUntil) {
 		let response;
+		if (!fnUntil) {
+			fnUntil = (response: HttpResponse) => !!response;
+		}
 		do {
 			response = await request.call(url, options);
-			await sleep(interval);
+			await sleep(interval || 1000);
 		} while (!fnUntil(response));
 
 		return response;

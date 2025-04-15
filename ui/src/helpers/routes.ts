@@ -59,7 +59,7 @@ export function useActionRoutes(baseUrl: string, extend?: object): ListControlsR
 				ignoreAbort: true,
 				headers: {
 					...options?.headers,
-					"X-Timestamp": Date.now()
+					"X-Timestamp": Date.now().toString()
 				}
 			};
 			data = data || {};

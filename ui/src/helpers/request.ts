@@ -8,7 +8,7 @@ import { sleep } from "./utils";
  * to make GET and POST requests easier w/ JSON payloads
  */
 export const request: RequestApi = {
-	abortControllers: {},
+	activeRequests: {},
 
 	url(url) {
 		if (url.startsWith("http")) {
@@ -19,20 +19,27 @@ export const request: RequestApi = {
 
 	async call(url, options) {
 		options = options || {};
-		const abortKey = options?.abortOn !== undefined ? options.abortOn : url + JSON.stringify(options.params || "");
+		const requestKey = options?.requestKey || url + JSON.stringify(options.params || "");
+		const waitOnPrevious = !!options?.waitOnPrevious;
+		const shouldAbort = !waitOnPrevious;
 		const timestamp = Date.now();
 
-		if (abortKey) {
-			const abort = new AbortController();
-			const previousAbort = request.abortControllers[abortKey];
+		// If there was a request with the same key made that is still active, track that here
+		const previousRequest = request.activeRequests[requestKey];
+
+		// Set the current active request to this one
+		request.activeRequests[requestKey] = { timestamp };
+
+		if (shouldAbort) {
 			// If there is already an abort controller set for this key, abort it
-			if (previousAbort) {
-				previousAbort.abort.abort("Request was aborted due to a newer request being made");
+			if (previousRequest) {
+				previousRequest.abortController?.abort("Request was aborted due to a newer request being made");
 			}
 
+			const abortController = new AbortController();
 			// Set the new abort controller for this key
-			request.abortControllers[abortKey] = { abort, timestamp };
-			options.signal = abort.signal;
+			request.activeRequests[requestKey].abortController = abortController;
+			options.signal = abortController.signal;
 		}
 
 		if (options.params) {
@@ -49,7 +56,14 @@ export const request: RequestApi = {
 
 		let response = null;
 		try {
-			response = await fetch(request.url(url), options);
+			// If there is a previous request still active, wait for it to finish before proceeding (if the waitForPrevious flag is set)
+			if (waitOnPrevious && previousRequest?.requestPromise) {
+				await previousRequest.requestPromise;
+			}
+
+			const requestPromise = fetch(request.url(url), options);
+			request.activeRequests[requestKey].requestPromise = requestPromise;
+			response = await requestPromise;
 		} catch (e) {
 			if (options.ignoreAbort && (e + "").match(/Request was aborted/)) {
 				return { abort: true };
@@ -61,15 +75,18 @@ export const request: RequestApi = {
 		checkAppVersion(response);
 
 		// handle the case where the request was aborted too late, and we need to abort the response via timestamp check
-		if (abortKey) {
+		if (shouldAbort) {
 			// If the request was aborted too late, but there was still another request that was made after the current,
 			// then abort the current request with an abort flag
-			if (timestamp < request.abortControllers[abortKey].timestamp) {
+			if (timestamp < request.activeRequests[requestKey].timestamp) {
 				return { abort: true };
 			}
+		}
 
-			// Otherwise, the current is the most recent request, so we can delete the abort controller
-			delete request.abortControllers[abortKey];
+		// If this request is the active request for the requestKey, we can clear this key from active requests
+		if (request.activeRequests[requestKey].timestamp === timestamp) {
+			// Remove the request from the active requests list
+			delete request.activeRequests[requestKey];
 		}
 
 		const result = await response.json();

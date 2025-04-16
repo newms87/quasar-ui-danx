@@ -56,7 +56,7 @@ export function useActionRoutes(baseUrl: string, extend?: object): ListControlsR
 		async applyAction(action, target, data, options?) {
 			options = {
 				...options,
-				ignoreAbort: true,
+				waitOnPrevious: true,
 				headers: {
 					...options?.headers,
 					"X-Timestamp": Date.now().toString()
@@ -86,7 +86,7 @@ export function useActionRoutes(baseUrl: string, extend?: object): ListControlsR
 		batchAction(action, targets, data, options?) {
 			options = {
 				...options,
-				ignoreAbort: true
+				waitOnPrevious: true
 			};
 			return request.post(`${baseUrl}/batch-action`, { action, filter: { id: targets.map(r => r.id) }, data }, options);
 		},

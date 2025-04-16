@@ -56,8 +56,8 @@ export const request: RequestApi = {
 			delete options.params;
 		}
 
-		let resolvePromise: (value: any) => any = null;
-		let rejectPromise: (reason?: any) => any = null;
+		let resolvePromise!: (value: any) => any;
+		let rejectPromise!: (reason?: any) => any;
 		currentRequest.requestPromise = new Promise((resolve, reject) => {
 			resolvePromise = resolve;
 			rejectPromise = reject;

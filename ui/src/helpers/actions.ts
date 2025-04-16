@@ -1,7 +1,7 @@
 import { useDebounceFn } from "@vueuse/core";
 import { FaSolidCopy as CopyIcon, FaSolidPencil as EditIcon, FaSolidTrash as DeleteIcon } from "danx-icon";
 import { uid } from "quasar";
-import { h, isReactive, Ref, shallowReactive, shallowRef } from "vue";
+import { h, Ref, shallowRef } from "vue";
 import { ConfirmActionDialog, CreateNewWithNameDialog } from "../components";
 import type {
 	ActionGlobalOptions,
@@ -55,39 +55,27 @@ export function useActions(actions: ActionOptions[], globalOptions: ActionGlobal
 	 */
 	function getAction(actionName: string, actionOptions?: Partial<ActionOptions>): ResourceAction {
 		/// Resolve the action options or resource action based on the provided input
-		let resourceAction: Partial<ResourceAction> = actions.find(a => a.name === actionName) || { name: actionName };
-
-		if (actionOptions) {
-			Object.assign(resourceAction, actionOptions);
-		}
+		const baseOptions: Partial<ResourceAction> = actions.find(a => a.name === actionName) || { name: actionName };
 
 		// If the action is already reactive, return it
-		if (!isReactive(resourceAction) || !("__type" in resourceAction)) {
-			resourceAction = storeObject({
-				onAction: globalOptions?.routes?.applyAction,
-				onBatchAction: globalOptions?.routes?.batchAction,
-				onBatchSuccess: globalOptions?.controls?.clearSelectedRows,
-				...globalOptions,
-				...resourceAction,
-				isApplying: false,
-				__type: "__Action:" + namespace
-			});
-
-			// Splice the resourceAction in place of the action in the actions list
-			actions.splice(actions.findIndex(a => a.name === actionName), 1, resourceAction as ResourceAction);
-		}
-
-		// Return a clone of the action so it can be modified without affecting the original
-		const clonedAction = shallowReactive({ ...resourceAction }) as ResourceAction;
+		const resourceAction = storeObject({
+			onAction: globalOptions?.routes?.applyAction,
+			onBatchAction: globalOptions?.routes?.batchAction,
+			onBatchSuccess: globalOptions?.controls?.clearSelectedRows,
+			...baseOptions,
+			...actionOptions,
+			isApplying: false,
+			__type: "__Action:" + namespace
+		}) as ResourceAction;
 
 		// Assign Trigger function if it doesn't exist
-		if (clonedAction.debounce) {
-			clonedAction.trigger = useDebounceFn((target, input) => performAction(clonedAction, target, input), clonedAction.debounce);
+		if (resourceAction.debounce) {
+			resourceAction.trigger = useDebounceFn((target, input) => performAction(resourceAction, target, input), resourceAction.debounce);
 		} else {
-			clonedAction.trigger = (target, input) => performAction(clonedAction, target, input);
+			resourceAction.trigger = (target, input) => performAction(resourceAction, target, input);
 		}
 
-		return clonedAction;
+		return resourceAction;
 	}
 
 	/**

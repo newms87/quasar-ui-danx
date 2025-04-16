@@ -57,6 +57,7 @@ export function useActionRoutes(baseUrl: string, extend?: object): ListControlsR
 			options = {
 				...options,
 				waitOnPrevious: true,
+				useMostRecentResponse: true,
 				headers: {
 					...options?.headers,
 					"X-Timestamp": Date.now().toString()

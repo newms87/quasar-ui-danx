@@ -1,8 +1,14 @@
 import { AnyObject } from "./shared";
 
+export interface ActiveRequest {
+	requestPromise?: Promise<any>,
+	abortController?: AbortController,
+	timestamp: number
+}
+
 export interface RequestApi {
 	activeRequests: {
-		[key: string]: { requestPromise?: Promise<any>, abortController?: AbortController, timestamp: number }
+		[key: string]: ActiveRequest
 	};
 
 	url(url: string): string;
@@ -34,6 +40,7 @@ export interface RequestOptions {
 export interface RequestCallOptions extends RequestInit {
 	requestKey?: string;
 	waitOnPrevious?: boolean;
+	useMostRecentResponse?: boolean;
 	ignoreAbort?: boolean;
 	params?: AnyObject;
 }

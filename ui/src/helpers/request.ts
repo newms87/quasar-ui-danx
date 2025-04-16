@@ -1,6 +1,6 @@
 import { Ref } from "vue";
 import { danxOptions } from "../config";
-import { HttpResponse, RequestApi } from "../types";
+import { ActiveRequest, HttpResponse, RequestApi } from "../types";
 import { sleep } from "./utils";
 
 /**
@@ -21,16 +21,18 @@ export const request: RequestApi = {
 		options = options || {};
 		const requestKey = options?.requestKey || url + JSON.stringify(options.params || "");
 		const waitOnPrevious = !!options?.waitOnPrevious;
-		const shouldAbort = !waitOnPrevious;
+		const useMostRecentResponse = !!options?.useMostRecentResponse;
+		const shouldAbortPrevious = !waitOnPrevious;
 		const timestamp = Date.now();
 
 		// If there was a request with the same key made that is still active, track that here
 		const previousRequest = request.activeRequests[requestKey];
 
 		// Set the current active request to this one
-		request.activeRequests[requestKey] = { timestamp };
+		const currentRequest: ActiveRequest = { timestamp };
+		request.activeRequests[requestKey] = currentRequest;
 
-		if (shouldAbort) {
+		if (shouldAbortPrevious) {
 			// If there is already an abort controller set for this key, abort it
 			if (previousRequest) {
 				previousRequest.abortController?.abort("Request was aborted due to a newer request being made");
@@ -38,7 +40,7 @@ export const request: RequestApi = {
 
 			const abortController = new AbortController();
 			// Set the new abort controller for this key
-			request.activeRequests[requestKey].abortController = abortController;
+			currentRequest.abortController = abortController;
 			options.signal = abortController.signal;
 		}
 
@@ -54,59 +56,85 @@ export const request: RequestApi = {
 			delete options.params;
 		}
 
-		let response = null;
-		try {
-			// If there is a previous request still active, wait for it to finish before proceeding (if the waitForPrevious flag is set)
-			if (waitOnPrevious && previousRequest?.requestPromise) {
-				await previousRequest.requestPromise;
-			}
+		let resolvePromise: (value: any) => any = null;
+		let rejectPromise: (reason?: any) => any = null;
+		currentRequest.requestPromise = new Promise((resolve, reject) => {
+			resolvePromise = resolve;
+			rejectPromise = reject;
+		});
 
-			const requestPromise = fetch(request.url(url), options);
-			request.activeRequests[requestKey].requestPromise = requestPromise;
-			response = await requestPromise;
+		// If there is a previous request still active, wait for it to finish before proceeding (if the waitForPrevious flag is set)
+		if (waitOnPrevious && previousRequest?.requestPromise) {
+			try {
+				await previousRequest.requestPromise;
+			} catch (e) {
+				// We don't care if it fails, we just need to wait for it to complete
+			}
+		}
+
+		// Wait to finish the request before proceeding
+		let response: Response;
+		try {
+			response = await fetch(request.url(url), options);
 		} catch (e) {
 			if (options.ignoreAbort && (e + "").match(/Request was aborted/)) {
-				return { abort: true };
+				const abortResponse = { abort: true };
+				resolvePromise(abortResponse);
+				return abortResponse;
 			}
+			rejectPromise(e);
 			throw e;
 		}
 
 		// Verify the app version of the client and server are matching
 		checkAppVersion(response);
 
-		// handle the case where the request was aborted too late, and we need to abort the response via timestamp check
-		if (shouldAbort) {
-			// If the request was aborted too late, but there was still another request that was made after the current,
-			// then abort the current request with an abort flag
-			if (timestamp < request.activeRequests[requestKey].timestamp) {
-				return { abort: true };
+		// Track the most recent request (maybe another request with the same key was made after this request started)
+		let mostRecentRequest = request.activeRequests[requestKey];
+
+		// Always fetch the result
+		let responseJson = await response.json();
+
+		// Send the real JSON response to the promise in case other requests are waiting on this request result
+		resolvePromise(responseJson);
+
+		// If this request is not the most recent request...
+		if (mostRecentRequest.timestamp !== timestamp) {
+			// and it should be aborted but was aborted too late, return an aborted response
+			if (shouldAbortPrevious) {
+				responseJson = { abort: true };
+			} else if (useMostRecentResponse) {
+				// or if there is a more recent request, and the useMoreRecentResponse flag is set, update this response to the more recent one
+				do {
+					// Always update on each iteration to make sure we're checking the current most recent
+					// (maybe additional requests will be made before the current most recent finishes)
+					mostRecentRequest = request.activeRequests[requestKey];
+					responseJson = await mostRecentRequest.requestPromise;
+
+					// If the most recent request is the same as this one, break out of the loop
+					if (request.activeRequests[requestKey].timestamp === mostRecentRequest.timestamp) {
+						break;
+					}
+				} while (mostRecentRequest.timestamp !== request.activeRequests[requestKey].timestamp);
 			}
 		}
 
-		// If this request is the active request for the requestKey, we can clear this key from active requests
-		if (request.activeRequests[requestKey].timestamp === timestamp) {
-			// Remove the request from the active requests list
-			delete request.activeRequests[requestKey];
-		}
-
-		const result = await response.json();
-
 		if (response.status === 401) {
 			const onUnauthorized = danxOptions.value.request?.onUnauthorized;
-			return onUnauthorized ? onUnauthorized(result, response) : {
+			return onUnauthorized ? onUnauthorized(responseJson, response) : {
 				error: true,
 				message: "Unauthorized",
-				...result
+				...responseJson
 			};
 		}
 
 		if (response.status > 400) {
-			if (result.exception && !result.error) {
-				result.error = true;
+			if (responseJson.exception && !responseJson.error) {
+				responseJson.error = true;
 			}
 		}
 
-		return result;
+		return responseJson;
 	},
 
 	async poll(url: string, options, interval, fnUntil) {

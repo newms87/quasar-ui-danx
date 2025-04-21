@@ -1,6 +1,7 @@
 <template>
   <div class="inline-block relative">
     <div
+      ref="textDiv"
       :contenteditable="readonly ? 'false' : 'true'"
       class="relative inline-block transition duration-300 outline-none outline-offset-0 border-none rounded-sm z-10 min-w-10 min-h-10"
       :style="{minWidth, minHeight}"
@@ -8,9 +9,7 @@
       @input="onInput"
       @focusin="hasFocus = true"
       @focusout="hasFocus = false"
-    >
-      {{ text }}
-    </div>
+    />
     <div
       v-if="!text && placeholder && !hasFocus && !readonly"
       ref="placeholderDiv"
@@ -44,6 +43,7 @@ const props = withDefaults(defineProps<{
 });
 
 const text = ref(props.modelValue);
+const textDiv = ref();
 const placeholderDiv = ref<Element | null>(null);
 const minWidth = ref<string>("0");
 const minHeight = ref<string>("0");
@@ -57,9 +57,17 @@ onMounted(() => {
 	}
 });
 
+// Watch external modelValue and update the contenteditable div directly
 watch(() => props.modelValue, (value) => {
-	if (!hasFocus.value)
+	if (!hasFocus.value && textDiv.value) {
+		textDiv.value.innerText = value;
 		text.value = value;
+	}
+});
+
+onMounted(() => {
+	// Set the initial value of the contenteditable div
+	textDiv.value.innerText = text.value;
 });
 
 const debouncedChange = useDebounceFn(() => {

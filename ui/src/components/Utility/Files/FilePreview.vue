@@ -245,7 +245,7 @@ const transcodingStatus = computed(() => {
 
 	for (let transcodeName of Object.keys(metaTranscodes)) {
 		const transcode = metaTranscodes[transcodeName];
-		if (!transcode?.completed_at) {
+		if (!["Complete", "Timeout"].includes(transcode?.status)) {
 			return { ...transcode, message: `${transcodeName} ${transcode.status}` };
 		}
 	}

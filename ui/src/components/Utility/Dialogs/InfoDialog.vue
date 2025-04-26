@@ -1,7 +1,6 @@
 <template>
   <DialogLayout
     class="dx-info-dialog"
-    v-bind="$props"
     @close="onClose"
   >
     <slot />
@@ -18,7 +17,10 @@
       <slot name="subtitle" />
     </template>
     <template #actions>
-      <div class="flex-grow">
+      <div
+        v-if="!hideDone"
+        class="flex-grow"
+      >
         <QBtn
           :label="doneText"
           class="dx-dialog-button dx-dialog-button-done"
@@ -34,21 +36,18 @@
   </DialogLayout>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import DialogLayout from "./DialogLayout";
 
 const emit = defineEmits(["update:model-value", "close"]);
-defineProps({
-	...DialogLayout.props,
-	disabled: Boolean,
-	doneClass: {
-		type: [String, Object],
-		default: ""
-	},
-	doneText: {
-		type: String,
-		default: "Done"
-	}
+withDefaults(defineProps<{
+	disabled?: boolean;
+	hideDone?: boolean;
+	doneClass?: string | object;
+	doneText?: string;
+}>(), {
+	doneClass: "",
+	doneText: "Done"
 });
 
 function onClose() {

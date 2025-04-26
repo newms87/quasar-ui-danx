@@ -1,7 +1,7 @@
 <template>
   <div class="dx-text-field">
     <FieldLabel
-      v-if="!prependLabel"
+      v-if="!prependLabel && label"
       :label="label"
       :required="required"
       :required-label="requiredLabel"

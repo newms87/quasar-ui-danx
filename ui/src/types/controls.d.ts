@@ -51,9 +51,14 @@ export interface ListControlsOptions {
 	isFieldOptionsEnabled?: boolean;
 }
 
+export interface ListSortItem {
+	column: string;
+	order?: "asc" | "desc";
+}
+
 export interface ListControlsPagination {
 	__sort?: object[] | null;
-	sort?: object[] | null;
+	sort?: ListSortItem[] | null;
 	sortBy?: string | null;
 	descending?: boolean;
 	page?: number;

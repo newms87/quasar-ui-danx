@@ -190,6 +190,7 @@ export function useControls(name: string, options: ListControlsOptions): ListCon
 	 * Sets the pagination settings to the given values.
 	 */
 	function setPagination(updated: Partial<ListControlsPagination>) {
+		// @ts-expect-error Seems like a bug in the typescript linting?
 		pagination.value = { ...pagination.value, ...updated };
 	}
 

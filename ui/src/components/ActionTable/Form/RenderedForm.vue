@@ -77,10 +77,18 @@
         :show-name="showName"
         :rows="field.type === 'TEXTAREA' ? 5 : 1"
         :clearable="field.clearable || clearable"
+        :file-class="fileClass"
         :disable="disable"
         :readonly="readonly"
         @update:model-value="onInput(field.name, $event)"
-      />
+      >
+        <template #below-file="{file}">
+          <slot
+            name="below-file"
+            :file="file"
+          />
+        </template>
+      </Component>
     </div>
     <ConfirmDialog
       v-if="variationToEdit !== false"
@@ -145,7 +153,11 @@ const props = defineProps({
 		type: [String, Number, Boolean],
 		default: undefined
 	},
-	canModifyVariations: Boolean
+	canModifyVariations: Boolean,
+	fileClass: {
+		type: String,
+		default: ""
+	}
 });
 
 const FORM_FIELD_MAP = {

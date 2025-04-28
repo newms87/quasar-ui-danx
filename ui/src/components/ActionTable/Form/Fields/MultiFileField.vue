@@ -37,17 +37,25 @@
       <FilePreview
         v-for="file in uploadedFiles"
         :key="'file-upload-' + file.id"
-        class="w-32 h-32 m-2 cursor-pointer bg-gray-200"
-        :class="{'border border-dashed border-blue-600': !uploadedFiles.length}"
+        class="cursor-pointer bg-gray-200"
+        :class="{'border border-dashed border-blue-600': !uploadedFiles.length, [fileClass]: true}"
         :image="file"
         :related-files="uploadedFiles"
         downloadable
         :removable="!readonly && !disable"
         @remove="onRemove(file)"
-      />
+      >
+        <template #below>
+          <slot
+            name="below-file"
+            :file="file"
+          />
+        </template>
+      </FilePreview>
       <FilePreview
         v-if="!disable && !readonly"
-        class="w-32 h-32 m-2 cursor-pointer border border-dashed border-blue-600"
+        class="cursor-pointer border border-dashed border-blue-600"
+        :class="fileClass"
         disabled
         @click="$refs.file.click()"
       />
@@ -80,7 +88,11 @@ const props = defineProps({
 	showName: Boolean,
 	disable: Boolean,
 	readonly: Boolean,
-	hideControls: Boolean
+	hideControls: Boolean,
+	fileClass: {
+		type: String,
+		default: "w-32 h-32 m-2"
+	}
 });
 
 const { onComplete, onDrop, onFilesSelected, uploadedFiles, clearUploadedFiles, onRemove } = useMultiFileUpload();

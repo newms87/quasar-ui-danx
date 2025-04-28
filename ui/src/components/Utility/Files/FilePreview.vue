@@ -1,78 +1,83 @@
 <template>
   <div
-    class="relative flex justify-center bg-gray-100 overflow-hidden"
+    class="relative flex justify-center"
     :class="{'rounded-2xl': !square}"
   >
-    <template v-if="computedImage">
-      <div
-        class="grow h-full"
-        @click="showPreview = true"
-      >
+    <div
+      class=" bg-gray-100 overflow-hidden flex justify-center relative w-full h-full"
+      :class="{'rounded-2xl': !square}"
+    >
+      <template v-if="computedImage">
         <div
-          v-if="isVideo"
-          class="relative max-h-full max-w-full w-full flex justify-center"
+          class="grow h-full"
+          @click="showPreview = true"
         >
-          <video
-            class="max-h-full"
-            preload="auto"
+          <div
+            v-if="isVideo"
+            class="relative max-h-full max-w-full w-full flex justify-center"
           >
-            <source
-              :src="previewUrl + '#t=0.1'"
-              :type="mimeType"
+            <video
+              class="max-h-full"
+              preload="auto"
             >
-          </video>
-          <button :class="cls['play-button']">
-            <PlayIcon class="w-16" />
-          </button>
-        </div>
-        <QImg
-          v-if="thumbUrl || isPreviewable"
-          fit="fill"
-          class="non-selectable max-h-full max-w-full h-full"
-          :src="(thumbUrl || previewUrl) + '#t=0.1'"
-          preload="auto"
-          data-testid="previewed-image"
-        />
-        <div
-          v-else
-          class="flex items-center justify-center h-full"
-        >
-          <PdfIcon
-            v-if="isPdf"
-            class="w-24"
+              <source
+                :src="previewUrl + '#t=0.1'"
+                :type="mimeType"
+              >
+            </video>
+            <button :class="cls['play-button']">
+              <PlayIcon class="w-16" />
+            </button>
+          </div>
+          <QImg
+            v-if="thumbUrl || isPreviewable"
+            fit="fill"
+            class="non-selectable max-h-full max-w-full h-full"
+            :src="(thumbUrl || previewUrl) + '#t=0.1'"
+            preload="auto"
+            data-testid="previewed-image"
           />
-          <TextFileIcon
+          <div
             v-else
-            class="w-24"
+            class="flex items-center justify-center h-full"
+          >
+            <PdfIcon
+              v-if="isPdf"
+              class="w-24"
+            />
+            <TextFileIcon
+              v-else
+              class="w-24"
+            />
+          </div>
+        </div>
+        <div
+          v-if="$slots['action-button']"
+          :class="cls['action-button']"
+        >
+          <slot name="action-button" />
+        </div>
+        <div
+          v-if="image && image.progress !== undefined"
+          class="absolute-bottom w-full"
+        >
+          <QLinearProgress
+            :value="image.progress"
+            size="15px"
+            color="green-600"
+            stripe
           />
         </div>
-      </div>
-      <div
-        v-if="$slots['action-button']"
-        :class="cls['action-button']"
-      >
-        <slot name="action-button" />
-      </div>
-      <div
-        v-if="image && image.progress !== undefined"
-        class="absolute-bottom w-full"
-      >
-        <QLinearProgress
-          :value="image.progress"
-          size="15px"
-          color="green-600"
-          stripe
-        />
-      </div>
-    </template>
-    <template v-else>
-      <slot name="missing">
-        <component
-          :is="missingIcon"
-          class="w-full h-full p-2 text-gray-300"
-        />
-      </slot>
-    </template>
+      </template>
+      <template v-else>
+        <slot name="missing">
+          <component
+            :is="missingIcon"
+            class="w-full h-full p-2 text-gray-300"
+          />
+        </slot>
+      </template>
+    </div>
 
     <div class="absolute top-1 right-1 flex items-center justify-between space-x-1">
       <QBtn
@@ -102,6 +107,10 @@
           class="w-3"
         />
       </QBtn>
+    </div>
+
+    <div class="below-file absolute-bottom">
+      <slot name="below" />
     </div>
 
     <FullScreenCarouselDialog

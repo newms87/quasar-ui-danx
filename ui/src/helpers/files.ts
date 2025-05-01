@@ -1,5 +1,5 @@
 import ExifReader from "exifreader";
-import { UploadedFile } from "src/types";
+import { UploadedFile } from "../types";
 import { useCompatibility } from "./compatibility";
 import { FlashMessages } from "./FlashMessages";
 

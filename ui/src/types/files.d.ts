@@ -1,4 +1,4 @@
-import { AnyObject, TypedObject } from "src/types/shared";
+import { AnyObject, TypedObject } from "../types";
 
 export interface FileUploadOptions {
 	directory?: string,

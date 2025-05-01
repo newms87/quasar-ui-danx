@@ -1,4 +1,4 @@
-import { AnyObject } from "src/types";
+import { AnyObject } from "../../types";
 
 export type DropZoneResolver = ((e: DragEvent) => HTMLElement) | string | null;
 export type DragAndDropCallback = ((e: DragEvent, data: DraggableData) => void) | null;

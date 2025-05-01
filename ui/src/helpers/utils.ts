@@ -1,5 +1,5 @@
-import { AnyObject } from "src/types";
 import { Ref, watch } from "vue";
+import { AnyObject } from "../types";
 
 export { useDebounceFn } from "@vueuse/core";
 

@@ -156,7 +156,7 @@ const props = defineProps({
 	canModifyVariations: Boolean,
 	fileClass: {
 		type: String,
-		default: ""
+		default: "w-32 h-32 m-2"
 	}
 });
 

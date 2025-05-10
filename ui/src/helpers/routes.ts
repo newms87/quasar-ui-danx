@@ -64,7 +64,7 @@ export function useActionRoutes(baseUrl: string, extend?: object): ListControlsR
 				}
 			};
 			data = data || {};
-			const response = await request.post(`${baseUrl}/${target ? target.id : "new"}/apply-action`, {
+			const response = await request.post(`${baseUrl}/${target ? target.id + "/" : ""}apply-action`, {
 				action,
 				data
 			}, options) as ApplyActionResponse;

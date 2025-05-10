@@ -64,6 +64,14 @@ export function fDateTime(
 	return formatted || empty;
 }
 
+export function fDateTimeMs(
+		dateTime: string | DateTime | null = null,
+		{ empty = "- -" }: fDateOptions = {}
+) {
+	const formatted = parseDateTime(dateTime)?.toFormat("M/d/yy H:mm:ss.SSS").toLowerCase();
+	return formatted || empty;
+}
+
 /**
  * Formats a date/time object or string into the best format for DB input
  * @param dateTime

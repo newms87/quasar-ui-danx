@@ -16,15 +16,28 @@ export const request = {
 		requestOptions.value = options;
 	},
 
-	url(url: string) {
-		if (url.startsWith("http")) {
-			return url;
+	url(url: string, params: string | string[][] | Record<string, string> | URLSearchParams | undefined = undefined) {
+		if (!url.startsWith("http")) {
+			url = requestOptions.value.baseUrl + url;
 		}
-		return requestOptions.value.baseUrl + url;
+
+		if (params) {
+			// Transform object values in params to JSON strings
+			for (const [key, value] of Object.entries(params)) {
+				if (typeof value === "object" && value !== null) {
+					params[key] = JSON.stringify(value);
+				}
+			}
+
+			url += (url.match(/\?/) ? "&" : "?") + new URLSearchParams(params).toString();
+		}
+
+		return url;
 	},
 
 	async get(url: string, options = {}): Promise<object> {
-		return fetch(request.url(url), {
+		url = request.url(url, options.params);
+		return fetch(url, {
 			method: "get",
 			headers: {
 				Accept: "application/json",

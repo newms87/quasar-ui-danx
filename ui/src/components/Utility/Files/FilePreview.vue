@@ -31,7 +31,7 @@
           </div>
           <QImg
             v-if="thumbUrl || isPreviewable"
-            fit="fill"
+            :fit="imageFit"
             class="non-selectable max-h-full max-w-full h-full"
             :src="(thumbUrl || previewUrl) + '#t=0.1'"
             preload="auto"
@@ -138,6 +138,10 @@ const props = defineProps({
 	image: {
 		type: Object,
 		default: null
+	},
+	imageFit: {
+		type: String,
+		default: "fill"
 	},
 	relatedFiles: {
 		type: Array,

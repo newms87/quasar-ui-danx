@@ -13,7 +13,6 @@ import {
 import { resolveFileLocation } from "./files";
 import { FlashMessages } from "./FlashMessages";
 import { storeObject } from "./objectStore";
-import { sleep } from "./utils";
 
 
 export class FileUpload {
@@ -231,7 +230,6 @@ export class FileUpload {
 							// Fire the file complete callbacks
 							this.fireCompleteCallback(fileUpload, storedFile);
 							this.checkAllComplete();
-							await this.waitForTranscode(storedFile);
 						} catch (error: any) {
 							this.errorHandler(e, fileUpload.file, error);
 						}
@@ -291,20 +289,6 @@ export class FileUpload {
 			}
 		}
 		return false;
-	}
-
-	/**
-	 * Keeps refreshing the file while there is transcoding in progress
-	 */
-	async waitForTranscode(file: UploadedFile) {
-		// Only allow waiting for transcode 1 time per file
-		if (!file.meta || file.meta.is_waiting_transcode) return;
-		file.meta.is_waiting_transcode = true;
-		let currentFile: UploadedFile | null = file;
-		while (currentFile && this.isTranscoding(currentFile)) {
-			await sleep(1000);
-			currentFile = await this.refreshFile(currentFile);
-		}
 	}
 
 	/**

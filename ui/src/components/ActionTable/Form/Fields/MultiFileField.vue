@@ -27,7 +27,8 @@
         :class="filePreviewClass"
         :style="styleSize"
         :file="file"
-        :related-files="file.transcodes || uploadedFiles"
+        :show-transcodes="showTranscodes"
+        :related-files="uploadedFiles"
         downloadable
         :removable="!readonly && !disabled"
         @remove="onRemove(file)"
@@ -92,6 +93,7 @@ const props = withDefaults(defineProps<{
 	addIconClass?: string;
 	filePreviewClass?: string;
 	filePreviewBtnSize?: string;
+	showTranscodes?: boolean;
 }>(), {
 	modelValue: null,
 	field: null,

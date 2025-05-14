@@ -6,7 +6,7 @@
     <template v-if="computedImage">
       <div
         class="grow h-full"
-        @click="showPreview = true"
+        @click="onShowPreview"
       >
         <div
           v-if="isVideo"
@@ -143,8 +143,9 @@
 
 <script setup lang="ts">
 import { DocumentTextIcon as TextFileIcon, DownloadIcon, PlayIcon } from "@heroicons/vue/outline";
-import { computed, ComputedRef, onMounted, ref } from "vue";
-import { download, FileUpload, uniqueBy } from "../../../helpers";
+import { computed, ComputedRef, ref, shallowRef } from "vue";
+import { danxOptions } from "../../../config";
+import { download, uniqueBy } from "../../../helpers";
 import { ImageIcon, PdfIcon, TrashIcon as RemoveIcon } from "../../../svg";
 import { UploadedFile } from "../../../types";
 import { FullScreenCarouselDialog } from "../Dialogs";
@@ -171,6 +172,7 @@ export interface FilePreviewProps {
 	disabled?: boolean;
 	square?: boolean;
 	btnSize?: "xs" | "sm" | "md" | "lg";
+	showTranscodes?: boolean;
 }
 
 const emit = defineEmits(["remove"]);
@@ -207,10 +209,11 @@ const computedImage: ComputedRef<UploadedFile | null> = computed(() => {
 	return null;
 });
 
+const transcodes = shallowRef(props.file?.transcodes || null);
 const isUploading = computed(() => !props.file || props.file?.progress !== undefined);
 const statusMessage = computed(() => isUploading.value ? "Uploading..." : transcodingStatus.value?.message);
 const previewableFiles: ComputedRef<(UploadedFile | null)[] | null> = computed(() => {
-	return props.relatedFiles?.length > 0 ? uniqueBy([computedImage.value, ...props.relatedFiles], filesHaveSameUrl) : [computedImage.value];
+	return props.relatedFiles?.length > 0 ? uniqueBy([computedImage.value, ...(props.showTranscodes ? (transcodes.value || []) : props.relatedFiles)], filesHaveSameUrl) : [computedImage.value];
 });
 
 function filesHaveSameUrl(a: UploadedFile, b: UploadedFile) {
@@ -253,13 +256,6 @@ const transcodingStatus = computed(() => {
 	return status;
 });
 
-// Check for an active transcode and make sure the file is being polled for updates
-onMounted(() => {
-	if (transcodingStatus.value) {
-		(new FileUpload([])).waitForTranscode(props.file);
-	}
-});
-
 const isConfirmingRemove = ref(false);
 function onRemove() {
 	if (!isConfirmingRemove.value) {
@@ -269,6 +265,15 @@ function onRemove() {
 		}, 2000);
 	} else {
 		emit("remove");
+	}
+}
+
+async function onShowPreview() {
+	showPreview.value = true;
+
+	if (props.showTranscodes && props.file && !transcodes.value) {
+		const file = await danxOptions.value.fileUpload.refreshFile(props.file.id) as UploadedFile;
+		transcodes.value = file.transcodes || [];
 	}
 }
 </script>

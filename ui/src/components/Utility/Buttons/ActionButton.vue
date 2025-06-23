@@ -1,64 +1,66 @@
 <template>
-	<QBtn
-		:loading="isSaving"
-		class="shadow-none py-0"
-		:class="buttonClass"
-		:disable="disabled"
-		@click="()=> onAction()"
-	>
-		<div class="flex items-center flex-nowrap">
-			<component
-				:is="icon || typeOptions.icon"
-				class="transition-all"
-				:class="resolvedIconClass"
-			/>
-			<div
-				v-if="label || label === 0"
-				class="ml-2"
-				:class="labelClass"
-			>
-				{{ label }}
-			</div>
-			<slot />
-		</div>
-		<QTooltip
-			v-if="tooltip"
-			class="whitespace-nowrap"
-			:class="tooltipClass"
-		>
-			<slot name="tooltip">
-				{{ tooltip }}
-			</slot>
-		</QTooltip>
-		<QMenu
-			v-if="isConfirming"
-			:model-value="true"
-		>
-			<div class="p-4 bg-slate-600">
-				<div>{{ confirmText }}</div>
-				<div class="flex items-center flex-nowrap mt-2">
-					<div class="flex-grow">
-						<ActionButton
-							type="cancel"
-							color="gray"
-							@click="isConfirming = false"
-						/>
-					</div>
-					<ActionButton
-						type="confirm"
-						color="green"
-						@click="()=> onAction(true)"
-					/>
-				</div>
-			</div>
-		</QMenu>
-	</QBtn>
+  <QBtn
+    :loading="isSaving"
+    class="shadow-none py-0"
+    :class="buttonClass"
+    :disable="disabled"
+    @click="()=> onAction()"
+  >
+    <div class="flex items-center flex-nowrap">
+      <component
+        :is="icon || typeOptions.icon"
+        class="transition-all"
+        :class="resolvedIconClass"
+      />
+      <div
+        v-if="label || label === 0"
+        class="ml-2"
+        :class="labelClass"
+      >
+        {{ label }}
+      </div>
+      <slot />
+    </div>
+    <QTooltip
+      v-if="tooltip"
+      class="whitespace-nowrap"
+      :class="tooltipClass"
+    >
+      <slot name="tooltip">
+        {{ tooltip }}
+      </slot>
+    </QTooltip>
+    <QMenu
+      v-if="isConfirming"
+      :model-value="true"
+    >
+      <div class="p-4 bg-slate-600">
+        <div>{{ confirmText }}</div>
+        <div class="flex items-center flex-nowrap mt-2">
+          <div class="flex-grow">
+            <ActionButton
+              type="cancel"
+              color="gray"
+              @click="isConfirming = false"
+            />
+          </div>
+          <ActionButton
+            type="confirm"
+            color="green"
+            @click="()=> onAction(true)"
+          />
+        </div>
+      </div>
+    </QMenu>
+  </QBtn>
 </template>
 <script setup lang="ts">
 import {
+	FaSolidArrowRotateRight as RestartIcon,
 	FaSolidArrowsRotate as RefreshIcon,
 	FaSolidCircleCheck as ConfirmIcon,
 	FaSolidCircleXmark as CancelIcon,
+	FaSolidCodeMerge as MergeIcon,
 	FaSolidCopy as CopyIcon,
 	FaSolidFileExport as ExportIcon,
 	FaSolidFileImport as ImportIcon,
@@ -75,8 +77,8 @@ import { computed, ref } from "vue";
 import { ActionTarget, ResourceAction } from "../../../types";
 
 export interface ActionButtonProps {
-	type?: "trash" | "create" | "edit" | "copy" | "folder" | "play" | "stop" | "pause" | "refresh" | "confirm" | "cancel" | "export" | "import" | "minus";
-	color?: "red" | "blue" | "sky" | "sky-invert" | "green" | "green-invert" | "lime" | "white" | "gray" | "yellow" | "orange";
+	type?: "trash" | "create" | "edit" | "copy" | "folder" | "play" | "stop" | "pause" | "refresh" | "restart" | "confirm" | "cancel" | "export" | "import" | "minus" | "merge";
+	color?: "red" | "blue" | "blue-invert" | "sky" | "sky-invert" | "green" | "green-invert" | "lime" | "white" | "gray" | "yellow" | "orange";
 	size?: "xxs" | "xs" | "sm" | "md" | "lg";
 	icon?: object | string;
 	iconClass?: string;
@@ -154,6 +156,8 @@ const colorClass = computed(() => {
 			return "text-green-300 bg-green-900 hover:bg-green-800";
 		case "blue":
 			return "text-blue-900 bg-blue-300 hover:bg-blue-400";
+		case "blue-invert":
+			return "text-blue-300 bg-blue-900 hover:bg-blue-800";
 		case "sky":
 			return "text-sky-900 bg-sky-300 hover:bg-sky-400";
 		case "sky-invert":
@@ -199,10 +203,14 @@ const typeOptions = computed(() => {
 			return { icon: StopIcon };
 		case "pause":
 			return { icon: PauseIcon };
+		case "restart":
+			return { icon: RestartIcon };
 		case "refresh":
 			return { icon: RefreshIcon };
 		case "minus":
 			return { icon: MinusIcon };
+		case "merge":
+			return { icon: MergeIcon };
 		default:
 			return { icon: EditIcon };
 	}

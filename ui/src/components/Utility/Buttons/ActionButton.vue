@@ -58,6 +58,7 @@
 import {
 	FaSolidArrowRotateRight as RestartIcon,
 	FaSolidArrowsRotate as RefreshIcon,
+	FaSolidBackward as BackIcon,
 	FaSolidCircleCheck as ConfirmIcon,
 	FaSolidCircleXmark as CancelIcon,
 	FaSolidCodeMerge as MergeIcon,
@@ -77,7 +78,7 @@ import { computed, ref } from "vue";
 import { ActionTarget, ResourceAction } from "../../../types";
 
 export interface ActionButtonProps {
-	type?: "trash" | "create" | "edit" | "copy" | "folder" | "play" | "stop" | "pause" | "refresh" | "restart" | "confirm" | "cancel" | "export" | "import" | "minus" | "merge";
+	type?: "trash" | "back" | "create" | "edit" | "copy" | "folder" | "play" | "stop" | "pause" | "refresh" | "restart" | "confirm" | "cancel" | "export" | "import" | "minus" | "merge";
 	color?: "red" | "blue" | "blue-invert" | "sky" | "sky-invert" | "green" | "green-invert" | "lime" | "white" | "gray" | "yellow" | "orange";
 	size?: "xxs" | "xs" | "sm" | "md" | "lg";
 	icon?: object | string;
@@ -185,6 +186,8 @@ const typeOptions = computed(() => {
 			return { icon: ExportIcon };
 		case "import":
 			return { icon: ImportIcon };
+		case "back":
+			return { icon: BackIcon };
 		case "create":
 			return { icon: CreateIcon };
 		case "confirm":

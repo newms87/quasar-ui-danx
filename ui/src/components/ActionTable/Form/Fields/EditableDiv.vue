@@ -5,7 +5,7 @@
       :contenteditable="readonly ? 'false' : 'true'"
       class="relative inline-block transition duration-300 outline-none outline-offset-0 border-none rounded-sm z-10 min-w-10 min-h-10"
       :style="{minWidth, minHeight}"
-      :class="contentClass"
+      :class="contentClassComputed"
       @input="onInput"
       @focusin="hasFocus = true"
       @focusout="hasFocus = false"
@@ -32,6 +32,7 @@ const props = withDefaults(defineProps<{
 	debounceDelay?: number;
 	readonly?: boolean;
 	placeholder?: string;
+	contentClass?: string;
 }>(), {
 	modelValue: "",
 	// NOTE: You must safe-list required colors in tailwind.config.js
@@ -39,7 +40,8 @@ const props = withDefaults(defineProps<{
 	color: "blue-200",
 	textColor: "blue-900",
 	debounceDelay: 1000,
-	placeholder: "Enter Text..."
+	placeholder: "Enter Text...",
+	contentClass: ""
 });
 
 const text = ref(props.modelValue);
@@ -80,12 +82,13 @@ function onInput(e) {
 	debouncedChange();
 }
 
-const contentClass = computed(() => [
+const contentClassComputed = computed(() => [
 	...(props.readonly ? [] : [
 		`hover:bg-${props.color} focus:bg-${props.color}`,
 		`hover:text-${props.textColor} focus:text-${props.textColor}`,
 		`hover:outline-${props.color} focus:outline-${props.color}`,
-		"focus:outline-4 hover:outline-4"
+		"focus:outline-4 hover:outline-4",
+		props.contentClass || ""
 	]),
 	text.value ? "" : "!bg-none"
 ]);

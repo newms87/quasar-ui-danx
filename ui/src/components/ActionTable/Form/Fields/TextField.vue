@@ -18,6 +18,7 @@
         :placeholder="placeholder || (placeholder === '' ? '' : `Enter ${label}`)"
         outlined
         dense
+        name=""
         :readonly="readonly"
         :autogrow="autogrow"
         :disable="disabled"
@@ -66,15 +67,15 @@ import FieldLabel from "./FieldLabel";
 
 defineEmits(["update:model-value", "submit"]);
 withDefaults(defineProps<TextFieldProps>(), {
-	modelValue: "",
-	field: null,
-	type: "text",
-	label: "",
-	labelClass: "",
-	inputClass: "",
-	maxLength: null,
-	rows: 3,
-	debounce: 0,
-	placeholder: null
+  modelValue: "",
+  field: null,
+  type: "text",
+  label: "",
+  labelClass: "",
+  inputClass: "",
+  maxLength: null,
+  rows: 3,
+  debounce: 0,
+  placeholder: null
 });
 </script>

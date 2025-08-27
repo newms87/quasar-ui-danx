@@ -80,43 +80,61 @@ import { FormField, UploadedFile } from "../../../../types";
 import { FilePreview } from "../../../Utility";
 import FieldLabel from "./FieldLabel";
 
-const emit = defineEmits(["update:model-value"]);
+const emit = defineEmits(["update:model-value", "uploading", "complete"]);
 const props = withDefaults(defineProps<{
-	modelValue?: UploadedFile[];
-	field?: FormField;
-	label?: string;
-	showName?: boolean;
-	disabled?: boolean;
-	readonly?: boolean;
-	width?: number | string;
-	height?: number | string;
-	addIconClass?: string;
-	filePreviewClass?: string;
-	filePreviewBtnSize?: string;
-	showTranscodes?: boolean;
+  modelValue?: UploadedFile[];
+  field?: FormField;
+  label?: string;
+  showName?: boolean;
+  disabled?: boolean;
+  readonly?: boolean;
+  width?: number | string;
+  height?: number | string;
+  addIconClass?: string;
+  filePreviewClass?: string;
+  filePreviewBtnSize?: string;
+  showTranscodes?: boolean;
 }>(), {
-	modelValue: null,
-	field: null,
-	label: "",
-	width: 128,
-	height: 128,
-	addIconClass: "w-10",
-	filePreviewClass: "rounded-2xl",
-	filePreviewBtnSize: "sm"
+  modelValue: null,
+  field: null,
+  label: "",
+  width: 128,
+  height: 128,
+  addIconClass: "w-10",
+  filePreviewClass: "rounded-2xl",
+  filePreviewBtnSize: "sm"
 });
 
-const { onComplete, onDrop, onFilesSelected, uploadedFiles, clearUploadedFiles, onRemove } = useMultiFileUpload();
+const {
+  onComplete,
+  onDrop,
+  onFilesChange,
+  onFilesSelected,
+  uploadedFiles,
+  clearUploadedFiles,
+  onRemove
+} = useMultiFileUpload();
 onMounted(() => {
-	if (props.modelValue) {
-		uploadedFiles.value = props.modelValue;
-	}
+  if (props.modelValue) {
+    uploadedFiles.value = props.modelValue;
+  }
 });
-onComplete(() => emit("update:model-value", uploadedFiles.value));
+
+onFilesChange(() => {
+  // Check if the files are currently uploading
+  if (uploadedFiles.value.some(file => file.progress < 1)) {
+    emit("uploading");
+  }
+});
+onComplete(() => {
+  emit("update:model-value", uploadedFiles.value);
+  emit("complete");
+});
 
 const styleSize = computed(() => {
-	return {
-		width: typeof props.width === "number" ? `${props.width}px` : props.width,
-		height: typeof props.height === "number" ? `${props.height}px` : props.height
-	};
+  return {
+    width: typeof props.width === "number" ? `${props.width}px` : props.width,
+    height: typeof props.height === "number" ? `${props.height}px` : props.height
+  };
 });
 </script>

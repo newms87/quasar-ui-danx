@@ -1,13 +1,13 @@
 .dx-field-label {
-	@apply text-xs mb-1.5 flex items-center space-x-1;
+  @apply text-xs mb-1.5 flex items-center space-x-1;
 
-	.dx-field-required {
-		@apply text-red-900 ml-0.5 bottom-1 relative;
-	}
+  .dx-field-required {
+    @apply text-red-900 ml-0.5 bottom-1 relative;
+  }
 }
 
 .q-field {
-	.q-field__label {
-		@apply text-sm text-gray-700;
-	}
+  .q-field__label {
+    @apply text-sm text-gray-700;
+  }
 }

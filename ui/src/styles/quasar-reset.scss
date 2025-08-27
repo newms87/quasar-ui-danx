@@ -1,105 +1,105 @@
 .danx-app {
-	.q-tab {
-		text-transform: capitalize
-	}
+  .q-tab {
+    text-transform: capitalize
+  }
 
-	.q-table__card {
-		background: inherit;
-		color: inherit;
-	}
+  .q-table__card {
+    background: inherit;
+    color: inherit;
+  }
 
-	.q-checkbox__inner {
-		color: inherit;
-	}
+  .q-checkbox__inner {
+    color: inherit;
+  }
 
-	.q-toolbar {
-		min-height: 0;
-		padding: 0;
-		flex-shrink: 0;
-	}
+  .q-toolbar {
+    min-height: 0;
+    padding: 0;
+    flex-shrink: 0;
+  }
 
-	.q-notification__actions {
-		color: inherit;
-	}
+  .q-notification__actions {
+    color: inherit;
+  }
 
-	.q-date {
-		min-width: 100px;
+  .q-date {
+    min-width: 100px;
 
-		.q-date__view {
-			min-height: 0;
-		}
-	}
+    .q-date__view {
+      min-height: 0;
+    }
+  }
 
-	.q-field {
-		&.q-field--auto-height {
-			.q-field__control {
-				min-height: 0;
+  .q-field {
+    &.q-field--auto-height {
+      .q-field__control {
+        min-height: 0;
 
-				.q-field__native {
-					min-height: 0;
-					color: inherit;
-				}
-			}
+        .q-field__native {
+          min-height: 0;
+          color: inherit;
+        }
+      }
 
-		}
+    }
 
-		&.q-field--labeled {
-			.q-field__control-container {
-				padding-top: 0;
-			}
+    &.q-field--labeled {
+      .q-field__control-container {
+        padding-top: 0;
+      }
 
-			&.q-textarea {
-				.q-field__control-container {
-					padding: .5rem 0;
-				}
-			}
-		}
+      &.q-textarea {
+        .q-field__control-container {
+          padding: .5rem 0;
+        }
+      }
+    }
 
-		.q-field__marginal, .q-field__input, .q-field__label {
-			color: inherit;
-			height: auto;
-			min-height: 0;
-			line-height: inherit;
-		}
-	}
+    .q-field__marginal, .q-field__input, .q-field__label {
+      color: inherit;
+      height: auto;
+      min-height: 0;
+      line-height: inherit;
+    }
+  }
 }
 
 .q-btn {
-	text-transform: inherit;
-	@apply bg-inherit text-inherit min-h-[auto] p-2;
+  text-transform: inherit;
+  @apply bg-inherit text-inherit min-h-[auto] p-2;
 
-	&:before {
-		@apply shadow-none;
-	}
+  &:before {
+    @apply shadow-none;
+  }
 }
 
 .q-item {
-	min-height: 0;
+  min-height: 0;
 }
 
 .q-tab-panels {
-	overflow: visible;
-	background: inherit;
+  overflow: visible;
+  background: inherit;
 
-	.q-panel {
-		overflow: visible;
+  .q-panel {
+    overflow: visible;
 
-		&.scroll {
-			overflow: auto;
-		}
-	}
+    &.scroll {
+      overflow: auto;
+    }
+  }
 
-	&.overflow-y-auto {
-		overflow-y: auto;
-	}
+  &.overflow-y-auto {
+    overflow-y: auto;
+  }
 }
 
 .dx-dialog {
-	.q-card__section--vert {
-		@apply p-0;
-	}
+  .q-card__section--vert {
+    @apply p-0;
+  }
 }
 
 .q-banner {
-	@apply min-h-[auto];
+  @apply min-h-[auto];
 }

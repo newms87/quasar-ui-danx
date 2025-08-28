@@ -59,8 +59,10 @@ import {
   FaSolidArrowRotateRight as RestartIcon,
   FaSolidArrowsRotate as RefreshIcon,
   FaSolidBackward as BackIcon,
+  FaSolidCheck as CheckIcon,
   FaSolidCircleCheck as ConfirmIcon,
   FaSolidCircleXmark as CancelIcon,
+  FaSolidClock as ClockIcon,
   FaSolidCodeMerge as MergeIcon,
   FaSolidCopy as CopyIcon,
   FaSolidFileExport as ExportIcon,
@@ -79,8 +81,8 @@ import { computed, ref } from "vue";
 import { ActionTarget, ResourceAction } from "../../../types";
 
 export interface ActionButtonProps {
-  type?: "save" | "trash" | "back" | "create" | "edit" | "copy" | "folder" | "play" | "stop" | "pause" | "refresh" | "restart" | "confirm" | "cancel" | "export" | "import" | "minus" | "merge";
-  color?: "red" | "blue" | "blue-invert" | "sky" | "sky-invert" | "green" | "green-invert" | "lime" | "white" | "gray" | "yellow" | "orange";
+  type?: "save" | "trash" | "back" | "create" | "edit" | "copy" | "folder" | "play" | "stop" | "pause" | "refresh" | "restart" | "confirm" | "cancel" | "export" | "import" | "minus" | "merge" | "check" | "clock";
+  color?: "red" | "blue" | "blue-invert" | "sky" | "sky-invert" | "green" | "green-invert" | "lime" | "white" | "gray" | "slate" | "slate-invert" | "yellow" | "orange";
   size?: "xxs" | "xs" | "sm" | "md" | "lg";
   icon?: object | string;
   iconClass?: string;
@@ -172,6 +174,10 @@ const colorClass = computed(() => {
       return "text-orange-400 bg-orange-900 hover:bg-orange-800";
     case "gray":
       return "text-slate-200 bg-slate-800 hover:bg-slate-900";
+    case "slate":
+      return "text-slate-900 bg-slate-300 hover:bg-slate-400";
+    case "slate-invert":
+      return "text-slate-300 bg-slate-900 hover:bg-slate-800";
     default:
       return "";
   }
@@ -203,6 +209,8 @@ const typeOptions = computed(() => {
       return { icon: CopyIcon };
     case "folder":
       return { icon: FolderIcon };
+    case "clock":
+      return { icon: ClockIcon };
     case "play":
       return { icon: PlayIcon };
     case "stop":
@@ -217,6 +225,8 @@ const typeOptions = computed(() => {
       return { icon: MinusIcon };
     case "merge":
       return { icon: MergeIcon };
+    case "check":
+      return { icon: CheckIcon };
     default:
       return { icon: EditIcon };
   }

@@ -125,6 +125,8 @@ onFilesChange(() => {
   if (uploadedFiles.value.some(file => file.progress < 1)) {
     emit("uploading");
   }
+
+  emit("update:model-value", uploadedFiles.value);
 });
 onComplete(() => {
   emit("update:model-value", uploadedFiles.value);

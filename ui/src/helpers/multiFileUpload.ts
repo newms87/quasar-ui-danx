@@ -15,34 +15,40 @@ export function useMultiFileUpload(options?: FileUploadOptions) {
 	const onFilesChangeCb: Ref<OnFilesChangeCallback | null> = ref(null);
 	const onFilesSelected = (e: any) => {
 		uploadedFiles.value = [...uploadedFiles.value, ...e.target.files];
+		triggerFilesChange();
+
 		new FileUpload(e.target.files, options)
-				.prepare()
-				.onProgress(({ file }) => {
-					file && updateFileInList(file);
-				})
-				.onComplete(({ file, uploadedFile }) => {
-					file && updateFileInList(file, uploadedFile);
-				})
-				.onError(({ file, error }) => {
-					console.error("Failed to upload", file, error);
-					FlashMessages.error(`Failed to upload ${file.name}: ${error}`);
-				})
-				.onAllComplete(() => {
-					onCompleteCb.value && onCompleteCb.value({
-						file: uploadedFiles.value[0],
-						uploadedFile: uploadedFiles.value[0]
-					});
-					onFilesChangeCb.value && onFilesChangeCb.value(uploadedFiles.value);
-				})
-				.upload();
+			.prepare()
+			.onProgress(({ file }) => {
+				file && updateFileInList(file);
+			})
+			.onComplete(({ file, uploadedFile }) => {
+				file && updateFileInList(file, uploadedFile);
+			})
+			.onError(({ file, error }) => {
+				console.error("Failed to upload", file, error);
+				FlashMessages.error(`Failed to upload ${file.name}: ${error}`);
+			})
+			.onAllComplete(() => {
+				onCompleteCb.value && onCompleteCb.value({
+					file: uploadedFiles.value[0],
+					uploadedFile: uploadedFiles.value[0]
+				});
+				triggerFilesChange();
+			})
+			.upload();
 	};
+
+	function triggerFilesChange() {
+		onFilesChangeCb.value && onFilesChangeCb.value(uploadedFiles.value);
+	}
 
 	function updateFileInList(file: UploadedFile, replace: UploadedFile | null = null) {
 		const index = uploadedFiles.value.findIndex(f => f.id === file.id);
 		if (index !== -1) {
 			uploadedFiles.value.splice(index, 1, replace || file);
 		}
-		onFilesChangeCb.value && onFilesChangeCb.value(uploadedFiles.value);
+		triggerFilesChange();
 	}
 
 	const onDrop = (e: InputEvent) => {
@@ -59,7 +65,7 @@ export function useMultiFileUpload(options?: FileUploadOptions) {
 
 	const clearUploadedFiles = () => {
 		uploadedFiles.value = [];
-		onFilesChangeCb.value && onFilesChangeCb.value(uploadedFiles.value);
+		triggerFilesChange();
 		onCompleteCb.value && onCompleteCb.value({ file: null, uploadedFile: null });
 	};
 
@@ -68,7 +74,7 @@ export function useMultiFileUpload(options?: FileUploadOptions) {
 		if (index !== -1) {
 			uploadedFiles.value.splice(index, 1);
 		}
-		onFilesChangeCb.value && onFilesChangeCb.value(uploadedFiles.value);
+		triggerFilesChange();
 		onCompleteCb.value && onCompleteCb.value({ file, uploadedFile: file });
 	};
 

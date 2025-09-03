@@ -65,6 +65,7 @@ import {
   FaSolidClock as ClockIcon,
   FaSolidCodeMerge as MergeIcon,
   FaSolidCopy as CopyIcon,
+  FaSolidDatabase as DatabaseIcon,
   FaSolidEye as ViewIcon,
   FaSolidFileExport as ExportIcon,
   FaSolidFileImport as ImportIcon,
@@ -82,7 +83,7 @@ import { computed, ref } from "vue";
 import { ActionTarget, ResourceAction } from "../../../types";
 
 export interface ActionButtonProps {
-  type?: "save" | "trash" | "back" | "create" | "edit" | "copy" | "folder" | "play" | "stop" | "pause" | "refresh" | "restart" | "confirm" | "cancel" | "export" | "import" | "minus" | "merge" | "check" | "clock" | "view";
+  type?: "save" | "trash" | "back" | "create" | "edit" | "copy" | "folder" | "play" | "stop" | "pause" | "refresh" | "restart" | "confirm" | "cancel" | "export" | "import" | "minus" | "merge" | "check" | "clock" | "view" | "database";
   color?: "red" | "blue" | "blue-invert" | "sky" | "sky-invert" | "green" | "green-invert" | "lime" | "white" | "gray" | "slate" | "slate-invert" | "yellow" | "orange";
   size?: "xxs" | "xs" | "sm" | "md" | "lg";
   icon?: object | string;
@@ -230,6 +231,8 @@ const typeOptions = computed(() => {
       return { icon: CheckIcon };
     case "view":
       return { icon: ViewIcon };
+    case "database":
+      return { icon: DatabaseIcon };
     default:
       return { icon: EditIcon };
   }

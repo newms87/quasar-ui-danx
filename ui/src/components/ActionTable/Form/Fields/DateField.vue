@@ -42,22 +42,22 @@ import { fDate, parseDateTime } from "../../../../helpers";
 
 const emit = defineEmits(["update:model-value"]);
 const props = defineProps<{
-	modelValue?: string | null;
-	label: string | null;
-	clearable: boolean;
+  modelValue?: string | null;
+  label: string | null;
+  clearable?: boolean;
 }>();
 
 const formattedDate = computed(() => {
-	if (props.modelValue) {
-		return fDate(parseDateTime(props.modelValue || "0000-00-00"));
-	}
-	return "- -";
+  if (props.modelValue) {
+    return fDate(parseDateTime(props.modelValue || "0000-00-00"));
+  }
+  return "- -";
 });
 
 const date = ref(parseDateTime(props.modelValue));
 watch(() => props.modelValue, val => date.value = val);
 
 function onSave() {
-	emit("update:model-value", date.value);
+  emit("update:model-value", date.value);
 }
 </script>

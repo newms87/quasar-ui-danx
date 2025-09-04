@@ -57,16 +57,16 @@ export function fLocalizedDateTime(dateTimeString: string, options = {}) {
  * @returns {string}
  */
 export function fDateTime(
-		dateTime: string | DateTime | null = null,
-		{ format = "M/d/yy h:mma", empty = "- -" }: fDateOptions = {}
+	dateTime: string | DateTime | null = null,
+	{ format = "M/d/yy h:mma", empty = "- -" }: fDateOptions = {}
 ) {
 	const formatted = parseDateTime(dateTime)?.toFormat(format).toLowerCase();
 	return formatted || empty;
 }
 
 export function fDateTimeMs(
-		dateTime: string | DateTime | null = null,
-		{ empty = "- -" }: fDateOptions = {}
+	dateTime: string | DateTime | null = null,
+	{ empty = "- -" }: fDateOptions = {}
 ) {
 	const formatted = parseDateTime(dateTime)?.toFormat("M/d/yy H:mm:ss.SSS").toLowerCase();
 	return formatted || empty;
@@ -202,6 +202,15 @@ export function fSecondsToDuration(seconds: number) {
 }
 
 /**
+ *  Formats a number of milliseconds into a duration string in 00h 00m 00s 000ms format
+ */
+export function fMillisecondsToDuration(milliseconds: number) {
+	const durStr = fSecondsToDuration(Math.floor(milliseconds / 1000));
+	return (durStr === "0s" ? "" : durStr) + ` ${Math.floor(milliseconds % 1000)}ms`;
+}
+
+
+/**
  *  Formats a duration between two date strings in 00h 00m 00s format
  */
 export function fDuration(start: string | number, end?: string | number) {
@@ -274,8 +283,8 @@ export function fShortNumber(value: string | number, options?: { round: boolean 
 	if (short) {
 		n = n / Math.pow(10, short.pow);
 		return options?.round
-				? n + short.unit
-				: n.toFixed(n > 100 ? 0 : 1) + short.unit;
+			? n + short.unit
+			: n.toFixed(n > 100 ? 0 : 1) + short.unit;
 	}
 
 	return n;
@@ -329,9 +338,9 @@ export function centerTruncate(str: string, maxLength: number) {
 		const frontCharCount = Math.floor((maxLength - 3) / 2);
 		const backCharCount = maxLength - frontCharCount - 3;
 		return (
-				str.substring(0, frontCharCount) +
-				"..." +
-				str.substring(str.length - backCharCount)
+			str.substring(0, frontCharCount) +
+			"..." +
+			str.substring(str.length - backCharCount)
 		);
 	} else {
 		return str;

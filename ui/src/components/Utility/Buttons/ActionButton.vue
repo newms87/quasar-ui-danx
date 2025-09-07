@@ -67,6 +67,7 @@ import {
   FaSolidCopy as CopyIcon,
   FaSolidDatabase as DatabaseIcon,
   FaSolidEye as ViewIcon,
+  FaSolidFile as DocumentIcon,
   FaSolidFileExport as ExportIcon,
   FaSolidFileImport as ImportIcon,
   FaSolidFloppyDisk as SaveIcon,
@@ -83,8 +84,8 @@ import { computed, ref } from "vue";
 import { ActionTarget, ResourceAction } from "../../../types";
 
 export interface ActionButtonProps {
-  type?: "save" | "trash" | "back" | "create" | "edit" | "copy" | "folder" | "play" | "stop" | "pause" | "refresh" | "restart" | "confirm" | "cancel" | "export" | "import" | "minus" | "merge" | "check" | "clock" | "view" | "database";
-  color?: "red" | "blue" | "blue-invert" | "sky" | "sky-invert" | "green" | "green-invert" | "lime" | "white" | "gray" | "slate" | "slate-invert" | "yellow" | "orange";
+  type?: "save" | "trash" | "back" | "create" | "edit" | "copy" | "folder" | "document" | "play" | "stop" | "pause" | "refresh" | "restart" | "confirm" | "cancel" | "export" | "import" | "minus" | "merge" | "check" | "clock" | "view" | "database";
+  color?: "red" | "blue" | "blue-invert" | "sky" | "sky-invert" | "green" | "green-invert" | "lime" | "white" | "gray" | "slate" | "slate-invert" | "yellow" | "orange" | "purple" | "teal" | "teal-invert";
   size?: "xxs" | "xs" | "sm" | "md" | "lg";
   icon?: object | string;
   iconClass?: string;
@@ -164,6 +165,10 @@ const colorClass = computed(() => {
       return "text-blue-900 bg-blue-300 hover:bg-blue-400";
     case "blue-invert":
       return "text-blue-300 bg-blue-900 hover:bg-blue-800";
+    case "teal":
+      return "text-teal-800 bg-teal-200 hover:bg-teal-400";
+    case "teal-invert":
+      return "text-teal-200 bg-teal-500 hover:bg-teal-600";
     case "sky":
       return "text-sky-900 bg-sky-300 hover:bg-sky-400";
     case "sky-invert":
@@ -180,6 +185,8 @@ const colorClass = computed(() => {
       return "text-slate-900 bg-slate-300 hover:bg-slate-400";
     case "slate-invert":
       return "text-slate-300 bg-slate-900 hover:bg-slate-800";
+    case "purple":
+      return "text-purple-300 bg-purple-900 hover:bg-purple-800";
     default:
       return "";
   }
@@ -211,6 +218,8 @@ const typeOptions = computed(() => {
       return { icon: CopyIcon };
     case "folder":
       return { icon: FolderIcon };
+    case "document":
+      return { icon: DocumentIcon };
     case "clock":
       return { icon: ClockIcon };
     case "play":

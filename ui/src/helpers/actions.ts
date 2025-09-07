@@ -25,11 +25,12 @@ export function useActions(actions: ActionOptions[], globalOptions: ActionGlobal
 
 	/**
 	 * Extend an action so the base action can be modified without affecting other places the action is used.
-	 * This isolates the action to the provided id, so it is still re-usable across the system, but does not affect behavior elsewhere.
+	 * This isolates the action to the provided id, so it is still re-usable across the system, but does not affect
+	 * behavior elsewhere.
 	 *
-	 * For example, when you have a list of items and you want to perform a callback on the action on a single item, you can extend the action
-	 * with the id of the item you want to perform the action on, allowing you to perform behavior on a single item, instead of all instances
-	 * in the list receiving the same callback.
+	 * For example, when you have a list of items and you want to perform a callback on the action on a single item,
+	 * you can extend the action with the id of the item you want to perform the action on, allowing you to perform
+	 * behavior on a single item, instead of all instances in the list receiving the same callback.
 	 */
 	function extendAction(actionName: string, extendedId: string | number, actionOptions: Partial<ActionOptions>): ResourceAction {
 		const action = getAction(actionName);
@@ -134,7 +135,8 @@ export function useActions(actions: ActionOptions[], globalOptions: ActionGlobal
 					confirm: async (confirmInput: any) => {
 
 						// Resolve the input based on the useInputFromConfirm option
-						// Not setting useInputFromConfirm will merge the input from the confirm dialog with the input from the action
+						// Not setting useInputFromConfirm will merge the input from the confirm dialog with the input
+						// from the action
 						let resolvedInput;
 						if (action.useInputFromConfirm === false) {
 							resolvedInput = input;
@@ -207,7 +209,8 @@ function setTargetSavingState(target: ActionTarget, saving: boolean) {
 /**
  * Execute the confirmed action on the target (ie: calling the server, or whatever the callback function does).
  *
- * 1. If the action has an optimistic callback, it will be called before the actual action to immediately update the UI (non batch actions only).
+ * 1. If the action has an optimistic callback, it will be called before the actual action to immediately update the UI
+ * (non batch actions only).
  * 2. Call the onBatchAction or onAction callback of the action object, depending on if the target is an array or not.
  * 3. Call the onSuccess or onError callback based on the result of the action.
  * 4. Call the onFinish callback of the action object.
@@ -310,11 +313,11 @@ async function onConfirmAction(action: ActionOptions, target: ActionTarget, inpu
 export function withDefaultActions(label: string, listController?: ListController): ActionOptions[] {
 	return [
 		{
-			name: "quick-create",
-			alias: "create"
+			name: "create"
 		},
 		{
-			name: "create",
+			name: "create-with-name",
+			alias: "create",
 			label: "Create " + label,
 			vnode: () => h(CreateNewWithNameDialog, { title: "Create " + label }),
 			onFinish: listController && ((result) => {
@@ -345,11 +348,11 @@ export function withDefaultActions(label: string, listController?: ListControlle
 			onAction: (action, target) => listController?.activatePanel(target, "edit")
 		},
 		{
-			name: "quick-delete",
-			alias: "delete"
+			name: "delete"
 		},
 		{
-			name: "delete",
+			name: "delete-with-confirm",
+			alias: "delete",
 			label: "Delete",
 			class: "text-red-500",
 			iconClass: "text-red-500",

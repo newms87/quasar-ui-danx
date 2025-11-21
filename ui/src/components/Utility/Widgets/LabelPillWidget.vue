@@ -20,9 +20,19 @@ const colorClasses = {
 	amber: "bg-amber-950 text-amber-400",
 	yellow: "bg-yellow-950 text-yellow-400",
 	blue: "bg-blue-950 text-blue-400",
+	purple: "bg-purple-950 text-purple-400",
 	slate: "bg-slate-950 text-slate-400",
 	"slate-mid": "bg-slate-800 text-slate-400",
 	gray: "bg-slate-700 text-gray-300",
+	emerald: "bg-emerald-950 text-emerald-400",
+	orange: "bg-orange-950 text-orange-400",
+	lime: "bg-lime-950 text-lime-400",
+	teal: "bg-teal-950 text-teal-400",
+	cyan: "bg-cyan-950 text-cyan-400",
+	rose: "bg-rose-950 text-rose-400",
+	indigo: "bg-indigo-950 text-indigo-400",
+	violet: "bg-violet-950 text-violet-400",
+	fuchsia: "bg-fuchsia-950 text-fuchsia-400",
 	none: ""
 };
 

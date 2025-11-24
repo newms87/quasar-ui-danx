@@ -77,3 +77,24 @@ export type FileUploadProgressCallback = (params: FileUploadProgressCallbackPara
 export type FileUploadErrorCallback = (params: FileUploadErrorCallbackParams) => void
 export type OnFilesChangeCallback = (files: UploadedFile[]) => void;
 export type VoidCallback = () => void;
+
+// File Navigation Types
+export interface FileNavigationState {
+	currentFile: UploadedFile | null;
+	relatedFiles: UploadedFile[];
+	parentStack: FileNavigationParent[];
+	currentIndex: number;
+}
+
+export interface FileNavigationParent {
+	file: UploadedFile;
+	relatedFiles: UploadedFile[];
+	index: number;
+}
+
+export interface VirtualCarouselSlide {
+	file: UploadedFile;
+	index: number;
+	isActive: boolean;
+	isVisible: boolean;
+}

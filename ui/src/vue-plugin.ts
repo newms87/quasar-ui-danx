@@ -1,6 +1,7 @@
 export * from "./config";
 export * from "./helpers";
 export * from "./components";
+export * from "./composables";
 export * from "./svg";
 
 // eslint-disable-next-line import/extensions

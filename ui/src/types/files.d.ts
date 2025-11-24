@@ -34,6 +34,23 @@ export interface UploadedFile extends TypedObject {
 	meta?: AnyObject;
 }
 
+export interface StoredFile extends TypedObject {
+	filename: string;
+	url: string;
+	mime: string;
+	size?: number;
+	location?: {
+		x: number;
+		y: number;
+	};
+	meta?: AnyObject;
+	page_number?: number;
+	is_transcoding?: boolean;
+	thumb?: StoredFile;
+	optimized?: StoredFile;
+	transcodes?: StoredFile[];
+}
+
 export interface FileUploadCompleteCallbackParams {
 	file?: UploadedFile | null;
 	uploadedFile?: UploadedFile | null;

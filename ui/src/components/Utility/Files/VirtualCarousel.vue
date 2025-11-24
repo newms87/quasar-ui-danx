@@ -29,30 +29,7 @@
             :is-active="slide.isActive"
           >
             <!-- Default slide content -->
-            <div class="flex items-center justify-center w-full h-full">
-              <img
-                v-if="isImage(slide.file)"
-                :src="getPreviewUrl(slide.file)"
-                :alt="slide.file.filename || slide.file.name"
-                class="max-h-full max-w-full object-contain"
-              >
-              <video
-                v-else-if="isVideo(slide.file)"
-                class="max-h-full max-w-full"
-                controls
-              >
-                <source
-                  :src="getPreviewUrl(slide.file)"
-                  :type="slide.file.mime"
-                >
-              </video>
-              <div
-                v-else
-                class="text-slate-300"
-              >
-                No preview available
-              </div>
-            </div>
+            <FileRenderer :file="slide.file" />
           </slot>
         </div>
       </transition-group>
@@ -86,32 +63,16 @@
       </QBtn>
     </div>
 
-    <!-- Thumbnail Navigation (if enabled and multiple files) -->
+    <!-- Thumbnail Navigation (using ThumbnailStrip component) -->
     <div
       v-if="showThumbnails && files.length > 1"
-      class="absolute bottom-0 left-0 right-0 bg-slate-900 bg-opacity-80 p-2"
+      class="absolute bottom-0 left-0 right-0"
     >
-      <div
-        ref="thumbnailContainer"
-        class="flex items-center justify-start gap-2 overflow-x-auto overflow-y-hidden px-4"
-      >
-        <div
-          v-for="(file, index) in files"
-          :key="file.id"
-          :ref="el => setThumbnailRef(el, index)"
-          :class="[
-            'thumbnail cursor-pointer rounded border-2 transition-all',
-            index === currentIndex ? 'border-blue-500 scale-110' : 'border-transparent opacity-60 hover:opacity-100'
-          ]"
-          @click="onThumbnailClick(index)"
-        >
-          <img
-            :src="getThumbUrl(file)"
-            :alt="file.filename || file.name"
-            class="w-16 h-16 object-cover rounded"
-          >
-        </div>
-      </div>
+      <ThumbnailStrip
+        :files="files"
+        :current-index="currentIndex"
+        @navigate="navigateTo"
+      />
     </div>
 
     <!-- Slide Counter -->
@@ -126,9 +87,12 @@
 
 <script setup lang="ts">
 import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/vue/outline";
-import { computed, nextTick, onMounted, onUnmounted, ref, watch } from "vue";
+import { computed, ref, toRef, watch } from "vue";
+import { useKeyboardNavigation } from "../../../composables/useKeyboardNavigation";
 import { useVirtualCarousel } from "../../../composables/useVirtualCarousel";
 import { UploadedFile } from "../../../types";
+import FileRenderer from "./FileRenderer.vue";
+import ThumbnailStrip from "./ThumbnailStrip.vue";
 
 interface VirtualCarouselProps {
 	files: UploadedFile[];
@@ -153,23 +117,11 @@ const props = withDefaults(defineProps<VirtualCarouselProps>(), {
 });
 
 const carouselContainer = ref<HTMLElement | null>(null);
-const thumbnailContainer = ref<HTMLElement | null>(null);
-const thumbnailRefs = ref<(HTMLElement | null)[]>([]);
 const currentIndex = ref(props.modelValue);
 const files = computed(() => props.files);
 
-// Set thumbnail ref
-function setThumbnailRef(el: HTMLElement | null, index: number) {
-	if (el) {
-		thumbnailRefs.value[index] = el;
-	}
-}
-
 // Use virtual carousel composable
-const {
-	visibleSlides,
-	isSlideVisible
-} = useVirtualCarousel(files, currentIndex);
+const { visibleSlides } = useVirtualCarousel(files, currentIndex);
 
 // Navigation
 const canNavigatePrevious = computed(() => currentIndex.value > 0);
@@ -195,22 +147,13 @@ function onNext() {
 	}
 }
 
-function onThumbnailClick(index: number) {
-	navigateTo(index);
-}
-
 // Keyboard navigation
-function onKeydown(e: KeyboardEvent) {
-	if (!props.enableKeyboard) return;
-
-	if (e.key === 'ArrowLeft') {
-		e.preventDefault();
-		onPrevious();
-	} else if (e.key === 'ArrowRight') {
-		e.preventDefault();
-		onNext();
-	}
-}
+useKeyboardNavigation({
+	onPrevious,
+	onNext
+}, {
+	enabled: toRef(props, 'enableKeyboard')
+});
 
 // Touch/swipe support
 const touchStart = ref<{ x: number; y: number } | null>(null);
@@ -252,64 +195,11 @@ function onTouchEnd(e: TouchEvent) {
 	touchStart.value = null;
 }
 
-// File type helpers
-function isImage(file: UploadedFile): boolean {
-	return !!file.mime?.startsWith('image') || !!file.type?.startsWith('image');
-}
-
-function isVideo(file: UploadedFile): boolean {
-	return !!file.mime?.startsWith('video') || !!file.type?.startsWith('video');
-}
-
-function getPreviewUrl(file: UploadedFile): string {
-	return file.optimized?.url || file.blobUrl || file.url || '';
-}
-
-function getThumbUrl(file: UploadedFile): string {
-	if (file.thumb?.url) {
-		return file.thumb.url;
-	}
-	if (isVideo(file)) {
-		// Placeholder for video
-		return `data:image/svg+xml;base64,${btoa(
-			'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="white"><path d="M8 5v14l11-7z"/></svg>'
-		)}`;
-	}
-	return getPreviewUrl(file) || 'https://placehold.co/64x64?text=?';
-}
-
-// Lifecycle
-onMounted(() => {
-	if (props.enableKeyboard) {
-		window.addEventListener('keydown', onKeydown);
-	}
-});
-
-onUnmounted(() => {
-	if (props.enableKeyboard) {
-		window.removeEventListener('keydown', onKeydown);
-	}
-});
-
 // Watch for external changes to modelValue
 watch(() => props.modelValue, (newIndex) => {
 	if (newIndex !== currentIndex.value) {
 		currentIndex.value = newIndex;
 	}
-});
-
-// Watch currentIndex and scroll active thumbnail into view
-watch(() => currentIndex.value, (newIndex) => {
-	nextTick(() => {
-		const activeThumbnail = thumbnailRefs.value[newIndex];
-		if (activeThumbnail && thumbnailContainer.value) {
-			activeThumbnail.scrollIntoView({
-				behavior: 'smooth',
-				block: 'nearest',
-				inline: 'center'
-			});
-		}
-	});
 });
 </script>
 

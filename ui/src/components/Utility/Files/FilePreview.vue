@@ -162,6 +162,8 @@ import { DocumentTextIcon as TextFileIcon, DownloadIcon, FilmIcon, PlayIcon } fr
 import { computed, ComputedRef, onMounted, ref, watch } from "vue";
 import { danxOptions } from "../../../config";
 import { download, uniqueBy } from "../../../helpers";
+import * as fileHelpers from "../../../helpers/filePreviewHelpers";
+import { getMimeType, getOptimizedUrl } from "../../../helpers/filePreviewHelpers";
 import { ImageIcon, PdfIcon, TrashIcon as RemoveIcon } from "../../../svg";
 import { UploadedFile } from "../../../types";
 import { FullScreenCarouselDialog } from "../Dialogs";
@@ -239,18 +241,12 @@ function filesHaveSameUrl(a: UploadedFile, b: UploadedFile) {
 }
 
 const filename = computed(() => computedImage.value?.name || computedImage.value?.filename || "");
-const mimeType = computed(
-	() => computedImage.value?.type || computedImage.value?.mime || ""
-);
-const isImage = computed(() => !!mimeType.value.match(/^image\//));
-const isVideo = computed(() => !!mimeType.value.match(/^video\//));
-const isPdf = computed(() => !!mimeType.value.match(/^application\/pdf/));
-const previewUrl = computed(
-	() => computedImage.value?.optimized?.url || computedImage.value?.blobUrl || computedImage.value?.url
-);
-const thumbUrl = computed(() => {
-	return computedImage.value?.thumb?.url;
-});
+const mimeType = computed(() => computedImage.value ? getMimeType(computedImage.value) : "");
+const isImage = computed(() => computedImage.value ? fileHelpers.isImage(computedImage.value) : false);
+const isVideo = computed(() => computedImage.value ? fileHelpers.isVideo(computedImage.value) : false);
+const isPdf = computed(() => computedImage.value ? fileHelpers.isPdf(computedImage.value) : false);
+const previewUrl = computed(() => computedImage.value ? getOptimizedUrl(computedImage.value) : "");
+const thumbUrl = computed(() => computedImage.value?.thumb?.url || "");
 const isPreviewable = computed(() => {
 	return !!thumbUrl.value || isVideo.value || isImage.value;
 });

@@ -8,6 +8,7 @@ export * from "./download";
 export * from "./downloadPdf";
 export * from "./files";
 export * from "./FileUpload";
+export * from "./filePreviewHelpers";
 export * from "./FlashMessages";
 export * from "./formats";
 export * from "./hotkeys";

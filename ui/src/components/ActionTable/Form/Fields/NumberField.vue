@@ -50,7 +50,37 @@ function format(number) {
 	return fNumber(number, options);
 }
 
-const onUpdateDebounced = useDebounceFn((val: number | string | undefined) => emit("update", val), props.delay);
+const onUpdateDebounced = useDebounceFn((val: number | string | undefined) => {
+	// Apply min/max clamping to the final value
+	let clampedVal = val;
+	if (typeof val === "number") {
+		if (props.min !== undefined) {
+			clampedVal = Math.max(val, props.min);
+		}
+		if (props.max !== undefined) {
+			clampedVal = Math.min(clampedVal as number, props.max);
+		}
+	}
+	emit("update", clampedVal);
+}, props.delay);
+
+const applyMinMaxClamping = useDebounceFn((value: number | undefined) => {
+	if (value === undefined) return;
+
+	let clampedValue = value;
+	if (props.min !== undefined) {
+		clampedValue = Math.max(clampedValue, props.min);
+	}
+	if (props.max !== undefined) {
+		clampedValue = Math.min(clampedValue, props.max);
+	}
+
+	// Only update the display if the value changed after clamping
+	if (clampedValue !== value) {
+		numberVal.value = format(clampedValue);
+		emit("update:model-value", clampedValue);
+	}
+}, 500);
 
 function onInput(value) {
 	let number: number | undefined = undefined;
@@ -68,19 +98,17 @@ function onInput(value) {
 		value = value.replace(/[^\d.]/g, "");
 		number = +value;
 
-		if (props.min) {
-			number = Math.max(number, props.min);
-		}
-		if (props.max) {
-			number = Math.min(number, props.max);
-		}
-
+		// Don't clamp immediately - let user type freely
 		numberVal.value = format(number);
 	}
 
+	// Emit the raw typed value immediately
 	emit("update:model-value", number);
 
 	// Delay the change event, so we only see the value after the user has finished
 	onUpdateDebounced(number);
+
+	// Apply min/max clamping after user stops typing
+	applyMinMaxClamping(number);
 }
 </script>

@@ -63,9 +63,12 @@ export function fMarkdownCode(type: string, string: string | object): string {
 		}
 	}
 
-	const regex = new RegExp(`\`\`\`${type}`, "g");
 	string = (string || "") as string;
-	if (!string.match(regex)) {
+	// Check if string STARTS with the code fence (not just contains it anywhere)
+	// This fixes a bug where JSON containing embedded code fences in the data
+	// would incorrectly be detected as already wrapped
+	const startsWithCodeFence = new RegExp(`^\\s*\`\`\`${type}\\s`).test(string);
+	if (!startsWithCodeFence) {
 		string = parseMarkdownCode(string as string);
 		return `\`\`\`${type}\n${string}\n\`\`\``;
 	}

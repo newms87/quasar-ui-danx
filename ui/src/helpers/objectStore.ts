@@ -88,7 +88,7 @@ function storeObjectChildren<T extends TypedObject>(object: T, recentlyStoredObj
 	applyToObject = applyToObject || object;
 	for (const key of Object.keys(object)) {
 		const value = object[key];
-		if (Array.isArray(value) && value.length > 0) {
+		if (Array.isArray(value)) {
 			for (const index in value) {
 				if (value[index] && typeof value[index] === "object") {
 					if (!applyToObject[key]) {
@@ -101,6 +101,9 @@ function storeObjectChildren<T extends TypedObject>(object: T, recentlyStoredObj
 		} else if (value?.__type) {
 			// @ts-expect-error __type is guaranteed to be set in this case
 			applyToObject[key] = storeObject(value as TypedObject, recentlyStoredObjects);
+		} else if (value && typeof value === "object") {
+			// Handle plain objects/dictionaries - recurse to find nested TypedObjects at any depth
+			storeObjectChildren(value, recentlyStoredObjects, applyToObject[key]);
 		}
 	}
 }

@@ -105,3 +105,34 @@ export function getThumbUrl(file: UploadedFile): string {
 export function getOptimizedUrl(file: UploadedFile): string {
 	return file.optimized?.url || file.blobUrl || file.url || "";
 }
+
+/**
+ * Check if file is an external link that should open in a new tab
+ * (e.g., Google Docs, external URLs that can't be previewed inline)
+ */
+export function isExternalLinkFile(file: UploadedFile): boolean {
+	const url = file.url || "";
+	const mime = getMimeType(file);
+
+	// Google Docs/Sheets/Slides URLs
+	if (url.includes("docs.google.com") || url.includes("drive.google.com")) {
+		return true;
+	}
+
+	// Google Doc MIME types
+	if (mime.startsWith("application/vnd.google-apps.")) {
+		return true;
+	}
+
+	return false;
+}
+
+/**
+ * Check if file can be previewed inline (image, video, text, pdf)
+ */
+export function canPreviewInline(file: UploadedFile): boolean {
+	if (isExternalLinkFile(file)) {
+		return false;
+	}
+	return isImage(file) || isVideo(file) || isText(file) || isPdf(file) || !!file.thumb?.url;
+}

@@ -2,6 +2,7 @@ export { default as CaretDownIcon } from "./CaretDownIcon.svg";
 export { default as DragHandleDotsIcon } from "./DragHandleDotsIcon.svg";
 export { default as DragHandleIcon } from "./DragHandleIcon.svg";
 export { default as FilterIcon } from "./FilterIcon.svg";
+export { default as GoogleDocsIcon } from "./GoogleDocsIcon.vue";
 export { default as ImageIcon } from "./ImageIcon.svg";
 export { default as PdfIcon } from "./PdfIcon.svg";
 export { default as PercentIcon } from "./PercentIcon.svg";

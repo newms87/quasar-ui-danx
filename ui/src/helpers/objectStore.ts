@@ -25,7 +25,12 @@ export function storeObject<T extends TypedObject>(newObject: T, recentlyStoredO
 
 	const id = newObject?.id || newObject?.name;
 	const type = newObject?.__type;
-	if (!id || !type) return shallowReactive(newObject);
+	if (!id || !type) {
+		// Still process children to store any nested TypedObjects
+		const reactiveObject = shallowReactive(newObject);
+		storeObjectChildren(newObject, recentlyStoredObjects, reactiveObject);
+		return reactiveObject;
+	}
 
 	if (!newObject.__id) {
 		newObject.__id = uid();

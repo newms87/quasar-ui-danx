@@ -37,8 +37,12 @@
           v-else
           class="flex items-center justify-center h-full"
         >
+          <GoogleDocsIcon
+            v-if="isExternalLink"
+            class="h-3/4"
+          />
           <PdfIcon
-            v-if="isPdf"
+            v-else-if="isPdf"
             class="w-3/4"
           />
           <TextFileIcon
@@ -163,8 +167,8 @@ import { computed, ComputedRef, onMounted, ref, watch } from "vue";
 import { danxOptions } from "../../../config";
 import { download, uniqueBy } from "../../../helpers";
 import * as fileHelpers from "../../../helpers/filePreviewHelpers";
-import { getMimeType, getOptimizedUrl } from "../../../helpers/filePreviewHelpers";
-import { ImageIcon, PdfIcon, TrashIcon as RemoveIcon } from "../../../svg";
+import { getMimeType, getOptimizedUrl, isExternalLinkFile } from "../../../helpers/filePreviewHelpers";
+import { GoogleDocsIcon, ImageIcon, PdfIcon, TrashIcon as RemoveIcon } from "../../../svg";
 import { UploadedFile } from "../../../types";
 import { FullScreenCarouselDialog } from "../Dialogs";
 
@@ -245,6 +249,7 @@ const mimeType = computed(() => computedImage.value ? getMimeType(computedImage.
 const isImage = computed(() => computedImage.value ? fileHelpers.isImage(computedImage.value) : false);
 const isVideo = computed(() => computedImage.value ? fileHelpers.isVideo(computedImage.value) : false);
 const isPdf = computed(() => computedImage.value ? fileHelpers.isPdf(computedImage.value) : false);
+const isExternalLink = computed(() => computedImage.value ? isExternalLinkFile(computedImage.value) : false);
 const previewUrl = computed(() => computedImage.value ? getOptimizedUrl(computedImage.value) : "");
 const thumbUrl = computed(() => computedImage.value?.thumb?.url || "");
 const isPreviewable = computed(() => {
@@ -281,6 +286,11 @@ function onRemove() {
 }
 
 function onShowPreview() {
+	// For external links (Google Docs, etc.), open directly in new tab
+	if (computedImage.value && isExternalLinkFile(computedImage.value)) {
+		window.open(computedImage.value.url, "_blank");
+		return;
+	}
 	showPreview.value = true;
 }
 

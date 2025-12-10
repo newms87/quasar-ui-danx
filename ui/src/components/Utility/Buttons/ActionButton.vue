@@ -78,14 +78,16 @@ import {
   FaSolidPlay as PlayIcon,
   FaSolidPlus as CreateIcon,
   FaSolidStop as StopIcon,
-  FaSolidTrash as TrashIcon
+  FaSolidTrash as TrashIcon,
+  FaSolidUsers as UsersIcon,
+  FaSolidXmark as CloseIcon
 } from "danx-icon";
 import { computed, ref } from "vue";
 import { ActionTarget, ResourceAction } from "../../../types";
 
 export interface ActionButtonProps {
-  type?: "save" | "trash" | "back" | "create" | "edit" | "copy" | "folder" | "document" | "play" | "stop" | "pause" | "refresh" | "restart" | "confirm" | "cancel" | "export" | "import" | "minus" | "merge" | "check" | "clock" | "view" | "database";
-  color?: "red" | "blue" | "blue-invert" | "sky" | "sky-invert" | "green" | "green-invert" | "lime" | "white" | "gray" | "slate" | "slate-invert" | "yellow" | "orange" | "purple" | "teal" | "teal-invert";
+  type?: "save" | "trash" | "back" | "create" | "edit" | "copy" | "folder" | "document" | "play" | "stop" | "pause" | "refresh" | "restart" | "confirm" | "cancel" | "export" | "import" | "minus" | "merge" | "check" | "clock" | "view" | "database" | "users" | "close";
+  color?: "red" | "blue" | "blue-invert" | "sky" | "sky-invert" | "green" | "green-invert" | "lime" | "white" | "gray" | "slate" | "slate-invert" | "yellow" | "orange" | "amber" | "purple" | "teal" | "teal-invert";
   size?: "xxs" | "xs" | "sm" | "md" | "lg";
   icon?: object | string;
   iconClass?: string;
@@ -179,6 +181,8 @@ const colorClass = computed(() => {
       return "text-yellow-300 bg-yellow-800 hover:bg-yellow-700";
     case "orange":
       return "text-orange-400 bg-orange-900 hover:bg-orange-800";
+    case "amber":
+      return "text-amber-900 bg-amber-300 hover:bg-amber-400";
     case "gray":
       return "text-slate-200 bg-slate-800 hover:bg-slate-900";
     case "slate":
@@ -242,6 +246,10 @@ const typeOptions = computed(() => {
       return { icon: ViewIcon };
     case "database":
       return { icon: DatabaseIcon };
+    case "users":
+      return { icon: UsersIcon };
+    case "close":
+      return { icon: CloseIcon };
     default:
       return { icon: EditIcon };
   }

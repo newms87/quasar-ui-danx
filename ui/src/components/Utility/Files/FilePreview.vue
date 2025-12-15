@@ -74,7 +74,7 @@
       >
         <QLinearProgress
           :key="'progress-' + isUploading ? 'uploading' : 'transcoding'"
-          :value="isUploading ? file.progress : ((transcodingStatus?.progress || 0) / 100)"
+          :value="isUploading ? (file?.progress || 0) : ((transcodingStatus?.progress || 0) / 100)"
           size="36px"
           :color="isUploading ? 'green-800' : 'blue-800'"
           :animation-speed="transcodingStatus?.estimate_ms || 3000"
@@ -173,75 +173,75 @@ import { UploadedFile } from "../../../types";
 import { FullScreenCarouselDialog } from "../Dialogs";
 
 export interface FileTranscode {
-	status: "Complete" | "Pending" | "In Progress";
-	progress: number;
-	estimate_ms: number;
-	started_at: string;
-	completed_at: string;
-	message?: string;
+  status: "Complete" | "Pending" | "In Progress";
+  progress: number;
+  estimate_ms: number;
+  started_at: string;
+  completed_at: string;
+  message?: string;
 }
 
 export interface FilePreviewProps {
-	src?: string;
-	file?: UploadedFile;
-	relatedFiles?: UploadedFile[];
-	missingIcon?: any;
-	showFilename?: boolean;
-	downloadButtonClass?: string;
-	imageFit?: "cover" | "contain" | "fill" | "none" | "scale-down";
-	downloadable?: boolean;
-	removable?: boolean;
-	disabled?: boolean;
-	square?: boolean;
-	btnSize?: "xs" | "sm" | "md" | "lg";
+  src?: string;
+  file?: UploadedFile;
+  relatedFiles?: UploadedFile[];
+  missingIcon?: any;
+  showFilename?: boolean;
+  downloadButtonClass?: string;
+  imageFit?: "cover" | "contain" | "fill" | "none" | "scale-down";
+  downloadable?: boolean;
+  removable?: boolean;
+  disabled?: boolean;
+  square?: boolean;
+  btnSize?: "xs" | "sm" | "md" | "lg";
 }
 
 const emit = defineEmits(["remove"]);
 
 const props = withDefaults(defineProps<FilePreviewProps>(), {
-	src: "",
-	file: null,
-	relatedFiles: null,
-	missingIcon: ImageIcon,
-	downloadButtonClass: "bg-blue-600 text-white",
-	imageFit: "cover",
-	downloadable: false,
-	removable: false,
-	disabled: false,
-	square: false,
-	btnSize: "sm"
+  src: "",
+  file: null,
+  relatedFiles: null,
+  missingIcon: ImageIcon,
+  downloadButtonClass: "bg-blue-600 text-white",
+  imageFit: "cover",
+  downloadable: false,
+  removable: false,
+  disabled: false,
+  square: false,
+  btnSize: "sm"
 });
 
 
 const showPreview = ref(false);
 const isLoadingTranscodes = ref(false);
 const computedImage: ComputedRef<UploadedFile | null> = computed(() => {
-	if (props.file) {
-		return props.file;
-	} else if (props.src) {
-		return {
-			id: props.src,
-			url: props.src,
-			type: "image/" + props.src.split(".").pop()?.toLowerCase(),
-			name: "",
-			size: 0,
-			__type: "BrowserFile"
-		};
-	}
-	return null;
+  if (props.file) {
+    return props.file;
+  } else if (props.src) {
+    return {
+      id: props.src,
+      url: props.src,
+      type: "image/" + props.src.split(".").pop()?.toLowerCase(),
+      name: "",
+      size: 0,
+      __type: "BrowserFile"
+    };
+  }
+  return null;
 });
 
-const isUploading = computed(() => !props.file || props.file?.progress !== undefined);
+const isUploading = computed(() => props.file && props.file?.progress !== undefined);
 const statusMessage = computed(() => isUploading.value ? "Uploading..." : transcodingStatus.value?.message);
 const hasTranscodes = computed(() => (props.file?.transcodes?.length || 0) > 0);
 const previewableFiles: ComputedRef<(UploadedFile | null)[] | null> = computed(() => {
-	return props.relatedFiles?.length > 0 ? uniqueBy([computedImage.value, ...props.relatedFiles], filesHaveSameUrl) : [computedImage.value];
+  return props.relatedFiles?.length > 0 ? uniqueBy([computedImage.value, ...props.relatedFiles], filesHaveSameUrl) : [computedImage.value];
 });
 
 function filesHaveSameUrl(a: UploadedFile, b: UploadedFile) {
-	return a.id === b.id ||
-		[b.url, b.optimized?.url, b.thumb?.url].includes(a.url) ||
-		[a.url, a.optimized?.url, a.thumb?.url].includes(b.url);
+  return a.id === b.id ||
+    [b.url, b.optimized?.url, b.thumb?.url].includes(a.url) ||
+    [a.url, a.optimized?.url, a.thumb?.url].includes(b.url);
 }
 
 const filename = computed(() => computedImage.value?.name || computedImage.value?.filename || "");
@@ -253,114 +253,115 @@ const isExternalLink = computed(() => computedImage.value ? isExternalLinkFile(c
 const previewUrl = computed(() => computedImage.value ? getOptimizedUrl(computedImage.value) : "");
 const thumbUrl = computed(() => computedImage.value?.thumb?.url || "");
 const isPreviewable = computed(() => {
-	return !!thumbUrl.value || isVideo.value || isImage.value;
+  return !!thumbUrl.value || isVideo.value || isImage.value;
 });
 
 /**
  * Resolve the active transcoding operation if there is one, otherwise return null
  */
 const transcodingStatus = computed(() => {
-	let status = null;
-	const metaTranscodes: FileTranscode[] = props.file?.meta?.transcodes || [];
+  let status = null;
+  const metaTranscodes: FileTranscode[] = props.file?.meta?.transcodes || [];
 
-	for (let transcodeName of Object.keys(metaTranscodes)) {
-		const transcode = metaTranscodes[transcodeName];
-		if (!["Complete", "Timeout"].includes(transcode?.status)) {
-			return { ...transcode, message: `${transcodeName} ${transcode.status}` };
-		}
-	}
+  for (let transcodeName of Object.keys(metaTranscodes)) {
+    const transcode = metaTranscodes[transcodeName];
+    if (!["Complete", "Timeout"].includes(transcode?.status)) {
+      return { ...transcode, message: `${transcodeName} ${transcode.status}` };
+    }
+  }
 
-	return status;
+  return status;
 });
 
 const isConfirmingRemove = ref(false);
+
 function onRemove() {
-	if (!isConfirmingRemove.value) {
-		isConfirmingRemove.value = true;
-		setTimeout(() => {
-			isConfirmingRemove.value = false;
-		}, 2000);
-	} else {
-		emit("remove");
-	}
+  if (!isConfirmingRemove.value) {
+    isConfirmingRemove.value = true;
+    setTimeout(() => {
+      isConfirmingRemove.value = false;
+    }, 2000);
+  } else {
+    emit("remove");
+  }
 }
 
 function onShowPreview() {
-	// For external links (Google Docs, etc.), open directly in new tab
-	if (computedImage.value && isExternalLinkFile(computedImage.value)) {
-		window.open(computedImage.value.url, "_blank");
-		return;
-	}
-	showPreview.value = true;
+  // For external links (Google Docs, etc.), open directly in new tab
+  if (computedImage.value && isExternalLinkFile(computedImage.value)) {
+    window.open(computedImage.value.url, "_blank");
+    return;
+  }
+  showPreview.value = true;
 }
 
 /**
  * Check if transcodes need to be loaded for the current file
  */
 function shouldLoadTranscodes(): boolean {
-	if (!props.file?.id) return false;
-	if (isLoadingTranscodes.value) return false;
-	if (!danxOptions.value.fileUpload?.refreshFile) return false;
+  if (!props.file?.id) return false;
+  if (isLoadingTranscodes.value) return false;
+  if (!danxOptions.value.fileUpload?.refreshFile) return false;
 
-	// Only load if transcodes is explicitly null, undefined, or an empty array
-	const transcodes = props.file.transcodes;
-	return transcodes === null || transcodes === undefined || (Array.isArray(transcodes) && transcodes.length === 0);
+  // Only load if transcodes is explicitly null, undefined, or an empty array
+  const transcodes = props.file.transcodes;
+  return transcodes === null || transcodes === undefined || (Array.isArray(transcodes) && transcodes.length === 0);
 }
 
 /**
  * Load transcodes for the current file
  */
 async function loadTranscodes() {
-	if (!shouldLoadTranscodes()) return;
+  if (!shouldLoadTranscodes()) return;
 
-	isLoadingTranscodes.value = true;
+  isLoadingTranscodes.value = true;
 
-	try {
-		const refreshFile = danxOptions.value.fileUpload.refreshFile;
-		if (refreshFile && props.file?.id) {
-			const refreshedFile = await refreshFile(props.file.id);
+  try {
+    const refreshFile = danxOptions.value.fileUpload.refreshFile;
+    if (refreshFile && props.file?.id) {
+      const refreshedFile = await refreshFile(props.file.id);
 
-			// Update the file object with the loaded transcodes
-			if (refreshedFile.transcodes && props.file) {
-				props.file.transcodes = refreshedFile.transcodes;
-			}
-		}
-	} catch (error) {
-		console.error("Failed to load transcodes:", error);
-	} finally {
-		isLoadingTranscodes.value = false;
-	}
+      // Update the file object with the loaded transcodes
+      if (refreshedFile.transcodes && props.file) {
+        props.file.transcodes = refreshedFile.transcodes;
+      }
+    }
+  } catch (error) {
+    console.error("Failed to load transcodes:", error);
+  } finally {
+    isLoadingTranscodes.value = false;
+  }
 }
 
 // Load transcodes when component mounts
 onMounted(() => {
-	loadTranscodes();
+  loadTranscodes();
 });
 
 // Watch for file changes and reload transcodes if needed
 watch(() => props.file?.id, () => {
-	loadTranscodes();
+  loadTranscodes();
 });
 </script>
 
 <style module="cls" lang="scss">
 .action-button {
-	position: absolute;
-	bottom: 1.5em;
-	right: 1em;
-	z-index: 1;
+  position: absolute;
+  bottom: 1.5em;
+  right: 1em;
+  z-index: 1;
 }
 
 .play-button {
-	position: absolute;
-	top: 0;
-	left: 0;
-	display: flex;
-	justify-content: center;
-	align-items: center;
-	width: 100%;
-	height: 100%;
-	pointer-events: none;
-	@apply text-blue-200;
+  position: absolute;
+  top: 0;
+  left: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  @apply text-blue-200;
 }
 </style>

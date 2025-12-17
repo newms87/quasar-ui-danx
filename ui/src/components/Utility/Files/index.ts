@@ -1,4 +1,5 @@
 export { default as CarouselHeader } from "./CarouselHeader.vue";
+export { default as FileMetadataDialog } from "./FileMetadataDialog.vue";
 export { default as FilePreview } from "./FilePreview.vue";
 export { default as FileRenderer } from "./FileRenderer.vue";
 export { default as SvgImg } from "./SvgImg.vue";

@@ -22,6 +22,24 @@
         {{ filename }}
       </div>
 
+      <!-- Metadata Button -->
+      <QBtn
+        v-if="showMetadataButton"
+        flat
+        dense
+        class="bg-purple-700 text-purple-200 hover:bg-purple-600"
+        @click="$emit('metadata')"
+      >
+        <div class="flex items-center flex-nowrap gap-1">
+          <MetaIcon class="w-4" />
+          <QBadge
+            class="bg-purple-900 text-purple-200"
+            :label="metadataCount"
+          />
+          <span class="text-sm ml-1">Metadata</span>
+        </div>
+      </QBtn>
+
       <!-- Transcodes Button -->
       <QBtn
         v-if="showTranscodesButton"
@@ -57,16 +75,21 @@
 
 <script setup lang="ts">
 import { ArrowLeftIcon, FilmIcon } from "@heroicons/vue/outline";
+import { FaSolidBarcode as MetaIcon } from "danx-icon";
 import { XIcon as CloseIcon } from "../../../svg";
 
 withDefaults(defineProps<{
 	filename: string;
 	showBackButton?: boolean;
+	showMetadataButton?: boolean;
+	metadataCount?: number;
 	showTranscodesButton?: boolean;
 	transcodesCount?: number;
 	showCloseButton?: boolean;
 }>(), {
 	showBackButton: false,
+	showMetadataButton: false,
+	metadataCount: 0,
 	showTranscodesButton: false,
 	transcodesCount: 0,
 	showCloseButton: false
@@ -74,6 +97,7 @@ withDefaults(defineProps<{
 
 defineEmits<{
 	'back': [];
+	'metadata': [];
 	'transcodes': [];
 	'close': [];
 }>();

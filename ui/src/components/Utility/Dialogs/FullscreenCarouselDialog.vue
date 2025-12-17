@@ -10,11 +10,14 @@
         <!-- Header with filename and navigation -->
         <CarouselHeader
           v-if="currentFile"
-          :filename="currentFile.filename || currentFile.name"
+          :filename="filename"
           :show-back-button="hasParent"
+          :show-metadata-button="hasMetadata"
+          :metadata-count="metadataKeyCount"
           :show-transcodes-button="!!(currentFile.transcodes && currentFile.transcodes.length > 0)"
           :transcodes-count="currentFile.transcodes?.length || 0"
           @back="navigateToParent"
+          @metadata="showMetadataDialog = true"
           @transcodes="showTranscodeNav = true"
         />
 
@@ -88,6 +91,15 @@
         :transcodes="currentFile.transcodes"
         @select="onSelectTranscode"
       />
+
+      <!-- Metadata Dialog -->
+      <FileMetadataDialog
+        v-if="showMetadataDialog"
+        :filename="filename"
+        :mime-type="mimeType"
+        :metadata="filteredMetadata"
+        @close="showMetadataDialog = false"
+      />
     </div>
   </QDialog>
 </template>
@@ -96,11 +108,13 @@
 import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/vue/outline";
 import { ref } from "vue";
 import { useFileNavigation } from "../../../composables/useFileNavigation";
+import { useFilePreview } from "../../../composables/useFilePreview";
 import { useKeyboardNavigation } from "../../../composables/useKeyboardNavigation";
 import { useVirtualCarousel } from "../../../composables/useVirtualCarousel";
 import { XIcon as CloseIcon } from "../../../svg";
 import { UploadedFile } from "../../../types";
 import CarouselHeader from "../Files/CarouselHeader.vue";
+import FileMetadataDialog from "../Files/FileMetadataDialog.vue";
 import FileRenderer from "../Files/FileRenderer.vue";
 import ThumbnailStrip from "../Files/ThumbnailStrip.vue";
 import TranscodeNavigator from "../Files/TranscodeNavigator.vue";
@@ -155,4 +169,16 @@ function onSelectTranscode(transcode: UploadedFile, index: number) {
 		diveInto(transcode, currentFile.value.transcodes);
 	}
 }
+
+// Metadata navigation
+const showMetadataDialog = ref(false);
+
+// Use file preview composable for metadata
+const {
+	filename,
+	mimeType,
+	hasMetadata,
+	metadataKeyCount,
+	filteredMetadata
+} = useFilePreview({ file: currentFile });
 </script>

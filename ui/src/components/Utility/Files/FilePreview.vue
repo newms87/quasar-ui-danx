@@ -108,6 +108,22 @@
 
     <div class="absolute top-1 right-1 flex items-center flex-nowrap justify-between space-x-1 transition-all opacity-0 group-hover:opacity-100">
       <QBtn
+        v-if="hasMetadata"
+        :size="btnSize"
+        class="dx-file-preview-metadata bg-purple-700 text-white opacity-70 hover:opacity-100 py-1 px-2 relative"
+        @click.stop="showMetadataDialog = true"
+      >
+        <div class="flex items-center flex-nowrap gap-1">
+          <MetaIcon class="w-4 h-4" />
+          <QBadge
+            class="bg-purple-900 text-purple-200"
+            :label="metadataKeyCount"
+          />
+        </div>
+        <QTooltip>View Metadata</QTooltip>
+      </QBtn>
+
+      <QBtn
         v-if="hasTranscodes"
         :size="btnSize"
         class="dx-file-preview-transcodes bg-purple-700 text-white opacity-70 hover:opacity-100 py-1 px-2 relative"
@@ -152,6 +168,14 @@
       </QBtn>
     </div>
 
+    <FileMetadataDialog
+      v-if="showMetadataDialog"
+      :filename="filename"
+      :mime-type="mimeType"
+      :metadata="filteredMetadata"
+      @close="showMetadataDialog = false"
+    />
+
     <FullScreenCarouselDialog
       v-if="showPreview && !disabled && previewableFiles"
       :files="previewableFiles"
@@ -163,23 +187,16 @@
 
 <script setup lang="ts">
 import { DocumentTextIcon as TextFileIcon, DownloadIcon, FilmIcon, PlayIcon } from "@heroicons/vue/outline";
-import { computed, ComputedRef, onMounted, ref, watch } from "vue";
-import { danxOptions } from "../../../config";
+import { FaSolidBarcode as MetaIcon } from "danx-icon";
+import { computed, ref, toRef } from "vue";
+import { useFilePreview } from "../../../composables/useFilePreview";
+import { useTranscodeLoader } from "../../../composables/useTranscodeLoader";
 import { download, uniqueBy } from "../../../helpers";
-import * as fileHelpers from "../../../helpers/filePreviewHelpers";
-import { getMimeType, getOptimizedUrl, isExternalLinkFile } from "../../../helpers/filePreviewHelpers";
+import { isExternalLinkFile } from "../../../helpers/filePreviewHelpers";
 import { GoogleDocsIcon, ImageIcon, PdfIcon, TrashIcon as RemoveIcon } from "../../../svg";
 import { UploadedFile } from "../../../types";
 import { FullScreenCarouselDialog } from "../Dialogs";
-
-export interface FileTranscode {
-  status: "Complete" | "Pending" | "In Progress";
-  progress: number;
-  estimate_ms: number;
-  started_at: string;
-  completed_at: string;
-  message?: string;
-}
+import FileMetadataDialog from "./FileMetadataDialog.vue";
 
 export interface FilePreviewProps {
   src?: string;
@@ -212,68 +229,51 @@ const props = withDefaults(defineProps<FilePreviewProps>(), {
   btnSize: "sm"
 });
 
+// Use composables for file preview logic
+const fileRef = toRef(props, "file");
+const srcRef = toRef(props, "src");
 
+const {
+  computedImage,
+  filename,
+  mimeType,
+  isVideo,
+  isPdf,
+  isExternalLink,
+  previewUrl,
+  thumbUrl,
+  isPreviewable,
+  hasMetadata,
+  metadataKeyCount,
+  filteredMetadata,
+  hasTranscodes,
+  transcodingStatus
+} = useFilePreview({ file: fileRef, src: srcRef });
+
+// Load transcodes automatically
+useTranscodeLoader({ file: fileRef });
+
+// Local state
 const showPreview = ref(false);
-const isLoadingTranscodes = ref(false);
-const computedImage: ComputedRef<UploadedFile | null> = computed(() => {
-  if (props.file) {
-    return props.file;
-  } else if (props.src) {
-    return {
-      id: props.src,
-      url: props.src,
-      type: "image/" + props.src.split(".").pop()?.toLowerCase(),
-      name: "",
-      size: 0,
-      __type: "BrowserFile"
-    };
-  }
-  return null;
-});
+const showMetadataDialog = ref(false);
+const isConfirmingRemove = ref(false);
 
+// Computed
 const isUploading = computed(() => props.file && props.file?.progress !== undefined);
 const statusMessage = computed(() => isUploading.value ? "Uploading..." : transcodingStatus.value?.message);
-const hasTranscodes = computed(() => (props.file?.transcodes?.length || 0) > 0);
-const previewableFiles: ComputedRef<(UploadedFile | null)[] | null> = computed(() => {
-  return props.relatedFiles?.length > 0 ? uniqueBy([computedImage.value, ...props.relatedFiles], filesHaveSameUrl) : [computedImage.value];
+
+const previewableFiles = computed(() => {
+  return props.relatedFiles?.length > 0
+    ? uniqueBy([computedImage.value, ...props.relatedFiles], filesHaveSameUrl)
+    : [computedImage.value];
 });
 
+// Helpers
 function filesHaveSameUrl(a: UploadedFile, b: UploadedFile) {
   return a.id === b.id ||
     [b.url, b.optimized?.url, b.thumb?.url].includes(a.url) ||
     [a.url, a.optimized?.url, a.thumb?.url].includes(b.url);
 }
-
-const filename = computed(() => computedImage.value?.name || computedImage.value?.filename || "");
-const mimeType = computed(() => computedImage.value ? getMimeType(computedImage.value) : "");
-const isImage = computed(() => computedImage.value ? fileHelpers.isImage(computedImage.value) : false);
-const isVideo = computed(() => computedImage.value ? fileHelpers.isVideo(computedImage.value) : false);
-const isPdf = computed(() => computedImage.value ? fileHelpers.isPdf(computedImage.value) : false);
-const isExternalLink = computed(() => computedImage.value ? isExternalLinkFile(computedImage.value) : false);
-const previewUrl = computed(() => computedImage.value ? getOptimizedUrl(computedImage.value) : "");
-const thumbUrl = computed(() => computedImage.value?.thumb?.url || "");
-const isPreviewable = computed(() => {
-  return !!thumbUrl.value || isVideo.value || isImage.value;
-});
-
-/**
- * Resolve the active transcoding operation if there is one, otherwise return null
- */
-const transcodingStatus = computed(() => {
-  let status = null;
-  const metaTranscodes: FileTranscode[] = props.file?.meta?.transcodes || [];
-
-  for (let transcodeName of Object.keys(metaTranscodes)) {
-    const transcode = metaTranscodes[transcodeName];
-    if (!["Complete", "Timeout"].includes(transcode?.status)) {
-      return { ...transcode, message: `${transcodeName} ${transcode.status}` };
-    }
-  }
-
-  return status;
-});
-
-const isConfirmingRemove = ref(false);
 
 function onRemove() {
   if (!isConfirmingRemove.value) {
@@ -287,61 +287,12 @@ function onRemove() {
 }
 
 function onShowPreview() {
-  // For external links (Google Docs, etc.), open directly in new tab
   if (computedImage.value && isExternalLinkFile(computedImage.value)) {
     window.open(computedImage.value.url, "_blank");
     return;
   }
   showPreview.value = true;
 }
-
-/**
- * Check if transcodes need to be loaded for the current file
- */
-function shouldLoadTranscodes(): boolean {
-  if (!props.file?.id) return false;
-  if (isLoadingTranscodes.value) return false;
-  if (!danxOptions.value.fileUpload?.refreshFile) return false;
-
-  // Only load if transcodes is explicitly null, undefined, or an empty array
-  const transcodes = props.file.transcodes;
-  return transcodes === null || transcodes === undefined || (Array.isArray(transcodes) && transcodes.length === 0);
-}
-
-/**
- * Load transcodes for the current file
- */
-async function loadTranscodes() {
-  if (!shouldLoadTranscodes()) return;
-
-  isLoadingTranscodes.value = true;
-
-  try {
-    const refreshFile = danxOptions.value.fileUpload.refreshFile;
-    if (refreshFile && props.file?.id) {
-      const refreshedFile = await refreshFile(props.file.id);
-
-      // Update the file object with the loaded transcodes
-      if (refreshedFile.transcodes && props.file) {
-        props.file.transcodes = refreshedFile.transcodes;
-      }
-    }
-  } catch (error) {
-    console.error("Failed to load transcodes:", error);
-  } finally {
-    isLoadingTranscodes.value = false;
-  }
-}
-
-// Load transcodes when component mounts
-onMounted(() => {
-  loadTranscodes();
-});
-
-// Watch for file changes and reload transcodes if needed
-watch(() => props.file?.id, () => {
-  loadTranscodes();
-});
 </script>
 
 <style module="cls" lang="scss">

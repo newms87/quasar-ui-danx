@@ -115,70 +115,164 @@ export function highlightJSON(code: string): string {
 }
 
 /**
- * Highlight YAML syntax
+ * Highlight a YAML value based on its type
+ */
+function highlightYAMLValue(value: string): string {
+	if (!value) return value;
+
+	// Quoted string (complete)
+	if (/^(&quot;.*&quot;|&#039;.*&#039;)$/.test(value) || /^["'].*["']$/.test(value)) {
+		return `<span class="syntax-string">${value}</span>`;
+	}
+	// Number (strict format: integers, decimals, scientific notation)
+	if (/^-?\d+(\.\d+)?([eE][+-]?\d+)?$/.test(value)) {
+		return `<span class="syntax-number">${value}</span>`;
+	}
+	// Boolean
+	if (/^(true|false)$/i.test(value)) {
+		return `<span class="syntax-boolean">${value}</span>`;
+	}
+	// Null
+	if (/^(null|~)$/i.test(value)) {
+		return `<span class="syntax-null">${value}</span>`;
+	}
+	// Block scalar indicators - don't wrap, handle continuation separately
+	if (/^[|>][-+]?\d*$/.test(value)) {
+		return `<span class="syntax-punctuation">${value}</span>`;
+	}
+	// Unquoted string
+	return `<span class="syntax-string">${value}</span>`;
+}
+
+/**
+ * Check if a line is a continuation of a multi-line string
+ * (indented content following a block scalar or inside a quoted string)
+ */
+function getIndentLevel(line: string): number {
+	const match = line.match(/^(\s*)/);
+	return match ? match[1].length : 0;
+}
+
+/**
+ * Highlight YAML syntax with multi-line string support
  */
 export function highlightYAML(code: string): string {
 	if (!code) return "";
 
 	const lines = code.split("\n");
-	const highlightedLines = lines.map(line => {
-		// Escape HTML first
+	const highlightedLines: string[] = [];
+
+	// State tracking for multi-line constructs
+	let inBlockScalar = false;
+	let blockScalarIndent = 0;
+	let inQuotedString = false;
+	let quoteChar = "";
+	let baseIndent = 0;
+
+	for (let i = 0; i < lines.length; i++) {
+		const line = lines[i];
 		const escaped = escapeHtml(line);
+		const currentIndent = getIndentLevel(line);
+		const trimmedLine = line.trim();
+
+		// Handle block scalar continuation (| or > style)
+		if (inBlockScalar) {
+			// Block scalar ends when we hit a line with less or equal indentation (and content)
+			// or when we hit a line that starts a new key at the base level
+			if (trimmedLine && currentIndent <= blockScalarIndent) {
+				inBlockScalar = false;
+				// Fall through to normal processing
+			} else {
+				// This is a continuation line - highlight as string
+				highlightedLines.push(`<span class="syntax-string">${escaped}</span>`);
+				continue;
+			}
+		}
+
+		// Handle quoted string continuation
+		if (inQuotedString) {
+			// Check if this line closes the quote
+			const escapedQuote = quoteChar === '"' ? '&quot;' : '&#039;';
+
+			// Count unescaped quotes in this line
+			let closed = false;
+			let searchLine = escaped;
+			while (searchLine.includes(escapedQuote)) {
+				const idx = searchLine.indexOf(escapedQuote);
+				// Check if preceded by backslash (escaped)
+				if (idx > 0 && searchLine[idx - 1] === '\\') {
+					searchLine = searchLine.slice(idx + escapedQuote.length);
+					continue;
+				}
+				closed = true;
+				break;
+			}
+
+			if (closed) {
+				// Find position of closing quote
+				const closeIdx = escaped.indexOf(escapedQuote);
+				const beforeClose = escaped.slice(0, closeIdx + escapedQuote.length);
+				const afterClose = escaped.slice(closeIdx + escapedQuote.length);
+
+				highlightedLines.push(`<span class="syntax-string">${beforeClose}</span>${afterClose}`);
+				inQuotedString = false;
+			} else {
+				// Still in quoted string
+				highlightedLines.push(`<span class="syntax-string">${escaped}</span>`);
+			}
+			continue;
+		}
 
 		// Comments
 		if (/^\s*#/.test(line)) {
-			return `<span class="syntax-punctuation">${escaped}</span>`;
+			highlightedLines.push(`<span class="syntax-punctuation">${escaped}</span>`);
+			continue;
 		}
 
 		// Key-value pairs
 		const keyValueMatch = escaped.match(/^(\s*)([^:]+?)(:)(\s*)(.*)$/);
 		if (keyValueMatch) {
 			const [, indent, key, colon, space, value] = keyValueMatch;
-			let highlightedValue = value;
 
-			// Highlight the value based on type
-			if (/^(&quot;.*&quot;|&#039;.*&#039;)$/.test(value) || /^["'].*["']$/.test(value)) {
-				// Quoted string
-				highlightedValue = `<span class="syntax-string">${value}</span>`;
-			} else if (/^-?\d+(\.\d+)?([eE][+-]?\d+)?$/.test(value)) {
-				// Number (strict format: integers, decimals, scientific notation)
-				highlightedValue = `<span class="syntax-number">${value}</span>`;
-			} else if (/^(true|false)$/i.test(value)) {
-				// Boolean
-				highlightedValue = `<span class="syntax-boolean">${value}</span>`;
-			} else if (/^(null|~)$/i.test(value)) {
-				// Null
-				highlightedValue = `<span class="syntax-null">${value}</span>`;
-			} else if (value && !value.startsWith("|") && !value.startsWith(">")) {
-				// Unquoted string (but not multiline indicators)
-				highlightedValue = `<span class="syntax-string">${value}</span>`;
+			// Check for block scalar start
+			if (/^[|>][-+]?\d*$/.test(value.trim())) {
+				inBlockScalar = true;
+				blockScalarIndent = currentIndent;
+				baseIndent = currentIndent;
+				const highlightedValue = `<span class="syntax-punctuation">${value}</span>`;
+				highlightedLines.push(`${indent}<span class="syntax-key">${key}</span><span class="syntax-punctuation">${colon}</span>${space}${highlightedValue}`);
+				continue;
 			}
 
-			return `${indent}<span class="syntax-key">${key}</span><span class="syntax-punctuation">${colon}</span>${space}${highlightedValue}`;
+			// Check for start of multi-line quoted string
+			const startsWithQuote = /^(&quot;|&#039;|"|')/.test(value);
+			const endsWithQuote = /(&quot;|&#039;|"|')$/.test(value);
+
+			if (startsWithQuote && !endsWithQuote && value.length > 1) {
+				// Multi-line quoted string starts here
+				inQuotedString = true;
+				quoteChar = value.startsWith('&quot;') || value.startsWith('"') ? '"' : "'";
+				highlightedLines.push(`${indent}<span class="syntax-key">${key}</span><span class="syntax-punctuation">${colon}</span>${space}<span class="syntax-string">${value}</span>`);
+				continue;
+			}
+
+			// Normal single-line value
+			const highlightedValue = highlightYAMLValue(value);
+			highlightedLines.push(`${indent}<span class="syntax-key">${key}</span><span class="syntax-punctuation">${colon}</span>${space}${highlightedValue}`);
+			continue;
 		}
 
 		// Array items (lines starting with -)
 		const arrayMatch = escaped.match(/^(\s*)(-)(\s*)(.*)$/);
 		if (arrayMatch) {
 			const [, indent, dash, space, value] = arrayMatch;
-			let highlightedValue = value;
-
-			if (/^-?\d+(\.\d+)?([eE][+-]?\d+)?$/.test(value)) {
-				// Number (strict format)
-				highlightedValue = `<span class="syntax-number">${value}</span>`;
-			} else if (/^(true|false)$/i.test(value)) {
-				highlightedValue = `<span class="syntax-boolean">${value}</span>`;
-			} else if (/^(null|~)$/i.test(value)) {
-				highlightedValue = `<span class="syntax-null">${value}</span>`;
-			} else if (value) {
-				highlightedValue = `<span class="syntax-string">${value}</span>`;
-			}
-
-			return `${indent}<span class="syntax-punctuation">${dash}</span>${space}${highlightedValue}`;
+			const highlightedValue = value ? highlightYAMLValue(value) : "";
+			highlightedLines.push(`${indent}<span class="syntax-punctuation">${dash}</span>${space}${highlightedValue}`);
+			continue;
 		}
 
-		return escaped;
-	});
+		highlightedLines.push(escaped);
+	}
 
 	return highlightedLines.join("\n");
 }

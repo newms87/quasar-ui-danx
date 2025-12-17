@@ -19,10 +19,22 @@
 
       <!-- Metadata section -->
       <div class="bg-white rounded-lg border border-gray-200 overflow-hidden flex-1 flex flex-col min-h-0">
-        <div class="bg-gray-50 px-4 py-3 border-b border-gray-200 flex-shrink-0">
+        <div class="bg-gray-50 px-4 py-3 border-b border-gray-200 flex-shrink-0 flex items-center justify-between">
           <h4 class="text-base font-medium text-gray-900">
             Metadata
           </h4>
+          <QBtn
+            v-if="showDockButton"
+            flat
+            dense
+            round
+            size="sm"
+            class="text-gray-500 hover:text-gray-700 hover:bg-gray-200"
+            @click="$emit('dock')"
+          >
+            <DockSideIcon class="w-4 h-4" />
+            <QTooltip>Dock to side</QTooltip>
+          </QBtn>
         </div>
         <div class="p-4 flex-1 min-h-0 flex flex-col">
           <CodeViewer
@@ -38,16 +50,21 @@
 </template>
 
 <script setup lang="ts">
+import { FaSolidTableColumns as DockSideIcon } from "danx-icon";
 import { CodeViewer } from "../Code";
 import { InfoDialog } from "../Dialogs";
 
-defineProps<{
+withDefaults(defineProps<{
 	filename: string;
 	mimeType?: string;
 	metadata: Record<string, unknown>;
-}>();
+	showDockButton?: boolean;
+}>(), {
+	showDockButton: false
+});
 
 defineEmits<{
 	close: [];
+	dock: [];
 }>();
 </script>

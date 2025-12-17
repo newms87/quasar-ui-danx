@@ -89,16 +89,23 @@
   }
 
   // ==========================================
-  // Textarea for edit mode
+  // Editable mode (contenteditable)
   // ==========================================
-  textarea.code-content {
-    resize: vertical;
+  .code-content.is-editable {
+    cursor: text;
     outline: none;
-    width: 100%;
-    border: none;
+    border: 2px solid transparent;
+    transition: border-color 0.2s ease;
 
     &:focus {
-      box-shadow: 0 0 0 2px rgba(86, 156, 214, 0.4);
+      border-color: rgba(86, 156, 214, 0.6);
     }
+
+    &:hover:not(:focus) {
+      border-color: rgba(86, 156, 214, 0.3);
+    }
+
+    // Caret color
+    caret-color: #d4d4d4;
   }
 }

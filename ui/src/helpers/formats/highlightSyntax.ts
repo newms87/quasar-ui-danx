@@ -3,7 +3,7 @@
  * Returns HTML string with syntax highlighting spans
  */
 
-export type HighlightFormat = "json" | "yaml";
+export type HighlightFormat = "json" | "yaml" | "text";
 
 export interface HighlightOptions {
 	format: HighlightFormat;
@@ -167,7 +167,8 @@ export function highlightYAML(code: string): string {
 	let blockScalarIndent = 0;
 	let inQuotedString = false;
 	let quoteChar = "";
-	let baseIndent = 0;
+	let inUnquotedMultiline = false;
+	let unquotedMultilineKeyIndent = 0;
 
 	for (let i = 0; i < lines.length; i++) {
 		const line = lines[i];
@@ -178,7 +179,6 @@ export function highlightYAML(code: string): string {
 		// Handle block scalar continuation (| or > style)
 		if (inBlockScalar) {
 			// Block scalar ends when we hit a line with less or equal indentation (and content)
-			// or when we hit a line that starts a new key at the base level
 			if (trimmedLine && currentIndent <= blockScalarIndent) {
 				inBlockScalar = false;
 				// Fall through to normal processing
@@ -223,6 +223,24 @@ export function highlightYAML(code: string): string {
 			continue;
 		}
 
+		// Handle unquoted multi-line string continuation
+		if (inUnquotedMultiline) {
+			// Unquoted multiline ends when we hit a line with <= indentation to the key
+			// or when the line contains a colon (new key-value pair)
+			if (trimmedLine && currentIndent <= unquotedMultilineKeyIndent) {
+				inUnquotedMultiline = false;
+				// Fall through to normal processing
+			} else if (trimmedLine) {
+				// This is a continuation line - highlight as string
+				highlightedLines.push(`<span class="syntax-string">${escaped}</span>`);
+				continue;
+			} else {
+				// Empty line within multiline - keep it
+				highlightedLines.push(escaped);
+				continue;
+			}
+		}
+
 		// Comments
 		if (/^\s*#/.test(line)) {
 			highlightedLines.push(`<span class="syntax-punctuation">${escaped}</span>`);
@@ -238,7 +256,6 @@ export function highlightYAML(code: string): string {
 			if (/^[|>][-+]?\d*$/.test(value.trim())) {
 				inBlockScalar = true;
 				blockScalarIndent = currentIndent;
-				baseIndent = currentIndent;
 				const highlightedValue = `<span class="syntax-punctuation">${value}</span>`;
 				highlightedLines.push(`${indent}<span class="syntax-key">${key}</span><span class="syntax-punctuation">${colon}</span>${space}${highlightedValue}`);
 				continue;
@@ -254,6 +271,21 @@ export function highlightYAML(code: string): string {
 				quoteChar = value.startsWith('&quot;') || value.startsWith('"') ? '"' : "'";
 				highlightedLines.push(`${indent}<span class="syntax-key">${key}</span><span class="syntax-punctuation">${colon}</span>${space}<span class="syntax-string">${value}</span>`);
 				continue;
+			}
+
+			// Check for start of unquoted multi-line string
+			// If value is an unquoted string and next line is more indented, it's a multiline
+			if (value && !startsWithQuote && i + 1 < lines.length) {
+				const nextLine = lines[i + 1];
+				const nextIndent = getIndentLevel(nextLine);
+				const nextTrimmed = nextLine.trim();
+				// Next line must be more indented than current key and not be a new key-value or array item
+				if (nextTrimmed && nextIndent > currentIndent && !nextTrimmed.includes(':') && !nextTrimmed.startsWith('-')) {
+					inUnquotedMultiline = true;
+					unquotedMultilineKeyIndent = currentIndent;
+					highlightedLines.push(`${indent}<span class="syntax-key">${key}</span><span class="syntax-punctuation">${colon}</span>${space}<span class="syntax-string">${value}</span>`);
+					continue;
+				}
 			}
 
 			// Normal single-line value
@@ -288,6 +320,7 @@ export function highlightSyntax(code: string, options: HighlightOptions): string
 			return highlightJSON(code);
 		case "yaml":
 			return highlightYAML(code);
+		case "text":
 		default:
 			return escapeHtml(code);
 	}

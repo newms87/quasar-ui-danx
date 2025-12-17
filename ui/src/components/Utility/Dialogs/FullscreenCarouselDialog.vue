@@ -107,7 +107,6 @@
                 :model-value="filteredMetadata"
                 :readonly="true"
                 format="yaml"
-                :show-format-toggle="true"
               />
             </div>
           </div>

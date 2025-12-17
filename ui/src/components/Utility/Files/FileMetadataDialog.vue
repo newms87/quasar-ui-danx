@@ -41,7 +41,6 @@
             :model-value="metadata"
             :readonly="true"
             format="yaml"
-            :show-format-toggle="true"
           />
         </div>
       </div>

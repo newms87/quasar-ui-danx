@@ -2,7 +2,7 @@ import { computed, ref, Ref } from "vue";
 import { parse as parseYAML, stringify as yamlStringify } from "yaml";
 import { fJSON, parseMarkdownJSON, parseMarkdownYAML } from "../helpers/formats/parsers";
 
-export type CodeFormat = "json" | "yaml";
+export type CodeFormat = "json" | "yaml" | "text";
 
 export interface UseCodeFormatOptions {
 	initialFormat?: CodeFormat;
@@ -51,6 +51,11 @@ export function useCodeFormat(options: UseCodeFormatOptions = {}): UseCodeFormat
 	function formatValueToString(value: object | string | null, targetFormat: CodeFormat = format.value): string {
 		if (!value) return "";
 
+		// Text format - just return as-is
+		if (targetFormat === "text") {
+			return typeof value === "string" ? value : JSON.stringify(value, null, 2);
+		}
+
 		try {
 			const obj = typeof value === "string" ? parseContent(value) : value;
 			if (!obj) return typeof value === "string" ? value : "";
@@ -69,6 +74,9 @@ export function useCodeFormat(options: UseCodeFormatOptions = {}): UseCodeFormat
 	// Validate string content for a format
 	function validateContent(content: string, targetFormat: CodeFormat = format.value): boolean {
 		if (!content) return true;
+
+		// Text format is always valid
+		if (targetFormat === "text") return true;
 
 		try {
 			if (targetFormat === "json") {

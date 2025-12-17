@@ -1,0 +1,125 @@
+// Custom Scrollbar Styles
+// Thin, overlay scrollbar that fades based on hover state
+// Usage: Apply .dx-scrollbar class to any scrollable container
+
+// Scrollbar dimensions
+$scrollbar-width: 4px;
+$scrollbar-width-hover: 8px;
+$scrollbar-track-color: transparent;
+$scrollbar-thumb-color: rgba(255, 255, 255, 0.2);
+$scrollbar-thumb-hover-color: rgba(255, 255, 255, 0.9);
+$scrollbar-transition: all 0.3s ease;
+
+// Mixin for scrollbar styles (reusable)
+@mixin dx-scrollbar-base {
+  // Firefox
+  scrollbar-width: thin;
+  scrollbar-color: transparent transparent;
+  transition: scrollbar-color 0.3s ease;
+
+  // Webkit (Chrome, Safari, Edge)
+  &::-webkit-scrollbar {
+    width: $scrollbar-width;
+    height: $scrollbar-width;
+    transition: $scrollbar-transition;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: $scrollbar-track-color;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: transparent;
+    border-radius: $scrollbar-width-hover;
+    transition: $scrollbar-transition;
+  }
+
+  &::-webkit-scrollbar-corner {
+    background: transparent;
+  }
+}
+
+// Main scrollbar class (light - for dark backgrounds)
+.dx-scrollbar {
+  @include dx-scrollbar-base;
+
+  // Container hovered or focused - show scrollbar at 0.2 opacity
+  &:hover,
+  &:focus,
+  &:focus-within {
+    scrollbar-color: $scrollbar-thumb-color transparent;
+
+    &::-webkit-scrollbar-thumb {
+      background: $scrollbar-thumb-color;
+    }
+  }
+
+  // Scrollbar directly hovered - full opacity and wider
+  &:hover::-webkit-scrollbar,
+  &:focus::-webkit-scrollbar,
+  &:focus-within::-webkit-scrollbar {
+    width: $scrollbar-width;
+    height: $scrollbar-width;
+  }
+
+  &:hover::-webkit-scrollbar-thumb:hover {
+    background: $scrollbar-thumb-hover-color;
+    width: $scrollbar-width-hover;
+  }
+
+  // Make scrollbar wider on hover
+  &::-webkit-scrollbar:hover {
+    width: $scrollbar-width-hover;
+    height: $scrollbar-width-hover;
+  }
+
+  // Active/dragging state
+  &::-webkit-scrollbar-thumb:active {
+    background: $scrollbar-thumb-hover-color;
+  }
+}
+
+// Dark variant (for light backgrounds)
+.dx-scrollbar-dark {
+  @include dx-scrollbar-base;
+
+  &:hover,
+  &:focus,
+  &:focus-within {
+    scrollbar-color: rgba(0, 0, 0, 0.2) transparent;
+
+    &::-webkit-scrollbar-thumb {
+      background: rgba(0, 0, 0, 0.2);
+    }
+  }
+
+  &:hover::-webkit-scrollbar,
+  &:focus::-webkit-scrollbar,
+  &:focus-within::-webkit-scrollbar {
+    width: $scrollbar-width;
+    height: $scrollbar-width;
+  }
+
+  &:hover::-webkit-scrollbar-thumb:hover {
+    background: rgba(0, 0, 0, 0.7);
+  }
+
+  &::-webkit-scrollbar:hover {
+    width: $scrollbar-width-hover;
+    height: $scrollbar-width-hover;
+  }
+
+  &::-webkit-scrollbar-thumb:active {
+    background: rgba(0, 0, 0, 0.7);
+  }
+}
+
+// Utility to hide scrollbar completely but keep scrolling
+.dx-scrollbar-hidden {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}

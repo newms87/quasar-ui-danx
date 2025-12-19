@@ -33,6 +33,12 @@
     background-color: #252526;
     border-radius: 0 0 0.375rem 0.375rem;
     padding: 0.25rem 0.5rem;
+    transition: background-color 0.2s ease;
+
+    &.has-error {
+      background-color: #5a1d1d;
+      border-top: 1px solid #be1100;
+    }
   }
 
   // Language badge
@@ -78,15 +84,6 @@
     color: #808080;
   }
 
-  // ==========================================
-  // Invalid state
-  // ==========================================
-  &.dx-code-invalid {
-    .code-content {
-      background-color: #5a1d1d;
-      border: 1px solid #be1100;
-    }
-  }
 
   // ==========================================
   // Editable mode (contenteditable)

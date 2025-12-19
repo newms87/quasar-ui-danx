@@ -1,7 +1,6 @@
 <template>
   <div
     class="dx-code-viewer group flex flex-col"
-    :class="{'dx-code-invalid': !isValid}"
   >
     <FieldLabel
       v-if="label"
@@ -15,21 +14,37 @@
         {{ currentFormat }}
       </div>
 
-      <!-- Code display with syntax highlighting (readonly or contenteditable) -->
+      <!-- Code display - readonly with syntax highlighting -->
       <pre
-        ref="codeRef"
+        v-if="!isEditing"
         class="code-content dx-scrollbar flex-1 min-h-0"
-        :class="[editorClass, { 'is-editable': isEditing }]"
-        :contenteditable="isEditing"
+        :class="editorClass"
+      ><code :class="'language-' + currentFormat" v-html="highlightedContent"></code></pre>
+
+      <!-- Code editor - contenteditable, content set imperatively to avoid cursor reset -->
+      <pre
+        v-else
+        ref="codeRef"
+        class="code-content dx-scrollbar flex-1 min-h-0 is-editable"
+        :class="[editorClass, 'language-' + currentFormat]"
+        contenteditable="true"
         @input="onContentEditableInput"
         @blur="onContentEditableBlur"
         @keydown="onKeyDown"
-      ><code :class="'language-' + currentFormat" v-html="highlightedContent"></code></pre>
+      ></pre>
 
       <!-- Footer with char count, edit toggle, and format toggle -->
-      <div class="code-footer flex items-center justify-between px-2 py-1 flex-shrink-0">
-        <div class="text-xs text-gray-500">
-          {{ charCount.toLocaleString() }} chars
+      <div
+        class="code-footer flex items-center justify-between px-2 py-1 flex-shrink-0"
+        :class="{ 'has-error': hasValidationError }"
+      >
+        <div class="text-xs" :class="hasValidationError ? 'text-red-400' : 'text-gray-500'">
+          <template v-if="hasValidationError">
+            <span class="font-medium">Syntax Error</span> · {{ charCount.toLocaleString() }} chars
+          </template>
+          <template v-else>
+            {{ charCount.toLocaleString() }} chars
+          </template>
         </div>
         <div class="flex items-center gap-2">
           <!-- Edit toggle button -->
@@ -59,11 +74,15 @@
 
 <script setup lang="ts">
 import { FaSolidPencil as EditIcon } from "danx-icon";
-import { computed, nextTick, ref, watch } from "vue";
+import { computed, nextTick, onUnmounted, ref, watch } from "vue";
 import { useCodeFormat, CodeFormat } from "../../../composables/useCodeFormat";
 import { highlightSyntax } from "../../../helpers/formats/highlightSyntax";
 import FieldLabel from "../../ActionTable/Form/Fields/FieldLabel.vue";
 import FormatToggle from "./FormatToggle.vue";
+
+// Debounce timeout handles
+let validationTimeout: ReturnType<typeof setTimeout> | null = null;
+let highlightTimeout: ReturnType<typeof setTimeout> | null = null;
 
 export interface CodeViewerProps {
 	modelValue?: object | string | null;
@@ -102,7 +121,9 @@ const currentFormat = ref<CodeFormat>(props.format);
 const codeRef = ref<HTMLPreElement | null>(null);
 const internalEditable = ref(props.editable);
 const editingContent = ref("");
+const cachedHighlightedContent = ref("");
 const isUserEditing = ref(false);
+const hasValidationError = ref(false);
 
 // Computed: is currently in edit mode
 const isEditing = computed(() => props.canEdit && internalEditable.value);
@@ -140,15 +161,19 @@ const displayContent = computed(() => {
 });
 
 // Computed: highlighted content with syntax highlighting
+// While actively editing, return cached content to avoid cursor reset from DOM replacement
 const highlightedContent = computed(() => {
-	return highlightSyntax(displayContent.value, { format: currentFormat.value });
+	if (isUserEditing.value) {
+		return cachedHighlightedContent.value;
+	}
+	const highlighted = highlightSyntax(displayContent.value, { format: currentFormat.value });
+	cachedHighlightedContent.value = highlighted;
+	return highlighted;
 });
 
-// Computed: is current content valid
+// Computed: is current content valid (used for external consumers, not for UI state)
 const isValid = computed(() => {
-	if (isUserEditing.value) {
-		return codeFormat.validate(editingContent.value, currentFormat.value);
-	}
+	if (hasValidationError.value) return false;
 	return codeFormat.isValid.value;
 });
 
@@ -163,15 +188,122 @@ function toggleEdit() {
 	emit("update:editable", internalEditable.value);
 
 	if (internalEditable.value) {
-		// Entering edit mode - initialize editing content
+		// Entering edit mode - initialize editing content and clear any previous error
 		editingContent.value = codeFormat.formattedContent.value;
-		// Focus the contenteditable element
+		hasValidationError.value = false;
+		// Set content imperatively with syntax highlighting and focus
 		nextTick(() => {
 			if (codeRef.value) {
+				// Set highlighted HTML content directly to avoid reactive binding issues
+				codeRef.value.innerHTML = highlightSyntax(editingContent.value, { format: currentFormat.value });
 				codeRef.value.focus();
+				// Move cursor to end
+				const selection = window.getSelection();
+				const range = document.createRange();
+				range.selectNodeContents(codeRef.value);
+				range.collapse(false);
+				selection?.removeAllRanges();
+				selection?.addRange(range);
 			}
 		});
+	} else {
+		// Exiting edit mode - clear validation error
+		hasValidationError.value = false;
 	}
+}
+
+// Debounced validation - validates content after 300ms of no input
+function debouncedValidate() {
+	if (validationTimeout) {
+		clearTimeout(validationTimeout);
+	}
+	validationTimeout = setTimeout(() => {
+		const isContentValid = codeFormat.validate(editingContent.value, currentFormat.value);
+		hasValidationError.value = !isContentValid;
+	}, 300);
+}
+
+// Get cursor offset in plain text
+function getCursorOffset(): number {
+	const selection = window.getSelection();
+	if (!selection || !selection.rangeCount || !codeRef.value) return 0;
+
+	const range = selection.getRangeAt(0);
+	const preCaretRange = document.createRange();
+	preCaretRange.selectNodeContents(codeRef.value);
+	preCaretRange.setEnd(range.startContainer, range.startOffset);
+
+	// Count characters by walking text nodes (faster than toString for getting length)
+	let offset = 0;
+	const walker = document.createTreeWalker(preCaretRange.commonAncestorContainer, NodeFilter.SHOW_TEXT);
+	let node = walker.nextNode();
+	while (node) {
+		if (preCaretRange.intersectsNode(node)) {
+			const nodeRange = document.createRange();
+			nodeRange.selectNodeContents(node);
+			if (preCaretRange.compareBoundaryPoints(Range.END_TO_END, nodeRange) >= 0) {
+				offset += node.textContent?.length || 0;
+			} else {
+				// Partial node - cursor is in this node
+				offset += range.startOffset;
+				break;
+			}
+		}
+		node = walker.nextNode();
+	}
+	return offset;
+}
+
+// Set cursor to offset in plain text
+function setCursorOffset(targetOffset: number) {
+	if (!codeRef.value) return;
+
+	const selection = window.getSelection();
+	if (!selection) return;
+
+	let currentOffset = 0;
+	const walker = document.createTreeWalker(codeRef.value, NodeFilter.SHOW_TEXT);
+	let node = walker.nextNode();
+
+	while (node) {
+		const nodeLength = node.textContent?.length || 0;
+		if (currentOffset + nodeLength >= targetOffset) {
+			const range = document.createRange();
+			range.setStart(node, targetOffset - currentOffset);
+			range.collapse(true);
+			selection.removeAllRanges();
+			selection.addRange(range);
+			return;
+		}
+		currentOffset += nodeLength;
+		node = walker.nextNode();
+	}
+
+	// If offset not found, place at end
+	const range = document.createRange();
+	range.selectNodeContents(codeRef.value);
+	range.collapse(false);
+	selection.removeAllRanges();
+	selection.addRange(range);
+}
+
+// Debounced highlighting - re-applies syntax highlighting after 300ms of no input
+function debouncedHighlight() {
+	if (highlightTimeout) {
+		clearTimeout(highlightTimeout);
+	}
+	highlightTimeout = setTimeout(() => {
+		if (!codeRef.value || !isEditing.value) return;
+
+		// Save cursor position
+		const cursorOffset = getCursorOffset();
+
+		// Re-apply highlighting
+		codeRef.value.innerHTML = highlightSyntax(editingContent.value, { format: currentFormat.value });
+
+		// Restore cursor position
+		setCursorOffset(cursorOffset);
+	}, 300);
 }
 
 // Handle contenteditable input
@@ -182,13 +314,29 @@ function onContentEditableInput(event: Event) {
 	const target = event.target as HTMLElement;
 	// Get text content, preserving newlines
 	editingContent.value = target.innerText || "";
+
+	// Trigger debounced validation and highlighting
+	debouncedValidate();
+	debouncedHighlight();
 }
 
-// Handle blur - emit changes
+// Handle blur - emit changes and re-apply highlighting
 function onContentEditableBlur() {
 	if (!isEditing.value || !isUserEditing.value) return;
 
 	isUserEditing.value = false;
+
+	// Clear pending timeouts and process immediately
+	if (validationTimeout) {
+		clearTimeout(validationTimeout);
+		validationTimeout = null;
+	}
+	if (highlightTimeout) {
+		clearTimeout(highlightTimeout);
+		highlightTimeout = null;
+	}
+	const isContentValid = codeFormat.validate(editingContent.value, currentFormat.value);
+	hasValidationError.value = !isContentValid;
 
 	// Parse and emit the value
 	const parsed = codeFormat.parse(editingContent.value);
@@ -198,16 +346,144 @@ function onContentEditableBlur() {
 		// Still emit the raw string if parsing fails
 		emit("update:modelValue", editingContent.value);
 	}
+
+	// Re-apply syntax highlighting after editing
+	if (codeRef.value) {
+		codeRef.value.innerHTML = highlightSyntax(editingContent.value, { format: currentFormat.value });
+	}
+}
+
+// Cleanup timeouts on unmount
+onUnmounted(() => {
+	if (validationTimeout) clearTimeout(validationTimeout);
+	if (highlightTimeout) clearTimeout(highlightTimeout);
+});
+
+// Get current line info from cursor position (optimized for performance)
+function getCurrentLineInfo(): { indent: string; lineContent: string } | null {
+	const selection = window.getSelection();
+	if (!selection || !selection.rangeCount) return null;
+
+	// Get the text node and offset directly from selection
+	const range = selection.getRangeAt(0);
+	let node = range.startContainer;
+	let offset = range.startOffset;
+
+	// If we're in an element node, get the text content before cursor
+	if (node.nodeType === Node.ELEMENT_NODE) {
+		// Walk backwards through child nodes to find text
+		const element = node as Element;
+		let textBeforeCursor = "";
+		for (let i = 0; i < offset && i < element.childNodes.length; i++) {
+			textBeforeCursor += element.childNodes[i].textContent || "";
+		}
+		const lastNewline = textBeforeCursor.lastIndexOf("\n");
+		const lineContent = lastNewline >= 0 ? textBeforeCursor.substring(lastNewline + 1) : textBeforeCursor;
+		const indentMatch = lineContent.match(/^[\t ]*/);
+		return { indent: indentMatch ? indentMatch[0] : "", lineContent };
+	}
+
+	// For text nodes, get the text content and find the line
+	const textContent = node.textContent || "";
+	const textBeforeOffset = textContent.substring(0, offset);
+
+	// Walk up to find previous text content for full line context
+	let fullTextBefore = textBeforeOffset;
+	let prevNode = node.previousSibling;
+	let parent = node.parentNode;
+
+	// Walk backwards through siblings and parent siblings to get current line
+	while (parent && parent !== codeRef.value) {
+		while (prevNode) {
+			fullTextBefore = (prevNode.textContent || "") + fullTextBefore;
+			// Stop if we hit a newline
+			if (fullTextBefore.includes("\n")) break;
+			prevNode = prevNode.previousSibling;
+		}
+		if (fullTextBefore.includes("\n")) break;
+		prevNode = parent.previousSibling;
+		parent = parent.parentNode;
+	}
+
+	// Extract just the current line (after last newline)
+	const lastNewline = fullTextBefore.lastIndexOf("\n");
+	const lineContent = lastNewline >= 0 ? fullTextBefore.substring(lastNewline + 1) : fullTextBefore;
+
+	// Extract indentation
+	const indentMatch = lineContent.match(/^[\t ]*/);
+	const indent = indentMatch ? indentMatch[0] : "";
+
+	return { indent, lineContent };
+}
+
+// Calculate smart indentation based on context
+function getSmartIndent(lineInfo: { indent: string; lineContent: string }): string {
+	const { indent, lineContent } = lineInfo;
+	const trimmedLine = lineContent.trim();
+	const indentUnit = "  "; // 2 spaces
+
+	if (currentFormat.value === "yaml") {
+		// After a key with colon (e.g., "key:" or "key: |" or "key: >")
+		if (trimmedLine.endsWith(":") || trimmedLine.match(/:\s*[|>][-+]?\s*$/)) {
+			return indent + indentUnit;
+		}
+		// After array item start (e.g., "- item" or "- key: value")
+		if (trimmedLine.startsWith("- ")) {
+			// Indent to align with content after "- "
+			return indent + indentUnit;
+		}
+		// Just "- " alone means we want to continue with same array indentation
+		if (trimmedLine === "-") {
+			return indent;
+		}
+	} else if (currentFormat.value === "json") {
+		// After opening brace/bracket
+		if (trimmedLine.endsWith("{") || trimmedLine.endsWith("[")) {
+			return indent + indentUnit;
+		}
+		// After comma, maintain indentation
+		if (trimmedLine.endsWith(",")) {
+			return indent;
+		}
+	}
+
+	// Default: maintain current indentation
+	return indent;
 }
 
 // Handle keyboard shortcuts in edit mode
 function onKeyDown(event: KeyboardEvent) {
 	if (!isEditing.value) return;
 
-	// Tab key - insert tab character instead of moving focus
+	// Enter key - smart indentation
+	if (event.key === "Enter") {
+		const lineInfo = getCurrentLineInfo();
+		if (lineInfo) {
+			event.preventDefault();
+			const smartIndent = getSmartIndent(lineInfo);
+
+			// Insert directly via Selection API (faster than execCommand for newlines)
+			const selection = window.getSelection();
+			if (selection && selection.rangeCount > 0) {
+				const range = selection.getRangeAt(0);
+				range.deleteContents();
+				const textNode = document.createTextNode("\n" + smartIndent);
+				range.insertNode(textNode);
+				range.setStartAfter(textNode);
+				range.setEndAfter(textNode);
+				selection.removeAllRanges();
+				selection.addRange(range);
+
+				// Trigger input event manually to update editingContent
+				codeRef.value?.dispatchEvent(new Event("input", { bubbles: true }));
+			}
+		}
+	}
+
+	// Tab key - insert spaces instead of moving focus
 	if (event.key === "Tab") {
 		event.preventDefault();
-		document.execCommand("insertText", false, "\t");
+		document.execCommand("insertText", false, "  ");
 	}
 
 	// Escape - exit edit mode

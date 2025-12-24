@@ -359,57 +359,24 @@ onUnmounted(() => {
 	if (highlightTimeout) clearTimeout(highlightTimeout);
 });
 
-// Get current line info from cursor position (optimized for performance)
+// Get current line info from cursor position
 function getCurrentLineInfo(): { indent: string; lineContent: string } | null {
-	const selection = window.getSelection();
-	if (!selection || !selection.rangeCount) return null;
+	// Use editingContent (plain text) and cursor offset for reliable line detection
+	const text = editingContent.value;
+	if (!text) return { indent: "", lineContent: "" };
 
-	// Get the text node and offset directly from selection
-	const range = selection.getRangeAt(0);
-	let node = range.startContainer;
-	let offset = range.startOffset;
+	// Get cursor position in plain text
+	const cursorOffset = getCursorOffset();
 
-	// If we're in an element node, get the text content before cursor
-	if (node.nodeType === Node.ELEMENT_NODE) {
-		// Walk backwards through child nodes to find text
-		const element = node as Element;
-		let textBeforeCursor = "";
-		for (let i = 0; i < offset && i < element.childNodes.length; i++) {
-			textBeforeCursor += element.childNodes[i].textContent || "";
-		}
-		const lastNewline = textBeforeCursor.lastIndexOf("\n");
-		const lineContent = lastNewline >= 0 ? textBeforeCursor.substring(lastNewline + 1) : textBeforeCursor;
-		const indentMatch = lineContent.match(/^[\t ]*/);
-		return { indent: indentMatch ? indentMatch[0] : "", lineContent };
-	}
+	// Find the start of the current line (after the previous newline)
+	const textBeforeCursor = text.substring(0, cursorOffset);
+	const lastNewlineIndex = textBeforeCursor.lastIndexOf("\n");
+	const lineStart = lastNewlineIndex + 1;
 
-	// For text nodes, get the text content and find the line
-	const textContent = node.textContent || "";
-	const textBeforeOffset = textContent.substring(0, offset);
+	// Get the content from line start to cursor
+	const lineContent = textBeforeCursor.substring(lineStart);
 
-	// Walk up to find previous text content for full line context
-	let fullTextBefore = textBeforeOffset;
-	let prevNode = node.previousSibling;
-	let parent = node.parentNode;
-
-	// Walk backwards through siblings and parent siblings to get current line
-	while (parent && parent !== codeRef.value) {
-		while (prevNode) {
-			fullTextBefore = (prevNode.textContent || "") + fullTextBefore;
-			// Stop if we hit a newline
-			if (fullTextBefore.includes("\n")) break;
-			prevNode = prevNode.previousSibling;
-		}
-		if (fullTextBefore.includes("\n")) break;
-		prevNode = parent.previousSibling;
-		parent = parent.parentNode;
-	}
-
-	// Extract just the current line (after last newline)
-	const lastNewline = fullTextBefore.lastIndexOf("\n");
-	const lineContent = lastNewline >= 0 ? fullTextBefore.substring(lastNewline + 1) : fullTextBefore;
-
-	// Extract indentation
+	// Extract indentation (spaces/tabs at start of line)
 	const indentMatch = lineContent.match(/^[\t ]*/);
 	const indent = indentMatch ? indentMatch[0] : "";
 
@@ -458,16 +425,20 @@ function onKeyDown(event: KeyboardEvent) {
 	// Enter key - smart indentation
 	if (event.key === "Enter") {
 		const lineInfo = getCurrentLineInfo();
+		console.log("lineInfo:", lineInfo);
 		if (lineInfo) {
 			event.preventDefault();
 			const smartIndent = getSmartIndent(lineInfo);
+			console.log("smartIndent:", JSON.stringify(smartIndent), "length:", smartIndent.length);
 
 			// Insert directly via Selection API (faster than execCommand for newlines)
 			const selection = window.getSelection();
 			if (selection && selection.rangeCount > 0) {
 				const range = selection.getRangeAt(0);
 				range.deleteContents();
-				const textNode = document.createTextNode("\n" + smartIndent);
+				const textToInsert = "\n" + smartIndent;
+				console.log("inserting:", JSON.stringify(textToInsert));
+				const textNode = document.createTextNode(textToInsert);
 				range.insertNode(textNode);
 				range.setStartAfter(textNode);
 				range.setEndAfter(textNode);

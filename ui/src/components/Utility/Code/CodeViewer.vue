@@ -38,9 +38,12 @@
         class="code-footer flex items-center justify-between px-2 py-1 flex-shrink-0"
         :class="{ 'has-error': hasValidationError }"
       >
-        <div class="text-xs" :class="hasValidationError ? 'text-red-400' : 'text-gray-500'">
-          <template v-if="hasValidationError">
-            <span class="font-medium">Syntax Error</span> · {{ charCount.toLocaleString() }} chars
+        <div class="text-xs flex-1 min-w-0" :class="hasValidationError ? 'text-red-400' : 'text-gray-500'">
+          <template v-if="validationError">
+            <span class="font-medium">
+              Error<template v-if="validationError.line"> (line {{ validationError.line }})</template>:
+            </span>
+            <span class="truncate">{{ validationError.message }}</span>
           </template>
           <template v-else>
             {{ charCount.toLocaleString() }} chars
@@ -75,7 +78,7 @@
 <script setup lang="ts">
 import { FaSolidPencil as EditIcon } from "danx-icon";
 import { computed, nextTick, onUnmounted, ref, watch } from "vue";
-import { useCodeFormat, CodeFormat } from "../../../composables/useCodeFormat";
+import { useCodeFormat, CodeFormat, ValidationError } from "../../../composables/useCodeFormat";
 import { highlightSyntax } from "../../../helpers/formats/highlightSyntax";
 import FieldLabel from "../../ActionTable/Form/Fields/FieldLabel.vue";
 import FormatToggle from "./FormatToggle.vue";
@@ -123,7 +126,10 @@ const internalEditable = ref(props.editable);
 const editingContent = ref("");
 const cachedHighlightedContent = ref("");
 const isUserEditing = ref(false);
-const hasValidationError = ref(false);
+const validationError = ref<ValidationError | null>(null);
+
+// Computed: has validation error
+const hasValidationError = computed(() => validationError.value !== null);
 
 // Computed: is currently in edit mode
 const isEditing = computed(() => props.canEdit && internalEditable.value);
@@ -190,7 +196,7 @@ function toggleEdit() {
 	if (internalEditable.value) {
 		// Entering edit mode - initialize editing content and clear any previous error
 		editingContent.value = codeFormat.formattedContent.value;
-		hasValidationError.value = false;
+		validationError.value = null;
 		// Set content imperatively with syntax highlighting and focus
 		nextTick(() => {
 			if (codeRef.value) {
@@ -208,7 +214,7 @@ function toggleEdit() {
 		});
 	} else {
 		// Exiting edit mode - clear validation error
-		hasValidationError.value = false;
+		validationError.value = null;
 	}
 }
 
@@ -218,8 +224,7 @@ function debouncedValidate() {
 		clearTimeout(validationTimeout);
 	}
 	validationTimeout = setTimeout(() => {
-		const isContentValid = codeFormat.validate(editingContent.value, currentFormat.value);
-		hasValidationError.value = !isContentValid;
+		validationError.value = codeFormat.validateWithError(editingContent.value, currentFormat.value);
 	}, 300);
 }
 
@@ -335,8 +340,7 @@ function onContentEditableBlur() {
 		clearTimeout(highlightTimeout);
 		highlightTimeout = null;
 	}
-	const isContentValid = codeFormat.validate(editingContent.value, currentFormat.value);
-	hasValidationError.value = !isContentValid;
+	validationError.value = codeFormat.validateWithError(editingContent.value, currentFormat.value);
 
 	// Parse and emit the value
 	const parsed = codeFormat.parse(editingContent.value);
@@ -425,20 +429,16 @@ function onKeyDown(event: KeyboardEvent) {
 	// Enter key - smart indentation
 	if (event.key === "Enter") {
 		const lineInfo = getCurrentLineInfo();
-		console.log("lineInfo:", lineInfo);
 		if (lineInfo) {
 			event.preventDefault();
 			const smartIndent = getSmartIndent(lineInfo);
-			console.log("smartIndent:", JSON.stringify(smartIndent), "length:", smartIndent.length);
 
 			// Insert directly via Selection API (faster than execCommand for newlines)
 			const selection = window.getSelection();
 			if (selection && selection.rangeCount > 0) {
 				const range = selection.getRangeAt(0);
 				range.deleteContents();
-				const textToInsert = "\n" + smartIndent;
-				console.log("inserting:", JSON.stringify(textToInsert));
-				const textNode = document.createTextNode(textToInsert);
+				const textNode = document.createTextNode("\n" + smartIndent);
 				range.insertNode(textNode);
 				range.setStartAfter(textNode);
 				range.setEndAfter(textNode);

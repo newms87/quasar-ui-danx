@@ -9,6 +9,12 @@ export interface UseCodeFormatOptions {
 	initialValue?: object | string | null;
 }
 
+export interface ValidationError {
+	message: string;
+	line?: number;
+	column?: number;
+}
+
 export interface UseCodeFormatReturn {
 	// State
 	format: Ref<CodeFormat>;
@@ -26,6 +32,7 @@ export interface UseCodeFormatReturn {
 	parse: (content: string) => object | null;
 	formatValue: (value: object | null, targetFormat?: CodeFormat) => string;
 	validate: (content: string, targetFormat?: CodeFormat) => boolean;
+	validateWithError: (content: string, targetFormat?: CodeFormat) => ValidationError | null;
 }
 
 export function useCodeFormat(options: UseCodeFormatOptions = {}): UseCodeFormatReturn {
@@ -90,6 +97,51 @@ export function useCodeFormat(options: UseCodeFormatOptions = {}): UseCodeFormat
 		}
 	}
 
+	// Validate and return error details if invalid
+	function validateContentWithError(content: string, targetFormat: CodeFormat = format.value): ValidationError | null {
+		if (!content) return null;
+
+		// Text format is always valid
+		if (targetFormat === "text") return null;
+
+		try {
+			if (targetFormat === "json") {
+				JSON.parse(content);
+			} else {
+				parseYAML(content);
+			}
+			return null;
+		} catch (e: unknown) {
+			const error = e as Error & { linePos?: { line: number; col: number }[] };
+			let line: number | undefined;
+			let column: number | undefined;
+
+			// YAML errors from 'yaml' library have linePos
+			if (error.linePos && error.linePos[0]) {
+				line = error.linePos[0].line;
+				column = error.linePos[0].col;
+			}
+
+			// JSON parse errors - try to extract position from message
+			if (targetFormat === "json" && error.message) {
+				const posMatch = error.message.match(/position\s+(\d+)/i);
+				if (posMatch) {
+					const pos = parseInt(posMatch[1], 10);
+					// Convert position to line number
+					const lines = content.substring(0, pos).split("\n");
+					line = lines.length;
+					column = lines[lines.length - 1].length + 1;
+				}
+			}
+
+			return {
+				message: error.message || "Invalid syntax",
+				line,
+				column
+			};
+		}
+	}
+
 	// Initialize with value if provided
 	if (options.initialValue) {
 		rawContent.value = formatValueToString(options.initialValue, format.value);
@@ -135,6 +187,7 @@ export function useCodeFormat(options: UseCodeFormatOptions = {}): UseCodeFormat
 		setValue,
 		parse: parseContent,
 		formatValue: formatValueToString,
-		validate: validateContent
+		validate: validateContent,
+		validateWithError: validateContentWithError
 	};
 }

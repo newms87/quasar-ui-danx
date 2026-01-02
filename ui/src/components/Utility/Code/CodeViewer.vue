@@ -14,19 +14,21 @@
       v-if="collapsible && isCollapsed"
       :preview="collapsedPreview"
       :format="currentFormat"
+      :available-formats="currentFormat === 'json' || currentFormat === 'yaml' ? ['json', 'yaml'] : currentFormat === 'text' || currentFormat === 'markdown' ? ['text', 'markdown'] : []"
       @expand="toggleCollapse"
-      @toggle-format="cycleFormat"
+      @format-change="onFormatChange"
     />
 
     <!-- Expanded view - full code viewer -->
     <template v-else>
       <div class="code-wrapper relative flex flex-col flex-1 min-h-0">
-        <!-- Language badge - clickable to toggle format -->
+        <!-- Language badge - shows popout format options on hover -->
         <LanguageBadge
           :format="currentFormat"
+          :available-formats="currentFormat === 'json' || currentFormat === 'yaml' ? ['json', 'yaml'] : currentFormat === 'text' || currentFormat === 'markdown' ? ['text', 'markdown'] : []"
           :toggleable="true"
           @click.stop
-          @toggle="cycleFormat"
+          @change="onFormatChange"
         />
 
         <!-- Collapse button (when collapsible and expanded) -->
@@ -73,16 +75,13 @@
           @keydown="editor.onKeyDown"
         ></pre>
 
-        <!-- Footer with char count, edit toggle, and format toggle -->
+        <!-- Footer with char count and edit toggle -->
         <CodeViewerFooter
           :char-count="editor.charCount.value"
           :validation-error="editor.validationError.value"
           :can-edit="canEdit && currentFormat !== 'markdown'"
           :is-editing="editor.isEditing.value"
-          :hide-format-toggle="hideFormatToggle"
-          :current-format="currentFormat"
           @toggle-edit="editor.toggleEdit"
-          @format-change="onFormatChange"
         />
       </div>
     </template>
@@ -106,7 +105,6 @@ export interface CodeViewerProps {
 	format?: CodeFormat;
 	label?: string;
 	editorClass?: string;
-	hideFormatToggle?: boolean;
 	canEdit?: boolean;
 	editable?: boolean;
 	collapsible?: boolean;
@@ -119,7 +117,6 @@ const props = withDefaults(defineProps<CodeViewerProps>(), {
 	format: "yaml",
 	label: "",
 	editorClass: "",
-	hideFormatToggle: false,
 	canEdit: false,
 	editable: false,
 	collapsible: false,
@@ -202,22 +199,6 @@ function onFormatChange(newFormat: CodeFormat) {
 	currentFormat.value = newFormat;
 	emit("update:format", newFormat);
 	editor.updateEditingContentOnFormatChange();
-}
-
-// Cycle through available formats based on current format group
-function cycleFormat() {
-	// Structured data formats group
-	if (currentFormat.value === "json") {
-		onFormatChange("yaml");
-	} else if (currentFormat.value === "yaml") {
-		onFormatChange("json");
-	}
-	// Raw text formats group
-	else if (currentFormat.value === "text") {
-		onFormatChange("markdown");
-	} else if (currentFormat.value === "markdown") {
-		onFormatChange("text");
-	}
 }
 
 // Get the raw markdown content for MarkdownContent component

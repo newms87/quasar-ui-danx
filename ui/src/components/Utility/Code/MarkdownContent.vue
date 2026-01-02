@@ -17,12 +17,14 @@
         <LanguageBadge
           v-if="isToggleableLanguage(token.language)"
           :format="getCodeBlockFormat(index, token.language)"
+          :available-formats="['json', 'yaml']"
           :toggleable="true"
-          @toggle="toggleCodeBlockFormat(index)"
+          @change="(fmt) => setCodeBlockFormat(index, fmt)"
         />
         <LanguageBadge
           v-else-if="token.language"
           :format="token.language"
+          :available-formats="[]"
           :toggleable="false"
         />
         <pre><code
@@ -154,14 +156,16 @@ function getConvertedContent(index: number, originalContent: string, originalLan
   return originalContent;
 }
 
-// Toggle between json and yaml for a code block
-function toggleCodeBlockFormat(index: number) {
+// Set format for a code block (converts content to the new format)
+function setCodeBlockFormat(index: number, newFormat: string) {
   const token = tokens.value[index];
   if (token?.type !== "code_block") return;
 
   const originalLang = token.language?.toLowerCase() || "json";
-  const current = getCodeBlockFormat(index, originalLang);  // FIX: use getCodeBlockFormat to respect defaultCodeFormat
-  const newFormat = current === "json" ? "yaml" : "json";
+  const current = getCodeBlockFormat(index, originalLang);
+
+  // No change needed if already in target format
+  if (current === newFormat) return;
 
   // Convert the content
   try {
@@ -185,7 +189,7 @@ function toggleCodeBlockFormat(index: number) {
 
     codeBlockFormats[index] = newFormat;
   } catch {
-    // If conversion fails, just toggle the format without converting
+    // If conversion fails, just set the format without converting
     codeBlockFormats[index] = newFormat;
   }
 }

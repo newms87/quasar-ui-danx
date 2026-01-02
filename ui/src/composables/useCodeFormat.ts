@@ -2,7 +2,7 @@ import { computed, ref, Ref } from "vue";
 import { parse as parseYAML, stringify as yamlStringify } from "yaml";
 import { fJSON, parseMarkdownJSON, parseMarkdownYAML } from "../helpers/formats/parsers";
 
-export type CodeFormat = "json" | "yaml" | "text";
+export type CodeFormat = "json" | "yaml" | "text" | "markdown";
 
 export interface UseCodeFormatOptions {
 	initialFormat?: CodeFormat;
@@ -58,8 +58,8 @@ export function useCodeFormat(options: UseCodeFormatOptions = {}): UseCodeFormat
 	function formatValueToString(value: object | string | null, targetFormat: CodeFormat = format.value): string {
 		if (!value) return "";
 
-		// Text format - just return as-is
-		if (targetFormat === "text") {
+		// Text and markdown formats - just return as-is
+		if (targetFormat === "text" || targetFormat === "markdown") {
 			return typeof value === "string" ? value : JSON.stringify(value, null, 2);
 		}
 
@@ -82,8 +82,8 @@ export function useCodeFormat(options: UseCodeFormatOptions = {}): UseCodeFormat
 	function validateContent(content: string, targetFormat: CodeFormat = format.value): boolean {
 		if (!content) return true;
 
-		// Text format is always valid
-		if (targetFormat === "text") return true;
+		// Text and markdown formats are always valid
+		if (targetFormat === "text" || targetFormat === "markdown") return true;
 
 		try {
 			if (targetFormat === "json") {
@@ -101,8 +101,8 @@ export function useCodeFormat(options: UseCodeFormatOptions = {}): UseCodeFormat
 	function validateContentWithError(content: string, targetFormat: CodeFormat = format.value): ValidationError | null {
 		if (!content) return null;
 
-		// Text format is always valid
-		if (targetFormat === "text") return null;
+		// Text and markdown formats are always valid
+		if (targetFormat === "text" || targetFormat === "markdown") return null;
 
 		try {
 			if (targetFormat === "json") {
@@ -151,9 +151,9 @@ export function useCodeFormat(options: UseCodeFormatOptions = {}): UseCodeFormat
 	const parsedValue = computed(() => parseContent(rawContent.value));
 
 	// Computed: formatted string
-	// For text format, return rawContent directly without parsing
+	// For text and markdown formats, return rawContent directly without parsing
 	const formattedContent = computed(() => {
-		if (format.value === "text") {
+		if (format.value === "text" || format.value === "markdown") {
 			return rawContent.value;
 		}
 		return formatValueToString(parsedValue.value, format.value);

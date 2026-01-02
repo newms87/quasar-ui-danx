@@ -13,16 +13,21 @@
     <CodeViewerCollapsed
       v-if="collapsible && isCollapsed"
       :preview="collapsedPreview"
+      :format="currentFormat"
       @expand="toggleCollapse"
+      @toggle-format="cycleFormat"
     />
 
     <!-- Expanded view - full code viewer -->
     <template v-else>
       <div class="code-wrapper relative flex flex-col flex-1 min-h-0">
-        <!-- Language badge -->
-        <div class="language-badge absolute top-0 right-0 p-1 text-[.7em] rounded-bl z-10 uppercase">
-          {{ currentFormat }}
-        </div>
+        <!-- Language badge - clickable to toggle format -->
+        <LanguageBadge
+          :format="currentFormat"
+          :toggleable="true"
+          @click.stop
+          @toggle="cycleFormat"
+        />
 
         <!-- Collapse button (when collapsible and expanded) -->
         <div
@@ -40,12 +45,21 @@
           @click="toggleCollapse"
         />
 
-        <!-- Code display - readonly with syntax highlighting -->
+        <!-- Code display - readonly with syntax highlighting (non-markdown formats) -->
         <pre
-          v-if="!editor.isEditing.value"
+          v-if="!editor.isEditing.value && currentFormat !== 'markdown'"
           class="code-content dx-scrollbar flex-1 min-h-0"
           :class="[editorClass, { 'is-collapsible': collapsible }]"
         ><code :class="'language-' + currentFormat" v-html="editor.highlightedContent.value"></code></pre>
+
+        <!-- Markdown display - rendered HTML -->
+        <MarkdownContent
+          v-else-if="currentFormat === 'markdown' && !editor.isEditing.value"
+          :content="markdownSource"
+          :default-code-format="defaultCodeFormat"
+          class="code-content dx-scrollbar flex-1 min-h-0"
+          :class="[editorClass, { 'is-collapsible': collapsible }]"
+        />
 
         <!-- Code editor - contenteditable, content set imperatively to avoid cursor reset -->
         <pre
@@ -63,7 +77,7 @@
         <CodeViewerFooter
           :char-count="editor.charCount.value"
           :validation-error="editor.validationError.value"
-          :can-edit="canEdit"
+          :can-edit="canEdit && currentFormat !== 'markdown'"
           :is-editing="editor.isEditing.value"
           :hide-format-toggle="hideFormatToggle"
           :current-format="currentFormat"
@@ -84,6 +98,8 @@ import { useCodeViewerEditor } from "../../../composables/useCodeViewerEditor";
 import FieldLabel from "../../ActionTable/Form/Fields/FieldLabel.vue";
 import CodeViewerCollapsed from "./CodeViewerCollapsed.vue";
 import CodeViewerFooter from "./CodeViewerFooter.vue";
+import LanguageBadge from "./LanguageBadge.vue";
+import MarkdownContent from "./MarkdownContent.vue";
 
 export interface CodeViewerProps {
 	modelValue?: object | string | null;
@@ -95,6 +111,7 @@ export interface CodeViewerProps {
 	editable?: boolean;
 	collapsible?: boolean;
 	defaultCollapsed?: boolean;
+	defaultCodeFormat?: "json" | "yaml";
 }
 
 const props = withDefaults(defineProps<CodeViewerProps>(), {
@@ -186,6 +203,30 @@ function onFormatChange(newFormat: CodeFormat) {
 	emit("update:format", newFormat);
 	editor.updateEditingContentOnFormatChange();
 }
+
+// Cycle through available formats based on current format group
+function cycleFormat() {
+	// Structured data formats group
+	if (currentFormat.value === "json") {
+		onFormatChange("yaml");
+	} else if (currentFormat.value === "yaml") {
+		onFormatChange("json");
+	}
+	// Raw text formats group
+	else if (currentFormat.value === "text") {
+		onFormatChange("markdown");
+	} else if (currentFormat.value === "markdown") {
+		onFormatChange("text");
+	}
+}
+
+// Get the raw markdown content for MarkdownContent component
+const markdownSource = computed(() => {
+	if (typeof props.modelValue === "string") {
+		return props.modelValue;
+	}
+	return editor.displayContent.value;
+});
 
 // Expose isValid for external consumers
 const isValid = computed(() => editor.isValid.value);

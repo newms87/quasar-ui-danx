@@ -21,7 +21,6 @@ import { CodeFormat } from "../../../composables/useCodeFormat";
 
 const props = defineProps<{
 	format: CodeFormat;
-	showText?: boolean;
 }>();
 
 defineEmits<{
@@ -29,11 +28,17 @@ defineEmits<{
 }>();
 
 const formats = computed<CodeFormat[]>(() => {
-	const base: CodeFormat[] = ["json", "yaml"];
-	// Only show text option if explicitly enabled or if current format is text
-	if (props.showText || props.format === "text") {
-		base.push("text");
+	// Structured data formats (JSON/YAML) are one group
+	if (props.format === "json" || props.format === "yaml") {
+		return ["json", "yaml"];
 	}
-	return base;
+
+	// Raw text formats (TEXT/MARKDOWN) are another group
+	if (props.format === "text" || props.format === "markdown") {
+		return ["text", "markdown"];
+	}
+
+	// Default fallback
+	return ["json", "yaml"];
 });
 </script>

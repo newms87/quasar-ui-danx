@@ -151,7 +151,13 @@ export function useCodeFormat(options: UseCodeFormatOptions = {}): UseCodeFormat
 	const parsedValue = computed(() => parseContent(rawContent.value));
 
 	// Computed: formatted string
-	const formattedContent = computed(() => formatValueToString(parsedValue.value, format.value));
+	// For text format, return rawContent directly without parsing
+	const formattedContent = computed(() => {
+		if (format.value === "text") {
+			return rawContent.value;
+		}
+		return formatValueToString(parsedValue.value, format.value);
+	});
 
 	// Computed: is current content valid
 	const isValid = computed(() => validateContent(rawContent.value, format.value));

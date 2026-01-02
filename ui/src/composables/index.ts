@@ -1,4 +1,6 @@
 export * from "./useCodeFormat";
+export * from "./useCodeViewerCollapse";
+export * from "./useCodeViewerEditor";
 export * from "./useFileNavigation";
 export * from "./useFilePreview";
 export * from "./useKeyboardNavigation";

@@ -3,7 +3,7 @@
  * Returns HTML string with syntax highlighting spans
  */
 
-export type HighlightFormat = "json" | "yaml" | "text";
+export type HighlightFormat = "json" | "yaml" | "text" | "markdown";
 
 export interface HighlightOptions {
 	format: HighlightFormat;

@@ -15,7 +15,9 @@
     "build:bundle": "vite build",
     "build": "yarn clean && yarn build:types && yarn build:bundle",
     "preview": "vite preview",
-    "postversion": "yarn build && npm publish && cd .. && git add ui && git commit -m \"v$npm_package_version\" && git tag \"v$npm_package_version\" && git push"
+    "publish:patch": "./scripts/publish.sh patch",
+    "publish:minor": "./scripts/publish.sh minor",
+    "publish:major": "./scripts/publish.sh major"
   },
   "repository": {
     "type": "git",

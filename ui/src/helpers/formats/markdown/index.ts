@@ -30,6 +30,13 @@
  * - Footnotes ([^id] with [^id]: content definitions)
  */
 
+// Re-export HTML to Markdown converter
+export { htmlToMarkdown, escapeMarkdownChars } from "./htmlToMarkdown";
+export { convertHeading, isHeadingElement, getHeadingLevel } from "./htmlToMarkdown/convertHeadings";
+
+// Re-export line pattern detection
+export * from "./linePatterns";
+
 // Re-export types
 export type {
 	MarkdownRenderOptions,

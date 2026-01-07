@@ -1,0 +1,235 @@
+<template>
+  <div class="dx-hotkey-help-overlay" @click.self="$emit('close')">
+    <div class="dx-hotkey-help-popover">
+      <div class="popover-header">
+        <h3>Keyboard Shortcuts</h3>
+        <button
+          class="close-btn"
+          type="button"
+          aria-label="Close"
+          @click="$emit('close')"
+        >
+          <CloseIcon class="w-4 h-4" />
+        </button>
+      </div>
+
+      <div class="popover-content">
+        <div
+          v-for="group in groupedHotkeys"
+          :key="group.name"
+          class="hotkey-group"
+        >
+          <h4>{{ group.label }}</h4>
+          <div class="hotkey-list">
+            <div
+              v-for="hotkey in group.hotkeys"
+              :key="hotkey.key"
+              class="hotkey-item"
+            >
+              <span class="hotkey-description">{{ hotkey.description }}</span>
+              <kbd class="hotkey-key">{{ formatKey(hotkey.key) }}</kbd>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>
+
+<script setup lang="ts">
+import { FaSolidXmark as CloseIcon } from "danx-icon";
+import { computed } from "vue";
+import { HotkeyDefinition, HotkeyGroup } from "../../../composables/markdown/useMarkdownHotkeys";
+
+export interface HotkeyHelpPopoverProps {
+  hotkeys: HotkeyDefinition[];
+}
+
+interface HotkeyGroupDisplay {
+  name: HotkeyGroup;
+  label: string;
+  hotkeys: HotkeyDefinition[];
+}
+
+const GROUP_LABELS: Record<HotkeyGroup, string> = {
+  headings: "Headings",
+  formatting: "Formatting",
+  blocks: "Blocks",
+  other: "Other"
+};
+
+const GROUP_ORDER: HotkeyGroup[] = ["headings", "formatting", "blocks", "other"];
+
+const props = defineProps<HotkeyHelpPopoverProps>();
+
+defineEmits<{
+  close: [];
+}>();
+
+const groupedHotkeys = computed<HotkeyGroupDisplay[]>(() => {
+  const groups = new Map<HotkeyGroup, HotkeyDefinition[]>();
+
+  // Initialize groups
+  for (const group of GROUP_ORDER) {
+    groups.set(group, []);
+  }
+
+  // Distribute hotkeys into groups
+  for (const hotkey of props.hotkeys) {
+    const group = groups.get(hotkey.group);
+    if (group) {
+      group.push(hotkey);
+    }
+  }
+
+  // Convert to display format, filtering empty groups
+  return GROUP_ORDER
+    .filter(name => (groups.get(name)?.length || 0) > 0)
+    .map(name => ({
+      name,
+      label: GROUP_LABELS[name],
+      hotkeys: groups.get(name) || []
+    }));
+});
+
+/**
+ * Format a key combination for display
+ * Converts 'ctrl+1' to 'Ctrl + 1'
+ */
+function formatKey(key: string): string {
+  return key
+    .split("+")
+    .map(part => {
+      const lower = part.toLowerCase();
+      switch (lower) {
+        case "ctrl":
+        case "control":
+          return "Ctrl";
+        case "shift":
+          return "Shift";
+        case "alt":
+        case "option":
+          return "Alt";
+        case "meta":
+        case "cmd":
+        case "command":
+          return "Cmd";
+        default:
+          return part.toUpperCase();
+      }
+    })
+    .join(" + ");
+}
+</script>
+
+<style lang="scss">
+.dx-hotkey-help-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(2px);
+}
+
+.dx-hotkey-help-popover {
+  background: #2d2d2d;
+  border: 1px solid #404040;
+  border-radius: 0.5rem;
+  box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5);
+  min-width: 320px;
+  max-width: 480px;
+  max-height: 80vh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+
+  .popover-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1rem 1.25rem;
+    border-bottom: 1px solid #404040;
+
+    h3 {
+      margin: 0;
+      font-size: 1rem;
+      font-weight: 600;
+      color: #f3f4f6;
+    }
+
+    .close-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 1.75rem;
+      height: 1.75rem;
+      padding: 0;
+      background: transparent;
+      border: none;
+      border-radius: 0.25rem;
+      color: #9ca3af;
+      cursor: pointer;
+      transition: all 0.15s ease;
+
+      &:hover {
+        background: rgba(255, 255, 255, 0.1);
+        color: #f3f4f6;
+      }
+    }
+  }
+
+  .popover-content {
+    padding: 1rem 1.25rem;
+    overflow-y: auto;
+  }
+
+  .hotkey-group {
+    &:not(:first-child) {
+      margin-top: 1.25rem;
+    }
+
+    h4 {
+      margin: 0 0 0.75rem;
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: #9ca3af;
+    }
+  }
+
+  .hotkey-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .hotkey-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+
+    .hotkey-description {
+      flex: 1;
+      color: #d4d4d4;
+      font-size: 0.875rem;
+    }
+
+    .hotkey-key {
+      flex-shrink: 0;
+      padding: 0.25rem 0.5rem;
+      background: #1e1e1e;
+      border: 1px solid #404040;
+      border-radius: 0.25rem;
+      font-family: 'Consolas', 'Monaco', monospace;
+      font-size: 0.75rem;
+      color: #9ca3af;
+      white-space: nowrap;
+    }
+  }
+}
+</style>

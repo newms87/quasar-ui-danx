@@ -3,3 +3,6 @@ export { default as CodeViewerCollapsed } from "./CodeViewerCollapsed.vue";
 export { default as CodeViewerFooter } from "./CodeViewerFooter.vue";
 export { default as LanguageBadge } from "./LanguageBadge.vue";
 export { default as MarkdownContent } from "./MarkdownContent.vue";
+
+// Re-export Markdown editor components
+export * from "../Markdown";

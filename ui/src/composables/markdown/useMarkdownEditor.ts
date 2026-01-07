@@ -3,6 +3,7 @@ import { HotkeyDefinition, useMarkdownHotkeys } from "./useMarkdownHotkeys";
 import { useMarkdownSelection } from "./useMarkdownSelection";
 import { useMarkdownSync } from "./useMarkdownSync";
 import { useHeadings } from "./features/useHeadings";
+import { useInlineFormatting } from "./features/useInlineFormatting";
 
 /**
  * Options for useMarkdownEditor composable
@@ -40,6 +41,7 @@ export interface UseMarkdownEditorReturn {
 
 	// Feature access (for custom hotkey registration)
 	headings: ReturnType<typeof useHeadings>;
+	inlineFormatting: ReturnType<typeof useInlineFormatting>;
 }
 
 /**
@@ -79,7 +81,15 @@ export function useMarkdownEditor(options: UseMarkdownEditorOptions): UseMarkdow
 		}
 	});
 
-	// Register default hotkeys for Phase 1
+	// Initialize inline formatting feature
+	const inlineFormatting = useInlineFormatting({
+		contentRef,
+		onContentChange: () => {
+			sync.debouncedSyncFromHtml();
+		}
+	});
+
+	// Register default hotkeys
 	registerDefaultHotkeys();
 
 	// Computed character count
@@ -93,10 +103,39 @@ export function useMarkdownEditor(options: UseMarkdownEditorOptions): UseMarkdow
 	});
 
 	/**
-	 * Register default hotkeys for headings and help
+	 * Register default hotkeys for all features
 	 */
 	function registerDefaultHotkeys(): void {
-		// Heading hotkeys (Ctrl+0 through Ctrl+6)
+		// === Inline Formatting Hotkeys ===
+		hotkeys.registerHotkey({
+			key: "ctrl+b",
+			action: () => inlineFormatting.toggleBold(),
+			description: "Bold",
+			group: "formatting"
+		});
+
+		hotkeys.registerHotkey({
+			key: "ctrl+i",
+			action: () => inlineFormatting.toggleItalic(),
+			description: "Italic",
+			group: "formatting"
+		});
+
+		hotkeys.registerHotkey({
+			key: "ctrl+e",
+			action: () => inlineFormatting.toggleInlineCode(),
+			description: "Inline code",
+			group: "formatting"
+		});
+
+		hotkeys.registerHotkey({
+			key: "ctrl+shift+s",
+			action: () => inlineFormatting.toggleStrikethrough(),
+			description: "Strikethrough",
+			group: "formatting"
+		});
+
+		// === Heading Hotkeys (Ctrl+0 through Ctrl+6) ===
 		hotkeys.registerHotkey({
 			key: "ctrl+0",
 			action: () => headings.setHeadingLevel(0),
@@ -263,6 +302,7 @@ export function useMarkdownEditor(options: UseMarkdownEditorOptions): UseMarkdow
 		hotkeyDefinitions,
 
 		// Feature access
-		headings
+		headings,
+		inlineFormatting
 	};
 }

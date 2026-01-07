@@ -188,7 +188,8 @@
 <script setup lang="ts">
 import { computed, reactive } from "vue";
 import { parse as parseYAML, stringify as stringifyYAML } from "yaml";
-import { tokenizeBlocks, parseInline, renderMarkdown, getFootnotes, resetParserState, BlockToken, ListItem } from "../../../helpers/formats/renderMarkdown";
+import { tokenizeBlocks, parseInline, renderMarkdown, getFootnotes, resetParserState } from "../../../helpers/formats/markdown";
+import type { BlockToken, ListItem } from "../../../helpers/formats/markdown";
 import { highlightJSON, highlightYAML } from "../../../helpers/formats/highlightSyntax";
 import LanguageBadge from "./LanguageBadge.vue";
 

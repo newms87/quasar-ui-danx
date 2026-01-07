@@ -55,25 +55,6 @@ function hasFormatting(node: Node | null, formatType: FormatType): Element | nul
 }
 
 /**
- * Get the deepest common ancestor element of a range that's still within contentRef
- */
-function getCommonAncestor(range: Range, contentRef: HTMLElement): Element | null {
-	let ancestor = range.commonAncestorContainer;
-
-	// If it's a text node, get its parent
-	if (ancestor.nodeType === Node.TEXT_NODE) {
-		ancestor = ancestor.parentNode as Node;
-	}
-
-	// Make sure we're within the content area
-	if (!contentRef.contains(ancestor)) {
-		return null;
-	}
-
-	return ancestor as Element;
-}
-
-/**
  * Composable for inline formatting operations in markdown editor
  */
 export function useInlineFormatting(options: UseInlineFormattingOptions): UseInlineFormattingReturn {
@@ -81,6 +62,13 @@ export function useInlineFormatting(options: UseInlineFormattingOptions): UseInl
 
 	/**
 	 * Apply or remove inline formatting to the current selection
+	 *
+	 * Behavior:
+	 * - With selection that matches entire formatted element: remove formatting
+	 * - With selection inside formatted element: remove formatting from selection only
+	 * - With selection (no existing format): wrap selection with formatting
+	 * - No selection, cursor inside formatted text: move cursor after formatted element
+	 * - No selection, cursor outside formatted text: insert formatted placeholder
 	 */
 	function toggleFormat(formatType: FormatType): void {
 		if (!contentRef.value) return;
@@ -95,24 +83,112 @@ export function useInlineFormatting(options: UseInlineFormattingOptions): UseInl
 
 		const { tag } = FORMAT_TAGS[formatType];
 
-		// Check if the selection is already formatted
+		// Check if the selection/cursor is inside formatted text
 		const existingFormat = hasFormatting(range.commonAncestorContainer, formatType);
 
-		if (existingFormat && range.toString() === existingFormat.textContent) {
-			// Selection matches the entire formatted element - remove formatting
-			removeFormatting(existingFormat);
-		} else if (existingFormat && range.collapsed) {
-			// Cursor is inside formatted text with no selection - remove formatting
-			removeFormatting(existingFormat);
-		} else if (!range.collapsed) {
-			// There's a selection - wrap it with formatting
-			wrapSelection(range, tag.toLowerCase());
+		if (!range.collapsed) {
+			// There's a selection
+			if (existingFormat && isSelectionEntireElement(range, existingFormat)) {
+				// Selection matches the entire formatted element - remove formatting
+				removeFormatting(existingFormat);
+			} else if (existingFormat) {
+				// Selection is partially inside formatted element - remove format from selection
+				unwrapSelectionFromFormat(range, existingFormat, formatType);
+			} else {
+				// Selection has no formatting - wrap it
+				wrapSelection(range, tag.toLowerCase());
+			}
 		} else {
-			// No selection, cursor only - insert formatted placeholder
-			insertFormattedPlaceholder(range, tag.toLowerCase(), formatType);
+			// No selection (cursor only)
+			if (existingFormat) {
+				// Cursor is inside formatted text - move cursor after the formatted element
+				moveCursorAfterElement(existingFormat);
+			} else {
+				// Cursor is in unformatted area - insert formatted placeholder
+				insertFormattedPlaceholder(range, tag.toLowerCase(), formatType);
+			}
 		}
 
 		onContentChange();
+	}
+
+	/**
+	 * Check if selection encompasses the entire element's content
+	 */
+	function isSelectionEntireElement(range: Range, element: Element): boolean {
+		return range.toString() === element.textContent;
+	}
+
+	/**
+	 * Move cursor to position immediately after an element by inserting a
+	 * zero-width space to break out of the formatting context.
+	 * The ZWS is cleaned up during HTML→markdown conversion.
+	 */
+	function moveCursorAfterElement(element: Element): void {
+		const selection = window.getSelection();
+		if (!selection) return;
+
+		// Insert a zero-width space after the element to break out of formatting
+		const zws = document.createTextNode("\u200B");
+		element.parentNode?.insertBefore(zws, element.nextSibling);
+
+		// Position cursor after the zero-width space
+		const range = document.createRange();
+		range.setStart(zws, 1);
+		range.collapse(true);
+
+		selection.removeAllRanges();
+		selection.addRange(range);
+	}
+
+	/**
+	 * Remove formatting from just the selected portion within a formatted element
+	 */
+	function unwrapSelectionFromFormat(range: Range, formatElement: Element, formatType: FormatType): void {
+		const { tag } = FORMAT_TAGS[formatType];
+		const tagLower = tag.toLowerCase();
+
+		// Get the selected text
+		const selectedText = range.toString();
+		const fullText = formatElement.textContent || "";
+
+		// Find where the selection is within the formatted element
+		const beforeText = fullText.substring(0, fullText.indexOf(selectedText));
+		const afterText = fullText.substring(fullText.indexOf(selectedText) + selectedText.length);
+
+		const parent = formatElement.parentNode;
+		if (!parent) return;
+
+		// Create new structure: [before formatted] [unformatted selection] [after formatted]
+		const fragment = document.createDocumentFragment();
+
+		if (beforeText) {
+			const beforeElement = document.createElement(tagLower);
+			beforeElement.textContent = beforeText;
+			fragment.appendChild(beforeElement);
+		}
+
+		// The unformatted selected text
+		const unformattedText = document.createTextNode(selectedText);
+		fragment.appendChild(unformattedText);
+
+		if (afterText) {
+			const afterElement = document.createElement(tagLower);
+			afterElement.textContent = afterText;
+			fragment.appendChild(afterElement);
+		}
+
+		// Replace the original formatted element
+		parent.replaceChild(fragment, formatElement);
+
+		// Select the unformatted text
+		const newRange = document.createRange();
+		newRange.selectNodeContents(unformattedText);
+		const selection = window.getSelection();
+		if (selection) {
+			selection.removeAllRanges();
+			selection.addRange(newRange);
+		}
 	}
 
 	/**

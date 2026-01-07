@@ -20,6 +20,14 @@ export function escapeMarkdownChars(text: string): string {
 }
 
 /**
+ * Strip zero-width spaces from text content
+ * These are inserted by the inline formatting toggle to break out of formatting context
+ */
+function stripZeroWidthSpaces(text: string): string {
+	return text.replace(/\u200B/g, "");
+}
+
+/**
  * Process inline content (text with inline formatting)
  * Handles nested inline elements like bold, italic, code, links
  */
@@ -28,7 +36,8 @@ function processInlineContent(element: Element): string {
 
 	for (const child of Array.from(element.childNodes)) {
 		if (child.nodeType === Node.TEXT_NODE) {
-			parts.push(child.textContent || "");
+			// Strip zero-width spaces from text nodes
+			parts.push(stripZeroWidthSpaces(child.textContent || ""));
 		} else if (child.nodeType === Node.ELEMENT_NODE) {
 			const el = child as Element;
 			const tagName = el.tagName.toLowerCase();
@@ -212,7 +221,8 @@ function processNode(node: Node): string {
 
 	for (const child of Array.from(node.childNodes)) {
 		if (child.nodeType === Node.TEXT_NODE) {
-			parts.push(child.textContent || "");
+			// Strip zero-width spaces from text nodes
+			parts.push(stripZeroWidthSpaces(child.textContent || ""));
 		} else if (child.nodeType === Node.ELEMENT_NODE) {
 			const element = child as Element;
 			const tagName = element.tagName.toLowerCase();
@@ -394,7 +404,8 @@ export function htmlToMarkdown(html: string | HTMLElement): string {
 	const markdown = processNode(container);
 
 	// Clean up extra whitespace - normalize multiple newlines to max 2
-	return markdown.replace(/\n{3,}/g, "\n\n").trim();
+	// Also strip any remaining zero-width spaces as a safety net
+	return stripZeroWidthSpaces(markdown).replace(/\n{3,}/g, "\n\n").trim();
 }
 
 // Re-export heading utilities

@@ -94,6 +94,24 @@
     list-style-type: decimal;
   }
 
+  // Task lists
+  .task-list {
+    list-style: none;
+    padding-left: 0;
+
+    .task-list-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.5em;
+      margin: 0.25em 0;
+
+      input[type="checkbox"] {
+        margin-top: 0.3em;
+        cursor: default;
+      }
+    }
+  }
+
   // Links
   a {
     color: #60a5fa; // blue-400
@@ -121,6 +139,32 @@
   strong { font-weight: 600; }
   em { font-style: italic; }
 
+  // Strikethrough
+  del {
+    text-decoration: line-through;
+    opacity: 0.7;
+  }
+
+  // Highlight
+  mark {
+    background: rgba(250, 204, 21, 0.4); // yellow-400 with opacity
+    padding: 0.1em 0.2em;
+    border-radius: 2px;
+  }
+
+  // Subscript/Superscript
+  sub, sup {
+    font-size: 0.75em;
+  }
+
+  sub {
+    vertical-align: sub;
+  }
+
+  sup {
+    vertical-align: super;
+  }
+
   // Tables
   table {
     border-collapse: collapse;
@@ -140,6 +184,58 @@
 
     tr:nth-child(even) {
       background: rgba(255, 255, 255, 0.05);
+    }
+  }
+
+  // Definition lists
+  dl {
+    margin: 1em 0;
+  }
+
+  dt {
+    font-weight: 600;
+    margin-top: 1em;
+
+    &:first-child {
+      margin-top: 0;
+    }
+  }
+
+  dd {
+    margin-left: 2em;
+    margin-top: 0.25em;
+  }
+
+  // Footnotes
+  .footnote-ref {
+    font-size: 0.75em;
+    vertical-align: super;
+    line-height: 0;
+
+    a {
+      text-decoration: none;
+    }
+  }
+
+  .footnotes {
+    margin-top: 2em;
+    font-size: 0.875em;
+
+    hr {
+      margin-bottom: 1em;
+    }
+
+    .footnote-list {
+      padding-left: 1.5em;
+    }
+
+    .footnote-item {
+      margin: 0.5em 0;
+    }
+
+    .footnote-backref {
+      margin-left: 0.5em;
+      text-decoration: none;
     }
   }
 }

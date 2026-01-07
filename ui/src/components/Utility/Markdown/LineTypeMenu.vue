@@ -1,10 +1,10 @@
 <template>
-  <div class="dx-line-type-menu" :class="{ 'is-open': isOpen }">
+  <div ref="menuRef" class="dx-line-type-menu" :class="{ 'is-open': isOpen }">
     <button
       class="line-type-trigger"
       :title="currentTypeLabel"
       type="button"
-      @click="toggleMenu"
+      @mousedown.prevent="toggleMenu"
     >
       <span class="type-icon">{{ typeIcon }}</span>
     </button>
@@ -16,7 +16,7 @@
         class="line-type-option"
         :class="{ active: option.value === currentType }"
         type="button"
-        @click="selectType(option.value)"
+        @mousedown.prevent="selectType(option.value)"
       >
         <span class="option-icon">{{ option.icon }}</span>
         <span class="option-label">{{ option.label }}</span>
@@ -27,7 +27,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref } from "vue";
+import { computed, onUnmounted, ref, watch } from "vue";
 import type { LineType, LineTypeOption } from "./types";
 
 export interface LineTypeMenuProps {
@@ -51,6 +51,7 @@ const emit = defineEmits<{
 }>();
 
 const isOpen = ref(false);
+const menuRef = ref<HTMLElement | null>(null);
 
 const currentOption = computed(() => {
   return LINE_TYPE_OPTIONS.find(o => o.value === props.currentType) || LINE_TYPE_OPTIONS[0];
@@ -67,6 +68,38 @@ function selectType(type: LineType) {
   emit("change", type);
   isOpen.value = false;
 }
+
+// Close menu on click outside
+function handleClickOutside(event: MouseEvent) {
+  const target = event.target as Node;
+  if (menuRef.value && !menuRef.value.contains(target)) {
+    isOpen.value = false;
+  }
+}
+
+// Close menu on Escape key
+function handleKeyDown(event: KeyboardEvent) {
+  if (event.key === "Escape") {
+    isOpen.value = false;
+  }
+}
+
+// Add/remove event listeners when menu opens/closes
+watch(isOpen, (open) => {
+  if (open) {
+    document.addEventListener("mousedown", handleClickOutside);
+    document.addEventListener("keydown", handleKeyDown);
+  } else {
+    document.removeEventListener("mousedown", handleClickOutside);
+    document.removeEventListener("keydown", handleKeyDown);
+  }
+});
+
+// Cleanup on unmount
+onUnmounted(() => {
+  document.removeEventListener("mousedown", handleClickOutside);
+  document.removeEventListener("keydown", handleKeyDown);
+});
 </script>
 
 <style lang="scss">
@@ -78,30 +111,30 @@ function selectType(type: LineType) {
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 2rem;
-    height: 1.5rem;
-    background: rgba(255, 255, 255, 0.1);
+    width: 1.25rem;
+    height: 1.25rem;
+    background: rgba(255, 255, 255, 0.05);
     border: none;
-    border-radius: 0.25rem;
-    color: #9ca3af;
-    font-size: 0.75rem;
+    border-radius: 0.2rem;
+    color: #6b7280;
+    font-size: 0.625rem;
     font-weight: 600;
     cursor: pointer;
     transition: all 0.15s ease;
 
     &:hover {
-      background: rgba(255, 255, 255, 0.2);
-      color: #d1d5db;
+      background: rgba(255, 255, 255, 0.15);
+      color: #9ca3af;
     }
   }
 
   .line-type-dropdown {
     position: absolute;
-    top: 100%;
-    left: 0;
+    top: 0;
+    left: 100%;
     z-index: 100;
     min-width: 180px;
-    margin-top: 0.25rem;
+    margin-left: 0.25rem;
     background: #2d2d2d;
     border: 1px solid #404040;
     border-radius: 0.375rem;

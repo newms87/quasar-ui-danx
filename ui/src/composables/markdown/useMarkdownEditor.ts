@@ -4,6 +4,7 @@ import { useMarkdownSelection } from "./useMarkdownSelection";
 import { useMarkdownSync } from "./useMarkdownSync";
 import { useHeadings } from "./features/useHeadings";
 import { useInlineFormatting } from "./features/useInlineFormatting";
+import { useLists } from "./features/useLists";
 
 /**
  * Options for useMarkdownEditor composable
@@ -42,6 +43,7 @@ export interface UseMarkdownEditorReturn {
 	// Feature access (for custom hotkey registration)
 	headings: ReturnType<typeof useHeadings>;
 	inlineFormatting: ReturnType<typeof useInlineFormatting>;
+	lists: ReturnType<typeof useLists>;
 }
 
 /**
@@ -84,6 +86,15 @@ export function useMarkdownEditor(options: UseMarkdownEditorOptions): UseMarkdow
 	// Initialize inline formatting feature
 	const inlineFormatting = useInlineFormatting({
 		contentRef,
+		onContentChange: () => {
+			sync.debouncedSyncFromHtml();
+		}
+	});
+
+	// Initialize lists feature
+	const lists = useLists({
+		contentRef,
+		selection,
 		onContentChange: () => {
 			sync.debouncedSyncFromHtml();
 		}
@@ -202,6 +213,21 @@ export function useMarkdownEditor(options: UseMarkdownEditorOptions): UseMarkdow
 			group: "headings"
 		});
 
+		// === List Hotkeys ===
+		hotkeys.registerHotkey({
+			key: "ctrl+shift+[",
+			action: () => lists.toggleUnorderedList(),
+			description: "Toggle bullet list",
+			group: "lists"
+		});
+
+		hotkeys.registerHotkey({
+			key: "ctrl+shift+]",
+			action: () => lists.toggleOrderedList(),
+			description: "Toggle numbered list",
+			group: "lists"
+		});
+
 		// Help hotkey (Ctrl+? is handled specially in handleKeyDown)
 		// This registration is for the help display list
 		hotkeys.registerHotkey({
@@ -215,13 +241,44 @@ export function useMarkdownEditor(options: UseMarkdownEditorOptions): UseMarkdow
 	}
 
 	/**
+	 * Insert a tab character at the current cursor position
+	 */
+	function insertTabCharacter(): void {
+		if (!contentRef.value) return;
+
+		const sel = window.getSelection();
+		if (!sel || sel.rangeCount === 0) return;
+
+		const range = sel.getRangeAt(0);
+		range.deleteContents();
+
+		const tabNode = document.createTextNode("\t");
+		range.insertNode(tabNode);
+
+		// Position cursor AFTER the tab node
+		range.setStartAfter(tabNode);
+		range.setEndAfter(tabNode);
+
+		sel.removeAllRanges();
+		sel.addRange(range);
+
+		// Trigger content sync AFTER cursor is positioned
+		sync.debouncedSyncFromHtml();
+	}
+
+	/**
 	 * Handle input events from contenteditable
-	 * Checks for markdown patterns (e.g., "# " for headings) and converts immediately
+	 * Checks for markdown patterns (e.g., "# " for headings, "- " for lists) and converts immediately
 	 */
 	function onInput(): void {
 		// Check for heading pattern first (e.g., "# " -> H1)
 		// This is called immediately (not debounced) for instant conversion
-		const converted = headings.checkAndConvertHeadingPattern();
+		let converted = headings.checkAndConvertHeadingPattern();
+
+		// Check for list pattern (e.g., "- " -> ul, "1. " -> ol)
+		if (!converted) {
+			converted = lists.checkAndConvertListPattern();
+		}
 
 		// If a pattern was converted, the content change callback already triggers sync
 		// Otherwise, sync as normal
@@ -232,10 +289,37 @@ export function useMarkdownEditor(options: UseMarkdownEditorOptions): UseMarkdow
 
 	/**
 	 * Handle keydown events
-	 * Let browser handle Enter natively (creates <div> elements) which heading pattern detection already supports
+	 * Handles Enter for list continuation, Tab/Shift+Tab for indentation
 	 */
 	function onKeyDown(event: KeyboardEvent): void {
-		// Let hotkeys handle the event - if not handled, default browser behavior occurs
+		// Handle Enter key for list continuation
+		if (event.key === "Enter" && !event.shiftKey && !event.ctrlKey && !event.altKey && !event.metaKey) {
+			const handled = lists.handleListEnter();
+			if (handled) {
+				event.preventDefault();
+				return;
+			}
+		}
+
+		// Handle Tab key - always prevent default to keep focus in editor
+		if (event.key === "Tab" && !event.ctrlKey && !event.altKey && !event.metaKey) {
+			event.preventDefault();
+
+			if (event.shiftKey) {
+				// Shift+Tab - outdent if in list, otherwise do nothing
+				lists.outdentListItem();
+			} else {
+				// Tab - indent if in list, otherwise insert tab character
+				const handled = lists.indentListItem();
+				if (!handled) {
+					// Not in a list - insert a tab character at cursor position
+					insertTabCharacter();
+				}
+			}
+			return;
+		}
+
+		// Let hotkeys handle other keys - if not handled, default browser behavior occurs
 		hotkeys.handleKeyDown(event);
 	}
 
@@ -303,6 +387,7 @@ export function useMarkdownEditor(options: UseMarkdownEditorOptions): UseMarkdow
 
 		// Feature access
 		headings,
-		inlineFormatting
+		inlineFormatting,
+		lists
 	};
 }

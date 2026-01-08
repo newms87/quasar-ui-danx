@@ -3,7 +3,7 @@ import { Ref, ref } from "vue";
 /**
  * Hotkey group categories for organization
  */
-export type HotkeyGroup = "headings" | "formatting" | "blocks" | "other";
+export type HotkeyGroup = "headings" | "formatting" | "lists" | "blocks" | "other";
 
 /**
  * Definition for a registered hotkey

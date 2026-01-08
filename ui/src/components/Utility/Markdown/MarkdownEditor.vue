@@ -92,7 +92,8 @@ const currentBlockTop = ref(0);
 const isEditorFocused = ref(false);
 
 // Map LineType to heading level (single source of truth for bidirectional mapping)
-const LINE_TYPE_TO_LEVEL: Record<LineType, number> = {
+// Note: ul and ol are handled separately, not as heading levels
+const LINE_TYPE_TO_LEVEL: Record<string, number> = {
   paragraph: 0,
   h1: 1,
   h2: 2,
@@ -107,8 +108,16 @@ const LEVEL_TO_LINE_TYPE = Object.fromEntries(
   Object.entries(LINE_TYPE_TO_LEVEL).map(([type, level]) => [level, type as LineType])
 ) as Record<number, LineType>;
 
-// Computed current line type from heading level
+// Track current list type for LineTypeMenu
+const currentListType = ref<"ul" | "ol" | null>(null);
+
+// Computed current line type from heading level or list type
 const currentLineType = computed<LineType>(() => {
+  // If we're in a list, return the list type
+  if (currentListType.value) {
+    return currentListType.value;
+  }
+  // Otherwise, return heading type based on level
   const level = currentHeadingLevel.value;
   return LEVEL_TO_LINE_TYPE[level] ?? "paragraph";
 });
@@ -166,10 +175,12 @@ function updateMenuPosition(): void {
   currentBlockTop.value = relativeTop;
 }
 
-// Update current heading level and menu position when selection changes
+// Update current heading level, list type, and menu position when selection changes
 function updateCurrentHeadingLevel(): void {
   const level = editor.headings.getCurrentHeadingLevel();
   currentHeadingLevel.value = level;
+  // Also check if we're in a list
+  currentListType.value = editor.lists.getCurrentListType();
   updateMenuPosition();
 }
 
@@ -199,10 +210,26 @@ function handleFocusOut(event: FocusEvent): void {
 
 // Handle line type change from menu
 function onLineTypeChange(type: LineType): void {
+  // Handle list types
+  if (type === "ul") {
+    editor.lists.toggleUnorderedList();
+    currentListType.value = editor.lists.getCurrentListType();
+    return;
+  }
+  if (type === "ol") {
+    editor.lists.toggleOrderedList();
+    currentListType.value = editor.lists.getCurrentListType();
+    return;
+  }
+
+  // Handle heading/paragraph types
   const level = LINE_TYPE_TO_LEVEL[type];
-  editor.headings.setHeadingLevel(level);
-  // Update the tracked level immediately
-  currentHeadingLevel.value = level;
+  if (level !== undefined) {
+    editor.headings.setHeadingLevel(level as 0 | 1 | 2 | 3 | 4 | 5 | 6);
+    // Update the tracked level immediately
+    currentHeadingLevel.value = level;
+    currentListType.value = null;
+  }
 }
 
 // Track which element has listeners attached

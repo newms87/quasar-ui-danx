@@ -82,5 +82,63 @@ defineExpose({ containerRef });
 
   // Caret color
   caret-color: #d4d4d4;
+
+  // Alternating styles for nested ordered lists
+  // Level 1: decimal (1, 2, 3)
+  ol {
+    list-style-type: decimal;
+
+    // Level 2: lower-roman (i, ii, iii)
+    ol {
+      list-style-type: lower-roman;
+
+      // Level 3: lower-alpha (a, b, c)
+      ol {
+        list-style-type: lower-alpha;
+
+        // Level 4+: cycle back to decimal
+        ol {
+          list-style-type: decimal;
+
+          ol {
+            list-style-type: lower-roman;
+
+            ol {
+              list-style-type: lower-alpha;
+            }
+          }
+        }
+      }
+    }
+  }
+
+  // Alternating styles for nested unordered lists
+  // Level 1: disc
+  ul {
+    list-style-type: disc;
+
+    // Level 2: circle
+    ul {
+      list-style-type: circle;
+
+      // Level 3: square
+      ul {
+        list-style-type: square;
+
+        // Level 4+: cycle back to disc
+        ul {
+          list-style-type: disc;
+
+          ul {
+            list-style-type: circle;
+
+            ul {
+              list-style-type: square;
+            }
+          }
+        }
+      }
+    }
+  }
 }
 </style>

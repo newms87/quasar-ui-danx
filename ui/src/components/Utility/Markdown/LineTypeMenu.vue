@@ -41,7 +41,9 @@ const LINE_TYPE_OPTIONS: LineTypeOption[] = [
   { value: "h3", label: "Heading 3", icon: "H3", shortcut: "Ctrl+3" },
   { value: "h4", label: "Heading 4", icon: "H4", shortcut: "Ctrl+4" },
   { value: "h5", label: "Heading 5", icon: "H5", shortcut: "Ctrl+5" },
-  { value: "h6", label: "Heading 6", icon: "H6", shortcut: "Ctrl+6" }
+  { value: "h6", label: "Heading 6", icon: "H6", shortcut: "Ctrl+6" },
+  { value: "ul", label: "Bullet List", icon: "\u2022", shortcut: "Ctrl+Shift+[" },
+  { value: "ol", label: "Numbered List", icon: "1.", shortcut: "Ctrl+Shift+]" }
 ];
 
 const props = defineProps<LineTypeMenuProps>();

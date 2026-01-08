@@ -9,7 +9,7 @@
       <span class="type-icon">{{ typeIcon }}</span>
     </button>
 
-    <div v-if="isOpen" class="line-type-dropdown">
+    <div v-if="isOpen" ref="dropdownRef" class="line-type-dropdown" :class="{ 'open-upward': openUpward }">
       <button
         v-for="option in LINE_TYPE_OPTIONS"
         :key="option.value"
@@ -27,7 +27,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onUnmounted, ref, watch } from "vue";
+import { computed, nextTick, onUnmounted, ref, watch } from "vue";
 import type { LineType, LineTypeOption } from "./types";
 
 export interface LineTypeMenuProps {
@@ -54,6 +54,8 @@ const emit = defineEmits<{
 
 const isOpen = ref(false);
 const menuRef = ref<HTMLElement | null>(null);
+const dropdownRef = ref<HTMLElement | null>(null);
+const openUpward = ref(false);
 
 const currentOption = computed(() => {
   return LINE_TYPE_OPTIONS.find(o => o.value === props.currentType) || LINE_TYPE_OPTIONS[0];
@@ -69,6 +71,30 @@ function toggleMenu() {
 function selectType(type: LineType) {
   emit("change", type);
   isOpen.value = false;
+}
+
+/**
+ * Check if dropdown would overflow the editor container and adjust positioning
+ */
+function checkDropdownPosition() {
+  if (!dropdownRef.value || !menuRef.value) return;
+
+  // Find the editor container (walk up to find .dx-markdown-editor or similar scrollable container)
+  const editor = menuRef.value.closest(".dx-markdown-editor") || menuRef.value.closest("[class*='editor']");
+  if (!editor) {
+    openUpward.value = false;
+    return;
+  }
+
+  const editorRect = editor.getBoundingClientRect();
+  const dropdownRect = dropdownRef.value.getBoundingClientRect();
+
+  // Check if dropdown extends below editor
+  if (dropdownRect.bottom > editorRect.bottom) {
+    openUpward.value = true;
+  } else {
+    openUpward.value = false;
+  }
 }
 
 // Close menu on click outside
@@ -87,13 +113,18 @@ function handleKeyDown(event: KeyboardEvent) {
 }
 
 // Add/remove event listeners when menu opens/closes
-watch(isOpen, (open) => {
+watch(isOpen, async (open) => {
   if (open) {
     document.addEventListener("mousedown", handleClickOutside);
     document.addEventListener("keydown", handleKeyDown);
+    // Wait for dropdown to render, then check position
+    await nextTick();
+    checkDropdownPosition();
   } else {
     document.removeEventListener("mousedown", handleClickOutside);
     document.removeEventListener("keydown", handleKeyDown);
+    // Reset position when closed
+    openUpward.value = false;
   }
 });
 
@@ -135,13 +166,19 @@ onUnmounted(() => {
     top: 0;
     left: 100%;
     z-index: 100;
-    min-width: 180px;
+    min-width: 240px;
     margin-left: 0.25rem;
     background: #2d2d2d;
     border: 1px solid #404040;
     border-radius: 0.375rem;
     box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
     overflow: hidden;
+
+    // When dropdown would overflow editor bottom, open upward instead
+    &.open-upward {
+      top: auto;
+      bottom: 0;
+    }
   }
 
   .line-type-option {

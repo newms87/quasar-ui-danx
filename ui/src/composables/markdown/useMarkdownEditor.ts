@@ -103,6 +103,55 @@ export function useMarkdownEditor(options: UseMarkdownEditorOptions): UseMarkdow
 	// Register default hotkeys
 	registerDefaultHotkeys();
 
+	/**
+	 * Set heading level, handling list items by converting to paragraph first.
+	 * This wrapper ensures Ctrl+0-6 hotkeys work even when cursor is in a list.
+	 */
+	function setHeadingLevelWithListHandling(level: 0 | 1 | 2 | 3 | 4 | 5 | 6): void {
+		// Check if currently in a list
+		const listType = lists.getCurrentListType();
+		if (listType) {
+			// Convert list item to paragraph first
+			lists.convertCurrentListItemToParagraph();
+		}
+
+		// Now apply heading level (skip if level is 0 and we just converted from list,
+		// because convertCurrentListItemToParagraph already creates a paragraph)
+		if (level > 0 || !listType) {
+			headings.setHeadingLevel(level);
+		}
+	}
+
+	/**
+	 * Increase heading level, handling list items by converting to paragraph first.
+	 * This wrapper ensures Ctrl+> hotkey works even when cursor is in a list.
+	 */
+	function increaseHeadingLevelWithListHandling(): void {
+		const listType = lists.getCurrentListType();
+		if (listType) {
+			// Convert list item to paragraph first, then apply H6 (since P -> H6 is first step)
+			lists.convertCurrentListItemToParagraph();
+			headings.setHeadingLevel(6);
+		} else {
+			headings.increaseHeadingLevel();
+		}
+	}
+
+	/**
+	 * Decrease heading level, handling list items by converting to paragraph first.
+	 * This wrapper ensures Ctrl+< hotkey works even when cursor is in a list.
+	 * For list items, just converts to paragraph (since that's the lowest level).
+	 */
+	function decreaseHeadingLevelWithListHandling(): void {
+		const listType = lists.getCurrentListType();
+		if (listType) {
+			// Convert list item to paragraph (already at paragraph level after conversion)
+			lists.convertCurrentListItemToParagraph();
+		} else {
+			headings.decreaseHeadingLevel();
+		}
+	}
+
 	// Computed character count
 	const charCount = computed(() => {
 		return contentRef.value?.textContent?.length || 0;
@@ -147,60 +196,61 @@ export function useMarkdownEditor(options: UseMarkdownEditorOptions): UseMarkdow
 		});
 
 		// === Heading Hotkeys (Ctrl+0 through Ctrl+6) ===
+		// These use wrapper functions that handle list items by converting to paragraph first
 		hotkeys.registerHotkey({
 			key: "ctrl+0",
-			action: () => headings.setHeadingLevel(0),
+			action: () => setHeadingLevelWithListHandling(0),
 			description: "Convert to paragraph",
 			group: "headings"
 		});
 
 		hotkeys.registerHotkey({
 			key: "ctrl+1",
-			action: () => headings.setHeadingLevel(1),
+			action: () => setHeadingLevelWithListHandling(1),
 			description: "Convert to Heading 1",
 			group: "headings"
 		});
 
 		hotkeys.registerHotkey({
 			key: "ctrl+2",
-			action: () => headings.setHeadingLevel(2),
+			action: () => setHeadingLevelWithListHandling(2),
 			description: "Convert to Heading 2",
 			group: "headings"
 		});
 
 		hotkeys.registerHotkey({
 			key: "ctrl+3",
-			action: () => headings.setHeadingLevel(3),
+			action: () => setHeadingLevelWithListHandling(3),
 			description: "Convert to Heading 3",
 			group: "headings"
 		});
 
 		hotkeys.registerHotkey({
 			key: "ctrl+4",
-			action: () => headings.setHeadingLevel(4),
+			action: () => setHeadingLevelWithListHandling(4),
 			description: "Convert to Heading 4",
 			group: "headings"
 		});
 
 		hotkeys.registerHotkey({
 			key: "ctrl+5",
-			action: () => headings.setHeadingLevel(5),
+			action: () => setHeadingLevelWithListHandling(5),
 			description: "Convert to Heading 5",
 			group: "headings"
 		});
 
 		hotkeys.registerHotkey({
 			key: "ctrl+6",
-			action: () => headings.setHeadingLevel(6),
+			action: () => setHeadingLevelWithListHandling(6),
 			description: "Convert to Heading 6",
 			group: "headings"
 		});
 
-		// Heading level cycling hotkeys
+		// Heading level cycling hotkeys (also handle list items)
 		// Ctrl+< decreases heading (H1 -> H2 -> ... -> H6 -> P)
 		hotkeys.registerHotkey({
 			key: "ctrl+<",
-			action: () => headings.decreaseHeadingLevel(),
+			action: () => decreaseHeadingLevelWithListHandling(),
 			description: "Decrease heading level",
 			group: "headings"
 		});
@@ -208,7 +258,7 @@ export function useMarkdownEditor(options: UseMarkdownEditorOptions): UseMarkdow
 		// Ctrl+> increases heading (P -> H6 -> H5 -> ... -> H1)
 		hotkeys.registerHotkey({
 			key: "ctrl+>",
-			action: () => headings.increaseHeadingLevel(),
+			action: () => increaseHeadingLevelWithListHandling(),
 			description: "Increase heading level",
 			group: "headings"
 		});

@@ -40,7 +40,7 @@ export interface UseMarkdownHotkeysReturn {
 /**
  * Parsed key combination for matching
  */
-interface ParsedKey {
+export interface ParsedKey {
 	key: string;
 	ctrl: boolean;
 	shift: boolean;
@@ -57,7 +57,7 @@ interface ParsedKey {
  * - 'ctrl+shift+b' -> { key: 'b', ctrl: true, shift: true, ... }
  * - 'cmd+s' -> { key: 's', meta: true, ... } (Mac)
  */
-function parseKeyCombo(combo: string): ParsedKey {
+export function parseKeyCombo(combo: string): ParsedKey {
 	const parts = combo.toLowerCase().split("+");
 	const result: ParsedKey = {
 		key: "",
@@ -100,7 +100,7 @@ function parseKeyCombo(combo: string): ParsedKey {
  * Check if a keyboard event matches a parsed key combination
  * Handles cross-platform modifier differences (Ctrl on Windows/Linux, Cmd on Mac)
  */
-function matchesKeyCombo(event: KeyboardEvent, parsed: ParsedKey): boolean {
+export function matchesKeyCombo(event: KeyboardEvent, parsed: ParsedKey): boolean {
 	// Normalize the event key
 	let eventKey = event.key.toLowerCase();
 
@@ -119,7 +119,9 @@ function matchesKeyCombo(event: KeyboardEvent, parsed: ParsedKey): boolean {
 		"&": "7",
 		"*": "8",
 		"(": "9",
-		")": "0"
+		")": "0",
+		"{": "[",
+		"}": "]"
 	};
 
 	// If the parsed key expects a shifted character, check if we have the right combination
@@ -133,6 +135,13 @@ function matchesKeyCombo(event: KeyboardEvent, parsed: ParsedKey): boolean {
 		if (event.shiftKey && eventKey === shiftedKeys[parsed.key]) {
 			return matchesModifiers(event, { ...parsed, shift: true });
 		}
+	}
+
+	// Handle case where browser reports shifted character but hotkey expects base key with shift
+	// e.g., hotkey "ctrl+shift+[" but browser reports "{" when Ctrl+Shift+[ is pressed
+	if (shiftedKeys[eventKey] && shiftedKeys[eventKey] === parsed.key) {
+		// The event key is a shifted character (e.g., "{") that maps to the parsed key (e.g., "[")
+		return matchesModifiers(event, parsed);
 	}
 
 	// Handle number keys (both main keyboard and numpad)

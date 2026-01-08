@@ -610,6 +610,173 @@ describe('useLists', () => {
 		});
 	});
 
+	describe('heading to list conversion', () => {
+		it('converts H1 to unordered list', () => {
+			editor = createTestEditor('<h1>Heading One</h1>');
+			const lists = createLists();
+			editor.setCursorInBlock(0, 0);
+
+			lists.toggleUnorderedList();
+
+			expect(editor.getHtml()).toBe('<ul><li>Heading One</li></ul>');
+			expect(onContentChange).toHaveBeenCalled();
+		});
+
+		it('converts H2 to ordered list', () => {
+			editor = createTestEditor('<h2>Heading Two</h2>');
+			const lists = createLists();
+			editor.setCursorInBlock(0, 0);
+
+			lists.toggleOrderedList();
+
+			expect(editor.getHtml()).toBe('<ol><li>Heading Two</li></ol>');
+			expect(onContentChange).toHaveBeenCalled();
+		});
+
+		it('converts H3 to unordered list via hotkey', () => {
+			editor = createTestEditor('<h3>Heading Three</h3>');
+			const lists = createLists();
+			editor.setCursorInBlock(0, 0);
+
+			lists.toggleUnorderedList();
+
+			expect(editor.container.querySelector('ul')).not.toBeNull();
+			expect(editor.container.querySelector('li')?.textContent).toBe('Heading Three');
+		});
+
+		it('converts H4 to ordered list via hotkey', () => {
+			editor = createTestEditor('<h4>Heading Four</h4>');
+			const lists = createLists();
+			editor.setCursorInBlock(0, 0);
+
+			lists.toggleOrderedList();
+
+			expect(editor.container.querySelector('ol')).not.toBeNull();
+			expect(editor.container.querySelector('li')?.textContent).toBe('Heading Four');
+		});
+
+		it('converts H5 heading to list via "- " pattern', () => {
+			editor = createTestEditor('<h5>- item from heading</h5>');
+			const lists = createLists();
+			editor.setCursorInBlock(0, 20);
+
+			const converted = lists.checkAndConvertListPattern();
+
+			expect(converted).toBe(true);
+			expect(editor.container.querySelector('ul')).not.toBeNull();
+			expect(editor.container.querySelector('li')?.textContent).toBe('item from heading');
+		});
+
+		it('converts H6 heading to list via "1. " pattern', () => {
+			editor = createTestEditor('<h6>1. numbered from heading</h6>');
+			const lists = createLists();
+			editor.setCursorInBlock(0, 25);
+
+			const converted = lists.checkAndConvertListPattern();
+
+			expect(converted).toBe(true);
+			expect(editor.container.querySelector('ol')).not.toBeNull();
+			expect(editor.container.querySelector('li')?.textContent).toBe('numbered from heading');
+		});
+
+		it('converts list back to paragraph, not heading', () => {
+			// Start with a heading, convert to list, then back
+			editor = createTestEditor('<h1>Original Heading</h1>');
+			const lists = createLists();
+			editor.setCursorInBlock(0, 0);
+
+			// Convert heading to list
+			lists.toggleUnorderedList();
+			expect(editor.container.querySelector('ul')).not.toBeNull();
+
+			// Now convert back - should become a paragraph, not a heading
+			const li = editor.container.querySelector('li')!;
+			setCursorInListItem(li, 0);
+			lists.toggleUnorderedList();
+
+			// Should be a paragraph now
+			expect(editor.container.querySelector('p')).not.toBeNull();
+			expect(editor.container.querySelector('h1')).toBeNull();
+			expect(editor.container.querySelector('p')?.textContent).toBe('Original Heading');
+		});
+
+		it('preserves heading content with formatting when converting to list', () => {
+			editor = createTestEditor('<h2>Heading with <strong>bold</strong> text</h2>');
+			const lists = createLists();
+			editor.setCursorInBlock(0, 0);
+
+			lists.toggleUnorderedList();
+
+			expect(editor.container.querySelector('li strong')).not.toBeNull();
+			expect(editor.container.textContent).toContain('Heading with bold text');
+		});
+	});
+
+	describe('convertCurrentListItemToParagraph', () => {
+		it('converts unordered list item to paragraph', () => {
+			editor = createTestEditor('<ul><li>List item</li></ul>');
+			const lists = createLists();
+			const li = editor.container.querySelector('li')!;
+			setCursorInListItem(li, 0);
+
+			const result = lists.convertCurrentListItemToParagraph();
+
+			expect(result).not.toBeNull();
+			expect(editor.getHtml()).toBe('<p>List item</p>');
+			expect(onContentChange).toHaveBeenCalled();
+		});
+
+		it('converts ordered list item to paragraph', () => {
+			editor = createTestEditor('<ol><li>Numbered item</li></ol>');
+			const lists = createLists();
+			const li = editor.container.querySelector('li')!;
+			setCursorInListItem(li, 0);
+
+			const result = lists.convertCurrentListItemToParagraph();
+
+			expect(result).not.toBeNull();
+			expect(editor.getHtml()).toBe('<p>Numbered item</p>');
+			expect(onContentChange).toHaveBeenCalled();
+		});
+
+		it('returns null when not in a list', () => {
+			editor = createTestEditor('<p>Paragraph</p>');
+			const lists = createLists();
+			editor.setCursorInBlock(0, 0);
+
+			const result = lists.convertCurrentListItemToParagraph();
+
+			expect(result).toBeNull();
+			expect(onContentChange).not.toHaveBeenCalled();
+		});
+
+		it('preserves content with formatting', () => {
+			editor = createTestEditor('<ul><li>Item with <strong>bold</strong> text</li></ul>');
+			const lists = createLists();
+			const li = editor.container.querySelector('li')!;
+			setCursorInListItem(li, 0);
+
+			lists.convertCurrentListItemToParagraph();
+
+			expect(editor.container.querySelector('p strong')).not.toBeNull();
+			expect(editor.container.textContent).toContain('Item with bold text');
+		});
+
+		it('handles multi-item list - converts only current item', () => {
+			editor = createTestEditor('<ul><li>First</li><li>Second</li><li>Third</li></ul>');
+			const lists = createLists();
+			const secondLi = editor.container.querySelectorAll('li')[1];
+			setCursorInListItem(secondLi as HTMLLIElement, 0);
+
+			lists.convertCurrentListItemToParagraph();
+
+			// Should have two lists with paragraph in between
+			const paragraphs = editor.container.querySelectorAll('p');
+			expect(paragraphs.length).toBe(1);
+			expect(paragraphs[0].textContent).toBe('Second');
+		});
+	});
+
 	describe('edge cases', () => {
 		it('handles empty contentRef gracefully', () => {
 			const lists = createLists();

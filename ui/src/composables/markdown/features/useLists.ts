@@ -3,6 +3,15 @@ import { UseMarkdownSelectionReturn } from "../useMarkdownSelection";
 import { detectListPattern } from "../../../helpers/formats/markdown/linePatterns";
 
 /**
+ * Check if an element is a block type that can be converted to/from lists
+ * Includes paragraphs, divs, and headings (H1-H6)
+ */
+function isConvertibleBlock(element: Element): boolean {
+	const tag = element.tagName;
+	return tag === "P" || tag === "DIV" || /^H[1-6]$/.test(tag);
+}
+
+/**
  * Options for useLists composable
  */
 export interface UseListsOptions {
@@ -29,6 +38,8 @@ export interface UseListsReturn {
 	outdentListItem: () => boolean;
 	/** Get current list type (ul, ol, or null if not in a list) */
 	getCurrentListType: () => "ul" | "ol" | null;
+	/** Convert current list item to paragraph - returns the new paragraph element or null */
+	convertCurrentListItemToParagraph: () => HTMLParagraphElement | null;
 }
 
 /**
@@ -38,30 +49,29 @@ function getTargetBlock(contentRef: Ref<HTMLElement | null>, selection: UseMarkd
 	const currentBlock = selection.getCurrentBlock();
 	if (!currentBlock) return null;
 
-	// For paragraphs and divs, return directly
-	const tagName = currentBlock.tagName;
-	if (tagName === "P" || tagName === "DIV") {
+	// For paragraphs, divs, and headings, return directly
+	if (isConvertibleBlock(currentBlock)) {
 		return currentBlock;
 	}
 
 	// For list items, return the LI
-	if (tagName === "LI") {
+	if (currentBlock.tagName === "LI") {
 		return currentBlock;
 	}
 
-	// Walk up to find a P, DIV, or LI
+	// Walk up to find a convertible block or LI
 	if (!contentRef.value) return null;
 
 	let current: Element | null = currentBlock;
 	while (current && current.parentElement !== contentRef.value) {
-		if (current.tagName === "P" || current.tagName === "DIV" || current.tagName === "LI") {
+		if (isConvertibleBlock(current) || current.tagName === "LI") {
 			return current;
 		}
 		current = current.parentElement;
 	}
 
-	// Check if this direct child is a P or DIV
-	if (current && (current.tagName === "P" || current.tagName === "DIV")) {
+	// Check if this direct child is a convertible block
+	if (current && isConvertibleBlock(current)) {
 		return current;
 	}
 
@@ -386,7 +396,7 @@ export function useLists(options: UseListsOptions): UseListsReturn {
 		} else {
 			// Not in list - convert block to ul
 			const block = getTargetBlock(contentRef, selection);
-			if (block && (block.tagName === "P" || block.tagName === "DIV")) {
+			if (block && isConvertibleBlock(block)) {
 				const li = convertToListItem(block, "ul");
 				positionCursorAtEnd(li);
 			}
@@ -432,7 +442,7 @@ export function useLists(options: UseListsOptions): UseListsReturn {
 		} else {
 			// Not in list - convert block to ol
 			const block = getTargetBlock(contentRef, selection);
-			if (block && (block.tagName === "P" || block.tagName === "DIV")) {
+			if (block && isConvertibleBlock(block)) {
 				const li = convertToListItem(block, "ol");
 				positionCursorAtEnd(li);
 			}
@@ -444,7 +454,7 @@ export function useLists(options: UseListsOptions): UseListsReturn {
 	/**
 	 * Check if the current block contains a list pattern (e.g., "- ", "1. ")
 	 * and convert it to the appropriate list if detected.
-	 * Only converts paragraphs/divs, not existing list items.
+	 * Only converts paragraphs/divs/headings, not existing list items.
 	 * @returns true if a pattern was detected and converted, false otherwise
 	 */
 	function checkAndConvertListPattern(): boolean {
@@ -453,8 +463,8 @@ export function useLists(options: UseListsOptions): UseListsReturn {
 		const block = getTargetBlock(contentRef, selection);
 		if (!block) return false;
 
-		// Only convert paragraphs or divs - don't convert existing list items
-		if (block.tagName !== "P" && block.tagName !== "DIV") return false;
+		// Only convert paragraphs, divs, or headings - don't convert existing list items
+		if (!isConvertibleBlock(block)) return false;
 
 		// Get the text content of the block
 		const textContent = block.textContent || "";
@@ -707,6 +717,23 @@ export function useLists(options: UseListsOptions): UseListsReturn {
 		return getListType(selection);
 	}
 
+	/**
+	 * Convert current list item to paragraph
+	 * Used when switching from list to heading/paragraph via menu
+	 * @returns the new paragraph element, or null if not in a list
+	 */
+	function convertCurrentListItemToParagraphFn(): HTMLParagraphElement | null {
+		if (!contentRef.value) return null;
+
+		const li = getListItem(selection);
+		if (!li) return null;
+
+		const p = convertListItemToParagraph(li, contentRef.value);
+		positionCursorAtEnd(p);
+		onContentChange();
+		return p;
+	}
+
 	return {
 		toggleUnorderedList,
 		toggleOrderedList,
@@ -714,6 +741,7 @@ export function useLists(options: UseListsOptions): UseListsReturn {
 		handleListEnter,
 		indentListItem,
 		outdentListItem,
-		getCurrentListType
+		getCurrentListType,
+		convertCurrentListItemToParagraph: convertCurrentListItemToParagraphFn
 	};
 }

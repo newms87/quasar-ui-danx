@@ -774,4 +774,61 @@ describe('useHeadings', () => {
 			expect(editor.getHtml()).toBe('<h3>   </h3>');
 		});
 	});
+
+	describe('list to heading workflow', () => {
+		/**
+		 * These tests verify the workflow where a list item is first
+		 * converted to a paragraph, then setHeadingLevel is called.
+		 * This simulates the LineTypeMenu behavior in MarkdownEditor.vue.
+		 */
+		beforeEach(() => {
+			onContentChange = vi.fn();
+		});
+
+		it('setHeadingLevel works on paragraph created from list item', () => {
+			// Start with a list, manually convert to paragraph, then apply heading
+			editor = createTestEditor('<p>Former list item</p>');
+			const headings = createHeadings();
+			editor.setCursorInBlock(0, 0);
+
+			headings.setHeadingLevel(1);
+
+			expect(editor.getHtml()).toBe('<h1>Former list item</h1>');
+			expect(onContentChange).toHaveBeenCalled();
+		});
+
+		it('setHeadingLevel with level 0 keeps paragraph', () => {
+			editor = createTestEditor('<p>Test paragraph</p>');
+			const headings = createHeadings();
+			editor.setCursorInBlock(0, 0);
+
+			// Setting level 0 should keep it as paragraph
+			headings.setHeadingLevel(0);
+
+			expect(editor.getHtml()).toBe('<p>Test paragraph</p>');
+			// Not called because already at level 0
+			expect(onContentChange).not.toHaveBeenCalled();
+		});
+
+		it('converts to all heading levels correctly after list-to-paragraph', () => {
+			const testCases = [
+				{ level: 1, tag: 'h1' },
+				{ level: 2, tag: 'h2' },
+				{ level: 3, tag: 'h3' },
+				{ level: 4, tag: 'h4' },
+				{ level: 5, tag: 'h5' },
+				{ level: 6, tag: 'h6' },
+			];
+
+			for (const { level, tag } of testCases) {
+				editor = createTestEditor('<p>Test content</p>');
+				const headings = createHeadings();
+				editor.setCursorInBlock(0, 0);
+
+				headings.setHeadingLevel(level as 0 | 1 | 2 | 3 | 4 | 5 | 6);
+
+				expect(editor.getHtml()).toBe(`<${tag}>Test content</${tag}>`);
+			}
+		});
+	});
 });

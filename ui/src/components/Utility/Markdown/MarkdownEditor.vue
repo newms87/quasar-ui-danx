@@ -225,7 +225,18 @@ function onLineTypeChange(type: LineType): void {
   // Handle heading/paragraph types
   const level = LINE_TYPE_TO_LEVEL[type];
   if (level !== undefined) {
-    editor.headings.setHeadingLevel(level as 0 | 1 | 2 | 3 | 4 | 5 | 6);
+    // If currently in a list, first convert the list item to paragraph
+    const listType = editor.lists.getCurrentListType();
+    if (listType) {
+      editor.lists.convertCurrentListItemToParagraph();
+    }
+
+    // Now apply the heading level (0 = paragraph, 1-6 = heading)
+    // Only set heading if level > 0 (paragraph is already the result of list conversion)
+    if (level > 0) {
+      editor.headings.setHeadingLevel(level as 1 | 2 | 3 | 4 | 5 | 6);
+    }
+
     // Update the tracked level immediately
     currentHeadingLevel.value = level;
     currentListType.value = null;

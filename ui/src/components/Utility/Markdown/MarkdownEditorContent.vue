@@ -8,6 +8,7 @@
     @input="$emit('input')"
     @keydown="$emit('keydown', $event)"
     @blur="$emit('blur')"
+    @click="handleClick"
     v-html="html"
   />
 </template>
@@ -33,6 +34,45 @@ defineEmits<{
 }>();
 
 const containerRef = ref<HTMLElement | null>(null);
+
+/**
+ * Find the anchor element if the click target is inside one
+ */
+function findLinkAncestor(node: Node | null): HTMLAnchorElement | null {
+  if (!node || !containerRef.value) return null;
+
+  let current: Node | null = node;
+  while (current && current !== containerRef.value) {
+    if (current.nodeType === Node.ELEMENT_NODE && (current as Element).tagName === "A") {
+      return current as HTMLAnchorElement;
+    }
+    current = current.parentNode;
+  }
+
+  return null;
+}
+
+/**
+ * Handle clicks in the editor content.
+ * Ctrl+Click (or Cmd+Click on Mac) opens links in a new tab.
+ */
+function handleClick(event: MouseEvent): void {
+  // Check if Ctrl (Windows/Linux) or Cmd (Mac) is held
+  const isModifierHeld = event.ctrlKey || event.metaKey;
+  if (!isModifierHeld) return;
+
+  // Find if the click was on or inside a link
+  const link = findLinkAncestor(event.target as Node);
+  if (!link) return;
+
+  const href = link.getAttribute("href");
+  if (!href) return;
+
+  // Prevent default behavior and open the link in a new tab
+  event.preventDefault();
+  event.stopPropagation();
+  window.open(href, "_blank", "noopener,noreferrer");
+}
 
 const isEmpty = computed(() => {
   return !props.html || props.html === "<p></p>" || props.html === "<p><br></p>";
@@ -82,6 +122,36 @@ defineExpose({ containerRef });
 
   // Caret color
   caret-color: #d4d4d4;
+
+  // Link styling - show pointer cursor and hint for Ctrl+Click
+  a {
+    cursor: pointer;
+    position: relative;
+
+    &:hover::after {
+      content: "Ctrl+Click to open";
+      position: absolute;
+      bottom: 100%;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #374151;
+      color: #d1d5db;
+      padding: 0.25rem 0.5rem;
+      border-radius: 0.25rem;
+      font-size: 0.75rem;
+      white-space: nowrap;
+      z-index: 10;
+      pointer-events: none;
+      opacity: 0;
+      animation: fadeIn 0.2s ease 0.5s forwards;
+    }
+  }
+
+  @keyframes fadeIn {
+    to {
+      opacity: 1;
+    }
+  }
 
   // Alternating styles for nested ordered lists
   // Level 1: decimal (1, 2, 3)

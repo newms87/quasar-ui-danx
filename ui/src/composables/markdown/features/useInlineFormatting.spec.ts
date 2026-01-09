@@ -574,6 +574,119 @@ describe("useInlineFormatting", () => {
 		});
 	});
 
+	describe("format merging (prevents nested same-type tags)", () => {
+		beforeEach(() => {
+			onContentChange = vi.fn();
+		});
+
+		it("merges highlight when selecting text containing highlighted portion", () => {
+			// User has: some ==highlighted== text
+			// User selects entire line and presses Ctrl+Shift+H
+			// Expected: <mark>some highlighted text</mark> (merged, not nested)
+			editor = createTestEditor("<p>some <mark>highlighted</mark> text</p>");
+			const formatting = createFormatting();
+			editor.selectInBlock(0, 0, 21); // Select "some highlighted text"
+
+			formatting.toggleHighlight();
+
+			const html = editor.getHtml();
+			// Should have exactly one mark tag, not nested marks
+			expect(html).toBe("<p><mark>some highlighted text</mark></p>");
+			// Verify no nested marks
+			expect(html.match(/<mark>/g)?.length).toBe(1);
+		});
+
+		it("merges bold when selecting text containing bold portion", () => {
+			editor = createTestEditor("<p>some <strong>bold</strong> text</p>");
+			const formatting = createFormatting();
+			editor.selectInBlock(0, 0, 14); // Select "some bold text"
+
+			formatting.toggleBold();
+
+			const html = editor.getHtml();
+			expect(html).toBe("<p><strong>some bold text</strong></p>");
+			expect(html.match(/<strong>/g)?.length).toBe(1);
+		});
+
+		it("merges italic when selecting text containing italic portion", () => {
+			editor = createTestEditor("<p>some <em>italic</em> text</p>");
+			const formatting = createFormatting();
+			editor.selectInBlock(0, 0, 16); // Select "some italic text"
+
+			formatting.toggleItalic();
+
+			const html = editor.getHtml();
+			expect(html).toBe("<p><em>some italic text</em></p>");
+			expect(html.match(/<em>/g)?.length).toBe(1);
+		});
+
+		it("merges strikethrough when selecting text containing strikethrough portion", () => {
+			editor = createTestEditor("<p>some <del>deleted</del> text</p>");
+			const formatting = createFormatting();
+			editor.selectInBlock(0, 0, 17); // Select "some deleted text"
+
+			formatting.toggleStrikethrough();
+
+			const html = editor.getHtml();
+			expect(html).toBe("<p><del>some deleted text</del></p>");
+			expect(html.match(/<del>/g)?.length).toBe(1);
+		});
+
+		it("merges code when selecting text containing code portion", () => {
+			editor = createTestEditor("<p>some <code>code</code> text</p>");
+			const formatting = createFormatting();
+			editor.selectInBlock(0, 0, 14); // Select "some code text"
+
+			formatting.toggleInlineCode();
+
+			const html = editor.getHtml();
+			expect(html).toBe("<p><code>some code text</code></p>");
+			expect(html.match(/<code>/g)?.length).toBe(1);
+		});
+
+		it("merges underline when selecting text containing underlined portion", () => {
+			editor = createTestEditor("<p>some <u>underlined</u> text</p>");
+			const formatting = createFormatting();
+			editor.selectInBlock(0, 0, 21); // Select "some underlined text"
+
+			formatting.toggleUnderline();
+
+			const html = editor.getHtml();
+			expect(html).toBe("<p><u>some underlined text</u></p>");
+			expect(html.match(/<u>/g)?.length).toBe(1);
+		});
+
+		it("merges multiple same-type formatted portions into one", () => {
+			// Multiple bold sections in selection - wrap the entire content
+			// The inner strong tags should be unwrapped, not nested
+			editor = createTestEditor("<p><strong>bold1</strong> middle <strong>bold2</strong></p>");
+			const formatting = createFormatting();
+			// Select all text content
+			editor.selectInBlock(0, 0, 18); // Select "bold1 middle bold2"
+
+			formatting.toggleBold();
+
+			const html = editor.getHtml();
+			// The result should have exactly one strong tag with merged content
+			// Empty boundary tags should be cleaned up
+			expect(html).toBe("<p><strong>bold1 middle bold2</strong></p>");
+		});
+
+		it("preserves different format types when merging same type", () => {
+			// Bold with italic inside, then wrap all in bold - should merge bold but keep italic
+			editor = createTestEditor("<p>text <strong>bold with <em>italic</em></strong> more</p>");
+			const formatting = createFormatting();
+			editor.selectInBlock(0, 0, 25); // Select all
+
+			formatting.toggleBold();
+
+			const html = editor.getHtml();
+			// Should have one strong tag wrapping everything, with em preserved inside
+			expect(html.match(/<strong>/g)?.length).toBe(1);
+			expect(html).toContain("<em>italic</em>");
+		});
+	});
+
 	describe("return type", () => {
 		beforeEach(() => {
 			onContentChange = vi.fn();

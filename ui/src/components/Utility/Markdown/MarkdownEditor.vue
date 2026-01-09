@@ -34,14 +34,25 @@
       :hotkeys="editor.hotkeyDefinitions.value"
       @close="editor.hideHotkeyHelp"
     />
+
+    <LinkPopover
+      v-if="isLinkPopoverVisible"
+      :position="linkPopoverPosition"
+      :existing-url="linkPopoverExistingUrl"
+      :selected-text="linkPopoverSelectedText"
+      @submit="handleLinkPopoverSubmit"
+      @cancel="handleLinkPopoverCancel"
+    />
   </div>
 </template>
 
 <script setup lang="ts">
 import { computed, onMounted, onUnmounted, ref, watch } from "vue";
+import { ShowLinkPopoverOptions } from "../../../composables/markdown/features/useLinks";
 import { useMarkdownEditor } from "../../../composables/markdown/useMarkdownEditor";
 import HotkeyHelpPopover from "./HotkeyHelpPopover.vue";
 import LineTypeMenu from "./LineTypeMenu.vue";
+import LinkPopover from "./LinkPopover.vue";
 import MarkdownEditorContent from "./MarkdownEditorContent.vue";
 import MarkdownEditorFooter from "./MarkdownEditorFooter.vue";
 import type { LineType } from "./types";
@@ -75,13 +86,54 @@ const menuContainerRef = ref<HTMLElement | null>(null);
 // Get the actual HTMLElement from the content component
 const contentElementRef = computed(() => contentRef.value?.containerRef || null);
 
+// Link popover state
+const isLinkPopoverVisible = ref(false);
+const linkPopoverPosition = ref({ x: 0, y: 0 });
+const linkPopoverExistingUrl = ref<string | undefined>(undefined);
+const linkPopoverSelectedText = ref<string | undefined>(undefined);
+let linkPopoverOnSubmit: ((url: string, label?: string) => void) | null = null;
+let linkPopoverOnCancel: (() => void) | null = null;
+
+/**
+ * Handle showing the link popover
+ */
+function handleShowLinkPopover(options: ShowLinkPopoverOptions): void {
+  linkPopoverPosition.value = options.position;
+  linkPopoverExistingUrl.value = options.existingUrl;
+  linkPopoverSelectedText.value = options.selectedText;
+  linkPopoverOnSubmit = options.onSubmit;
+  linkPopoverOnCancel = options.onCancel;
+  isLinkPopoverVisible.value = true;
+}
+
+/**
+ * Handle link popover submit
+ */
+function handleLinkPopoverSubmit(url: string, label?: string): void {
+  isLinkPopoverVisible.value = false;
+  if (linkPopoverOnSubmit) {
+    linkPopoverOnSubmit(url, label);
+  }
+}
+
+/**
+ * Handle link popover cancel
+ */
+function handleLinkPopoverCancel(): void {
+  isLinkPopoverVisible.value = false;
+  if (linkPopoverOnCancel) {
+    linkPopoverOnCancel();
+  }
+}
+
 // Initialize the markdown editor composable
 const editor = useMarkdownEditor({
   contentRef: contentElementRef,
   initialValue: props.modelValue,
   onEmitValue: (markdown: string) => {
     emit("update:modelValue", markdown);
-  }
+  },
+  onShowLinkPopover: handleShowLinkPopover
 });
 
 // Track current heading level for LineTypeMenu

@@ -247,6 +247,11 @@ function processNode(node: Node, getCodeBlockById?: CodeBlockLookup): string {
 					parts.push(`==${processInlineContent(element)}==`);
 					break;
 
+				// Underline (no markdown equivalent, preserve as HTML)
+				case "u":
+					parts.push(`<u>${processInlineContent(element)}</u>`);
+					break;
+
 				// Superscript
 				case "sup":
 					parts.push(`^${processInlineContent(element)}^`);
@@ -330,6 +335,9 @@ function processInlineContent(element: Element): string {
 					break;
 				case "mark":
 					parts.push(`==${processInlineContent(el)}==`);
+					break;
+				case "u":
+					parts.push(`<u>${processInlineContent(el)}</u>`);
 					break;
 				case "sup":
 					parts.push(`^${processInlineContent(el)}^`);

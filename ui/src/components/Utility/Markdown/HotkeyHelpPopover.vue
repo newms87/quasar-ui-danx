@@ -54,11 +54,12 @@ interface HotkeyGroupDisplay {
 const GROUP_LABELS: Record<HotkeyGroup, string> = {
   headings: "Headings",
   formatting: "Formatting",
+  lists: "Lists",
   blocks: "Blocks",
   other: "Other"
 };
 
-const GROUP_ORDER: HotkeyGroup[] = ["headings", "formatting", "blocks", "other"];
+const GROUP_ORDER: HotkeyGroup[] = ["headings", "formatting", "lists", "blocks", "other"];
 
 const props = defineProps<HotkeyHelpPopoverProps>();
 

@@ -2,10 +2,12 @@ import { computed, nextTick, Ref, ref } from "vue";
 import { HotkeyDefinition, useMarkdownHotkeys } from "./useMarkdownHotkeys";
 import { useMarkdownSelection } from "./useMarkdownSelection";
 import { useMarkdownSync } from "./useMarkdownSync";
+import { useBlockquotes } from "./features/useBlockquotes";
 import { useCodeBlocks } from "./features/useCodeBlocks";
 import { useCodeBlockManager } from "./features/useCodeBlockManager";
 import { useHeadings } from "./features/useHeadings";
 import { useInlineFormatting } from "./features/useInlineFormatting";
+import { ShowLinkPopoverOptions, useLinks } from "./features/useLinks";
 import { useLists } from "./features/useLists";
 
 /**
@@ -15,6 +17,8 @@ export interface UseMarkdownEditorOptions {
 	contentRef: Ref<HTMLElement | null>;
 	initialValue: string;
 	onEmitValue: (markdown: string) => void;
+	/** Callback to show the link popover UI */
+	onShowLinkPopover?: (options: ShowLinkPopoverOptions) => void;
 }
 
 /**
@@ -37,6 +41,9 @@ export interface UseMarkdownEditorReturn {
 	// For external value updates
 	setMarkdown: (markdown: string) => void;
 
+	// Formatting actions
+	insertHorizontalRule: () => void;
+
 	// Hotkey help
 	showHotkeyHelp: () => void;
 	hideHotkeyHelp: () => void;
@@ -45,9 +52,11 @@ export interface UseMarkdownEditorReturn {
 	// Feature access (for custom hotkey registration)
 	headings: ReturnType<typeof useHeadings>;
 	inlineFormatting: ReturnType<typeof useInlineFormatting>;
+	links: ReturnType<typeof useLinks>;
 	lists: ReturnType<typeof useLists>;
 	codeBlocks: ReturnType<typeof useCodeBlocks>;
 	codeBlockManager: ReturnType<typeof useCodeBlockManager>;
+	blockquotes: ReturnType<typeof useBlockquotes>;
 }
 
 /**
@@ -55,7 +64,7 @@ export interface UseMarkdownEditorReturn {
  * Composes selection, sync, hotkeys, and feature composables
  */
 export function useMarkdownEditor(options: UseMarkdownEditorOptions): UseMarkdownEditorReturn {
-	const { contentRef, initialValue, onEmitValue } = options;
+	const { contentRef, initialValue, onEmitValue, onShowLinkPopover } = options;
 
 	// State
 	const isShowingHotkeyHelp = ref(false);
@@ -119,6 +128,23 @@ export function useMarkdownEditor(options: UseMarkdownEditorOptions): UseMarkdow
 		onContentChange: () => {
 			sync.debouncedSyncFromHtml();
 		}
+	});
+
+	// Initialize blockquotes feature
+	const blockquotes = useBlockquotes({
+		contentRef,
+		onContentChange: () => {
+			sync.debouncedSyncFromHtml();
+		}
+	});
+
+	// Initialize links feature
+	const links = useLinks({
+		contentRef,
+		onContentChange: () => {
+			sync.debouncedSyncFromHtml();
+		},
+		onShowLinkPopover
 	});
 
 	/**
@@ -327,6 +353,20 @@ export function useMarkdownEditor(options: UseMarkdownEditorOptions): UseMarkdow
 			group: "formatting"
 		});
 
+		hotkeys.registerHotkey({
+			key: "ctrl+shift+h",
+			action: () => inlineFormatting.toggleHighlight(),
+			description: "Highlight",
+			group: "formatting"
+		});
+
+		hotkeys.registerHotkey({
+			key: "ctrl+u",
+			action: () => inlineFormatting.toggleUnderline(),
+			description: "Underline",
+			group: "formatting"
+		});
+
 		// === Heading Hotkeys (Ctrl+0 through Ctrl+6) ===
 		// These use wrapper functions that handle list items by converting to paragraph first
 		hotkeys.registerHotkey({
@@ -418,6 +458,30 @@ export function useMarkdownEditor(options: UseMarkdownEditorOptions): UseMarkdow
 			group: "formatting"
 		});
 
+		// === Blockquote Hotkeys ===
+		hotkeys.registerHotkey({
+			key: "ctrl+shift+q",
+			action: () => blockquotes.toggleBlockquote(),
+			description: "Toggle blockquote",
+			group: "formatting"
+		});
+
+		// === Horizontal Rule Hotkey ===
+		hotkeys.registerHotkey({
+			key: "ctrl+enter",
+			action: () => insertHorizontalRule(),
+			description: "Insert horizontal rule",
+			group: "formatting"
+		});
+
+		// === Link Hotkeys ===
+		hotkeys.registerHotkey({
+			key: "ctrl+k",
+			action: () => links.insertLink(),
+			description: "Insert/edit link",
+			group: "formatting"
+		});
+
 		// Help hotkey (Ctrl+? is handled specially in handleKeyDown)
 		// This registration is for the help display list
 		hotkeys.registerHotkey({
@@ -429,15 +493,7 @@ export function useMarkdownEditor(options: UseMarkdownEditorOptions): UseMarkdow
 			group: "other"
 		});
 
-		// Code block exit hotkey (handled by CodeViewer, this is for help display)
-		hotkeys.registerHotkey({
-			key: "ctrl+enter",
-			action: () => {
-				// Handled by CodeViewer's onKeyDown
-			},
-			description: "Exit code block",
-			group: "formatting"
-		});
+		// Note: Code block exit (Ctrl+Enter inside code blocks) is handled by CodeViewer's onKeyDown
 
 		// Code block language cycle hotkey (handled by CodeViewer, this is for help display)
 		hotkeys.registerHotkey({
@@ -448,6 +504,86 @@ export function useMarkdownEditor(options: UseMarkdownEditorOptions): UseMarkdow
 			description: "Cycle code block language",
 			group: "formatting"
 		});
+	}
+
+	/**
+	 * Insert a horizontal rule after the current block element
+	 * Creates an <hr> element followed by a new paragraph for continued editing
+	 */
+	function insertHorizontalRule(): void {
+		if (!contentRef.value) return;
+
+		const sel = window.getSelection();
+		if (!sel || sel.rangeCount === 0) return;
+
+		// Find the current block element containing the cursor
+		let node: Node | null = sel.getRangeAt(0).startContainer;
+		let blockElement: HTMLElement | null = null;
+
+		// Walk up to find a block-level element
+		while (node && node !== contentRef.value) {
+			const element = node as HTMLElement;
+			const tagName = element.tagName?.toUpperCase();
+
+			// Check if this is a block element (p, h1-h6, li, blockquote, etc.)
+			if (tagName === "P" || /^H[1-6]$/.test(tagName) || tagName === "LI" || tagName === "BLOCKQUOTE") {
+				blockElement = element;
+				break;
+			}
+
+			// Also check for code block wrapper
+			if (element.hasAttribute?.("data-code-block-id")) {
+				blockElement = element;
+				break;
+			}
+
+			node = element.parentElement;
+		}
+
+		// If no block element found, use the contentRef itself as reference
+		const insertAfter = blockElement || contentRef.value.lastElementChild;
+
+		if (!insertAfter) {
+			// Empty editor - just add hr and paragraph
+			const hr = document.createElement("hr");
+			const p = document.createElement("p");
+			p.appendChild(document.createElement("br"));
+			contentRef.value.appendChild(hr);
+			contentRef.value.appendChild(p);
+		} else {
+			// Insert hr after the current block
+			const hr = document.createElement("hr");
+			const p = document.createElement("p");
+			p.appendChild(document.createElement("br"));
+
+			// Insert after the block element (or its parent list if in a list item)
+			let insertionPoint: Element = insertAfter;
+			if (insertAfter.tagName?.toUpperCase() === "LI") {
+				// If in a list item, insert after the entire list
+				const parentList = insertAfter.closest("ul, ol");
+				if (parentList) {
+					insertionPoint = parentList;
+				}
+			}
+
+			insertionPoint.parentNode?.insertBefore(hr, insertionPoint.nextSibling);
+			hr.parentNode?.insertBefore(p, hr.nextSibling);
+		}
+
+		// Position cursor in the new paragraph
+		nextTick(() => {
+			const newParagraph = contentRef.value?.querySelector("hr + p");
+			if (newParagraph) {
+				const range = document.createRange();
+				range.selectNodeContents(newParagraph);
+				range.collapse(true);
+				const newSel = window.getSelection();
+				newSel?.removeAllRanges();
+				newSel?.addRange(range);
+			}
+		});
+
+		sync.debouncedSyncFromHtml();
 	}
 
 	/**
@@ -763,6 +899,9 @@ export function useMarkdownEditor(options: UseMarkdownEditorOptions): UseMarkdow
 		// External value updates
 		setMarkdown,
 
+		// Formatting actions
+		insertHorizontalRule,
+
 		// Hotkey help
 		showHotkeyHelp,
 		hideHotkeyHelp,
@@ -771,8 +910,10 @@ export function useMarkdownEditor(options: UseMarkdownEditorOptions): UseMarkdow
 		// Feature access
 		headings,
 		inlineFormatting,
+		links,
 		lists,
 		codeBlocks,
-		codeBlockManager
+		codeBlockManager,
+		blockquotes
 	};
 }

@@ -20,6 +20,10 @@ export interface UseInlineFormattingReturn {
 	toggleStrikethrough: () => void;
 	/** Toggle inline code formatting on selection */
 	toggleInlineCode: () => void;
+	/** Toggle highlight formatting on selection */
+	toggleHighlight: () => void;
+	/** Toggle underline formatting on selection */
+	toggleUnderline: () => void;
 }
 
 /**
@@ -29,7 +33,9 @@ const FORMAT_TAGS = {
 	bold: { tag: "STRONG", fallback: "B" },
 	italic: { tag: "EM", fallback: "I" },
 	strikethrough: { tag: "DEL", fallback: "S" },
-	code: { tag: "CODE", fallback: null }
+	code: { tag: "CODE", fallback: null },
+	highlight: { tag: "MARK", fallback: null },
+	underline: { tag: "U", fallback: null }
 } as const;
 
 type FormatType = keyof typeof FORMAT_TAGS;
@@ -211,6 +217,56 @@ export function useInlineFormatting(options: UseInlineFormattingOptions): UseInl
 	}
 
 	/**
+	 * Unwrap all existing formatting elements of the same type within a node tree.
+	 * This prevents nested formatting like <mark><mark>text</mark></mark>.
+	 */
+	function unwrapExistingFormat(container: Node, tagName: string): void {
+		// Handle both Element and DocumentFragment (from extractContents)
+		if (container.nodeType === Node.ELEMENT_NODE || container.nodeType === Node.DOCUMENT_FRAGMENT_NODE) {
+			// Use a temporary div to enable querySelectorAll on DocumentFragment
+			const wrapper = document.createElement("div");
+			while (container.firstChild) {
+				wrapper.appendChild(container.firstChild);
+			}
+
+			// Find all matching elements
+			const matchingElements = Array.from(wrapper.querySelectorAll(tagName));
+
+			// Unwrap each matching element (replace with its children)
+			for (const el of matchingElements) {
+				const parent = el.parentNode;
+				if (parent) {
+					while (el.firstChild) {
+						parent.insertBefore(el.firstChild, el);
+					}
+					parent.removeChild(el);
+				}
+			}
+
+			// Move content back to original container
+			while (wrapper.firstChild) {
+				container.appendChild(wrapper.firstChild);
+			}
+		}
+	}
+
+	/**
+	 * Remove empty formatting elements from a parent node
+	 */
+	function removeEmptyElements(parent: Node, tagName: string): void {
+		if (parent.nodeType === Node.ELEMENT_NODE) {
+			const element = parent as Element;
+			// Find all matching elements that have no meaningful content
+			const emptyElements = Array.from(element.querySelectorAll(tagName)).filter(
+				el => !el.textContent?.trim()
+			);
+			for (const el of emptyElements) {
+				el.parentNode?.removeChild(el);
+			}
+		}
+	}
+
+	/**
 	 * Wrap the current selection with a formatting tag
 	 */
 	function wrapSelection(range: Range, tagName: string): void {
@@ -219,10 +275,23 @@ export function useInlineFormatting(options: UseInlineFormattingOptions): UseInl
 
 		// Extract the selected content and wrap it
 		const contents = range.extractContents();
+
+		// Unwrap any existing formatting of the same type to prevent nesting
+		unwrapExistingFormat(contents, tagName);
+
 		formatElement.appendChild(contents);
 
 		// Insert the wrapped content
 		range.insertNode(formatElement);
+
+		// Clean up empty elements left behind by extractContents
+		const parentBlock = formatElement.parentElement;
+		if (parentBlock) {
+			removeEmptyElements(parentBlock, tagName);
+		}
+
+		// Normalize to merge adjacent text nodes
+		formatElement.normalize();
 
 		// Select the newly formatted content
 		const newRange = document.createRange();
@@ -271,6 +340,10 @@ export function useInlineFormatting(options: UseInlineFormattingOptions): UseInl
 				return "strikethrough text";
 			case "code":
 				return "code";
+			case "highlight":
+				return "highlighted text";
+			case "underline":
+				return "underlined text";
 			default:
 				return "text";
 		}
@@ -304,10 +377,26 @@ export function useInlineFormatting(options: UseInlineFormattingOptions): UseInl
 		toggleFormat("code");
 	}
 
+	/**
+	 * Toggle highlight formatting (Ctrl+Shift+H)
+	 */
+	function toggleHighlight(): void {
+		toggleFormat("highlight");
+	}
+
+	/**
+	 * Toggle underline formatting (Ctrl+U)
+	 */
+	function toggleUnderline(): void {
+		toggleFormat("underline");
+	}
+
 	return {
 		toggleBold,
 		toggleItalic,
 		toggleStrikethrough,
-		toggleInlineCode
+		toggleInlineCode,
+		toggleHighlight,
+		toggleUnderline
 	};
 }

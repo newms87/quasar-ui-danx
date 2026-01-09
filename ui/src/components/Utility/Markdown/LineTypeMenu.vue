@@ -44,7 +44,8 @@ const LINE_TYPE_OPTIONS: LineTypeOption[] = [
   { value: "h6", label: "Heading 6", icon: "H6", shortcut: "Ctrl+6" },
   { value: "ul", label: "Bullet List", icon: "\u2022", shortcut: "Ctrl+Shift+[" },
   { value: "ol", label: "Numbered List", icon: "1.", shortcut: "Ctrl+Shift+]" },
-  { value: "code", label: "Code Block", icon: "</>", shortcut: "Ctrl+Shift+K" }
+  { value: "code", label: "Code Block", icon: "</>", shortcut: "Ctrl+Shift+K" },
+  { value: "blockquote", label: "Blockquote", icon: ">", shortcut: "Ctrl+Shift+Q" }
 ];
 
 const props = defineProps<LineTypeMenuProps>();

@@ -11,6 +11,7 @@
         :format="format"
         :available-formats="availableFormats"
         :toggleable="availableFormats.length > 1"
+        :allow-any-language="allowAnyLanguage"
         @click.stop
         @change="(fmt) => $emit('format-change', fmt)"
       />
@@ -25,6 +26,7 @@ defineProps<{
 	preview: string;
 	format: string;
 	availableFormats?: string[];
+	allowAnyLanguage?: boolean;
 }>();
 
 defineEmits<{

@@ -15,6 +15,7 @@
       :preview="collapsedPreview"
       :format="currentFormat"
       :available-formats="currentFormat === 'json' || currentFormat === 'yaml' ? ['json', 'yaml'] : currentFormat === 'text' || currentFormat === 'markdown' ? ['text', 'markdown'] : []"
+      :allow-any-language="allowAnyLanguage"
       @expand="toggleCollapse"
       @format-change="onFormatChange"
     />
@@ -28,9 +29,11 @@
       >
         <!-- Language badge - shows popout format options on hover -->
         <LanguageBadge
+          ref="languageBadgeRef"
           :format="currentFormat"
           :available-formats="currentFormat === 'json' || currentFormat === 'yaml' ? ['json', 'yaml'] : currentFormat === 'text' || currentFormat === 'markdown' ? ['text', 'markdown'] : []"
           :toggleable="true"
+          :allow-any-language="allowAnyLanguage"
           @click.stop
           @change="onFormatChange"
         />
@@ -114,6 +117,7 @@ export interface CodeViewerProps {
 	collapsible?: boolean;
 	defaultCollapsed?: boolean;
 	defaultCodeFormat?: "json" | "yaml";
+	allowAnyLanguage?: boolean;
 }
 
 const props = withDefaults(defineProps<CodeViewerProps>(), {
@@ -144,6 +148,7 @@ const codeFormat = useCodeFormat({
 // Local state
 const currentFormat = ref<CodeFormat>(props.format);
 const codeRef = ref<HTMLPreElement | null>(null);
+const languageBadgeRef = ref<InstanceType<typeof LanguageBadge> | null>(null);
 
 // Collapsed state (for collapsible mode)
 const isCollapsed = ref(props.collapsible && props.defaultCollapsed);
@@ -171,7 +176,8 @@ const editor = useCodeViewerEditor({
 	onEmitEditable: (editable) => emit("update:editable", editable),
 	onEmitFormat: (format) => onFormatChange(format),
 	onExit: () => emit("exit"),
-	onDelete: () => emit("delete")
+	onDelete: () => emit("delete"),
+	onOpenLanguageSearch: () => languageBadgeRef.value?.openSearchPanel()
 });
 
 // Sync composable format with current format and update editor content

@@ -180,6 +180,7 @@ export function useCodeBlockManager(options: UseCodeBlockManagerOptions): UseCod
 					format: computedFormat.value,
 					canEdit: true,
 					editable: true,
+					allowAnyLanguage: true,
 					class: "code-block-island",
 					"onUpdate:modelValue": onUpdateModelValue,
 					"onUpdate:format": onUpdateFormat,

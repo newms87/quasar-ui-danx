@@ -16,6 +16,8 @@ export interface UseCodeViewerEditorOptions {
 	onExit?: () => void;
 	/** Callback when user wants to delete the code block (Backspace/Delete on empty) */
 	onDelete?: () => void;
+	/** Callback when user wants to open the language search panel (Ctrl+Alt+Shift+L) */
+	onOpenLanguageSearch?: () => void;
 }
 
 export interface UseCodeViewerEditorReturn {
@@ -193,7 +195,7 @@ function getAvailableFormats(format: CodeFormat): CodeFormat[] {
  * Composable for CodeViewer editor functionality
  */
 export function useCodeViewerEditor(options: UseCodeViewerEditorOptions): UseCodeViewerEditorReturn {
-	const { codeRef, codeFormat, currentFormat, canEdit, editable, onEmitModelValue, onEmitEditable, onEmitFormat, onExit, onDelete } = options;
+	const { codeRef, codeFormat, currentFormat, canEdit, editable, onEmitModelValue, onEmitEditable, onEmitFormat, onExit, onDelete, onOpenLanguageSearch } = options;
 
 	// Debounce timeout handles
 	let validationTimeout: ReturnType<typeof setTimeout> | null = null;
@@ -381,15 +383,22 @@ export function useCodeViewerEditor(options: UseCodeViewerEditorOptions): UseCod
 
 	// Handle keyboard shortcuts (some work in any mode, some only in edit mode)
 	function onKeyDown(event: KeyboardEvent): void {
-		// Ctrl/Cmd + Alt + L - cycle through available formats/languages
-		// This should work even when not in edit mode
+		// Check for Ctrl/Cmd + Alt + L combinations (with or without Shift)
+		// These should work even when not in edit mode
 		const isCtrlAltL = (event.ctrlKey || event.metaKey) && event.altKey && event.key.toLowerCase() === "l";
 
 		if (isCtrlAltL) {
 			event.preventDefault();
 			event.stopPropagation();
 
-			if (onEmitFormat) {
+			// Ctrl/Cmd + Alt + Shift + L - open language search panel
+			if (event.shiftKey && onOpenLanguageSearch) {
+				onOpenLanguageSearch();
+				return;
+			}
+
+			// Ctrl/Cmd + Alt + L (without Shift) - cycle through available formats/languages
+			if (!event.shiftKey && onEmitFormat) {
 				const availableFormats = getAvailableFormats(currentFormat.value);
 				if (availableFormats.length > 1) {
 					const currentIndex = availableFormats.indexOf(currentFormat.value);

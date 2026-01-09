@@ -344,12 +344,10 @@ watch(
   }
 );
 
-// Ensure content is synced on mount
-onMounted(() => {
-  if (props.modelValue) {
-    editor.setMarkdown(props.modelValue);
-  }
-});
+// NOTE: Content is already initialized in useMarkdownEditor with initialValue.
+// The v-html binding renders it, and the MutationObserver mounts CodeViewers.
+// Calling setMarkdown again here would replace the DOM and cause race conditions
+// with CodeViewer mounting. Only call setMarkdown for external value changes.
 
 // Expose the editor for parent components that may need access
 defineExpose({

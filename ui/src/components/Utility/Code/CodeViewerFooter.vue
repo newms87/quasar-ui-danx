@@ -26,13 +26,13 @@
       @click="$emit('toggle-edit')"
     >
       <EditIcon class="w-3.5 h-3.5" />
-      <QTooltip>{{ isEditing ? 'Exit edit mode' : 'Edit content' }}</QTooltip>
     </QBtn>
   </div>
 </template>
 
 <script setup lang="ts">
 import { FaSolidPencil as EditIcon } from "danx-icon";
+import { QBtn } from "quasar";
 import { computed } from "vue";
 import { ValidationError } from "../../../composables/useCodeFormat";
 

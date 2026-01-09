@@ -21,7 +21,11 @@
 
     <!-- Expanded view - full code viewer -->
     <template v-else>
-      <div class="code-wrapper relative flex flex-col flex-1 min-h-0">
+      <div
+        class="code-wrapper relative flex flex-col flex-1 min-h-0"
+        tabindex="0"
+        @keydown="editor.onKeyDown"
+      >
         <!-- Language badge - shows popout format options on hover -->
         <LanguageBadge
           :format="currentFormat"
@@ -127,6 +131,8 @@ const emit = defineEmits<{
 	"update:modelValue": [value: object | string | null];
 	"update:format": [format: CodeFormat];
 	"update:editable": [editable: boolean];
+	"exit": [];
+	"delete": [];
 }>();
 
 // Initialize composable with current props
@@ -154,9 +160,25 @@ function toggleCollapse() {
 	isCollapsed.value = !isCollapsed.value;
 }
 
-// Sync composable format with current format
+// Initialize editor composable
+const editor = useCodeViewerEditor({
+	codeRef,
+	codeFormat,
+	currentFormat,
+	canEdit: toRef(props, "canEdit"),
+	editable: toRef(props, "editable"),
+	onEmitModelValue: (value) => emit("update:modelValue", value),
+	onEmitEditable: (editable) => emit("update:editable", editable),
+	onEmitFormat: (format) => onFormatChange(format),
+	onExit: () => emit("exit"),
+	onDelete: () => emit("delete")
+});
+
+// Sync composable format with current format and update editor content
 watch(currentFormat, (newFormat) => {
 	codeFormat.setFormat(newFormat);
+	// Update editor content when format changes (needed for syntax re-highlighting)
+	editor.updateEditingContentOnFormatChange();
 });
 
 // Watch for external format changes
@@ -168,17 +190,6 @@ watch(() => props.format, (newFormat) => {
 watch(() => props.modelValue, () => {
 	codeFormat.setValue(props.modelValue);
 	editor.syncEditingContentFromValue();
-});
-
-// Initialize editor composable
-const editor = useCodeViewerEditor({
-	codeRef,
-	codeFormat,
-	currentFormat,
-	canEdit: toRef(props, "canEdit"),
-	editable: toRef(props, "editable"),
-	onEmitModelValue: (value) => emit("update:modelValue", value),
-	onEmitEditable: (editable) => emit("update:editable", editable)
 });
 
 // Sync internal editable state with prop
@@ -198,7 +209,7 @@ const { collapsedPreview } = useCodeViewerCollapse({
 function onFormatChange(newFormat: CodeFormat) {
 	currentFormat.value = newFormat;
 	emit("update:format", newFormat);
-	editor.updateEditingContentOnFormatChange();
+	// Note: editor.updateEditingContentOnFormatChange() is called by the currentFormat watcher
 }
 
 // Get the raw markdown content for MarkdownContent component

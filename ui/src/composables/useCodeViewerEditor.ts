@@ -10,6 +10,12 @@ export interface UseCodeViewerEditorOptions {
 	editable: Ref<boolean>;
 	onEmitModelValue: (value: object | string | null) => void;
 	onEmitEditable: (editable: boolean) => void;
+	/** Callback when format changes (e.g., cycling languages) */
+	onEmitFormat?: (format: CodeFormat) => void;
+	/** Callback when user wants to exit the code block (Ctrl+Enter) */
+	onExit?: () => void;
+	/** Callback when user wants to delete the code block (Backspace/Delete on empty) */
+	onDelete?: () => void;
 }
 
 export interface UseCodeViewerEditorReturn {
@@ -168,10 +174,26 @@ function getSmartIndent(lineInfo: { indent: string; lineContent: string }, forma
 }
 
 /**
+ * Get available formats that can be cycled through based on current format.
+ * YAML/JSON formats cycle between each other only.
+ * Text/Markdown formats cycle between each other only.
+ * Other formats don't cycle.
+ */
+function getAvailableFormats(format: CodeFormat): CodeFormat[] {
+	if (format === "json" || format === "yaml") {
+		return ["yaml", "json"];
+	}
+	if (format === "text" || format === "markdown") {
+		return ["text", "markdown"];
+	}
+	return [format];
+}
+
+/**
  * Composable for CodeViewer editor functionality
  */
 export function useCodeViewerEditor(options: UseCodeViewerEditorOptions): UseCodeViewerEditorReturn {
-	const { codeRef, codeFormat, currentFormat, canEdit, editable, onEmitModelValue, onEmitEditable } = options;
+	const { codeRef, codeFormat, currentFormat, canEdit, editable, onEmitModelValue, onEmitEditable, onEmitFormat, onExit, onDelete } = options;
 
 	// Debounce timeout handles
 	let validationTimeout: ReturnType<typeof setTimeout> | null = null;
@@ -231,10 +253,18 @@ export function useCodeViewerEditor(options: UseCodeViewerEditorOptions): UseCod
 		}
 	}
 
-	// Update editing content when format changes
+	// Update editing content when format changes and re-apply syntax highlighting
 	function updateEditingContentOnFormatChange(): void {
 		if (isEditing.value) {
 			editingContent.value = codeFormat.formattedContent.value;
+			// Update the cached highlighted content with new format
+			cachedHighlightedContent.value = highlightSyntax(editingContent.value, { format: currentFormat.value });
+			// Re-apply syntax highlighting with new format in the DOM
+			nextTick(() => {
+				if (codeRef.value) {
+					codeRef.value.innerHTML = cachedHighlightedContent.value;
+				}
+			});
 		}
 	}
 
@@ -256,6 +286,10 @@ export function useCodeViewerEditor(options: UseCodeViewerEditorOptions): UseCod
 		highlightTimeout = setTimeout(() => {
 			if (!codeRef.value || !isEditing.value) return;
 
+			// Check if document has active focus on the codeRef before replacing innerHTML
+			const activeElement = document.activeElement;
+			const hasFocus = activeElement === codeRef.value || codeRef.value.contains(activeElement);
+
 			// Save cursor position
 			const cursorOffset = getCursorOffset(codeRef.value);
 
@@ -264,6 +298,12 @@ export function useCodeViewerEditor(options: UseCodeViewerEditorOptions): UseCod
 
 			// Restore cursor position
 			setCursorOffset(codeRef.value, cursorOffset);
+
+			// Ensure the element maintains focus after innerHTML replacement
+			// This is important because innerHTML replacement can cause focus loss
+			if (hasFocus && document.activeElement !== codeRef.value) {
+				codeRef.value.focus();
+			}
 		}, 300);
 	}
 
@@ -339,31 +379,109 @@ export function useCodeViewerEditor(options: UseCodeViewerEditorOptions): UseCod
 		}
 	}
 
-	// Handle keyboard shortcuts in edit mode
+	// Handle keyboard shortcuts (some work in any mode, some only in edit mode)
 	function onKeyDown(event: KeyboardEvent): void {
+		// Ctrl/Cmd + Alt + L - cycle through available formats/languages
+		// This should work even when not in edit mode
+		const isCtrlAltL = (event.ctrlKey || event.metaKey) && event.altKey && event.key.toLowerCase() === "l";
+
+		if (isCtrlAltL) {
+			event.preventDefault();
+			event.stopPropagation();
+
+			if (onEmitFormat) {
+				const availableFormats = getAvailableFormats(currentFormat.value);
+				if (availableFormats.length > 1) {
+					const currentIndex = availableFormats.indexOf(currentFormat.value);
+					const nextIndex = (currentIndex + 1) % availableFormats.length;
+					const nextFormat = availableFormats[nextIndex];
+					onEmitFormat(nextFormat);
+				}
+			}
+			return;
+		}
+
+		// All other shortcuts require edit mode
 		if (!isEditing.value) return;
+
+		// Backspace/Delete on empty content - delete the code block
+		if ((event.key === "Backspace" || event.key === "Delete") && onDelete) {
+			const content = editingContent.value.trim();
+			if (content === "") {
+				event.preventDefault();
+				onDelete();
+				return;
+			}
+		}
+
+		// Ctrl/Cmd + Enter - exit the code block immediately
+		if (event.key === "Enter" && (event.ctrlKey || event.metaKey)) {
+			event.preventDefault();
+			if (onExit) {
+				// Emit the current value before exiting
+				const parsed = codeFormat.parse(editingContent.value);
+				if (parsed) {
+					onEmitModelValue(parsed);
+				} else {
+					onEmitModelValue(editingContent.value);
+				}
+				onExit();
+			}
+			return;
+		}
 
 		// Enter key - smart indentation
 		if (event.key === "Enter") {
-			const lineInfo = getCurrentLineInfo(editingContent.value, codeRef.value);
-			if (lineInfo) {
-				event.preventDefault();
-				const smartIndent = getSmartIndent(lineInfo, currentFormat.value);
+			const selection = window.getSelection();
 
-				const selection = window.getSelection();
-				if (selection && selection.rangeCount > 0) {
-					const range = selection.getRangeAt(0);
-					range.deleteContents();
-					const textNode = document.createTextNode("\n" + smartIndent);
-					range.insertNode(textNode);
-					range.setStartAfter(textNode);
-					range.setEndAfter(textNode);
-					selection.removeAllRanges();
-					selection.addRange(range);
-
-					codeRef.value?.dispatchEvent(new Event("input", { bubbles: true }));
+			// If no selection, try to ensure we have one by focusing the element
+			if (!selection || selection.rangeCount === 0) {
+				// Fallback: position cursor at end of content
+				if (codeRef.value) {
+					const range = document.createRange();
+					range.selectNodeContents(codeRef.value);
+					range.collapse(false);
+					selection?.removeAllRanges();
+					selection?.addRange(range);
 				}
 			}
+
+			// Re-check selection - if still none, let browser handle it
+			if (!selection || selection.rangeCount === 0) {
+				return;
+			}
+
+			event.preventDefault();
+
+			// Check if the range is actually valid and positioned within our codeRef
+			let range = selection.getRangeAt(0);
+			const isWithinCodeRef = codeRef.value?.contains(range.startContainer);
+
+			// If selection is not within codeRef, re-create it at the end of content
+			// This can happen after innerHTML replacement in debouncedHighlight
+			if (!isWithinCodeRef && codeRef.value) {
+				range = document.createRange();
+				range.selectNodeContents(codeRef.value);
+				range.collapse(false);
+				selection.removeAllRanges();
+				selection.addRange(range);
+			}
+
+			// IMPORTANT: Always use the DOM's actual content, not editingContent.value
+			// editingContent.value may be stale if isUserEditing is false (e.g., after debounced highlight)
+			const domTextContent = codeRef.value?.innerText || "";
+			const lineInfo = getCurrentLineInfo(domTextContent, codeRef.value);
+			const smartIndent = lineInfo ? getSmartIndent(lineInfo, currentFormat.value) : "";
+
+			range.deleteContents();
+			const textNode = document.createTextNode("\n" + smartIndent);
+			range.insertNode(textNode);
+			range.setStartAfter(textNode);
+			range.setEndAfter(textNode);
+			selection.removeAllRanges();
+			selection.addRange(range);
+
+			codeRef.value?.dispatchEvent(new Event("input", { bubbles: true }));
 		}
 
 		// Tab key - insert spaces instead of moving focus
@@ -384,6 +502,33 @@ export function useCodeViewerEditor(options: UseCodeViewerEditorOptions): UseCod
 			event.preventDefault();
 			onContentEditableBlur();
 		}
+
+		// Ctrl/Cmd + A - select all content within this CodeViewer only
+		if ((event.ctrlKey || event.metaKey) && event.key === "a") {
+			event.preventDefault();
+			event.stopPropagation();
+
+			// Select all content in the current contenteditable element
+			const selection = window.getSelection();
+			if (selection && codeRef.value) {
+				const range = document.createRange();
+				range.selectNodeContents(codeRef.value);
+				selection.removeAllRanges();
+				selection.addRange(range);
+			}
+		}
+	}
+
+	// Initialize editing content when starting in edit mode
+	// This handles the case where editable=true is passed as initial prop
+	if (isEditing.value) {
+		editingContent.value = codeFormat.formattedContent.value;
+		// Set the pre element content after it mounts
+		nextTick(() => {
+			if (codeRef.value) {
+				codeRef.value.innerHTML = highlightSyntax(editingContent.value, { format: currentFormat.value });
+			}
+		});
 	}
 
 	// Cleanup timeouts on unmount

@@ -140,5 +140,26 @@ defineExpose({ containerRef });
       }
     }
   }
+
+  // Code block wrapper styling - distinct background to separate from editor content
+  .code-block-wrapper {
+    background: #0d1117;
+    border-radius: 0.375rem;
+    margin: 0.5rem 0;
+    border: 1px solid #30363d;
+
+    // Override CodeViewer backgrounds to be transparent so wrapper controls it
+    .dx-code-viewer {
+      .code-content {
+        background: transparent;
+        border-radius: 0.375rem 0.375rem 0 0;
+      }
+
+      .code-footer {
+        background: #161b22;
+        border-radius: 0 0 0.375rem 0.375rem;
+      }
+    }
+  }
 }
 </style>

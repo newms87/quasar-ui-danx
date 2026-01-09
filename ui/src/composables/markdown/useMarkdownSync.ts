@@ -1,5 +1,6 @@
 import { onUnmounted, Ref, ref } from "vue";
 import { renderMarkdown } from "../../helpers/formats/markdown";
+import { CodeBlockState } from "./features/useCodeBlocks";
 
 /**
  * Options for useMarkdownSync composable
@@ -8,6 +9,10 @@ export interface UseMarkdownSyncOptions {
 	contentRef: Ref<HTMLElement | null>;
 	onEmitValue: (markdown: string) => void;
 	debounceMs?: number;
+	/** Optional function to look up code block state by ID */
+	getCodeBlockById?: (id: string) => CodeBlockState | undefined;
+	/** Optional function to register a new code block in state */
+	registerCodeBlock?: (id: string, content: string, language: string) => void;
 }
 
 /**
@@ -21,22 +26,85 @@ export interface UseMarkdownSyncReturn {
 	debouncedSyncFromHtml: () => void;
 }
 
+/** Code block state lookup function type */
+type CodeBlockLookup = (id: string) => CodeBlockState | undefined;
+
+/** Code block registration function type */
+type CodeBlockRegister = (id: string, content: string, language: string) => void;
+
+/**
+ * Generate a unique ID for code blocks
+ */
+function generateCodeBlockId(): string {
+	return `cb-${crypto.randomUUID()}`;
+}
+
+/**
+ * Convert <pre><code> elements in HTML string to code block wrapper structure.
+ * This allows CodeBlockManager to mount CodeViewer instances.
+ */
+function convertCodeBlocksToWrappers(html: string, registerCodeBlock?: CodeBlockRegister): string {
+	// Parse the HTML
+	const temp = document.createElement("div");
+	temp.innerHTML = html;
+
+	// Find all <pre> elements (code blocks)
+	const preElements = temp.querySelectorAll("pre");
+
+	for (const pre of Array.from(preElements)) {
+		// Get the code element inside
+		const codeElement = pre.querySelector("code");
+		if (!codeElement) continue;
+
+		// Extract content and language
+		const content = codeElement.textContent || "";
+		const langMatch = codeElement.className.match(/language-(\w+)/);
+		const language = langMatch ? langMatch[1] : "";
+
+		// Generate unique ID
+		const id = generateCodeBlockId();
+
+		// Register in state if callback provided
+		if (registerCodeBlock) {
+			registerCodeBlock(id, content, language);
+		}
+
+		// Create wrapper structure
+		const wrapper = document.createElement("div");
+		wrapper.className = "code-block-wrapper";
+		wrapper.setAttribute("contenteditable", "false");
+		wrapper.setAttribute("data-code-block-id", id);
+
+		// Create mount point for CodeViewer
+		const mountPoint = document.createElement("div");
+		mountPoint.className = "code-viewer-mount-point";
+		mountPoint.setAttribute("data-content", content);
+		mountPoint.setAttribute("data-language", language);
+		wrapper.appendChild(mountPoint);
+
+		// Replace the <pre> with the wrapper
+		pre.parentNode?.replaceChild(wrapper, pre);
+	}
+
+	return temp.innerHTML;
+}
+
 /**
  * Convert HTML back to markdown
  * This handles the reverse conversion from rendered HTML to markdown source
  */
-function htmlToMarkdown(html: string): string {
+function htmlToMarkdown(html: string, getCodeBlockById?: CodeBlockLookup): string {
 	// Create a temporary element to parse the HTML
 	const temp = document.createElement("div");
 	temp.innerHTML = html;
 
-	return processNode(temp);
+	return processNode(temp, getCodeBlockById);
 }
 
 /**
  * Process a DOM node and convert it to markdown
  */
-function processNode(node: Node): string {
+function processNode(node: Node, getCodeBlockById?: CodeBlockLookup): string {
 	const parts: string[] = [];
 
 	for (const child of Array.from(node.childNodes)) {
@@ -45,6 +113,20 @@ function processNode(node: Node): string {
 		} else if (child.nodeType === Node.ELEMENT_NODE) {
 			const element = child as Element;
 			const tagName = element.tagName.toLowerCase();
+
+			// Check for code block wrapper (non-editable island)
+			const codeBlockId = element.getAttribute("data-code-block-id");
+			if (codeBlockId && getCodeBlockById) {
+				const state = getCodeBlockById(codeBlockId);
+				if (state) {
+					const lang = state.language || "";
+					const content = state.content || "";
+					// Strip any trailing zero-width spaces from content
+					const cleanContent = content.replace(/\u200B/g, "");
+					parts.push(`\`\`\`${lang}\n${cleanContent}\n\`\`\`\n\n`);
+					continue;
+				}
+			}
 
 			switch (tagName) {
 				// Headings
@@ -98,19 +180,21 @@ function processNode(node: Node): string {
 					}
 					break;
 
-				// Code blocks
+				// Code blocks (legacy PRE/CODE structure)
 				case "pre": {
 					const codeElement = element.querySelector("code");
 					const code = codeElement?.textContent || element.textContent || "";
+					// Strip zero-width spaces (cursor anchors)
+					const cleanCode = code.replace(/\u200B/g, "");
 					const langClass = codeElement?.className.match(/language-(\w+)/);
 					const lang = langClass ? langClass[1] : "";
-					parts.push(`\`\`\`${lang}\n${code}\n\`\`\`\n\n`);
+					parts.push(`\`\`\`${lang}\n${cleanCode}\n\`\`\`\n\n`);
 					break;
 				}
 
 				// Blockquotes
 				case "blockquote": {
-					const content = processNode(element).trim();
+					const content = processNode(element, getCodeBlockById).trim();
 					const quotedLines = content.split("\n").map(line => `> ${line}`).join("\n");
 					parts.push(`${quotedLines}\n\n`);
 					break;
@@ -173,8 +257,9 @@ function processNode(node: Node): string {
 					parts.push(`~${processInlineContent(element)}~`);
 					break;
 
-				// Divs - treat as paragraphs (browsers create DIVs when pressing Enter)
+				// Divs - could be code block wrappers or regular divs
 				case "div": {
+					// Already handled code block wrappers above
 					const content = processInlineContent(element);
 					// Only add paragraph breaks if div has content
 					if (content.trim()) {
@@ -185,7 +270,7 @@ function processNode(node: Node): string {
 
 				// Spans - inline containers, just process children
 				case "span":
-					parts.push(processNode(element));
+					parts.push(processNode(element, getCodeBlockById));
 					break;
 
 				// Tables
@@ -195,7 +280,7 @@ function processNode(node: Node): string {
 
 				default:
 					// Unknown elements - just get text content
-					parts.push(processNode(element));
+					parts.push(processNode(element, getCodeBlockById));
 			}
 		}
 	}
@@ -392,7 +477,7 @@ function getTextContent(element: Element): string {
  * Composable for bidirectional markdown <-> HTML synchronization
  */
 export function useMarkdownSync(options: UseMarkdownSyncOptions): UseMarkdownSyncReturn {
-	const { contentRef, onEmitValue, debounceMs = 300 } = options;
+	const { contentRef, onEmitValue, debounceMs = 300, getCodeBlockById, registerCodeBlock } = options;
 
 	const renderedHtml = ref("");
 	// Flag to track when changes originate from the editor itself (vs external prop changes)
@@ -401,10 +486,13 @@ export function useMarkdownSync(options: UseMarkdownSyncOptions): UseMarkdownSyn
 	let syncTimeout: ReturnType<typeof setTimeout> | null = null;
 
 	/**
-	 * Convert markdown to HTML and update rendered content
+	 * Convert markdown to HTML and update rendered content.
+	 * Code blocks are converted to wrapper structures for CodeViewer mounting.
 	 */
 	function syncFromMarkdown(markdown: string): void {
-		renderedHtml.value = renderMarkdown(markdown);
+		const baseHtml = renderMarkdown(markdown);
+		// Convert <pre><code> to code block wrappers so CodeBlockManager can mount CodeViewer
+		renderedHtml.value = convertCodeBlocksToWrappers(baseHtml, registerCodeBlock);
 	}
 
 	/**
@@ -414,7 +502,7 @@ export function useMarkdownSync(options: UseMarkdownSyncOptions): UseMarkdownSyn
 		if (!contentRef.value) return;
 
 		const html = contentRef.value.innerHTML;
-		const markdown = htmlToMarkdown(html);
+		const markdown = htmlToMarkdown(html, getCodeBlockById);
 
 		// Clean up extra whitespace
 		const cleaned = markdown.replace(/\n{3,}/g, "\n\n").trim();

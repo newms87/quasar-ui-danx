@@ -1,6 +1,15 @@
-import { Ref } from "vue";
+import { reactive, Ref } from "vue";
 import { UseMarkdownSelectionReturn } from "../useMarkdownSelection";
 import { detectCodeFenceStart } from "../../../helpers/formats/markdown/linePatterns";
+
+/**
+ * Represents a code block's state
+ */
+export interface CodeBlockState {
+	id: string;
+	content: string;
+	language: string;
+}
 
 /**
  * Options for useCodeBlocks composable
@@ -15,6 +24,8 @@ export interface UseCodeBlocksOptions {
  * Return type for useCodeBlocks composable
  */
 export interface UseCodeBlocksReturn {
+	/** Reactive map of all code blocks by ID */
+	codeBlocks: Map<string, CodeBlockState>;
 	/** Toggle code block on current block (Ctrl+Shift+K) */
 	toggleCodeBlock: () => void;
 	/** Check for code fence pattern (```) and convert if matched */
@@ -27,6 +38,29 @@ export interface UseCodeBlocksReturn {
 	setCodeBlockLanguage: (language: string) => void;
 	/** Handle Enter key in code block - returns true if handled */
 	handleCodeBlockEnter: () => boolean;
+	/** Get all code blocks */
+	getCodeBlocks: () => Map<string, CodeBlockState>;
+	/** Update content for a specific code block */
+	updateCodeBlockContent: (id: string, content: string) => void;
+	/** Update language for a specific code block */
+	updateCodeBlockLanguage: (id: string, language: string) => void;
+	/** Remove a code block by ID */
+	removeCodeBlock: (id: string) => void;
+	/** Get code block state by ID */
+	getCodeBlockById: (id: string) => CodeBlockState | undefined;
+	/** Get current code block ID (if cursor is in one) */
+	getCurrentCodeBlockId: () => string | null;
+	/** Handle code block mounted event - focuses if pending */
+	handleCodeBlockMounted: (id: string, wrapper: HTMLElement) => void;
+	/** Register a code block in state (for initial markdown parsing) */
+	registerCodeBlock: (id: string, content: string, language: string) => void;
+}
+
+/**
+ * Generate a unique ID for code blocks
+ */
+function generateCodeBlockId(): string {
+	return `cb-${crypto.randomUUID()}`;
 }
 
 /**
@@ -45,8 +79,8 @@ function getTargetBlock(contentRef: Ref<HTMLElement | null>, selection: UseMarkd
 	const currentBlock = selection.getCurrentBlock();
 	if (!currentBlock) return null;
 
-	// For paragraphs, divs, headings, and PRE, return directly
-	if (isConvertibleBlock(currentBlock) || currentBlock.tagName === "PRE") {
+	// For paragraphs, divs, headings, and code block wrappers, return directly
+	if (isConvertibleBlock(currentBlock) || currentBlock.tagName === "PRE" || currentBlock.hasAttribute("data-code-block-id")) {
 		return currentBlock;
 	}
 
@@ -55,19 +89,19 @@ function getTargetBlock(contentRef: Ref<HTMLElement | null>, selection: UseMarkd
 		return currentBlock;
 	}
 
-	// Walk up to find a convertible block or PRE
+	// Walk up to find a convertible block, code block wrapper, or PRE
 	if (!contentRef.value) return null;
 
 	let current: Element | null = currentBlock;
 	while (current && current.parentElement !== contentRef.value) {
-		if (isConvertibleBlock(current) || current.tagName === "PRE" || current.tagName === "LI") {
+		if (isConvertibleBlock(current) || current.tagName === "PRE" || current.tagName === "LI" || current.hasAttribute("data-code-block-id")) {
 			return current;
 		}
 		current = current.parentElement;
 	}
 
-	// Check if this direct child is a convertible block or PRE
-	if (current && (isConvertibleBlock(current) || current.tagName === "PRE")) {
+	// Check if this direct child is a convertible block, PRE, or code block wrapper
+	if (current && (isConvertibleBlock(current) || current.tagName === "PRE" || current.hasAttribute("data-code-block-id"))) {
 		return current;
 	}
 
@@ -75,7 +109,31 @@ function getTargetBlock(contentRef: Ref<HTMLElement | null>, selection: UseMarkd
 }
 
 /**
+ * Get the code block wrapper element containing the cursor (if in a code block)
+ */
+function getCodeBlockWrapper(selection: UseMarkdownSelectionReturn): HTMLElement | null {
+	const currentBlock = selection.getCurrentBlock();
+	if (!currentBlock) return null;
+
+	// Walk up to find code block wrapper
+	let current: Element | null = currentBlock;
+	while (current) {
+		if (current.hasAttribute("data-code-block-id")) {
+			return current as HTMLElement;
+		}
+		// Legacy support: check for PRE without wrapper
+		if (current.tagName === "PRE" && !current.closest("[data-code-block-id]")) {
+			return null; // Legacy PRE, not wrapped
+		}
+		current = current.parentElement;
+	}
+
+	return null;
+}
+
+/**
  * Get the PRE element containing the cursor (if in a code block)
+ * Supports both legacy PRE and new wrapper structure
  */
 function getCodeBlockElement(selection: UseMarkdownSelectionReturn): HTMLPreElement | null {
 	const currentBlock = selection.getCurrentBlock();
@@ -163,31 +221,56 @@ function positionCursorAtStart(element: Element): void {
 }
 
 /**
- * Convert a paragraph/div/heading to a code block
+ * Create a code block wrapper with non-editable island structure.
+ * Returns the wrapper div and the code block ID.
  */
-function convertToCodeBlock(block: Element, language: string = ""): HTMLPreElement {
-	const pre = document.createElement("pre");
-	const code = document.createElement("code");
+function createCodeBlockWrapper(content: string, language: string): { wrapper: HTMLDivElement; id: string } {
+	const id = generateCodeBlockId();
 
-	if (language) {
-		code.className = `language-${language}`;
-	}
+	const wrapper = document.createElement("div");
+	wrapper.className = "code-block-wrapper";
+	wrapper.setAttribute("contenteditable", "false");
+	wrapper.setAttribute("data-code-block-id", id);
 
-	// Move content from block to code element
-	code.textContent = block.textContent || "";
+	// Create mount point for CodeViewer
+	const mountPoint = document.createElement("div");
+	mountPoint.className = "code-viewer-mount-point";
 
-	pre.appendChild(code);
+	// Store initial content and language as data attributes for the manager to read
+	mountPoint.setAttribute("data-content", content);
+	mountPoint.setAttribute("data-language", language);
 
-	// Replace block with code block
-	block.parentNode?.replaceChild(pre, block);
+	wrapper.appendChild(mountPoint);
 
-	return pre;
+	return { wrapper, id };
 }
 
 /**
- * Convert a code block back to a paragraph
+ * Convert a code block wrapper back to a paragraph
  */
-function convertCodeBlockToParagraph(pre: HTMLPreElement): HTMLParagraphElement {
+function convertCodeBlockToParagraph(wrapper: HTMLElement, codeBlocks: Map<string, CodeBlockState>): HTMLParagraphElement {
+	const p = document.createElement("p");
+	const id = wrapper.getAttribute("data-code-block-id");
+
+	// Get content from state
+	const state = id ? codeBlocks.get(id) : null;
+	p.textContent = state?.content || "";
+
+	// Remove from state
+	if (id) {
+		codeBlocks.delete(id);
+	}
+
+	// Replace wrapper with paragraph
+	wrapper.parentNode?.replaceChild(p, wrapper);
+
+	return p;
+}
+
+/**
+ * Convert legacy PRE/CODE to paragraph (backwards compatibility)
+ */
+function convertLegacyCodeBlockToParagraph(pre: HTMLPreElement): HTMLParagraphElement {
 	const p = document.createElement("p");
 
 	// Get text content from code element or directly from pre
@@ -206,10 +289,124 @@ function convertCodeBlockToParagraph(pre: HTMLPreElement): HTMLParagraphElement 
 export function useCodeBlocks(options: UseCodeBlocksOptions): UseCodeBlocksReturn {
 	const { contentRef, selection, onContentChange } = options;
 
+	// Reactive map to track all code blocks
+	const codeBlocks = reactive(new Map<string, CodeBlockState>());
+
+	// Track code blocks that should be focused when mounted
+	const pendingFocusIds = new Set<string>();
+
+	/**
+	 * Focus the editable pre element inside a code block wrapper
+	 */
+	function focusCodeBlockEditor(wrapper: HTMLElement): void {
+		// Find the CodeViewer's contenteditable pre element
+		const codeViewerPre = wrapper.querySelector("pre[contenteditable=\"true\"]") as HTMLElement | null;
+		if (codeViewerPre) {
+			// Focus the pre element
+			codeViewerPre.focus();
+
+			// Position cursor at start
+			const range = document.createRange();
+			range.selectNodeContents(codeViewerPre);
+			range.collapse(true); // Collapse to start
+			const sel = window.getSelection();
+			sel?.removeAllRanges();
+			sel?.addRange(range);
+		}
+	}
+
+	/**
+	 * Handle code block mounted event from useCodeBlockManager.
+	 * If this code block was pending focus, focus it now.
+	 */
+	function handleCodeBlockMounted(id: string, wrapper: HTMLElement): void {
+		if (pendingFocusIds.has(id)) {
+			pendingFocusIds.delete(id);
+			focusCodeBlockEditor(wrapper);
+		}
+	}
+
+	/**
+	 * Register a code block in state.
+	 * Used during initial markdown parsing to register code blocks that are
+	 * converted from <pre><code> to wrapper structure.
+	 */
+	function registerCodeBlock(id: string, content: string, language: string): void {
+		codeBlocks.set(id, {
+			id,
+			content,
+			language
+		});
+	}
+
+	/**
+	 * Get all code blocks
+	 */
+	function getCodeBlocks(): Map<string, CodeBlockState> {
+		return codeBlocks;
+	}
+
+	/**
+	 * Get code block state by ID
+	 */
+	function getCodeBlockById(id: string): CodeBlockState | undefined {
+		return codeBlocks.get(id);
+	}
+
+	/**
+	 * Update content for a specific code block
+	 */
+	function updateCodeBlockContent(id: string, content: string): void {
+		const state = codeBlocks.get(id);
+		if (state) {
+			state.content = content;
+			onContentChange();
+		}
+	}
+
+	/**
+	 * Update language for a specific code block
+	 */
+	function updateCodeBlockLanguage(id: string, language: string): void {
+		const state = codeBlocks.get(id);
+		if (state) {
+			state.language = language;
+			onContentChange();
+		}
+	}
+
+	/**
+	 * Remove a code block by ID
+	 */
+	function removeCodeBlock(id: string): void {
+		codeBlocks.delete(id);
+		// Also remove from DOM if present
+		if (contentRef.value) {
+			const wrapper = contentRef.value.querySelector(`[data-code-block-id="${id}"]`);
+			if (wrapper) {
+				wrapper.remove();
+			}
+		}
+		onContentChange();
+	}
+
+	/**
+	 * Get current code block ID (if cursor is in one)
+	 */
+	function getCurrentCodeBlockId(): string | null {
+		const wrapper = getCodeBlockWrapper(selection);
+		return wrapper?.getAttribute("data-code-block-id") || null;
+	}
+
 	/**
 	 * Check if cursor is inside a code block
 	 */
 	function isInCodeBlock(): boolean {
+		// Check for new wrapper structure first
+		if (getCodeBlockWrapper(selection)) {
+			return true;
+		}
+		// Fall back to legacy PRE detection
 		return getCodeBlockElement(selection) !== null;
 	}
 
@@ -217,6 +414,17 @@ export function useCodeBlocks(options: UseCodeBlocksOptions): UseCodeBlocksRetur
 	 * Get current code block's language
 	 */
 	function getCurrentCodeBlockLanguage(): string | null {
+		// Check new wrapper structure first
+		const wrapper = getCodeBlockWrapper(selection);
+		if (wrapper) {
+			const id = wrapper.getAttribute("data-code-block-id");
+			if (id) {
+				const state = codeBlocks.get(id);
+				return state?.language ?? "";
+			}
+		}
+
+		// Fall back to legacy PRE/CODE detection
 		const pre = getCodeBlockElement(selection);
 		if (!pre) return null;
 
@@ -231,6 +439,17 @@ export function useCodeBlocks(options: UseCodeBlocksOptions): UseCodeBlocksRetur
 	 * Set language for current code block
 	 */
 	function setCodeBlockLanguage(language: string): void {
+		// Check new wrapper structure first
+		const wrapper = getCodeBlockWrapper(selection);
+		if (wrapper) {
+			const id = wrapper.getAttribute("data-code-block-id");
+			if (id) {
+				updateCodeBlockLanguage(id, language);
+			}
+			return;
+		}
+
+		// Fall back to legacy PRE/CODE handling
 		const pre = getCodeBlockElement(selection);
 		if (!pre) return;
 
@@ -256,15 +475,21 @@ export function useCodeBlocks(options: UseCodeBlocksOptions): UseCodeBlocksRetur
 
 	/**
 	 * Handle Enter key press when in a code block
-	 * - Normal Enter: insert a newline inside the code block
-	 * - If content ends with two consecutive newlines (user pressed Enter twice at end):
-	 *   exit the code block and create a new paragraph below
+	 * For the new wrapper structure, this is handled by CodeViewer internally.
+	 * This function handles legacy PRE/CODE structures.
 	 * @returns true if the Enter was handled, false to let browser handle it
 	 */
 	function handleCodeBlockEnter(): boolean {
 		if (!contentRef.value) return false;
 
-		// Check if we're in a code block
+		// New wrapper structure handles Enter internally via CodeViewer
+		const wrapper = getCodeBlockWrapper(selection);
+		if (wrapper) {
+			// Let CodeViewer handle it
+			return false;
+		}
+
+		// Check if we're in a legacy code block
 		const pre = getCodeBlockElement(selection);
 		if (!pre) return false;
 
@@ -423,18 +648,27 @@ export function useCodeBlocks(options: UseCodeBlocksOptions): UseCodeBlocksRetur
 
 	/**
 	 * Toggle code block on the current block
-	 * - If paragraph/div/heading: convert to <pre><code>
+	 * - If paragraph/div/heading: convert to code block wrapper
 	 * - If already in code block: convert back to paragraph
 	 * - If in a list: convert list item to paragraph first, then to code block
 	 */
 	function toggleCodeBlock(): void {
 		if (!contentRef.value) return;
 
-		// Check if already in code block
+		// Check if already in new-style code block wrapper
+		const wrapper = getCodeBlockWrapper(selection);
+		if (wrapper) {
+			const p = convertCodeBlockToParagraph(wrapper, codeBlocks);
+			positionCursorAtEnd(p);
+			onContentChange();
+			return;
+		}
+
+		// Check if in legacy code block
 		const pre = getCodeBlockElement(selection);
 		if (pre) {
-			// Already in code block - convert to paragraph
-			const p = convertCodeBlockToParagraph(pre);
+			// Convert legacy code block to paragraph
+			const p = convertLegacyCodeBlockToParagraph(pre);
 			positionCursorAtEnd(p);
 			onContentChange();
 			return;
@@ -451,15 +685,24 @@ export function useCodeBlocks(options: UseCodeBlocksOptions): UseCodeBlocksRetur
 			return;
 		}
 
-		// Convert to code block
+		// Convert to code block wrapper
 		if (isConvertibleBlock(block)) {
-			const pre = convertToCodeBlock(block, "");
-			const code = pre.querySelector("code");
-			if (code) {
-				positionCursorAtEnd(code);
-			} else {
-				positionCursorAtEnd(pre);
-			}
+			const content = block.textContent || "";
+			const { wrapper, id } = createCodeBlockWrapper(content, "");
+
+			// Register in state
+			codeBlocks.set(id, {
+				id,
+				content,
+				language: ""
+			});
+
+			// Replace block with wrapper
+			block.parentNode?.replaceChild(wrapper, block);
+
+			// Mark this code block for focus when it mounts
+			pendingFocusIds.add(id);
+
 			onContentChange();
 		}
 	}
@@ -486,30 +729,24 @@ export function useCodeBlocks(options: UseCodeBlocksOptions): UseCodeBlocksRetur
 		const pattern = detectCodeFenceStart(textContent);
 		if (!pattern) return false;
 
-		// Pattern detected - convert to code block
+		// Pattern detected - convert to code block wrapper
 		const language = pattern.language || "";
 
-		// Create the new code block structure
-		const pre = document.createElement("pre");
-		const code = document.createElement("code");
+		const { wrapper, id } = createCodeBlockWrapper("", language);
 
-		if (language) {
-			code.className = `language-${language}`;
-		}
+		// Register in state
+		codeBlocks.set(id, {
+			id,
+			content: "",
+			language
+		});
 
-		// Code block starts with a zero-width space as cursor anchor.
-		// This is necessary because contenteditable doesn't position the cursor
-		// correctly in empty elements - the anchor gives the cursor something to hold onto.
-		// The zero-width space is stripped during htmlToMarkdown conversion.
-		code.textContent = CURSOR_ANCHOR;
+		// Replace block with wrapper
+		block.parentNode?.replaceChild(wrapper, block);
 
-		pre.appendChild(code);
-
-		// Replace block with code block
-		block.parentNode?.replaceChild(pre, block);
-
-		// Position cursor at the start of the code element (which is empty)
-		positionCursorAtStart(code);
+		// Mark this code block for focus when it mounts
+		// The useCodeBlockManager will call handleCodeBlockMounted after mounting
+		pendingFocusIds.add(id);
 
 		// Notify of content change
 		onContentChange();
@@ -518,11 +755,20 @@ export function useCodeBlocks(options: UseCodeBlocksOptions): UseCodeBlocksRetur
 	}
 
 	return {
+		codeBlocks,
 		toggleCodeBlock,
 		checkAndConvertCodeBlockPattern,
 		isInCodeBlock,
 		getCurrentCodeBlockLanguage,
 		setCodeBlockLanguage,
-		handleCodeBlockEnter
+		handleCodeBlockEnter,
+		getCodeBlocks,
+		updateCodeBlockContent,
+		updateCodeBlockLanguage,
+		removeCodeBlock,
+		getCodeBlockById,
+		getCurrentCodeBlockId,
+		handleCodeBlockMounted,
+		registerCodeBlock
 	};
 }

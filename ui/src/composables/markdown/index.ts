@@ -3,6 +3,7 @@ export * from "./useMarkdownSelection";
 export * from "./useMarkdownSync";
 export * from "./useMarkdownHotkeys";
 export * from "./features/useCodeBlocks";
+export * from "./features/useCodeBlockManager";
 export * from "./features/useHeadings";
 export * from "./features/useInlineFormatting";
 export * from "./features/useLists";

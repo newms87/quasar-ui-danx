@@ -94,19 +94,22 @@ export function detectBlockquotePattern(line: string): BlockquotePattern | null 
 }
 
 /**
- * Check if a line is a code fence start (```)
+ * Check if a line is a code fence start (```) with a language identifier
+ * Requires at least one character in the language identifier to avoid triggering
+ * on just "```" before the user finishes typing the language.
  * @param line - The line to check
- * @returns Pattern info with language, or null if not a code fence
+ * @returns Pattern info with language, or null if not a code fence with language
  */
 export function detectCodeFenceStart(line: string): CodeFencePattern | null {
-	// Code fence: ``` optionally followed by language identifier
-	const match = line.match(/^```(\w*)$/);
+	// Code fence: ``` followed by required language identifier (at least 1 char)
+	// This prevents triggering on just "```" before user types the language
+	const match = line.match(/^```(\w+)$/);
 	if (!match) {
 		return null;
 	}
 
 	return {
-		language: match[1] || ""
+		language: match[1]
 	};
 }
 

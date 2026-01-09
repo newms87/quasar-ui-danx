@@ -2,6 +2,7 @@ import { computed, nextTick, Ref, ref } from "vue";
 import { HotkeyDefinition, useMarkdownHotkeys } from "./useMarkdownHotkeys";
 import { useMarkdownSelection } from "./useMarkdownSelection";
 import { useMarkdownSync } from "./useMarkdownSync";
+import { useCodeBlocks } from "./features/useCodeBlocks";
 import { useHeadings } from "./features/useHeadings";
 import { useInlineFormatting } from "./features/useInlineFormatting";
 import { useLists } from "./features/useLists";
@@ -44,6 +45,7 @@ export interface UseMarkdownEditorReturn {
 	headings: ReturnType<typeof useHeadings>;
 	inlineFormatting: ReturnType<typeof useInlineFormatting>;
 	lists: ReturnType<typeof useLists>;
+	codeBlocks: ReturnType<typeof useCodeBlocks>;
 }
 
 /**
@@ -93,6 +95,15 @@ export function useMarkdownEditor(options: UseMarkdownEditorOptions): UseMarkdow
 
 	// Initialize lists feature
 	const lists = useLists({
+		contentRef,
+		selection,
+		onContentChange: () => {
+			sync.debouncedSyncFromHtml();
+		}
+	});
+
+	// Initialize code blocks feature
+	const codeBlocks = useCodeBlocks({
 		contentRef,
 		selection,
 		onContentChange: () => {
@@ -150,6 +161,28 @@ export function useMarkdownEditor(options: UseMarkdownEditorOptions): UseMarkdow
 		} else {
 			headings.decreaseHeadingLevel();
 		}
+	}
+
+	/**
+	 * Toggle code block, handling list items by converting to paragraph first.
+	 * This wrapper ensures Ctrl+Shift+K hotkey works even when cursor is in a list.
+	 */
+	function toggleCodeBlockWithListHandling(): void {
+		// If already in a code block, just toggle off
+		if (codeBlocks.isInCodeBlock()) {
+			codeBlocks.toggleCodeBlock();
+			return;
+		}
+
+		// Check if currently in a list
+		const listType = lists.getCurrentListType();
+		if (listType) {
+			// Convert list item to paragraph first
+			lists.convertCurrentListItemToParagraph();
+		}
+
+		// Now toggle to code block
+		codeBlocks.toggleCodeBlock();
 	}
 
 	// Computed character count
@@ -278,6 +311,14 @@ export function useMarkdownEditor(options: UseMarkdownEditorOptions): UseMarkdow
 			group: "lists"
 		});
 
+		// === Code Block Hotkeys ===
+		hotkeys.registerHotkey({
+			key: "ctrl+shift+k",
+			action: () => toggleCodeBlockWithListHandling(),
+			description: "Toggle code block",
+			group: "formatting"
+		});
+
 		// Help hotkey (Ctrl+? is handled specially in handleKeyDown)
 		// This registration is for the help display list
 		hotkeys.registerHotkey({
@@ -318,12 +359,17 @@ export function useMarkdownEditor(options: UseMarkdownEditorOptions): UseMarkdow
 
 	/**
 	 * Handle input events from contenteditable
-	 * Checks for markdown patterns (e.g., "# " for headings, "- " for lists) and converts immediately
+	 * Checks for markdown patterns (e.g., "# " for headings, "- " for lists, "```" for code blocks) and converts immediately
 	 */
 	function onInput(): void {
-		// Check for heading pattern first (e.g., "# " -> H1)
+		// Check for code fence pattern first (e.g., "```" or "```javascript" -> code block)
 		// This is called immediately (not debounced) for instant conversion
-		let converted = headings.checkAndConvertHeadingPattern();
+		let converted = codeBlocks.checkAndConvertCodeBlockPattern();
+
+		// Check for heading pattern (e.g., "# " -> H1)
+		if (!converted) {
+			converted = headings.checkAndConvertHeadingPattern();
+		}
 
 		// Check for list pattern (e.g., "- " -> ul, "1. " -> ol)
 		if (!converted) {
@@ -339,11 +385,19 @@ export function useMarkdownEditor(options: UseMarkdownEditorOptions): UseMarkdow
 
 	/**
 	 * Handle keydown events
-	 * Handles Enter for list continuation, Tab/Shift+Tab for indentation
+	 * Handles Enter for code block continuation/exit and list continuation, Tab/Shift+Tab for indentation
 	 */
 	function onKeyDown(event: KeyboardEvent): void {
-		// Handle Enter key for list continuation
+		// Handle Enter key for code block and list continuation
 		if (event.key === "Enter" && !event.shiftKey && !event.ctrlKey && !event.altKey && !event.metaKey) {
+			// Check code block first - Enter inserts newline, or exits after double-Enter at end
+			const handledByCodeBlock = codeBlocks.handleCodeBlockEnter();
+			if (handledByCodeBlock) {
+				event.preventDefault();
+				return;
+			}
+
+			// Then check lists
 			const handled = lists.handleListEnter();
 			if (handled) {
 				event.preventDefault();
@@ -438,6 +492,7 @@ export function useMarkdownEditor(options: UseMarkdownEditorOptions): UseMarkdow
 		// Feature access
 		headings,
 		inlineFormatting,
-		lists
+		lists,
+		codeBlocks
 	};
 }

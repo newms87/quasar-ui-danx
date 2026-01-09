@@ -111,8 +111,15 @@ const LEVEL_TO_LINE_TYPE = Object.fromEntries(
 // Track current list type for LineTypeMenu
 const currentListType = ref<"ul" | "ol" | null>(null);
 
-// Computed current line type from heading level or list type
+// Track if we're in a code block
+const isInCodeBlock = ref(false);
+
+// Computed current line type from heading level, list type, or code block
 const currentLineType = computed<LineType>(() => {
+  // If we're in a code block, return "code"
+  if (isInCodeBlock.value) {
+    return "code";
+  }
   // If we're in a list, return the list type
   if (currentListType.value) {
     return currentListType.value;
@@ -175,12 +182,14 @@ function updateMenuPosition(): void {
   currentBlockTop.value = relativeTop;
 }
 
-// Update current heading level, list type, and menu position when selection changes
+// Update current heading level, list type, code block state, and menu position when selection changes
 function updateCurrentHeadingLevel(): void {
   const level = editor.headings.getCurrentHeadingLevel();
   currentHeadingLevel.value = level;
   // Also check if we're in a list
   currentListType.value = editor.lists.getCurrentListType();
+  // Also check if we're in a code block
+  isInCodeBlock.value = editor.codeBlocks.isInCodeBlock();
   updateMenuPosition();
 }
 
@@ -210,21 +219,56 @@ function handleFocusOut(event: FocusEvent): void {
 
 // Handle line type change from menu
 function onLineTypeChange(type: LineType): void {
+  // Handle code block type
+  if (type === "code") {
+    // If already in a code block, do nothing (or toggle off if that's desired)
+    if (editor.codeBlocks.isInCodeBlock()) {
+      return;
+    }
+
+    // If currently in a list, first convert the list item to paragraph
+    const listType = editor.lists.getCurrentListType();
+    if (listType) {
+      editor.lists.convertCurrentListItemToParagraph();
+    }
+
+    // Now toggle to code block
+    editor.codeBlocks.toggleCodeBlock();
+    isInCodeBlock.value = true;
+    currentListType.value = null;
+    return;
+  }
+
   // Handle list types
   if (type === "ul") {
+    // If in code block, first convert to paragraph
+    if (editor.codeBlocks.isInCodeBlock()) {
+      editor.codeBlocks.toggleCodeBlock();
+    }
     editor.lists.toggleUnorderedList();
     currentListType.value = editor.lists.getCurrentListType();
+    isInCodeBlock.value = false;
     return;
   }
   if (type === "ol") {
+    // If in code block, first convert to paragraph
+    if (editor.codeBlocks.isInCodeBlock()) {
+      editor.codeBlocks.toggleCodeBlock();
+    }
     editor.lists.toggleOrderedList();
     currentListType.value = editor.lists.getCurrentListType();
+    isInCodeBlock.value = false;
     return;
   }
 
   // Handle heading/paragraph types
   const level = LINE_TYPE_TO_LEVEL[type];
   if (level !== undefined) {
+    // If currently in a code block, first convert to paragraph
+    if (editor.codeBlocks.isInCodeBlock()) {
+      editor.codeBlocks.toggleCodeBlock();
+    }
+
     // If currently in a list, first convert the list item to paragraph
     const listType = editor.lists.getCurrentListType();
     if (listType) {
@@ -240,6 +284,7 @@ function onLineTypeChange(type: LineType): void {
     // Update the tracked level immediately
     currentHeadingLevel.value = level;
     currentListType.value = null;
+    isInCodeBlock.value = false;
   }
 }
 

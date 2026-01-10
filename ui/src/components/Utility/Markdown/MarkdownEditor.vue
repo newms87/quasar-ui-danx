@@ -43,18 +43,27 @@
       @submit="handleLinkPopoverSubmit"
       @cancel="handleLinkPopoverCancel"
     />
+
+    <TablePopover
+      v-if="isTablePopoverVisible"
+      :position="tablePopoverPosition"
+      @submit="handleTablePopoverSubmit"
+      @cancel="handleTablePopoverCancel"
+    />
   </div>
 </template>
 
 <script setup lang="ts">
 import { computed, onMounted, onUnmounted, ref, watch } from "vue";
 import { ShowLinkPopoverOptions } from "../../../composables/markdown/features/useLinks";
+import { ShowTablePopoverOptions } from "../../../composables/markdown/features/useTables";
 import { useMarkdownEditor } from "../../../composables/markdown/useMarkdownEditor";
 import HotkeyHelpPopover from "./HotkeyHelpPopover.vue";
 import LineTypeMenu from "./LineTypeMenu.vue";
 import LinkPopover from "./LinkPopover.vue";
 import MarkdownEditorContent from "./MarkdownEditorContent.vue";
 import MarkdownEditorFooter from "./MarkdownEditorFooter.vue";
+import TablePopover from "./TablePopover.vue";
 import type { LineType } from "./types";
 
 export interface MarkdownEditorProps {
@@ -94,6 +103,12 @@ const linkPopoverSelectedText = ref<string | undefined>(undefined);
 let linkPopoverOnSubmit: ((url: string, label?: string) => void) | null = null;
 let linkPopoverOnCancel: (() => void) | null = null;
 
+// Table popover state
+const isTablePopoverVisible = ref(false);
+const tablePopoverPosition = ref({ x: 0, y: 0 });
+let tablePopoverSubmitCallback: ((rows: number, cols: number) => void) | null = null;
+let tablePopoverCancelCallback: (() => void) | null = null;
+
 /**
  * Handle showing the link popover
  */
@@ -126,6 +141,36 @@ function handleLinkPopoverCancel(): void {
   }
 }
 
+/**
+ * Handle showing the table popover
+ */
+function handleShowTablePopover(options: ShowTablePopoverOptions): void {
+  tablePopoverPosition.value = options.position;
+  tablePopoverSubmitCallback = options.onSubmit;
+  tablePopoverCancelCallback = options.onCancel;
+  isTablePopoverVisible.value = true;
+}
+
+/**
+ * Handle table popover submit
+ */
+function handleTablePopoverSubmit(rows: number, cols: number): void {
+  isTablePopoverVisible.value = false;
+  tablePopoverSubmitCallback?.(rows, cols);
+  tablePopoverSubmitCallback = null;
+  tablePopoverCancelCallback = null;
+}
+
+/**
+ * Handle table popover cancel
+ */
+function handleTablePopoverCancel(): void {
+  isTablePopoverVisible.value = false;
+  tablePopoverCancelCallback?.();
+  tablePopoverSubmitCallback = null;
+  tablePopoverCancelCallback = null;
+}
+
 // Initialize the markdown editor composable
 const editor = useMarkdownEditor({
   contentRef: contentElementRef,
@@ -133,7 +178,8 @@ const editor = useMarkdownEditor({
   onEmitValue: (markdown: string) => {
     emit("update:modelValue", markdown);
   },
-  onShowLinkPopover: handleShowLinkPopover
+  onShowLinkPopover: handleShowLinkPopover,
+  onShowTablePopover: handleShowTablePopover
 });
 
 // Track current heading level for LineTypeMenu

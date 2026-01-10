@@ -1,16 +1,16 @@
 <template>
   <div
-    class="dx-link-popover-overlay"
+    class="dx-table-popover-overlay"
     @click.self="onCancel"
     @keydown.escape="onCancel"
   >
     <div
       ref="popoverRef"
-      class="dx-link-popover"
+      class="dx-table-popover"
       :style="popoverStyle"
     >
       <div class="popover-header">
-        <h3>{{ isEditing ? 'Edit Link' : 'Insert Link' }}</h3>
+        <h3>Insert Table</h3>
         <button
           class="close-btn"
           type="button"
@@ -22,39 +22,60 @@
       </div>
 
       <div class="popover-content">
-        <div class="input-group">
-          <label for="link-url">URL</label>
-          <input
-            id="link-url"
-            ref="urlInputRef"
-            v-model="urlValue"
-            type="text"
-            placeholder="https://example.com"
-            @keydown.enter.prevent="onSubmit"
-            @keydown.escape="onCancel"
+        <!-- Visual Grid Selector -->
+        <div class="grid-selector">
+          <div
+            v-for="row in GRID_SIZE"
+            :key="row"
+            class="grid-row"
           >
+            <div
+              v-for="col in GRID_SIZE"
+              :key="col"
+              class="grid-cell"
+              :class="{ selected: row <= hoverRows && col <= hoverCols }"
+              @mouseenter="onCellHover(row, col)"
+              @click="onCellClick(row, col)"
+            />
+          </div>
         </div>
 
-        <div
-          v-if="!isEditing"
-          class="input-group"
-        >
-          <label for="link-label">Label</label>
-          <input
-            id="link-label"
-            v-model="labelValue"
-            type="text"
-            :placeholder="labelPlaceholder"
-            @keydown.enter.prevent="onSubmit"
-            @keydown.escape="onCancel"
-          >
+        <!-- Dimension Label -->
+        <div class="dimension-label">
+          {{ hoverRows }} x {{ hoverCols }}
         </div>
 
-        <div
-          v-if="isEditing"
-          class="edit-hint"
-        >
-          Enter an empty URL to remove the link.
+        <!-- Manual Input Divider -->
+        <div class="divider">
+          <span>or enter manually</span>
+        </div>
+
+        <!-- Manual Input Fields -->
+        <div class="manual-inputs">
+          <div class="input-group">
+            <label for="table-rows">Rows</label>
+            <input
+              id="table-rows"
+              v-model.number="manualRows"
+              type="number"
+              min="1"
+              :max="MAX_ROWS"
+              @keydown.enter.prevent="onSubmit"
+              @keydown.escape="onCancel"
+            >
+          </div>
+          <div class="input-group">
+            <label for="table-cols">Cols</label>
+            <input
+              id="table-cols"
+              v-model.number="manualCols"
+              type="number"
+              min="1"
+              :max="MAX_COLS"
+              @keydown.enter.prevent="onSubmit"
+              @keydown.escape="onCancel"
+            >
+          </div>
         </div>
       </div>
 
@@ -71,7 +92,7 @@
           class="btn-insert"
           @click="onSubmit"
         >
-          {{ isEditing ? 'Update' : 'Insert' }}
+          Insert
         </button>
       </div>
     </div>
@@ -80,47 +101,38 @@
 
 <script setup lang="ts">
 import { FaSolidXmark as CloseIcon } from "danx-icon";
-import { computed, nextTick, onMounted, onUnmounted, ref, watch } from "vue";
+import { computed, onMounted, onUnmounted, ref } from "vue";
 import type { PopoverPosition } from "./types";
 
-export interface LinkPopoverProps {
+export interface TablePopoverProps {
   position: PopoverPosition;
-  existingUrl?: string;
-  selectedText?: string;
 }
 
-const props = withDefaults(defineProps<LinkPopoverProps>(), {
-  existingUrl: "",
-  selectedText: ""
-});
+const GRID_SIZE = 5;
+const MAX_ROWS = 20;
+const MAX_COLS = 10;
+const DEFAULT_SIZE = 3;
+
+const props = defineProps<TablePopoverProps>();
 
 const emit = defineEmits<{
-  submit: [url: string, label?: string];
+  submit: [rows: number, cols: number];
   cancel: [];
 }>();
 
 // Refs
 const popoverRef = ref<HTMLElement | null>(null);
-const urlInputRef = ref<HTMLInputElement | null>(null);
 
 // State
-const urlValue = ref(props.existingUrl || "");
-const labelValue = ref("");
-
-// Computed
-const isEditing = computed(() => !!props.existingUrl);
-
-const labelPlaceholder = computed(() => {
-  if (props.selectedText) {
-    return props.selectedText;
-  }
-  return "Link text (optional)";
-});
+const hoverRows = ref(DEFAULT_SIZE);
+const hoverCols = ref(DEFAULT_SIZE);
+const manualRows = ref(DEFAULT_SIZE);
+const manualCols = ref(DEFAULT_SIZE);
 
 // Calculate popover position (below cursor by default, above if at bottom of viewport)
 const popoverStyle = computed(() => {
-  const popoverHeight = 200; // Approximate height
-  const popoverWidth = 320;
+  const popoverHeight = 340; // Approximate height
+  const popoverWidth = 280;
   const padding = 10;
 
   let top = props.position.y + padding;
@@ -149,10 +161,21 @@ const popoverStyle = computed(() => {
 });
 
 // Methods
+function onCellHover(row: number, col: number): void {
+  hoverRows.value = row;
+  hoverCols.value = col;
+  manualRows.value = row;
+  manualCols.value = col;
+}
+
+function onCellClick(row: number, col: number): void {
+  emit("submit", row, col);
+}
+
 function onSubmit(): void {
-  const url = urlValue.value.trim();
-  const label = labelValue.value.trim() || undefined;
-  emit("submit", url, label);
+  const rows = Math.min(Math.max(1, manualRows.value), MAX_ROWS);
+  const cols = Math.min(Math.max(1, manualCols.value), MAX_COLS);
+  emit("submit", rows, cols);
 }
 
 function onCancel(): void {
@@ -166,28 +189,17 @@ function handleDocumentKeydown(event: KeyboardEvent): void {
   }
 }
 
-// Auto-focus URL input on mount
 onMounted(() => {
-  nextTick(() => {
-    urlInputRef.value?.focus();
-    urlInputRef.value?.select();
-  });
-
   document.addEventListener("keydown", handleDocumentKeydown);
 });
 
 onUnmounted(() => {
   document.removeEventListener("keydown", handleDocumentKeydown);
 });
-
-// Watch for existingUrl changes to update the input
-watch(() => props.existingUrl, (newUrl) => {
-  urlValue.value = newUrl || "";
-});
 </script>
 
 <style lang="scss">
-.dx-link-popover-overlay {
+.dx-table-popover-overlay {
   position: fixed;
   inset: 0;
   z-index: 1000;
@@ -195,13 +207,13 @@ watch(() => props.existingUrl, (newUrl) => {
   backdrop-filter: blur(1px);
 }
 
-.dx-link-popover {
+.dx-table-popover {
   position: fixed;
   background: #2d2d2d;
   border: 1px solid #404040;
   border-radius: 0.5rem;
   box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5);
-  width: 320px;
+  width: 280px;
   overflow: hidden;
   display: flex;
   flex-direction: column;
@@ -245,13 +257,83 @@ watch(() => props.existingUrl, (newUrl) => {
     padding: 1rem;
     display: flex;
     flex-direction: column;
-    gap: 0.875rem;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  .grid-selector {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    padding: 0.5rem;
+    background: #1e1e1e;
+    border-radius: 0.375rem;
+  }
+
+  .grid-row {
+    display: flex;
+    gap: 3px;
+  }
+
+  .grid-cell {
+    width: 28px;
+    height: 28px;
+    background: #3a3a3a;
+    border: 1px solid #4a4a4a;
+    border-radius: 3px;
+    cursor: pointer;
+    transition: all 0.1s ease;
+
+    &:hover {
+      border-color: #60a5fa;
+    }
+
+    &.selected {
+      background: #3b82f6;
+      border-color: #60a5fa;
+    }
+  }
+
+  .dimension-label {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #d4d4d4;
+    margin-top: 0.25rem;
+  }
+
+  .divider {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    margin: 0.5rem 0;
+
+    &::before,
+    &::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: #404040;
+    }
+
+    span {
+      padding: 0 0.75rem;
+      font-size: 0.75rem;
+      color: #6b7280;
+      white-space: nowrap;
+    }
+  }
+
+  .manual-inputs {
+    display: flex;
+    gap: 1rem;
+    width: 100%;
+    justify-content: center;
   }
 
   .input-group {
     display: flex;
     flex-direction: column;
-    gap: 0.375rem;
+    gap: 0.25rem;
 
     label {
       font-size: 0.75rem;
@@ -262,7 +344,7 @@ watch(() => props.existingUrl, (newUrl) => {
     }
 
     input {
-      width: 100%;
+      width: 70px;
       padding: 0.5rem 0.75rem;
       background: #1e1e1e;
       border: 1px solid #404040;
@@ -270,6 +352,7 @@ watch(() => props.existingUrl, (newUrl) => {
       font-size: 0.875rem;
       color: #f3f4f6;
       outline: none;
+      text-align: center;
       transition: border-color 0.15s ease;
 
       &::placeholder {
@@ -279,13 +362,19 @@ watch(() => props.existingUrl, (newUrl) => {
       &:focus {
         border-color: #60a5fa;
       }
-    }
-  }
 
-  .edit-hint {
-    font-size: 0.75rem;
-    color: #6b7280;
-    font-style: italic;
+      /* Hide number input spinners */
+      &::-webkit-outer-spin-button,
+      &::-webkit-inner-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+      }
+
+      /* Firefox */
+      &[type=number] {
+        -moz-appearance: textfield;
+      }
+    }
   }
 
   .popover-footer {

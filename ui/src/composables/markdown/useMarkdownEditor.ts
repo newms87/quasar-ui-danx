@@ -9,6 +9,7 @@ import { useHeadings } from "./features/useHeadings";
 import { useInlineFormatting } from "./features/useInlineFormatting";
 import { ShowLinkPopoverOptions, useLinks } from "./features/useLinks";
 import { useLists } from "./features/useLists";
+import { ShowTablePopoverOptions, useTables } from "./features/useTables";
 
 /**
  * Options for useMarkdownEditor composable
@@ -19,6 +20,8 @@ export interface UseMarkdownEditorOptions {
 	onEmitValue: (markdown: string) => void;
 	/** Callback to show the link popover UI */
 	onShowLinkPopover?: (options: ShowLinkPopoverOptions) => void;
+	/** Callback to show the table popover UI */
+	onShowTablePopover?: (options: ShowTablePopoverOptions) => void;
 }
 
 /**
@@ -57,6 +60,7 @@ export interface UseMarkdownEditorReturn {
 	codeBlocks: ReturnType<typeof useCodeBlocks>;
 	codeBlockManager: ReturnType<typeof useCodeBlockManager>;
 	blockquotes: ReturnType<typeof useBlockquotes>;
+	tables: ReturnType<typeof useTables>;
 }
 
 /**
@@ -64,7 +68,7 @@ export interface UseMarkdownEditorReturn {
  * Composes selection, sync, hotkeys, and feature composables
  */
 export function useMarkdownEditor(options: UseMarkdownEditorOptions): UseMarkdownEditorReturn {
-	const { contentRef, initialValue, onEmitValue, onShowLinkPopover } = options;
+	const { contentRef, initialValue, onEmitValue, onShowLinkPopover, onShowTablePopover } = options;
 
 	// State
 	const isShowingHotkeyHelp = ref(false);
@@ -145,6 +149,15 @@ export function useMarkdownEditor(options: UseMarkdownEditorOptions): UseMarkdow
 			sync.debouncedSyncFromHtml();
 		},
 		onShowLinkPopover
+	});
+
+	// Initialize tables feature
+	const tables = useTables({
+		contentRef,
+		onContentChange: () => {
+			sync.debouncedSyncFromHtml();
+		},
+		onShowTablePopover
 	});
 
 	/**
@@ -450,12 +463,50 @@ export function useMarkdownEditor(options: UseMarkdownEditorOptions): UseMarkdow
 			group: "lists"
 		});
 
+		// Tab/Shift+Tab for list indentation (registered for help display - actual handling is in onKeyDown)
+		hotkeys.registerHotkey({
+			key: "tab",
+			action: () => {}, // Handled in onKeyDown
+			description: "Indent list item",
+			group: "lists"
+		});
+
+		hotkeys.registerHotkey({
+			key: "shift+tab",
+			action: () => {}, // Handled in onKeyDown
+			description: "Outdent list item",
+			group: "lists"
+		});
+
 		// === Code Block Hotkeys ===
 		hotkeys.registerHotkey({
 			key: "ctrl+shift+k",
 			action: () => toggleCodeBlockWithListHandling(),
 			description: "Toggle code block",
-			group: "formatting"
+			group: "blocks"
+		});
+
+		// Exit code block (registered for help display - actual handling is in CodeViewer)
+		hotkeys.registerHotkey({
+			key: "ctrl+enter",
+			action: () => {}, // Handled by CodeViewer's onKeyDown
+			description: "Exit code block",
+			group: "blocks"
+		});
+
+		// Language cycling for code blocks (registered for help display - actual handling is in onKeyDown)
+		hotkeys.registerHotkey({
+			key: "ctrl+alt+l",
+			action: () => {}, // Handled in onKeyDown when in code block
+			description: "Cycle language (in code block)",
+			group: "blocks"
+		});
+
+		hotkeys.registerHotkey({
+			key: "ctrl+alt+shift+l",
+			action: () => {}, // Handled by CodeViewer
+			description: "Search language (in code block)",
+			group: "blocks"
 		});
 
 		// === Blockquote Hotkeys ===
@@ -463,15 +514,15 @@ export function useMarkdownEditor(options: UseMarkdownEditorOptions): UseMarkdow
 			key: "ctrl+shift+q",
 			action: () => blockquotes.toggleBlockquote(),
 			description: "Toggle blockquote",
-			group: "formatting"
+			group: "blocks"
 		});
 
 		// === Horizontal Rule Hotkey ===
 		hotkeys.registerHotkey({
-			key: "ctrl+enter",
+			key: "ctrl+shift+enter",
 			action: () => insertHorizontalRule(),
 			description: "Insert horizontal rule",
-			group: "formatting"
+			group: "blocks"
 		});
 
 		// === Link Hotkeys ===
@@ -480,6 +531,73 @@ export function useMarkdownEditor(options: UseMarkdownEditorOptions): UseMarkdow
 			action: () => links.insertLink(),
 			description: "Insert/edit link",
 			group: "formatting"
+		});
+
+		// === Table Hotkeys ===
+		hotkeys.registerHotkey({
+			key: "ctrl+alt+shift+t",
+			action: () => tables.insertTable(),
+			description: "Insert table",
+			group: "tables"
+		});
+
+		// Table insert operations (only work when in table)
+		hotkeys.registerHotkey({
+			key: "ctrl+alt+shift+up",
+			action: () => { if (tables.isInTable()) tables.insertRowAbove(); },
+			description: "Insert row above",
+			group: "tables"
+		});
+
+		hotkeys.registerHotkey({
+			key: "ctrl+alt+shift+down",
+			action: () => { if (tables.isInTable()) tables.insertRowBelow(); },
+			description: "Insert row below",
+			group: "tables"
+		});
+
+		hotkeys.registerHotkey({
+			key: "ctrl+alt+shift+left",
+			action: () => { if (tables.isInTable()) tables.insertColumnLeft(); },
+			description: "Insert column left",
+			group: "tables"
+		});
+
+		hotkeys.registerHotkey({
+			key: "ctrl+alt+shift+right",
+			action: () => { if (tables.isInTable()) tables.insertColumnRight(); },
+			description: "Insert column right",
+			group: "tables"
+		});
+
+		// Table delete operations (only work when in table)
+		hotkeys.registerHotkey({
+			key: "ctrl+alt+backspace",
+			action: () => { if (tables.isInTable()) tables.deleteCurrentRow(); },
+			description: "Delete row",
+			group: "tables"
+		});
+
+		hotkeys.registerHotkey({
+			key: "ctrl+shift+backspace",
+			action: () => { if (tables.isInTable()) tables.deleteCurrentColumn(); },
+			description: "Delete column",
+			group: "tables"
+		});
+
+		hotkeys.registerHotkey({
+			key: "ctrl+alt+shift+backspace",
+			action: () => { if (tables.isInTable()) tables.deleteTable(); },
+			description: "Delete table",
+			group: "tables"
+		});
+
+		// Ctrl+Alt+L for table column alignment (registered for help display - shared with code blocks for language cycling)
+		hotkeys.registerHotkey({
+			key: "ctrl+alt+l",
+			action: () => { if (tables.isInTable()) tables.cycleColumnAlignment(); },
+			description: "Cycle column alignment (in table)",
+			group: "tables"
 		});
 
 		// Help hotkey (Ctrl+? is handled specially in handleKeyDown)
@@ -491,18 +609,6 @@ export function useMarkdownEditor(options: UseMarkdownEditorOptions): UseMarkdow
 			},
 			description: "Show keyboard shortcuts",
 			group: "other"
-		});
-
-		// Note: Code block exit (Ctrl+Enter inside code blocks) is handled by CodeViewer's onKeyDown
-
-		// Code block language cycle hotkey (handled by CodeViewer, this is for help display)
-		hotkeys.registerHotkey({
-			key: "ctrl+alt+l",
-			action: () => {
-				// Handled by CodeViewer's onKeyDown
-			},
-			description: "Cycle code block language",
-			group: "formatting"
 		});
 	}
 
@@ -795,7 +901,7 @@ export function useMarkdownEditor(options: UseMarkdownEditorOptions): UseMarkdow
 			}
 		}
 
-		// Handle Enter key for code block and list continuation
+		// Handle Enter key for code block, table, and list continuation
 		if (event.key === "Enter" && !event.shiftKey && !event.ctrlKey && !event.altKey && !event.metaKey) {
 			// Check for code fence pattern first (e.g., "```javascript" -> code block)
 			// This triggers only on Enter, allowing user to type full language before conversion
@@ -812,6 +918,13 @@ export function useMarkdownEditor(options: UseMarkdownEditorOptions): UseMarkdow
 				return;
 			}
 
+			// Check if in a table - Enter moves to cell below or creates new row
+			if (tables.isInTable()) {
+				event.preventDefault();
+				tables.handleTableEnter();
+				return;
+			}
+
 			// Then check lists
 			const handled = lists.handleListEnter();
 			if (handled) {
@@ -823,6 +936,12 @@ export function useMarkdownEditor(options: UseMarkdownEditorOptions): UseMarkdow
 		// Handle Tab key - always prevent default to keep focus in editor
 		if (event.key === "Tab" && !event.ctrlKey && !event.altKey && !event.metaKey) {
 			event.preventDefault();
+
+			// Check if in a table first - Tab navigates between cells
+			if (tables.isInTable()) {
+				tables.handleTableTab(event.shiftKey);
+				return;
+			}
 
 			if (event.shiftKey) {
 				// Shift+Tab - outdent if in list, otherwise do nothing
@@ -914,6 +1033,7 @@ export function useMarkdownEditor(options: UseMarkdownEditorOptions): UseMarkdow
 		lists,
 		codeBlocks,
 		codeBlockManager,
-		blockquotes
+		blockquotes,
+		tables
 	};
 }

@@ -3,7 +3,7 @@ import { Ref, ref } from "vue";
 /**
  * Hotkey group categories for organization
  */
-export type HotkeyGroup = "headings" | "formatting" | "lists" | "blocks" | "other";
+export type HotkeyGroup = "headings" | "formatting" | "lists" | "blocks" | "tables" | "other";
 
 /**
  * Definition for a registered hotkey
@@ -103,6 +103,11 @@ export function parseKeyCombo(combo: string): ParsedKey {
 export function matchesKeyCombo(event: KeyboardEvent, parsed: ParsedKey): boolean {
 	// Normalize the event key
 	let eventKey = event.key.toLowerCase();
+
+	// Normalize arrow keys: ArrowUp -> up, ArrowDown -> down, etc.
+	if (eventKey.startsWith("arrow")) {
+		eventKey = eventKey.replace("arrow", "");
+	}
 
 	// Special handling for shifted keys
 	// When shift is held, some keys produce different characters
@@ -241,6 +246,7 @@ export function useMarkdownHotkeys(options: UseMarkdownHotkeysOptions): UseMarkd
 		// Check all registered hotkeys
 		for (const [key, def] of hotkeys.value) {
 			const parsed = parsedKeys.get(key);
+
 			if (parsed && matchesKeyCombo(event, parsed)) {
 				event.preventDefault();
 				def.action();

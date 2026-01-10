@@ -1,5 +1,11 @@
 <template>
-  <div class="dx-hotkey-help-overlay" @click.self="$emit('close')">
+  <div
+    ref="overlayRef"
+    class="dx-hotkey-help-overlay"
+    tabindex="-1"
+    @click.self="$emit('close')"
+    @keydown.escape="$emit('close')"
+  >
     <div class="dx-hotkey-help-popover">
       <div class="popover-header">
         <h3>Keyboard Shortcuts</h3>
@@ -14,20 +20,22 @@
       </div>
 
       <div class="popover-content">
-        <div
-          v-for="group in groupedHotkeys"
-          :key="group.name"
-          class="hotkey-group"
-        >
-          <h4>{{ group.label }}</h4>
-          <div class="hotkey-list">
-            <div
-              v-for="hotkey in group.hotkeys"
-              :key="hotkey.key"
-              class="hotkey-item"
-            >
-              <span class="hotkey-description">{{ hotkey.description }}</span>
-              <kbd class="hotkey-key">{{ formatKey(hotkey.key) }}</kbd>
+        <div class="hotkey-groups-grid">
+          <div
+            v-for="group in groupedHotkeys"
+            :key="group.name"
+            class="hotkey-group"
+          >
+            <h4>{{ group.label }}</h4>
+            <div class="hotkey-list">
+              <div
+                v-for="hotkey in group.hotkeys"
+                :key="hotkey.key"
+                class="hotkey-item"
+              >
+                <span class="hotkey-description">{{ hotkey.description }}</span>
+                <kbd class="hotkey-key">{{ formatKey(hotkey.key) }}</kbd>
+              </div>
             </div>
           </div>
         </div>
@@ -38,8 +46,15 @@
 
 <script setup lang="ts">
 import { FaSolidXmark as CloseIcon } from "danx-icon";
-import { computed } from "vue";
+import { computed, onMounted, ref } from "vue";
 import { HotkeyDefinition, HotkeyGroup } from "../../../composables/markdown/useMarkdownHotkeys";
+
+const overlayRef = ref<HTMLDivElement | null>(null);
+
+onMounted(() => {
+  // Focus the overlay so it can receive keyboard events
+  overlayRef.value?.focus();
+});
 
 export interface HotkeyHelpPopoverProps {
   hotkeys: HotkeyDefinition[];
@@ -56,10 +71,11 @@ const GROUP_LABELS: Record<HotkeyGroup, string> = {
   formatting: "Formatting",
   lists: "Lists",
   blocks: "Blocks",
+  tables: "Tables",
   other: "Other"
 };
 
-const GROUP_ORDER: HotkeyGroup[] = ["headings", "formatting", "lists", "blocks", "other"];
+const GROUP_ORDER: HotkeyGroup[] = ["headings", "formatting", "lists", "blocks", "tables", "other"];
 
 const props = defineProps<HotkeyHelpPopoverProps>();
 
@@ -141,7 +157,7 @@ function formatKey(key: string): string {
   border-radius: 0.5rem;
   box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5);
   min-width: 320px;
-  max-width: 480px;
+  max-width: 90vw;
   max-height: 80vh;
   overflow: hidden;
   display: flex;
@@ -187,11 +203,18 @@ function formatKey(key: string): string {
     overflow-y: auto;
   }
 
-  .hotkey-group {
-    &:not(:first-child) {
-      margin-top: 1.25rem;
-    }
+  .hotkey-groups-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 1.5rem 2rem;
 
+    // For wider screens, limit to 3 columns max
+    @media (min-width: 800px) {
+      grid-template-columns: repeat(3, minmax(200px, 1fr));
+    }
+  }
+
+  .hotkey-group {
     h4 {
       margin: 0 0 0.75rem;
       font-size: 0.75rem;

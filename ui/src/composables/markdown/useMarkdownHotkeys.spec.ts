@@ -462,6 +462,89 @@ describe("useMarkdownHotkeys", () => {
 			});
 		});
 
+		describe("arrow key normalization", () => {
+			it("matches ArrowUp to ctrl+alt+shift+up", () => {
+				const event = createKeyboardEvent({
+					key: "ArrowUp",
+					ctrlKey: true,
+					altKey: true,
+					shiftKey: true
+				});
+				const parsed = parseKeyCombo("ctrl+alt+shift+up");
+				expect(matchesKeyCombo(event, parsed)).toBe(true);
+			});
+
+			it("matches ArrowDown to ctrl+alt+shift+down", () => {
+				const event = createKeyboardEvent({
+					key: "ArrowDown",
+					ctrlKey: true,
+					altKey: true,
+					shiftKey: true
+				});
+				const parsed = parseKeyCombo("ctrl+alt+shift+down");
+				expect(matchesKeyCombo(event, parsed)).toBe(true);
+			});
+
+			it("matches ArrowLeft to ctrl+alt+shift+left", () => {
+				const event = createKeyboardEvent({
+					key: "ArrowLeft",
+					ctrlKey: true,
+					altKey: true,
+					shiftKey: true
+				});
+				const parsed = parseKeyCombo("ctrl+alt+shift+left");
+				expect(matchesKeyCombo(event, parsed)).toBe(true);
+			});
+
+			it("matches ArrowRight to ctrl+alt+shift+right", () => {
+				const event = createKeyboardEvent({
+					key: "ArrowRight",
+					ctrlKey: true,
+					altKey: true,
+					shiftKey: true
+				});
+				const parsed = parseKeyCombo("ctrl+alt+shift+right");
+				expect(matchesKeyCombo(event, parsed)).toBe(true);
+			});
+
+			it("matches ArrowUp with only ctrl modifier", () => {
+				const event = createKeyboardEvent({
+					key: "ArrowUp",
+					ctrlKey: true
+				});
+				const parsed = parseKeyCombo("ctrl+up");
+				expect(matchesKeyCombo(event, parsed)).toBe(true);
+			});
+
+			it("matches ArrowDown with only alt modifier", () => {
+				const event = createKeyboardEvent({
+					key: "ArrowDown",
+					altKey: true
+				});
+				const parsed = parseKeyCombo("alt+down");
+				expect(matchesKeyCombo(event, parsed)).toBe(true);
+			});
+
+			it("does not match ArrowUp when expecting ArrowDown", () => {
+				const event = createKeyboardEvent({
+					key: "ArrowUp",
+					ctrlKey: true
+				});
+				const parsed = parseKeyCombo("ctrl+down");
+				expect(matchesKeyCombo(event, parsed)).toBe(false);
+			});
+
+			it("does not match when modifiers are different", () => {
+				const event = createKeyboardEvent({
+					key: "ArrowUp",
+					ctrlKey: true,
+					shiftKey: false
+				});
+				const parsed = parseKeyCombo("ctrl+shift+up");
+				expect(matchesKeyCombo(event, parsed)).toBe(false);
+			});
+		});
+
 		describe("cross-platform modifier handling", () => {
 			// Note: These tests check the function behavior; actual Mac detection
 			// depends on navigator.platform which is mocked by jsdom

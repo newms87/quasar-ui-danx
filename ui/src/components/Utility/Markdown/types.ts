@@ -6,3 +6,8 @@ export interface LineTypeOption {
   icon: string;
   shortcut: string;
 }
+
+export interface PopoverPosition {
+  x: number;
+  y: number;
+}

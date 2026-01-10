@@ -9,3 +9,4 @@ export * from "./features/useHeadings";
 export * from "./features/useInlineFormatting";
 export * from "./features/useLinks";
 export * from "./features/useLists";
+export * from "./features/useTables";

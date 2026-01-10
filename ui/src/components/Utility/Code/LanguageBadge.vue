@@ -53,14 +53,20 @@
           type="text"
           class="dx-language-search-input"
           placeholder="Search languages..."
+          @input="onSearchQueryChange"
+          @keydown.down.prevent="navigateDown"
+          @keydown.up.prevent="navigateUp"
+          @keydown.enter.prevent="selectCurrentItem"
           @keydown.escape="closeSearchPanel"
         />
         <div class="dx-language-search-list">
           <div
-            v-for="lang in filteredLanguages"
+            v-for="(lang, index) in filteredLanguages"
             :key="lang"
             class="dx-language-search-item"
+            :class="{ 'is-selected': index === selectedIndex }"
             @click="selectLanguage(lang)"
+            @mouseenter="selectedIndex = index"
           >
             {{ lang.toUpperCase() }}
           </div>
@@ -125,6 +131,7 @@ const showOptions = ref(false);
 const showSearchPanel = ref(false);
 const searchQuery = ref("");
 const searchInputRef = ref<HTMLInputElement | null>(null);
+const selectedIndex = ref(0);
 
 // Get formats other than the current one
 const otherFormats = computed(() => {
@@ -140,9 +147,44 @@ const filteredLanguages = computed(() => {
   return ALL_LANGUAGES.filter(lang => lang.toLowerCase().includes(query));
 });
 
+// Reset selectedIndex when search query changes
+function onSearchQueryChange() {
+  selectedIndex.value = 0;
+}
+
+// Keyboard navigation functions
+function navigateDown() {
+  if (filteredLanguages.value.length === 0) return;
+  selectedIndex.value = (selectedIndex.value + 1) % filteredLanguages.value.length;
+  scrollSelectedIntoView();
+}
+
+function navigateUp() {
+  if (filteredLanguages.value.length === 0) return;
+  selectedIndex.value = selectedIndex.value === 0
+    ? filteredLanguages.value.length - 1
+    : selectedIndex.value - 1;
+  scrollSelectedIntoView();
+}
+
+function selectCurrentItem() {
+  if (filteredLanguages.value.length > 0) {
+    selectLanguage(filteredLanguages.value[selectedIndex.value]);
+  }
+}
+
+function scrollSelectedIntoView() {
+  nextTick(() => {
+    const list = document.querySelector(".dx-language-search-list");
+    const selected = list?.querySelector(".is-selected");
+    selected?.scrollIntoView({ block: "nearest" });
+  });
+}
+
 function openSearchPanel() {
   showSearchPanel.value = true;
   searchQuery.value = "";
+  selectedIndex.value = 0;
   nextTick(() => {
     searchInputRef.value?.focus();
   });
@@ -314,8 +356,9 @@ defineExpose({
   cursor: pointer;
   transition: all 0.15s;
 
-  &:hover {
-    background: rgba(255, 255, 255, 0.1);
+  &:hover,
+  &.is-selected {
+    background: rgba(255, 255, 255, 0.15);
     color: rgba(255, 255, 255, 0.95);
   }
 }

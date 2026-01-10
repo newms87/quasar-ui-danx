@@ -901,6 +901,21 @@ export function useMarkdownEditor(options: UseMarkdownEditorOptions): UseMarkdow
 			}
 		}
 
+		// Handle arrow keys in tables (without modifiers for simple navigation)
+		if ((event.key === "ArrowUp" || event.key === "ArrowDown") &&
+			!event.ctrlKey && !event.altKey && !event.shiftKey && !event.metaKey) {
+			if (tables.isInTable()) {
+				// Always navigate to the same column in the adjacent row
+				const handled = event.key === "ArrowUp"
+					? tables.navigateToCellAbove()
+					: tables.navigateToCellBelow();
+				if (handled) {
+					event.preventDefault();
+					return;
+				}
+			}
+		}
+
 		// Handle Enter key for code block, table, and list continuation
 		if (event.key === "Enter" && !event.shiftKey && !event.ctrlKey && !event.altKey && !event.metaKey) {
 			// Check for code fence pattern first (e.g., "```javascript" -> code block)

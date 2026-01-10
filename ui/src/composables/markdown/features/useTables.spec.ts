@@ -564,6 +564,275 @@ describe("useTables", () => {
 		});
 	});
 
+	describe("cursor position preservation", () => {
+		/**
+		 * Helper to get cursor offset within a cell
+		 */
+		function getCursorOffsetInCell(cell: HTMLTableCellElement): number {
+			const selection = window.getSelection();
+			if (!selection || !selection.rangeCount) return -1;
+
+			const range = selection.getRangeAt(0);
+			if (!cell.contains(range.startContainer)) return -1;
+
+			const preCaretRange = document.createRange();
+			preCaretRange.selectNodeContents(cell);
+			preCaretRange.setEnd(range.startContainer, range.startOffset);
+			return preCaretRange.toString().length;
+		}
+
+		describe("navigateToCellBelow with cursor offset", () => {
+			it("preserves cursor position when moving down", () => {
+				// Create table with specific content
+				editor = createTestEditor(
+					"<table><thead><tr><th>Hello</th></tr></thead><tbody><tr><td>World</td></tr></tbody></table>"
+				);
+				const tables = createTables();
+				const table = editor.container.querySelector("table") as HTMLTableElement;
+				const headerCell = getCell(table, 0, 0)!;
+
+				// Place cursor at position 3 in "Hello" (after "Hel")
+				setCursorInCell(headerCell, 3);
+
+				// Verify cursor is at position 3
+				expect(getCursorOffsetInCell(headerCell)).toBe(3);
+
+				// Navigate down
+				tables.navigateToCellBelow();
+
+				// Verify cursor is at position 3 in second row ("Wor|ld")
+				const targetCell = getCell(table, 1, 0)!;
+				expect(tables.getCurrentCell()).toBe(targetCell);
+				expect(getCursorOffsetInCell(targetCell)).toBe(3);
+			});
+
+			it("clamps cursor position when target cell is shorter", () => {
+				// Cell 1 has "Hello" (5 chars), Cell 2 has "Hi" (2 chars)
+				editor = createTestEditor(
+					"<table><thead><tr><th>Hello</th></tr></thead><tbody><tr><td>Hi</td></tr></tbody></table>"
+				);
+				const tables = createTables();
+				const table = editor.container.querySelector("table") as HTMLTableElement;
+				const headerCell = getCell(table, 0, 0)!;
+
+				// Place cursor at position 4 in "Hello"
+				setCursorInCell(headerCell, 4);
+				expect(getCursorOffsetInCell(headerCell)).toBe(4);
+
+				// Navigate down
+				tables.navigateToCellBelow();
+
+				// Cursor should be clamped to position 2 (end of "Hi")
+				const targetCell = getCell(table, 1, 0)!;
+				expect(tables.getCurrentCell()).toBe(targetCell);
+				expect(getCursorOffsetInCell(targetCell)).toBe(2);
+			});
+
+			it("places cursor at start for empty target cell", () => {
+				// Cell 1 has "Hello", Cell 2 is empty (just BR placeholder)
+				editor = createTestEditor(
+					"<table><thead><tr><th>Hello</th></tr></thead><tbody><tr><td><br></td></tr></tbody></table>"
+				);
+				const tables = createTables();
+				const table = editor.container.querySelector("table") as HTMLTableElement;
+				const headerCell = getCell(table, 0, 0)!;
+
+				// Place cursor at position 3 in "Hello"
+				setCursorInCell(headerCell, 3);
+
+				// Navigate down
+				tables.navigateToCellBelow();
+
+				// Cursor should be at position 0 in empty cell
+				const targetCell = getCell(table, 1, 0)!;
+				expect(tables.getCurrentCell()).toBe(targetCell);
+				// Empty cell has no text, cursor should be at 0
+				expect(getCursorOffsetInCell(targetCell)).toBe(0);
+			});
+
+			it("handles cursor at end of cell when moving down", () => {
+				editor = createTestEditor(
+					"<table><thead><tr><th>ABC</th></tr></thead><tbody><tr><td>DEFGH</td></tr></tbody></table>"
+				);
+				const tables = createTables();
+				const table = editor.container.querySelector("table") as HTMLTableElement;
+				const headerCell = getCell(table, 0, 0)!;
+
+				// Place cursor at end of "ABC" (position 3)
+				setCursorInCell(headerCell, 3);
+
+				// Navigate down
+				tables.navigateToCellBelow();
+
+				// Cursor should be at position 3 in "DEFGH"
+				const targetCell = getCell(table, 1, 0)!;
+				expect(getCursorOffsetInCell(targetCell)).toBe(3);
+			});
+		});
+
+		describe("navigateToCellAbove with cursor offset", () => {
+			it("preserves cursor position when moving up", () => {
+				editor = createTestEditor(
+					"<table><thead><tr><th>Hello</th></tr></thead><tbody><tr><td>World</td></tr></tbody></table>"
+				);
+				const tables = createTables();
+				const table = editor.container.querySelector("table") as HTMLTableElement;
+				const bodyCell = getCell(table, 1, 0)!;
+
+				// Place cursor at position 2 in "World" (after "Wo")
+				setCursorInCell(bodyCell, 2);
+				expect(getCursorOffsetInCell(bodyCell)).toBe(2);
+
+				// Navigate up
+				tables.navigateToCellAbove();
+
+				// Verify cursor is at position 2 in header row ("He|llo")
+				const targetCell = getCell(table, 0, 0)!;
+				expect(tables.getCurrentCell()).toBe(targetCell);
+				expect(getCursorOffsetInCell(targetCell)).toBe(2);
+			});
+
+			it("clamps cursor position when target cell is shorter", () => {
+				// Cell 1 (header) has "Hi" (2 chars), Cell 2 has "Hello" (5 chars)
+				editor = createTestEditor(
+					"<table><thead><tr><th>Hi</th></tr></thead><tbody><tr><td>Hello</td></tr></tbody></table>"
+				);
+				const tables = createTables();
+				const table = editor.container.querySelector("table") as HTMLTableElement;
+				const bodyCell = getCell(table, 1, 0)!;
+
+				// Place cursor at position 4 in "Hello"
+				setCursorInCell(bodyCell, 4);
+				expect(getCursorOffsetInCell(bodyCell)).toBe(4);
+
+				// Navigate up
+				tables.navigateToCellAbove();
+
+				// Cursor should be clamped to position 2 (end of "Hi")
+				const targetCell = getCell(table, 0, 0)!;
+				expect(tables.getCurrentCell()).toBe(targetCell);
+				expect(getCursorOffsetInCell(targetCell)).toBe(2);
+			});
+
+			it("places cursor at start for empty target cell", () => {
+				// Header cell is empty, body cell has content
+				editor = createTestEditor(
+					"<table><thead><tr><th><br></th></tr></thead><tbody><tr><td>Hello</td></tr></tbody></table>"
+				);
+				const tables = createTables();
+				const table = editor.container.querySelector("table") as HTMLTableElement;
+				const bodyCell = getCell(table, 1, 0)!;
+
+				// Place cursor at position 3 in "Hello"
+				setCursorInCell(bodyCell, 3);
+
+				// Navigate up
+				tables.navigateToCellAbove();
+
+				// Cursor should be at position 0 in empty header cell
+				const targetCell = getCell(table, 0, 0)!;
+				expect(tables.getCurrentCell()).toBe(targetCell);
+				expect(getCursorOffsetInCell(targetCell)).toBe(0);
+			});
+
+			it("handles multi-row navigation preserving offset", () => {
+				// 3-row table to test navigating through multiple rows
+				editor = createTestEditor(
+					"<table><thead><tr><th>Row1</th></tr></thead><tbody><tr><td>Row2</td></tr><tr><td>Row3</td></tr></tbody></table>"
+				);
+				const tables = createTables();
+				const table = editor.container.querySelector("table") as HTMLTableElement;
+				const lastRowCell = getCell(table, 2, 0)!;
+
+				// Place cursor at position 2 in "Row3"
+				setCursorInCell(lastRowCell, 2);
+
+				// Navigate up twice
+				tables.navigateToCellAbove();
+				let currentCell = tables.getCurrentCell();
+				expect(currentCell).toBe(getCell(table, 1, 0));
+				expect(getCursorOffsetInCell(currentCell!)).toBe(2);
+
+				tables.navigateToCellAbove();
+				currentCell = tables.getCurrentCell();
+				expect(currentCell).toBe(getCell(table, 0, 0));
+				expect(getCursorOffsetInCell(currentCell!)).toBe(2);
+			});
+		});
+
+		describe("cursor offset edge cases", () => {
+			it("handles cursor at position 0", () => {
+				editor = createTestEditor(
+					"<table><thead><tr><th>Hello</th></tr></thead><tbody><tr><td>World</td></tr></tbody></table>"
+				);
+				const tables = createTables();
+				const table = editor.container.querySelector("table") as HTMLTableElement;
+				const headerCell = getCell(table, 0, 0)!;
+
+				// Place cursor at position 0
+				setCursorInCell(headerCell, 0);
+				expect(getCursorOffsetInCell(headerCell)).toBe(0);
+
+				// Navigate down
+				tables.navigateToCellBelow();
+
+				// Cursor should be at position 0
+				const targetCell = getCell(table, 1, 0)!;
+				expect(getCursorOffsetInCell(targetCell)).toBe(0);
+			});
+
+			it("handles cells with inline formatting", () => {
+				// Cell with bold text
+				editor = createTestEditor(
+					"<table><thead><tr><th><strong>Bold</strong></th></tr></thead><tbody><tr><td>Plain</td></tr></tbody></table>"
+				);
+				const tables = createTables();
+				const table = editor.container.querySelector("table") as HTMLTableElement;
+				const headerCell = getCell(table, 0, 0)!;
+
+				// Place cursor at position 2 in "Bold" (inside strong tag)
+				const strongText = headerCell.querySelector("strong")!.firstChild!;
+				editor.setCursor(strongText, 2);
+				expect(getCursorOffsetInCell(headerCell)).toBe(2);
+
+				// Navigate down
+				tables.navigateToCellBelow();
+
+				// Cursor should be at position 2 in "Plain"
+				const targetCell = getCell(table, 1, 0)!;
+				expect(getCursorOffsetInCell(targetCell)).toBe(2);
+			});
+
+			it("handles mixed content cells", () => {
+				// Cell with text + bold + text
+				editor = createTestEditor(
+					"<table><thead><tr><th>A<strong>B</strong>C</th></tr></thead><tbody><tr><td>DEFGH</td></tr></tbody></table>"
+				);
+				const tables = createTables();
+				const table = editor.container.querySelector("table") as HTMLTableElement;
+				const headerCell = getCell(table, 0, 0)!;
+
+				// Total text is "ABC", place cursor at position 2 (after "AB")
+				// Need to find the right text node - the one after strong
+				const walker = document.createTreeWalker(headerCell, NodeFilter.SHOW_TEXT);
+				walker.nextNode(); // "A"
+				walker.nextNode(); // "B" inside strong
+				const lastTextNode = walker.nextNode() as Text; // "C"
+
+				// Set cursor at start of "C" which is offset 2 in total text
+				editor.setCursor(lastTextNode, 0);
+				expect(getCursorOffsetInCell(headerCell)).toBe(2);
+
+				// Navigate down
+				tables.navigateToCellBelow();
+
+				// Cursor should be at position 2 in "DEFGH"
+				const targetCell = getCell(table, 1, 0)!;
+				expect(getCursorOffsetInCell(targetCell)).toBe(2);
+			});
+		});
+	});
+
 	describe("insertRowAbove", () => {
 		it("inserts a new row above the current row", () => {
 			editor = createTestEditor(createTableHtml(2, 2, ["H1", "H2"], [["C1", "C2"]]));

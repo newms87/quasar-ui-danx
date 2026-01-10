@@ -55,9 +55,9 @@ export interface UseTablesReturn {
 	navigateToNextCell: () => boolean;
 	/** Navigate to the previous cell. Returns false if at start. */
 	navigateToPreviousCell: () => boolean;
-	/** Navigate to the cell directly below. Returns false if at bottom. */
+	/** Navigate to the cell directly below. Returns false if at bottom row. */
 	navigateToCellBelow: () => boolean;
-	/** Navigate to the cell directly above. Returns false if at top. */
+	/** Navigate to the cell directly above. Returns false if at top row. */
 	navigateToCellAbove: () => boolean;
 
 	// Row operations
@@ -231,7 +231,84 @@ function getCellAt(table: HTMLTableElement, rowIndex: number, colIndex: number):
 }
 
 /**
- * Place cursor at the start of a cell
+ * Get the cursor offset (character position) within a cell
+ * This measures the text length from the start of the cell to the cursor position
+ */
+function getCursorOffsetInCell(cell: HTMLTableCellElement): number {
+	const selection = window.getSelection();
+	if (!selection || !selection.rangeCount) return 0;
+
+	const range = selection.getRangeAt(0);
+
+	// Create a range from cell start to cursor position
+	const preCaretRange = document.createRange();
+	preCaretRange.selectNodeContents(cell);
+	preCaretRange.setEnd(range.startContainer, range.startOffset);
+
+	// Get text length up to cursor
+	return preCaretRange.toString().length;
+}
+
+/**
+ * Set the cursor at a specific character offset within a cell
+ * If the offset exceeds the cell's text length, places cursor at the end
+ */
+function setCursorOffsetInCell(cell: HTMLTableCellElement, targetOffset: number): void {
+	const selection = window.getSelection();
+	if (!selection) return;
+
+	const textContent = cell.textContent || "";
+	const maxOffset = textContent.length;
+	const offset = Math.min(targetOffset, maxOffset);
+
+	// Find the text node and position for this offset
+	let currentOffset = 0;
+	const walker = document.createTreeWalker(cell, NodeFilter.SHOW_TEXT);
+	let node: Text | null = null;
+
+	while ((node = walker.nextNode() as Text | null)) {
+		const nodeLength = node.textContent?.length || 0;
+		if (currentOffset + nodeLength >= offset) {
+			// Found the right node
+			const range = document.createRange();
+			range.setStart(node, offset - currentOffset);
+			range.collapse(true);
+			selection.removeAllRanges();
+			selection.addRange(range);
+			return;
+		}
+		currentOffset += nodeLength;
+	}
+
+	// Fallback: place at end of cell
+	const range = document.createRange();
+	range.selectNodeContents(cell);
+	range.collapse(false);
+	selection.removeAllRanges();
+	selection.addRange(range);
+}
+
+/**
+ * Get the first text node with actual content in an element
+ */
+function getFirstTextNode(node: Node): Text | null {
+	if (node.nodeType === Node.TEXT_NODE) {
+		// Return the text node even if it's empty/whitespace - we can position at offset 0
+		return node as Text;
+	}
+	for (const child of Array.from(node.childNodes)) {
+		// Skip BR elements - they're placeholders for empty cells
+		if (child.nodeType === Node.ELEMENT_NODE && (child as Element).tagName === "BR") {
+			continue;
+		}
+		const found = getFirstTextNode(child);
+		if (found) return found;
+	}
+	return null;
+}
+
+/**
+ * Place cursor at the start of a cell without selecting text
  */
 function focusCell(cell: HTMLTableCellElement): void {
 	const selection = window.getSelection();
@@ -239,25 +316,24 @@ function focusCell(cell: HTMLTableCellElement): void {
 
 	const range = document.createRange();
 
-	// Find first text node or use the cell itself
-	const walker = document.createTreeWalker(cell, NodeFilter.SHOW_TEXT);
-	const firstTextNode = walker.nextNode() as Text | null;
+	// Find first text node
+	const firstTextNode = getFirstTextNode(cell);
 
 	if (firstTextNode) {
+		// Place cursor at start of text node
 		range.setStart(firstTextNode, 0);
-		range.collapse(true);
+		range.collapse(true); // Collapse to start, no selection
 	} else {
-		// No text node, check for BR or other content
-		if (cell.firstChild) {
-			range.setStartBefore(cell.firstChild);
-		} else {
-			range.selectNodeContents(cell);
-		}
-		range.collapse(true);
+		// Empty cell or only has BR - position at start of cell contents
+		range.selectNodeContents(cell);
+		range.collapse(true); // Collapse to start, no selection
 	}
 
 	selection.removeAllRanges();
 	selection.addRange(range);
+
+	// Ensure the cell element itself has focus for keyboard events
+	cell.focus();
 }
 
 /**
@@ -585,20 +661,26 @@ export function useTables(options: UseTablesOptions): UseTablesReturn {
 
 	/**
 	 * Navigate to the cell directly below
-	 * Returns false if at the bottom of the table
+	 * Returns false if at the bottom row of the table
+	 * Preserves cursor offset position from the source cell
 	 */
 	function navigateToCellBelow(): boolean {
 		const context = getCurrentCellAndTable();
 		if (!context) return false;
 
 		const { cell, table } = context;
+
+		// Get current cursor offset BEFORE navigating
+		const cursorOffset = getCursorOffsetInCell(cell);
+
 		const { row, col } = getCellCoordinates(cell);
 		const rows = getAllTableRows(table);
 
 		if (row + 1 < rows.length) {
 			const belowCell = getCellAt(table, row + 1, col);
 			if (belowCell) {
-				selectCellContent(belowCell);
+				// Set cursor at same offset in target cell (clamped to cell length)
+				setCursorOffsetInCell(belowCell, cursorOffset);
 				return true;
 			}
 		}
@@ -608,19 +690,25 @@ export function useTables(options: UseTablesOptions): UseTablesReturn {
 
 	/**
 	 * Navigate to the cell directly above
-	 * Returns false if at the top of the table
+	 * Returns false if at the top row of the table
+	 * Preserves cursor offset position from the source cell
 	 */
 	function navigateToCellAbove(): boolean {
 		const context = getCurrentCellAndTable();
 		if (!context) return false;
 
 		const { cell, table } = context;
+
+		// Get current cursor offset BEFORE navigating
+		const cursorOffset = getCursorOffsetInCell(cell);
+
 		const { row, col } = getCellCoordinates(cell);
 
 		if (row > 0) {
 			const aboveCell = getCellAt(table, row - 1, col);
 			if (aboveCell) {
-				selectCellContent(aboveCell);
+				// Set cursor at same offset in target cell (clamped to cell length)
+				setCursorOffsetInCell(aboveCell, cursorOffset);
 				return true;
 			}
 		}

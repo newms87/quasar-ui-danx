@@ -57,26 +57,22 @@ export function useContextMenu(options: UseContextMenuOptions): UseContextMenuRe
 
 		// In code blocks, show minimal menu - just exit option
 		// Code blocks are literal/verbatim, no formatting is allowed
+		// Unnested since this is the only action available in this context
 		if (context === "code") {
 			menuItems.push({
-				id: "blocks",
-				label: "Blocks",
-				children: [
-					{
-						id: "code-block",
-						label: "Toggle Code Block",
-						shortcut: "Ctrl+Shift+K",
-						action: () => editor.codeBlocks.toggleCodeBlock()
-					}
-				]
+				id: "code-block",
+				label: "Toggle Code Block",
+				shortcut: "Ctrl+Shift+K",
+				action: () => editor.codeBlocks.toggleCodeBlock()
 			});
 			return menuItems;
 		}
 
 		// In tables, only show inline formatting and table operations
 		// Tables cannot contain block-level elements (headings, code blocks, blockquotes, lists, nested tables)
+		// Table operations are unnested since this context is already limited to tables
 		if (context === "table") {
-			// Format submenu (inline only)
+			// Format submenu (inline only - keep nested)
 			menuItems.push({
 				id: "format",
 				label: "Format",
@@ -114,61 +110,67 @@ export function useContextMenu(options: UseContextMenuOptions): UseContextMenuRe
 				]
 			});
 
-			// Table operations
+			// Table operations - unnested as top-level items with dividers between groups
+			// Divider after Format submenu
+			menuItems.push({ id: "table-format-divider", label: "", divider: true });
+
+			// Insert operations
 			menuItems.push({
-				id: "table",
-				label: "Table",
-				children: [
-					{
-						id: "insert-row-above",
-						label: "Insert Row Above",
-						shortcut: "Ctrl+Alt+Shift+Up",
-						action: () => editor.tables.insertRowAbove()
-					},
-					{
-						id: "insert-row-below",
-						label: "Insert Row Below",
-						shortcut: "Ctrl+Alt+Shift+Down",
-						action: () => editor.tables.insertRowBelow()
-					},
-					{
-						id: "insert-col-left",
-						label: "Insert Column Left",
-						shortcut: "Ctrl+Alt+Shift+Left",
-						action: () => editor.tables.insertColumnLeft()
-					},
-					{
-						id: "insert-col-right",
-						label: "Insert Column Right",
-						shortcut: "Ctrl+Alt+Shift+Right",
-						action: () => editor.tables.insertColumnRight()
-					},
-					{ id: "table-divider-1", label: "", divider: true },
-					{
-						id: "delete-row",
-						label: "Delete Row",
-						shortcut: "Ctrl+Alt+Backspace",
-						action: () => editor.tables.deleteCurrentRow()
-					},
-					{
-						id: "delete-col",
-						label: "Delete Column",
-						shortcut: "Ctrl+Shift+Backspace",
-						action: () => editor.tables.deleteCurrentColumn()
-					},
-					{
-						id: "delete-table",
-						label: "Delete Table",
-						action: () => editor.tables.deleteTable()
-					},
-					{ id: "table-divider-2", label: "", divider: true },
-					{
-						id: "cycle-alignment",
-						label: "Cycle Alignment",
-						shortcut: "Ctrl+Alt+L",
-						action: () => editor.tables.cycleColumnAlignment()
-					}
-				]
+				id: "insert-row-above",
+				label: "Insert Row Above",
+				shortcut: "Ctrl+Alt+Shift+Up",
+				action: () => editor.tables.insertRowAbove()
+			});
+			menuItems.push({
+				id: "insert-row-below",
+				label: "Insert Row Below",
+				shortcut: "Ctrl+Alt+Shift+Down",
+				action: () => editor.tables.insertRowBelow()
+			});
+			menuItems.push({
+				id: "insert-col-left",
+				label: "Insert Column Left",
+				shortcut: "Ctrl+Alt+Shift+Left",
+				action: () => editor.tables.insertColumnLeft()
+			});
+			menuItems.push({
+				id: "insert-col-right",
+				label: "Insert Column Right",
+				shortcut: "Ctrl+Alt+Shift+Right",
+				action: () => editor.tables.insertColumnRight()
+			});
+
+			// Divider before delete operations
+			menuItems.push({ id: "table-divider-1", label: "", divider: true });
+
+			// Delete operations
+			menuItems.push({
+				id: "delete-row",
+				label: "Delete Row",
+				shortcut: "Ctrl+Alt+Backspace",
+				action: () => editor.tables.deleteCurrentRow()
+			});
+			menuItems.push({
+				id: "delete-col",
+				label: "Delete Column",
+				shortcut: "Ctrl+Shift+Backspace",
+				action: () => editor.tables.deleteCurrentColumn()
+			});
+			menuItems.push({
+				id: "delete-table",
+				label: "Delete Table",
+				action: () => editor.tables.deleteTable()
+			});
+
+			// Divider before alignment
+			menuItems.push({ id: "table-divider-2", label: "", divider: true });
+
+			// Alignment operation
+			menuItems.push({
+				id: "cycle-alignment",
+				label: "Cycle Alignment",
+				shortcut: "Ctrl+Alt+L",
+				action: () => editor.tables.cycleColumnAlignment()
 			});
 
 			return menuItems;

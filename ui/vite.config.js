@@ -3,6 +3,8 @@ import { resolve } from "path";
 import { defineConfig } from "vite";
 import svgLoader from "vite-svg-loader";
 
+const __dirname = import.meta.dirname;
+
 export default defineConfig({
 	plugins: [vue(), svgLoader()],
 	resolve: {
@@ -32,7 +34,9 @@ export default defineConfig({
 	css: {
 		preprocessorOptions: {
 			scss: {
-				additionalData: `@import "./src/styles/index.scss";`
+				api: "modern",
+				loadPaths: [resolve(__dirname, "src/styles")],
+				additionalData: `@use "index" as *;`
 			}
 		}
 	}

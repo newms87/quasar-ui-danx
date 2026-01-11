@@ -7,11 +7,6 @@ export interface LineTypeOption {
   shortcut: string;
 }
 
-export interface PopoverPosition {
-  x: number;
-  y: number;
-}
-
 export type ContextMenuContext = "table" | "list" | "code" | "text";
 
 export interface ContextMenuItem {

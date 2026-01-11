@@ -81,7 +81,7 @@
 <script setup lang="ts">
 import { FaSolidXmark as CloseIcon } from "danx-icon";
 import { computed, nextTick, onMounted, onUnmounted, ref, watch } from "vue";
-import type { PopoverPosition } from "./types";
+import type { PopoverPosition } from "@/composables/markdown";
 
 export interface LinkPopoverProps {
   position: PopoverPosition;

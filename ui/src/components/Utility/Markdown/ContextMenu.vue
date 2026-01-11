@@ -69,7 +69,8 @@
 
 <script setup lang="ts">
 import { computed, onMounted, onUnmounted, ref } from "vue";
-import type { ContextMenuItem, PopoverPosition } from "./types";
+import type { ContextMenuItem } from "./types";
+import type { PopoverPosition } from "@/composables/markdown";
 
 export interface ContextMenuProps {
   position: PopoverPosition;

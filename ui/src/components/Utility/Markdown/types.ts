@@ -11,3 +11,22 @@ export interface PopoverPosition {
   x: number;
   y: number;
 }
+
+export type ContextMenuContext = "table" | "list" | "code" | "text";
+
+export interface ContextMenuItem {
+  id: string;
+  label: string;
+  icon?: string;
+  shortcut?: string;
+  action?: () => void;  // Optional - not needed if has children
+  disabled?: boolean;
+  children?: ContextMenuItem[];  // For nested submenus
+  divider?: boolean;  // For visual dividers between items
+}
+
+export interface ContextMenuGroup {
+  id: string;
+  label: string;
+  items: ContextMenuItem[];
+}

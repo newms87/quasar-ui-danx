@@ -1,3 +1,4 @@
+export { default as ContextMenu } from "./ContextMenu.vue";
 export { default as HotkeyHelpPopover } from "./HotkeyHelpPopover.vue";
 export { default as LineTypeMenu } from "./LineTypeMenu.vue";
 export { default as LinkPopover } from "./LinkPopover.vue";

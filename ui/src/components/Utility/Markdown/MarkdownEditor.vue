@@ -1,15 +1,15 @@
 <template>
   <div class="dx-markdown-editor" :class="{ 'is-readonly': readonly }">
-    <div class="dx-markdown-editor-body">
+    <div class="dx-markdown-editor-body" @contextmenu="contextMenu.show">
       <!-- Floating line type menu positioned next to current block -->
       <div
         ref="menuContainerRef"
         class="dx-line-type-menu-container"
-        :style="lineTypeMenuStyle"
+        :style="lineTypeMenu.menuStyle.value"
       >
         <LineTypeMenu
-          :current-type="currentLineType"
-          @change="onLineTypeChange"
+          :current-type="lineTypeMenu.currentLineType.value"
+          @change="lineTypeMenu.onLineTypeChange"
         />
       </div>
 
@@ -36,35 +36,44 @@
     />
 
     <LinkPopover
-      v-if="isLinkPopoverVisible"
-      :position="linkPopoverPosition"
-      :existing-url="linkPopoverExistingUrl"
-      :selected-text="linkPopoverSelectedText"
-      @submit="handleLinkPopoverSubmit"
-      @cancel="handleLinkPopoverCancel"
+      v-if="linkPopover.isVisible.value"
+      :position="linkPopover.position.value"
+      :existing-url="linkPopover.existingUrl.value"
+      :selected-text="linkPopover.selectedText.value"
+      @submit="linkPopover.submit"
+      @cancel="linkPopover.cancel"
     />
 
     <TablePopover
-      v-if="isTablePopoverVisible"
-      :position="tablePopoverPosition"
-      @submit="handleTablePopoverSubmit"
-      @cancel="handleTablePopoverCancel"
+      v-if="tablePopover.isVisible.value"
+      :position="tablePopover.position.value"
+      @submit="tablePopover.submit"
+      @cancel="tablePopover.cancel"
+    />
+
+    <ContextMenu
+      v-if="contextMenu.isVisible.value"
+      :position="contextMenu.position.value"
+      :items="contextMenu.items.value"
+      @close="contextMenu.hide"
     />
   </div>
 </template>
 
 <script setup lang="ts">
 import { computed, onMounted, onUnmounted, ref, watch } from "vue";
-import { ShowLinkPopoverOptions } from "../../../composables/markdown/features/useLinks";
-import { ShowTablePopoverOptions } from "../../../composables/markdown/features/useTables";
+import { useContextMenu } from "../../../composables/markdown/features/useContextMenu";
+import { useFocusTracking } from "../../../composables/markdown/features/useFocusTracking";
+import { useLineTypeMenu } from "../../../composables/markdown/features/useLineTypeMenu";
+import { useLinkPopover, useTablePopover } from "../../../composables/markdown/features/usePopoverManager";
 import { useMarkdownEditor } from "../../../composables/markdown/useMarkdownEditor";
+import ContextMenu from "./ContextMenu.vue";
 import HotkeyHelpPopover from "./HotkeyHelpPopover.vue";
 import LineTypeMenu from "./LineTypeMenu.vue";
 import LinkPopover from "./LinkPopover.vue";
 import MarkdownEditorContent from "./MarkdownEditorContent.vue";
 import MarkdownEditorFooter from "./MarkdownEditorFooter.vue";
 import TablePopover from "./TablePopover.vue";
-import type { LineType } from "./types";
 
 export interface MarkdownEditorProps {
   modelValue?: string;
@@ -95,81 +104,9 @@ const menuContainerRef = ref<HTMLElement | null>(null);
 // Get the actual HTMLElement from the content component
 const contentElementRef = computed(() => contentRef.value?.containerRef || null);
 
-// Link popover state
-const isLinkPopoverVisible = ref(false);
-const linkPopoverPosition = ref({ x: 0, y: 0 });
-const linkPopoverExistingUrl = ref<string | undefined>(undefined);
-const linkPopoverSelectedText = ref<string | undefined>(undefined);
-let linkPopoverOnSubmit: ((url: string, label?: string) => void) | null = null;
-let linkPopoverOnCancel: (() => void) | null = null;
-
-// Table popover state
-const isTablePopoverVisible = ref(false);
-const tablePopoverPosition = ref({ x: 0, y: 0 });
-let tablePopoverSubmitCallback: ((rows: number, cols: number) => void) | null = null;
-let tablePopoverCancelCallback: (() => void) | null = null;
-
-/**
- * Handle showing the link popover
- */
-function handleShowLinkPopover(options: ShowLinkPopoverOptions): void {
-  linkPopoverPosition.value = options.position;
-  linkPopoverExistingUrl.value = options.existingUrl;
-  linkPopoverSelectedText.value = options.selectedText;
-  linkPopoverOnSubmit = options.onSubmit;
-  linkPopoverOnCancel = options.onCancel;
-  isLinkPopoverVisible.value = true;
-}
-
-/**
- * Handle link popover submit
- */
-function handleLinkPopoverSubmit(url: string, label?: string): void {
-  isLinkPopoverVisible.value = false;
-  if (linkPopoverOnSubmit) {
-    linkPopoverOnSubmit(url, label);
-  }
-}
-
-/**
- * Handle link popover cancel
- */
-function handleLinkPopoverCancel(): void {
-  isLinkPopoverVisible.value = false;
-  if (linkPopoverOnCancel) {
-    linkPopoverOnCancel();
-  }
-}
-
-/**
- * Handle showing the table popover
- */
-function handleShowTablePopover(options: ShowTablePopoverOptions): void {
-  tablePopoverPosition.value = options.position;
-  tablePopoverSubmitCallback = options.onSubmit;
-  tablePopoverCancelCallback = options.onCancel;
-  isTablePopoverVisible.value = true;
-}
-
-/**
- * Handle table popover submit
- */
-function handleTablePopoverSubmit(rows: number, cols: number): void {
-  isTablePopoverVisible.value = false;
-  tablePopoverSubmitCallback?.(rows, cols);
-  tablePopoverSubmitCallback = null;
-  tablePopoverCancelCallback = null;
-}
-
-/**
- * Handle table popover cancel
- */
-function handleTablePopoverCancel(): void {
-  isTablePopoverVisible.value = false;
-  tablePopoverCancelCallback?.();
-  tablePopoverSubmitCallback = null;
-  tablePopoverCancelCallback = null;
-}
+// Initialize popover managers
+const linkPopover = useLinkPopover();
+const tablePopover = useTablePopover();
 
 // Initialize the markdown editor composable
 const editor = useMarkdownEditor({
@@ -178,250 +115,38 @@ const editor = useMarkdownEditor({
   onEmitValue: (markdown: string) => {
     emit("update:modelValue", markdown);
   },
-  onShowLinkPopover: handleShowLinkPopover,
-  onShowTablePopover: handleShowTablePopover
+  onShowLinkPopover: linkPopover.show,
+  onShowTablePopover: tablePopover.show
 });
 
-// Track current heading level for LineTypeMenu
-const currentHeadingLevel = ref(0);
-
-// Track the current block element's top position for floating menu
-const currentBlockTop = ref(0);
-const isEditorFocused = ref(false);
-
-// Map LineType to heading level (single source of truth for bidirectional mapping)
-// Note: ul and ol are handled separately, not as heading levels
-const LINE_TYPE_TO_LEVEL: Record<string, number> = {
-  paragraph: 0,
-  h1: 1,
-  h2: 2,
-  h3: 3,
-  h4: 4,
-  h5: 5,
-  h6: 6
-};
-
-// Derive the inverse mapping from LINE_TYPE_TO_LEVEL
-const LEVEL_TO_LINE_TYPE = Object.fromEntries(
-  Object.entries(LINE_TYPE_TO_LEVEL).map(([type, level]) => [level, type as LineType])
-) as Record<number, LineType>;
-
-// Track current list type for LineTypeMenu
-const currentListType = ref<"ul" | "ol" | null>(null);
-
-// Track if we're in a code block
-const isInCodeBlock = ref(false);
-
-// Computed current line type from heading level, list type, or code block
-const currentLineType = computed<LineType>(() => {
-  // If we're in a code block, return "code"
-  if (isInCodeBlock.value) {
-    return "code";
-  }
-  // If we're in a list, return the list type
-  if (currentListType.value) {
-    return currentListType.value;
-  }
-  // Otherwise, return heading type based on level
-  const level = currentHeadingLevel.value;
-  return LEVEL_TO_LINE_TYPE[level] ?? "paragraph";
+// Initialize focus tracking
+const focusTracking = useFocusTracking({
+  contentRef: contentElementRef,
+  menuContainerRef,
+  onSelectionChange: () => lineTypeMenu.updatePositionAndState()
 });
 
-// Computed style for the floating line type menu
-const lineTypeMenuStyle = computed(() => {
-  return {
-    top: `${currentBlockTop.value}px`,
-    opacity: isEditorFocused.value ? 1 : 0,
-    pointerEvents: isEditorFocused.value ? "auto" : "none"
-  };
+// Initialize line type menu
+const lineTypeMenu = useLineTypeMenu({
+  contentRef: contentElementRef,
+  editor,
+  isEditorFocused: focusTracking.isEditorFocused
 });
 
-// Find the block element containing the current selection
-function findCurrentBlockElement(): HTMLElement | null {
-  const selection = window.getSelection();
-  if (!selection || selection.rangeCount === 0) return null;
+// Initialize context menu
+const contextMenu = useContextMenu({
+  editor,
+  readonly: computed(() => props.readonly)
+});
 
-  let node: Node | null = selection.anchorNode;
-
-  // Walk up to find a block element (P, H1-H6, DIV, etc.)
-  while (node && node !== contentElementRef.value) {
-    if (node.nodeType === Node.ELEMENT_NODE) {
-      const element = node as HTMLElement;
-      const tagName = element.tagName.toUpperCase();
-      if (["P", "H1", "H2", "H3", "H4", "H5", "H6", "DIV", "BLOCKQUOTE", "PRE", "UL", "OL", "LI"].includes(tagName)) {
-        return element;
-      }
-    }
-    node = node.parentNode;
-  }
-
-  return null;
-}
-
-// Update the floating menu position based on current block
-function updateMenuPosition(): void {
-  const contentEl = contentElementRef.value;
-  if (!contentEl) return;
-
-  const blockElement = findCurrentBlockElement();
-  if (!blockElement) {
-    // If no block found, position at top
-    currentBlockTop.value = 0;
-    return;
-  }
-
-  // Get the block's position relative to the content container
-  // We need to account for the content's scroll position
-  const contentRect = contentEl.getBoundingClientRect();
-  const blockRect = blockElement.getBoundingClientRect();
-
-  // Calculate top position relative to the content container, accounting for scroll
-  const relativeTop = blockRect.top - contentRect.top + contentEl.scrollTop;
-  currentBlockTop.value = relativeTop;
-}
-
-// Update current heading level, list type, code block state, and menu position when selection changes
-function updateCurrentHeadingLevel(): void {
-  const level = editor.headings.getCurrentHeadingLevel();
-  currentHeadingLevel.value = level;
-  // Also check if we're in a list
-  currentListType.value = editor.lists.getCurrentListType();
-  // Also check if we're in a code block
-  isInCodeBlock.value = editor.codeBlocks.isInCodeBlock();
-  updateMenuPosition();
-}
-
-// Track focus state
-function handleFocusIn(event: FocusEvent): void {
-  const contentEl = contentElementRef.value;
-  if (contentEl && contentEl.contains(event.target as Node)) {
-    isEditorFocused.value = true;
-    updateMenuPosition();
-  }
-}
-
-function handleFocusOut(event: FocusEvent): void {
-  const contentEl = contentElementRef.value;
-  const menuEl = menuContainerRef.value;
-  const relatedTarget = event.relatedTarget as Node | null;
-
-  // Check if focus is moving outside the editor AND the menu container
-  // Keep focused if moving to menu (allows clicking menu without losing focus state)
-  if (contentEl && !contentEl.contains(relatedTarget)) {
-    // Also check if focus is moving to the menu container
-    if (!menuEl || !menuEl.contains(relatedTarget)) {
-      isEditorFocused.value = false;
-    }
-  }
-}
-
-// Handle line type change from menu
-function onLineTypeChange(type: LineType): void {
-  // Handle code block type
-  if (type === "code") {
-    // If already in a code block, do nothing (or toggle off if that's desired)
-    if (editor.codeBlocks.isInCodeBlock()) {
-      return;
-    }
-
-    // If currently in a list, first convert the list item to paragraph
-    const listType = editor.lists.getCurrentListType();
-    if (listType) {
-      editor.lists.convertCurrentListItemToParagraph();
-    }
-
-    // Now toggle to code block
-    editor.codeBlocks.toggleCodeBlock();
-    isInCodeBlock.value = true;
-    currentListType.value = null;
-    return;
-  }
-
-  // Handle list types
-  if (type === "ul") {
-    // If in code block, first convert to paragraph
-    if (editor.codeBlocks.isInCodeBlock()) {
-      editor.codeBlocks.toggleCodeBlock();
-    }
-    editor.lists.toggleUnorderedList();
-    currentListType.value = editor.lists.getCurrentListType();
-    isInCodeBlock.value = false;
-    return;
-  }
-  if (type === "ol") {
-    // If in code block, first convert to paragraph
-    if (editor.codeBlocks.isInCodeBlock()) {
-      editor.codeBlocks.toggleCodeBlock();
-    }
-    editor.lists.toggleOrderedList();
-    currentListType.value = editor.lists.getCurrentListType();
-    isInCodeBlock.value = false;
-    return;
-  }
-
-  // Handle heading/paragraph types
-  const level = LINE_TYPE_TO_LEVEL[type];
-  if (level !== undefined) {
-    // If currently in a code block, first convert to paragraph
-    if (editor.codeBlocks.isInCodeBlock()) {
-      editor.codeBlocks.toggleCodeBlock();
-    }
-
-    // If currently in a list, first convert the list item to paragraph
-    const listType = editor.lists.getCurrentListType();
-    if (listType) {
-      editor.lists.convertCurrentListItemToParagraph();
-    }
-
-    // Now apply the heading level (0 = paragraph, 1-6 = heading)
-    // Only set heading if level > 0 (paragraph is already the result of list conversion)
-    if (level > 0) {
-      editor.headings.setHeadingLevel(level as 1 | 2 | 3 | 4 | 5 | 6);
-    }
-
-    // Update the tracked level immediately
-    currentHeadingLevel.value = level;
-    currentListType.value = null;
-    isInCodeBlock.value = false;
-  }
-}
-
-// Track which element has listeners attached
-let boundContentEl: HTMLElement | null = null;
-
-// Setup/cleanup focus and scroll listeners on content element
-function setupContentListeners(el: HTMLElement | null): void {
-  // Cleanup previous listeners if element changed
-  if (boundContentEl && boundContentEl !== el) {
-    boundContentEl.removeEventListener("focusin", handleFocusIn);
-    boundContentEl.removeEventListener("focusout", handleFocusOut);
-    boundContentEl.removeEventListener("scroll", updateMenuPosition);
-    boundContentEl = null;
-  }
-
-  // Setup new listeners
-  if (el && el !== boundContentEl) {
-    el.addEventListener("focusin", handleFocusIn);
-    el.addEventListener("focusout", handleFocusOut);
-    el.addEventListener("scroll", updateMenuPosition);
-    boundContentEl = el;
-  }
-}
-
-// Watch for content element to become available
-watch(contentElementRef, (newEl) => {
-  setupContentListeners(newEl);
-}, { immediate: true });
-
-// Listen for selection changes
+// Setup line type menu listeners on mount
 onMounted(() => {
-  document.addEventListener("selectionchange", updateCurrentHeadingLevel);
+  lineTypeMenu.setupListeners();
 });
 
+// Cleanup line type menu listeners on unmount
 onUnmounted(() => {
-  document.removeEventListener("selectionchange", updateCurrentHeadingLevel);
-  // Cleanup content listeners
-  setupContentListeners(null);
+  lineTypeMenu.cleanupListeners();
 });
 
 // Watch for external value changes
@@ -477,12 +202,13 @@ defineExpose({
     display: flex;
     position: relative;
     flex: 1;
+    overflow: visible;
   }
 
-  // Floating line type menu container
+  // Floating line type menu container - positioned outside editor bounds
   .dx-line-type-menu-container {
     position: absolute;
-    left: 0;
+    left: -1.75rem;
     z-index: 10;
     width: 1.75rem;
     display: flex;
@@ -492,12 +218,11 @@ defineExpose({
     transition: top 0.1s ease-out, opacity 0.15s ease;
   }
 
-  // Apply min/max height to content area with left margin for menu
+  // Apply min/max height to content area (no left margin needed - menu is outside)
   .dx-markdown-editor-content {
     flex: 1;
     min-height: v-bind(minHeight);
     max-height: v-bind(maxHeight);
-    margin-left: 1.75rem;
   }
 }
 </style>

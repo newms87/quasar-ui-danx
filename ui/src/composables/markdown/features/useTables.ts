@@ -81,8 +81,12 @@ export interface UseTablesReturn {
 	deleteTable: () => void;
 
 	// Alignment
-	/** Cycle column alignment: left -> center -> right -> left */
-	cycleColumnAlignment: () => void;
+	/** Set column alignment to left */
+	setColumnAlignmentLeft: () => void;
+	/** Set column alignment to center */
+	setColumnAlignmentCenter: () => void;
+	/** Set column alignment to right */
+	setColumnAlignmentRight: () => void;
 
 	// Key handlers
 	/** Handle Tab key in table - returns true if handled */
@@ -967,32 +971,41 @@ export function useTables(options: UseTablesOptions): UseTablesReturn {
 	}
 
 	/**
-	 * Cycle column alignment: left -> center -> right -> left
+	 * Set column alignment to left
 	 */
-	function cycleColumnAlignment(): void {
+	function setColumnAlignmentLeft(): void {
 		const context = getCurrentCellAndTable();
 		if (!context) return;
 
 		const { cell, table } = context;
 		const { col } = getCellCoordinates(cell);
-		const currentAlignment = getColumnAlignment(table, col);
+		setColumnAlignment(table, col, "left");
+		notifyContentChange();
+	}
 
-		let newAlignment: "left" | "center" | "right";
-		switch (currentAlignment) {
-			case "left":
-				newAlignment = "center";
-				break;
-			case "center":
-				newAlignment = "right";
-				break;
-			case "right":
-			default:
-				newAlignment = "left";
-				break;
-		}
+	/**
+	 * Set column alignment to center
+	 */
+	function setColumnAlignmentCenter(): void {
+		const context = getCurrentCellAndTable();
+		if (!context) return;
 
-		setColumnAlignment(table, col, newAlignment);
+		const { cell, table } = context;
+		const { col } = getCellCoordinates(cell);
+		setColumnAlignment(table, col, "center");
+		notifyContentChange();
+	}
 
+	/**
+	 * Set column alignment to right
+	 */
+	function setColumnAlignmentRight(): void {
+		const context = getCurrentCellAndTable();
+		if (!context) return;
+
+		const { cell, table } = context;
+		const { col } = getCellCoordinates(cell);
+		setColumnAlignment(table, col, "right");
 		notifyContentChange();
 	}
 
@@ -1083,7 +1096,9 @@ export function useTables(options: UseTablesOptions): UseTablesReturn {
 		deleteTable,
 
 		// Alignment
-		cycleColumnAlignment,
+		setColumnAlignmentLeft,
+		setColumnAlignmentCenter,
+		setColumnAlignmentRight,
 
 		// Key handlers
 		handleTableTab,

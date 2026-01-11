@@ -592,11 +592,25 @@ export function useMarkdownEditor(options: UseMarkdownEditorOptions): UseMarkdow
 			group: "tables"
 		});
 
-		// Ctrl+Alt+L for table column alignment (registered for help display - shared with code blocks for language cycling)
+		// Table alignment hotkeys (only work when in table)
 		hotkeys.registerHotkey({
 			key: "ctrl+alt+l",
-			action: () => { if (tables.isInTable()) tables.cycleColumnAlignment(); },
-			description: "Cycle column alignment (in table)",
+			action: () => { if (tables.isInTable()) tables.setColumnAlignmentLeft(); },
+			description: "Align column left",
+			group: "tables"
+		});
+
+		hotkeys.registerHotkey({
+			key: "ctrl+alt+c",
+			action: () => { if (tables.isInTable()) tables.setColumnAlignmentCenter(); },
+			description: "Align column center",
+			group: "tables"
+		});
+
+		hotkeys.registerHotkey({
+			key: "ctrl+alt+r",
+			action: () => { if (tables.isInTable()) tables.setColumnAlignmentRight(); },
+			description: "Align column right",
 			group: "tables"
 		});
 

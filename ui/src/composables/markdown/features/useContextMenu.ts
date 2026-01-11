@@ -165,12 +165,30 @@ export function useContextMenu(options: UseContextMenuOptions): UseContextMenuRe
 			// Divider before alignment
 			menuItems.push({ id: "table-divider-2", label: "", divider: true });
 
-			// Alignment operation
+			// Alignment submenu
 			menuItems.push({
-				id: "cycle-alignment",
-				label: "Cycle Alignment",
-				shortcut: "Ctrl+Alt+L",
-				action: () => editor.tables.cycleColumnAlignment()
+				id: "alignment",
+				label: "Alignment",
+				children: [
+					{
+						id: "align-left",
+						label: "Align Left",
+						shortcut: "Ctrl+Alt+L",
+						action: () => editor.tables.setColumnAlignmentLeft()
+					},
+					{
+						id: "align-center",
+						label: "Align Center",
+						shortcut: "Ctrl+Alt+C",
+						action: () => editor.tables.setColumnAlignmentCenter()
+					},
+					{
+						id: "align-right",
+						label: "Align Right",
+						shortcut: "Ctrl+Alt+R",
+						action: () => editor.tables.setColumnAlignmentRight()
+					}
+				]
 			});
 
 			return menuItems;

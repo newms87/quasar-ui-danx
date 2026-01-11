@@ -1189,21 +1189,8 @@ describe("useTables", () => {
 		});
 	});
 
-	describe("cycleColumnAlignment", () => {
-		it("cycles from left to center", () => {
-			editor = createTestEditor(createTableHtml(2, 2));
-			const tables = createTables();
-			const table = editor.container.querySelector("table") as HTMLTableElement;
-			const cell = getCell(table, 0, 0)!;
-			setCursorInCell(cell);
-
-			tables.cycleColumnAlignment();
-
-			expect(cell.style.textAlign).toBe("center");
-			expect(onContentChange).toHaveBeenCalled();
-		});
-
-		it("cycles from center to right", () => {
+	describe("setColumnAlignmentLeft", () => {
+		it("sets column alignment to left", () => {
 			editor = createTestEditor(createTableHtml(2, 2));
 			const tables = createTables();
 			const table = editor.container.querySelector("table") as HTMLTableElement;
@@ -1211,23 +1198,36 @@ describe("useTables", () => {
 			cell.style.textAlign = "center";
 			setCursorInCell(cell);
 
-			tables.cycleColumnAlignment();
+			tables.setColumnAlignmentLeft();
 
-			expect(cell.style.textAlign).toBe("right");
+			// Left alignment removes the style property
+			expect(cell.style.textAlign).toBe("");
+			expect(onContentChange).toHaveBeenCalled();
 		});
 
-		it("cycles from right back to left", () => {
+		it("does nothing when not in table", () => {
+			editor = createTestEditor("<p>Not in table</p>");
+			const tables = createTables();
+			editor.setCursorInBlock(0, 0);
+
+			tables.setColumnAlignmentLeft();
+
+			expect(onContentChange).not.toHaveBeenCalled();
+		});
+	});
+
+	describe("setColumnAlignmentCenter", () => {
+		it("sets column alignment to center", () => {
 			editor = createTestEditor(createTableHtml(2, 2));
 			const tables = createTables();
 			const table = editor.container.querySelector("table") as HTMLTableElement;
 			const cell = getCell(table, 0, 0)!;
-			cell.style.textAlign = "right";
 			setCursorInCell(cell);
 
-			tables.cycleColumnAlignment();
+			tables.setColumnAlignmentCenter();
 
-			// Left alignment removes the style property
-			expect(cell.style.textAlign).toBe("");
+			expect(cell.style.textAlign).toBe("center");
+			expect(onContentChange).toHaveBeenCalled();
 		});
 
 		it("applies alignment to all cells in column", () => {
@@ -1237,7 +1237,7 @@ describe("useTables", () => {
 			const cell = getCell(table, 0, 0)!;
 			setCursorInCell(cell);
 
-			tables.cycleColumnAlignment();
+			tables.setColumnAlignmentCenter();
 
 			// All cells in first column should be centered
 			expect(getCell(table, 0, 0)?.style.textAlign).toBe("center");
@@ -1250,7 +1250,32 @@ describe("useTables", () => {
 			const tables = createTables();
 			editor.setCursorInBlock(0, 0);
 
-			tables.cycleColumnAlignment();
+			tables.setColumnAlignmentCenter();
+
+			expect(onContentChange).not.toHaveBeenCalled();
+		});
+	});
+
+	describe("setColumnAlignmentRight", () => {
+		it("sets column alignment to right", () => {
+			editor = createTestEditor(createTableHtml(2, 2));
+			const tables = createTables();
+			const table = editor.container.querySelector("table") as HTMLTableElement;
+			const cell = getCell(table, 0, 0)!;
+			setCursorInCell(cell);
+
+			tables.setColumnAlignmentRight();
+
+			expect(cell.style.textAlign).toBe("right");
+			expect(onContentChange).toHaveBeenCalled();
+		});
+
+		it("does nothing when not in table", () => {
+			editor = createTestEditor("<p>Not in table</p>");
+			const tables = createTables();
+			editor.setCursorInBlock(0, 0);
+
+			tables.setColumnAlignmentRight();
 
 			expect(onContentChange).not.toHaveBeenCalled();
 		});
@@ -1564,7 +1589,9 @@ describe("useTables", () => {
 			expect(typeof tables.deleteTable).toBe("function");
 
 			// Alignment
-			expect(typeof tables.cycleColumnAlignment).toBe("function");
+			expect(typeof tables.setColumnAlignmentLeft).toBe("function");
+			expect(typeof tables.setColumnAlignmentCenter).toBe("function");
+			expect(typeof tables.setColumnAlignmentRight).toBe("function");
 
 			// Key handlers
 			expect(typeof tables.handleTableTab).toBe("function");

@@ -860,8 +860,8 @@ export function useMarkdownEditor(options: UseMarkdownEditorOptions): UseMarkdow
 	function onKeyDown(event: KeyboardEvent): void {
 		// Don't handle events that originate from inside code block wrappers
 		// (CodeViewer handles its own keyboard events like Ctrl+A for select-all)
-		const target = event.target as HTMLElement;
-		const isInCodeBlock = target.closest("[data-code-block-id]");
+		const target = event.target as HTMLElement | null;
+		const isInCodeBlock = target?.closest("[data-code-block-id]");
 
 		// SPECIAL CASE: Handle Ctrl+Alt+L for code block language cycling
 		// This is a fallback in case the CodeViewer's handler doesn't receive the event
@@ -873,7 +873,7 @@ export function useMarkdownEditor(options: UseMarkdownEditorOptions): UseMarkdow
 			event.stopPropagation();
 
 			// Find the code block ID and cycle its language
-			const wrapper = target.closest("[data-code-block-id]");
+			const wrapper = target?.closest("[data-code-block-id]");
 			const codeBlockId = wrapper?.getAttribute("data-code-block-id");
 
 			if (codeBlockId) {

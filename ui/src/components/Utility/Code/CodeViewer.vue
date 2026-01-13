@@ -1,7 +1,7 @@
 <template>
   <div
     class="dx-code-viewer group flex flex-col"
-    :class="{ 'is-collapsed': isCollapsed }"
+    :class="[{ 'is-collapsed': isCollapsed }, props.theme === 'light' ? 'theme-light' : '']"
   >
     <FieldLabel
       v-if="label"
@@ -118,6 +118,7 @@ export interface CodeViewerProps {
 	defaultCollapsed?: boolean;
 	defaultCodeFormat?: "json" | "yaml";
 	allowAnyLanguage?: boolean;
+	theme?: "dark" | "light";
 }
 
 const props = withDefaults(defineProps<CodeViewerProps>(), {
@@ -128,7 +129,8 @@ const props = withDefaults(defineProps<CodeViewerProps>(), {
 	canEdit: false,
 	editable: false,
 	collapsible: false,
-	defaultCollapsed: true
+	defaultCollapsed: true,
+	theme: "dark"
 });
 
 const emit = defineEmits<{

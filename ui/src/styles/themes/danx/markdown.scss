@@ -238,4 +238,63 @@
       text-decoration: none;
     }
   }
+
+  // ==========================================
+  // LIGHT THEME VARIANT
+  // ==========================================
+  &.theme-light {
+    color: #1e293b;
+
+    // Inline code - light theme
+    code {
+      background: #f1f5f9;
+      color: #0f172a;
+    }
+
+    // Code blocks - light theme
+    pre {
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+
+      code {
+        background: transparent;
+      }
+    }
+
+    // Blockquotes - light theme
+    blockquote {
+      border-left-color: #cbd5e1;
+      color: #475569;
+    }
+
+    // Links - light theme
+    a {
+      color: #0369a1;
+    }
+
+    // Horizontal rules - light theme
+    hr {
+      border-top-color: #e2e8f0;
+    }
+
+    // Tables - light theme
+    table {
+      th, td {
+        border-color: #e2e8f0;
+      }
+
+      th {
+        background: #f1f5f9;
+      }
+
+      tr:nth-child(even) {
+        background: #f8fafc;
+      }
+    }
+
+    // Highlight - light theme
+    mark {
+      background: rgba(250, 204, 21, 0.5);
+    }
+  }
 }

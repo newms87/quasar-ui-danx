@@ -1,5 +1,5 @@
 <template>
-  <div class="dx-markdown-editor" :class="{ 'is-readonly': readonly }">
+  <div class="dx-markdown-editor" :class="[{ 'is-readonly': readonly }, props.theme === 'light' ? 'theme-light' : '']">
     <div class="dx-markdown-editor-body" @contextmenu="contextMenu.show">
       <!-- Floating line type menu positioned next to current block -->
       <div
@@ -81,6 +81,7 @@ export interface MarkdownEditorProps {
   readonly?: boolean;
   minHeight?: string;
   maxHeight?: string;
+  theme?: "dark" | "light";
 }
 
 const props = withDefaults(defineProps<MarkdownEditorProps>(), {
@@ -88,7 +89,8 @@ const props = withDefaults(defineProps<MarkdownEditorProps>(), {
   placeholder: "Start typing...",
   readonly: false,
   minHeight: "100px",
-  maxHeight: "none"
+  maxHeight: "none",
+  theme: "dark"
 });
 
 const emit = defineEmits<{

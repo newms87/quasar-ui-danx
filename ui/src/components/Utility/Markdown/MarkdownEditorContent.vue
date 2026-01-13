@@ -231,5 +231,45 @@ defineExpose({ containerRef });
       }
     }
   }
+
+  // ==========================================
+  // LIGHT THEME VARIANT
+  // ==========================================
+  .dx-markdown-editor.theme-light & {
+    background-color: #f8fafc;
+    color: #1e293b;
+    caret-color: #1e293b;
+
+    &:focus {
+      border-color: rgba(14, 165, 233, 0.6);
+    }
+
+    &:hover:not(:focus):not(.is-readonly) {
+      border-color: rgba(14, 165, 233, 0.3);
+    }
+
+    // Placeholder styling - light theme
+    &.is-empty::before {
+      color: #94a3b8;
+    }
+
+    // Link tooltip - light theme
+    a:hover::after {
+      background: #e2e8f0;
+      color: #1e293b;
+    }
+
+    // Code block wrapper - light theme
+    .code-block-wrapper {
+      background: #f1f5f9;
+      border-color: #e2e8f0;
+
+      .dx-code-viewer {
+        .code-footer {
+          background: #e2e8f0;
+        }
+      }
+    }
+  }
 }
 </style>

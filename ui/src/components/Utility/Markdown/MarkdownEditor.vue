@@ -25,6 +25,7 @@
     </div>
 
     <MarkdownEditorFooter
+      v-if="!hideFooter"
       :char-count="editor.charCount.value"
       @show-hotkeys="editor.showHotkeyHelp"
     />
@@ -82,6 +83,7 @@ export interface MarkdownEditorProps {
   minHeight?: string;
   maxHeight?: string;
   theme?: "dark" | "light";
+  hideFooter?: boolean;
 }
 
 const props = withDefaults(defineProps<MarkdownEditorProps>(), {
@@ -90,7 +92,8 @@ const props = withDefaults(defineProps<MarkdownEditorProps>(), {
   readonly: false,
   minHeight: "100px",
   maxHeight: "none",
-  theme: "dark"
+  theme: "dark",
+  hideFooter: false
 });
 
 const emit = defineEmits<{

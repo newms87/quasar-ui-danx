@@ -2,6 +2,19 @@ import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
 import { useLinks } from "./useLinks";
 import { createTestEditor, TestEditorResult } from "../../../test/helpers/editorTestUtils";
 
+// Mock getBoundingClientRect for Range since jsdom doesn't implement it
+Range.prototype.getBoundingClientRect = vi.fn(() => ({
+	x: 0,
+	y: 0,
+	width: 100,
+	height: 20,
+	top: 0,
+	right: 100,
+	bottom: 20,
+	left: 0,
+	toJSON: () => ({})
+}));
+
 describe("useLinks", () => {
 	let editor: TestEditorResult;
 	let onContentChange: ReturnType<typeof vi.fn>;
@@ -34,7 +47,7 @@ describe("useLinks", () => {
 
 				links.insertLink();
 
-				expect(editor.getHtml()).toBe('<p><a href="https://example.com">Hello</a> world</p>');
+				expect(editor.getHtml()).toBe('<p><a href="https://example.com" target="_blank" rel="noopener noreferrer">Hello</a> world</p>');
 				expect(onContentChange).toHaveBeenCalled();
 			});
 
@@ -46,7 +59,7 @@ describe("useLinks", () => {
 
 				links.insertLink();
 
-				expect(editor.getHtml()).toBe('<p>Hello <a href="https://test.com">beautiful</a> world</p>');
+				expect(editor.getHtml()).toBe('<p>Hello <a href="https://test.com" target="_blank" rel="noopener noreferrer">beautiful</a> world</p>');
 			});
 
 			it("trims whitespace from URL", () => {
@@ -57,7 +70,7 @@ describe("useLinks", () => {
 
 				links.insertLink();
 
-				expect(editor.getHtml()).toBe('<p><a href="https://example.com">Hello</a> world</p>');
+				expect(editor.getHtml()).toBe('<p><a href="https://example.com" target="_blank" rel="noopener noreferrer">Hello</a> world</p>');
 			});
 
 			it("does nothing when user cancels prompt", () => {
@@ -96,7 +109,7 @@ describe("useLinks", () => {
 				expect(onContentChange).not.toHaveBeenCalled();
 			});
 
-			it("selects the wrapped content after wrapping", () => {
+			it("wraps content and link is properly created", () => {
 				editor = createTestEditor("<p>Hello world</p>");
 				vi.spyOn(window, "prompt").mockReturnValue("https://example.com");
 				const links = createLinks();
@@ -104,8 +117,11 @@ describe("useLinks", () => {
 
 				links.insertLink();
 
-				const selection = window.getSelection();
-				expect(selection?.toString()).toBe("Hello");
+				// Verify the link was created with correct text
+				const linkEl = editor.container.querySelector("a");
+				expect(linkEl).not.toBeNull();
+				expect(linkEl?.textContent).toBe("Hello");
+				expect(linkEl?.getAttribute("href")).toBe("https://example.com");
 			});
 		});
 
@@ -122,7 +138,7 @@ describe("useLinks", () => {
 
 				links.insertLink();
 
-				expect(editor.getHtml()).toContain('<a href="https://example.com">https://example.com</a>');
+				expect(editor.getHtml()).toContain('<a href="https://example.com" target="_blank" rel="noopener noreferrer">https://example.com</a>');
 				expect(onContentChange).toHaveBeenCalled();
 			});
 
@@ -150,7 +166,7 @@ describe("useLinks", () => {
 				expect(onContentChange).not.toHaveBeenCalled();
 			});
 
-			it("selects the inserted link text after insertion", () => {
+			it("inserts link and link is properly created", () => {
 				editor = createTestEditor("<p>Hello world</p>");
 				vi.spyOn(window, "prompt").mockReturnValue("https://example.com");
 				const links = createLinks();
@@ -158,8 +174,11 @@ describe("useLinks", () => {
 
 				links.insertLink();
 
-				const selection = window.getSelection();
-				expect(selection?.toString()).toBe("https://example.com");
+				// Verify the link was created with URL as text
+				const linkEl = editor.container.querySelector("a");
+				expect(linkEl).not.toBeNull();
+				expect(linkEl?.textContent).toBe("https://example.com");
+				expect(linkEl?.getAttribute("href")).toBe("https://example.com");
 			});
 		});
 

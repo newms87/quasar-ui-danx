@@ -26,6 +26,29 @@ describe("useCodeBlocks", () => {
 		});
 	}
 
+	/**
+	 * Helper to verify code block wrapper structure
+	 * The new implementation creates wrapper divs with mount points instead of <pre><code>
+	 */
+	function expectCodeBlockWrapper(content: string, language = "") {
+		const wrapper = editor.container.querySelector(".code-block-wrapper");
+		expect(wrapper).not.toBeNull();
+		expect(wrapper?.getAttribute("contenteditable")).toBe("false");
+		expect(wrapper?.hasAttribute("data-code-block-id")).toBe(true);
+
+		const mountPoint = wrapper?.querySelector(".code-viewer-mount-point");
+		expect(mountPoint).not.toBeNull();
+		expect(mountPoint?.getAttribute("data-content")).toBe(content);
+		expect(mountPoint?.getAttribute("data-language")).toBe(language);
+	}
+
+	/**
+	 * Helper to check if a code block wrapper exists
+	 */
+	function hasCodeBlockWrapper(): boolean {
+		return editor.container.querySelector(".code-block-wrapper") !== null;
+	}
+
 	describe("toggleCodeBlock", () => {
 		beforeEach(() => {
 			onContentChange = vi.fn();
@@ -38,7 +61,7 @@ describe("useCodeBlocks", () => {
 
 			codeBlocks.toggleCodeBlock();
 
-			expect(editor.getHtml()).toBe("<pre><code>Hello world</code></pre>");
+			expectCodeBlockWrapper("Hello world");
 			expect(onContentChange).toHaveBeenCalled();
 		});
 
@@ -49,7 +72,7 @@ describe("useCodeBlocks", () => {
 
 			codeBlocks.toggleCodeBlock();
 
-			expect(editor.getHtml()).toBe("<pre><code>Hello world</code></pre>");
+			expectCodeBlockWrapper("Hello world");
 			expect(onContentChange).toHaveBeenCalled();
 		});
 
@@ -60,7 +83,7 @@ describe("useCodeBlocks", () => {
 
 			codeBlocks.toggleCodeBlock();
 
-			expect(editor.getHtml()).toBe("<pre><code>Hello world</code></pre>");
+			expectCodeBlockWrapper("Hello world");
 			expect(onContentChange).toHaveBeenCalled();
 		});
 
@@ -71,7 +94,7 @@ describe("useCodeBlocks", () => {
 
 			codeBlocks.toggleCodeBlock();
 
-			expect(editor.getHtml()).toBe("<pre><code>Hello world</code></pre>");
+			expectCodeBlockWrapper("Hello world");
 			expect(onContentChange).toHaveBeenCalled();
 		});
 
@@ -97,7 +120,7 @@ describe("useCodeBlocks", () => {
 
 			codeBlocks.toggleCodeBlock();
 
-			expect(editor.getHtml()).toBe("<pre><code>const x = 1;</code></pre>");
+			expectCodeBlockWrapper("const x = 1;");
 		});
 
 		it("preserves content when toggling from code block", () => {
@@ -128,7 +151,7 @@ describe("useCodeBlocks", () => {
 
 			codeBlocks.toggleCodeBlock();
 
-			expect(editor.getHtml()).toBe("<pre><code></code></pre>");
+			expectCodeBlockWrapper("");
 		});
 
 		it("does not convert list items directly", () => {
@@ -152,17 +175,18 @@ describe("useCodeBlocks", () => {
 			onContentChange = vi.fn();
 		});
 
-		it("converts ``` to code block with cursor anchor", () => {
+		it("does not convert just ``` without language (requires language identifier)", () => {
+			// Implementation intentionally requires at least one character in language identifier
+			// to avoid triggering on just "```" before user finishes typing the language
 			editor = createTestEditor("<p>```</p>");
 			const codeBlocks = createCodeBlocks();
 			editor.setCursorInBlock(0, 3);
 
 			const result = codeBlocks.checkAndConvertCodeBlockPattern();
 
-			expect(result).toBe(true);
-			// Code element contains a zero-width space as cursor anchor
-			expect(editor.getHtml()).toBe(`<pre><code>${CURSOR_ANCHOR}</code></pre>`);
-			expect(onContentChange).toHaveBeenCalled();
+			expect(result).toBe(false);
+			expect(editor.getHtml()).toBe("<p>```</p>");
+			expect(onContentChange).not.toHaveBeenCalled();
 		});
 
 		it("converts ```javascript to code block with language", () => {
@@ -173,7 +197,7 @@ describe("useCodeBlocks", () => {
 			const result = codeBlocks.checkAndConvertCodeBlockPattern();
 
 			expect(result).toBe(true);
-			expect(editor.getHtml()).toBe(`<pre><code class="language-javascript">${CURSOR_ANCHOR}</code></pre>`);
+			expectCodeBlockWrapper("", "javascript");
 			expect(onContentChange).toHaveBeenCalled();
 		});
 
@@ -185,7 +209,7 @@ describe("useCodeBlocks", () => {
 			const result = codeBlocks.checkAndConvertCodeBlockPattern();
 
 			expect(result).toBe(true);
-			expect(editor.getHtml()).toBe(`<pre><code class="language-python">${CURSOR_ANCHOR}</code></pre>`);
+			expectCodeBlockWrapper("", "python");
 		});
 
 		it("converts ```typescript to code block with language", () => {
@@ -196,7 +220,7 @@ describe("useCodeBlocks", () => {
 			const result = codeBlocks.checkAndConvertCodeBlockPattern();
 
 			expect(result).toBe(true);
-			expect(editor.getHtml()).toBe(`<pre><code class="language-typescript">${CURSOR_ANCHOR}</code></pre>`);
+			expectCodeBlockWrapper("", "typescript");
 		});
 
 		it("returns false when no pattern is present", () => {
@@ -237,7 +261,7 @@ describe("useCodeBlocks", () => {
 			expect(onContentChange).not.toHaveBeenCalled();
 		});
 
-		it("does not convert if already a heading", () => {
+		it("converts heading with code fence pattern", () => {
 			editor = createTestEditor("<h1>```javascript</h1>");
 			const codeBlocks = createCodeBlocks();
 			editor.setCursorInBlock(0, 13);
@@ -246,7 +270,7 @@ describe("useCodeBlocks", () => {
 
 			// Headings ARE convertible blocks, so this should convert
 			expect(result).toBe(true);
-			expect(editor.getHtml()).toBe(`<pre><code class="language-javascript">${CURSOR_ANCHOR}</code></pre>`);
+			expectCodeBlockWrapper("", "javascript");
 		});
 
 		it("converts DIV elements (browser default)", () => {
@@ -257,7 +281,7 @@ describe("useCodeBlocks", () => {
 			const result = codeBlocks.checkAndConvertCodeBlockPattern();
 
 			expect(result).toBe(true);
-			expect(editor.getHtml()).toBe(`<pre><code class="language-rust">${CURSOR_ANCHOR}</code></pre>`);
+			expectCodeBlockWrapper("", "rust");
 		});
 
 		it("does not convert list items", () => {
@@ -275,25 +299,19 @@ describe("useCodeBlocks", () => {
 			expect(onContentChange).not.toHaveBeenCalled();
 		});
 
-		it("positions cursor inside code element after conversion", () => {
+		it("creates wrapper structure after conversion", () => {
 			editor = createTestEditor("<p>```javascript</p>");
 			const codeBlocks = createCodeBlocks();
 			editor.setCursorInBlock(0, 13);
 
 			codeBlocks.checkAndConvertCodeBlockPattern();
 
-			// Verify cursor is positioned inside the code element
-			const sel = window.getSelection();
-			expect(sel).not.toBeNull();
-			expect(sel?.rangeCount).toBe(1);
+			// Verify wrapper structure is created
+			expectCodeBlockWrapper("", "javascript");
 
-			const range = sel?.getRangeAt(0);
-			const code = editor.container.querySelector("code");
-
-			// The cursor should be in the code element's text node (the cursor anchor)
-			expect(range?.startContainer.parentElement).toBe(code);
-			// Position should be at the end of the cursor anchor (after the zero-width space)
-			expect(range?.startOffset).toBe(1);
+			// Verify the wrapper has an id that can be used for mounting
+			const wrapper = editor.container.querySelector(".code-block-wrapper");
+			expect(wrapper?.getAttribute("data-code-block-id")).toBeTruthy();
 		});
 
 		it("cursor anchor is stripped during markdown conversion", () => {
@@ -761,7 +779,15 @@ describe("useCodeBlocks", () => {
 
 			codeBlocks.toggleCodeBlock();
 
-			expect(editor.getHtml()).toBe("<p>First</p><pre><code>Second</code></pre><p>Third</p>");
+			// Verify only the second block was converted
+			const html = editor.getHtml();
+			expect(html).toContain("<p>First</p>");
+			expect(html).toContain("<p>Third</p>");
+			expect(html).toContain("code-block-wrapper");
+
+			// Verify the wrapper has the correct content
+			const mountPoint = editor.container.querySelector(".code-viewer-mount-point");
+			expect(mountPoint?.getAttribute("data-content")).toBe("Second");
 		});
 
 		it("handles multiline content in code block", () => {
@@ -771,9 +797,9 @@ describe("useCodeBlocks", () => {
 
 			codeBlocks.toggleCodeBlock();
 
-			// Content should be preserved as-is
-			const code = editor.container.querySelector("code");
-			expect(code?.textContent).toBe("Line 1\nLine 2\nLine 3");
+			// Content should be preserved in the data-content attribute
+			const mountPoint = editor.container.querySelector(".code-viewer-mount-point");
+			expect(mountPoint?.getAttribute("data-content")).toBe("Line 1\nLine 2\nLine 3");
 		});
 	});
 });

@@ -204,8 +204,10 @@ describe('linePatterns', () => {
 	});
 
 	describe('detectCodeFenceStart', () => {
-		it('detects code fence without language', () => {
-			expect(detectCodeFenceStart('```')).toEqual({ language: '' });
+		it('returns null for code fence without language (requires language identifier)', () => {
+			// Implementation intentionally requires at least one character in language identifier
+			// to avoid triggering on just "```" before user finishes typing the language
+			expect(detectCodeFenceStart('```')).toBeNull();
 		});
 
 		it('detects code fence with javascript language', () => {
@@ -426,8 +428,9 @@ describe('linePatterns', () => {
 		});
 
 		describe('code block patterns', () => {
-			it('detects code block without language', () => {
-				expect(detectLinePattern('```')).toEqual({ type: 'code-block', language: '' });
+			it('returns null for code block without language (requires language identifier)', () => {
+				// Implementation intentionally requires language identifier
+				expect(detectLinePattern('```')).toBeNull();
 			});
 
 			it('detects code block with language', () => {

@@ -364,8 +364,21 @@ function processNode(node: Node): string {
 					break;
 				}
 
-				// Divs and other containers - just process children
-				case "div":
+				// Divs - check for code block wrapper first
+				case "div": {
+					// Handle code block wrapper structure
+					if (element.hasAttribute("data-code-block-id")) {
+						const mountPoint = element.querySelector(".code-viewer-mount-point");
+						const content = mountPoint?.getAttribute("data-content") || "";
+						const language = mountPoint?.getAttribute("data-language") || "";
+						parts.push(`\`\`\`${language}\n${content}\n\`\`\`\n\n`);
+					} else {
+						parts.push(processNode(element));
+					}
+					break;
+				}
+
+				// Spans - just process children
 				case "span":
 					parts.push(processNode(element));
 					break;

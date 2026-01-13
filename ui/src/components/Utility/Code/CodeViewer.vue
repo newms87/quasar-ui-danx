@@ -88,6 +88,7 @@
           :validation-error="editor.validationError.value"
           :can-edit="canEdit && currentFormat !== 'markdown'"
           :is-editing="editor.isEditing.value"
+          :show-version="showVersion"
           @toggle-edit="editor.toggleEdit"
         />
       </div>
@@ -119,6 +120,7 @@ export interface CodeViewerProps {
 	defaultCodeFormat?: "json" | "yaml";
 	allowAnyLanguage?: boolean;
 	theme?: "dark" | "light";
+	showVersion?: boolean;
 }
 
 const props = withDefaults(defineProps<CodeViewerProps>(), {
@@ -130,7 +132,8 @@ const props = withDefaults(defineProps<CodeViewerProps>(), {
 	editable: false,
 	collapsible: false,
 	defaultCollapsed: true,
-	theme: "dark"
+	theme: "dark",
+	showVersion: false
 });
 
 const emit = defineEmits<{

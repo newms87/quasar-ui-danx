@@ -2,7 +2,10 @@ import { computed, ref, Ref } from "vue";
 import { parse as parseYAML, stringify as yamlStringify } from "yaml";
 import { fJSON, parseMarkdownJSON, parseMarkdownYAML } from "../helpers/formats/parsers";
 
-export type CodeFormat = "json" | "yaml" | "text" | "markdown";
+// Version for HMR cache busting
+export const USE_CODE_FORMAT_VERSION = "1.0.4";
+
+export type CodeFormat = "json" | "yaml" | "text" | "markdown" | "html" | "css" | "javascript";
 
 export interface UseCodeFormatOptions {
 	initialFormat?: CodeFormat;
@@ -58,8 +61,8 @@ export function useCodeFormat(options: UseCodeFormatOptions = {}): UseCodeFormat
 	function formatValueToString(value: object | string | null, targetFormat: CodeFormat = format.value): string {
 		if (!value) return "";
 
-		// Text and markdown formats - just return as-is
-		if (targetFormat === "text" || targetFormat === "markdown") {
+		// Text, markdown, and code formats (CSS, JavaScript, HTML) - just return as-is
+		if (targetFormat === "text" || targetFormat === "markdown" || targetFormat === "css" || targetFormat === "javascript" || targetFormat === "html") {
 			return typeof value === "string" ? value : JSON.stringify(value, null, 2);
 		}
 
@@ -79,11 +82,12 @@ export function useCodeFormat(options: UseCodeFormatOptions = {}): UseCodeFormat
 	}
 
 	// Validate string content for a format
+	// v2: Added CSS/JavaScript/HTML as always-valid formats
 	function validateContent(content: string, targetFormat: CodeFormat = format.value): boolean {
 		if (!content) return true;
 
-		// Text and markdown formats are always valid
-		if (targetFormat === "text" || targetFormat === "markdown") return true;
+		// Text, markdown, and code formats are always valid
+		if (targetFormat === "text" || targetFormat === "markdown" || targetFormat === "css" || targetFormat === "javascript" || targetFormat === "html") return true;
 
 		try {
 			if (targetFormat === "json") {
@@ -98,11 +102,12 @@ export function useCodeFormat(options: UseCodeFormatOptions = {}): UseCodeFormat
 	}
 
 	// Validate and return error details if invalid
+	// v2: Added CSS/JavaScript/HTML as always-valid formats
 	function validateContentWithError(content: string, targetFormat: CodeFormat = format.value): ValidationError | null {
 		if (!content) return null;
 
-		// Text and markdown formats are always valid
-		if (targetFormat === "text" || targetFormat === "markdown") return null;
+		// Text, markdown, and code formats are always valid
+		if (targetFormat === "text" || targetFormat === "markdown" || targetFormat === "css" || targetFormat === "javascript" || targetFormat === "html") return null;
 
 		try {
 			if (targetFormat === "json") {
@@ -144,16 +149,18 @@ export function useCodeFormat(options: UseCodeFormatOptions = {}): UseCodeFormat
 
 	// Initialize with value if provided
 	if (options.initialValue) {
-		rawContent.value = formatValueToString(options.initialValue, format.value);
+		const formatted = formatValueToString(options.initialValue, format.value);
+		rawContent.value = formatted;
 	}
 
 	// Computed: parsed object from raw content
 	const parsedValue = computed(() => parseContent(rawContent.value));
 
 	// Computed: formatted string
-	// For text and markdown formats, return rawContent directly without parsing
+	// v3: For text, markdown, and code formats (CSS, JavaScript, HTML), return rawContent directly without parsing
 	const formattedContent = computed(() => {
-		if (format.value === "text" || format.value === "markdown") {
+		const isStringFormat = format.value === "text" || format.value === "markdown" || format.value === "css" || format.value === "javascript" || format.value === "html";
+		if (isStringFormat) {
 			return rawContent.value;
 		}
 		return formatValueToString(parsedValue.value, format.value);

@@ -1,9 +1,13 @@
 /**
- * Lightweight syntax highlighting for JSON and YAML
+ * Lightweight syntax highlighting for JSON, YAML, HTML, CSS, and JavaScript
  * Returns HTML string with syntax highlighting spans
  */
 
-export type HighlightFormat = "json" | "yaml" | "text" | "markdown";
+import { highlightCSS } from "./highlightCSS";
+import { highlightJavaScript } from "./highlightJavaScript";
+import { highlightHTML } from "./highlightHTML";
+
+export type HighlightFormat = "json" | "yaml" | "text" | "markdown" | "html" | "css" | "javascript";
 
 export interface HighlightOptions {
 	format: HighlightFormat;
@@ -320,7 +324,14 @@ export function highlightSyntax(code: string, options: HighlightOptions): string
 			return highlightJSON(code);
 		case "yaml":
 			return highlightYAML(code);
+		case "html":
+			return highlightHTML(code);
+		case "css":
+			return highlightCSS(code);
+		case "javascript":
+			return highlightJavaScript(code);
 		case "text":
+		case "markdown":
 		default:
 			return escapeHtml(code);
 	}

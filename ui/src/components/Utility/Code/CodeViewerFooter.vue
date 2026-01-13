@@ -12,6 +12,7 @@
       </template>
       <template v-else>
         {{ charCount.toLocaleString() }} chars
+        <span v-if="showVersion" class="ml-2 text-sky-400">[v1.0.5]</span>
       </template>
     </div>
     <!-- Edit toggle button -->
@@ -41,6 +42,7 @@ export interface CodeViewerFooterProps {
 	validationError: ValidationError | null;
 	canEdit: boolean;
 	isEditing: boolean;
+	showVersion?: boolean;
 }
 
 const props = defineProps<CodeViewerFooterProps>();

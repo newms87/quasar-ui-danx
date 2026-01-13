@@ -142,6 +142,59 @@ quasar-ui-danx/
 - `yarn test --filter=ComponentName` - Run specific tests
 - `yarn dev` - Development mode (if configured)
 
+## CRITICAL: Development Workflow
+
+### Package Manager
+**ALWAYS use `yarn` - NEVER use `npm`**
+- Delete any `package-lock.json` files if they appear
+- Only `yarn.lock` should exist
+
+### Local Development with Vite HMR
+
+**ALL testing is done locally using Vite HMR - NO building required for testing!**
+
+Both quasar-ui-danx and gpt-manager use Vite with Hot Module Replacement (HMR):
+- Changes to danx library source files are picked up automatically via HMR
+- Changes to gpt-manager source files are picked up automatically via HMR
+- Just save your file and refresh the browser - no build step needed
+
+**Testing workflow:**
+1. Make code changes to danx library or gpt-manager
+2. Save the file
+3. Refresh browser to see changes (HMR picks them up automatically)
+4. Repeat until everything works
+
+### Playground Testing
+The gpt-manager has a playground at `http://localhost:5173/playground` for testing components.
+- PlaygroundView.vue location: `/home/newms/web/gpt-manager/spa/src/views/PlaygroundView.vue`
+- Use this for visual testing of CodeViewer, MarkdownEditor, etc.
+
+### Todo Lists
+**ALWAYS use TodoWrite tool** to track tasks during development:
+- Create todo list at start of multi-step tasks
+- Mark items in_progress before starting
+- Mark completed immediately when done
+- Add discovered sub-tasks as you find them
+
+### Version Numbers for Debugging
+When making changes that need verification, add version comments to track updates:
+```typescript
+// v2: Added CSS/JavaScript/HTML support
+function myFunction() { ... }
+```
+This helps verify the correct version is being loaded in browser.
+
+### Build Validation (LAST STEP ONLY)
+
+**Building is ONLY for final validation - NOT for testing!**
+
+After ALL testing is complete and everything works:
+1. Run `yarn build` to verify the build passes
+2. Run `cd /home/newms/web/gpt-manager && make fix-danx-ui`
+3. Report results
+
+**This should be the LAST action before reporting results.**
+
 **Component Patterns:**
 - Always use `<script setup lang="ts">`
 - Always type props and emits

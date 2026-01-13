@@ -134,6 +134,58 @@
     color: #808080;
   }
 
+  // Comments - Muted green
+  .syntax-comment {
+    color: #6a9955;
+  }
+
+  // CSS/HTML specific
+  .syntax-selector {
+    color: #d7ba7d; // Gold/yellow
+  }
+
+  .syntax-property {
+    color: #9cdcfe; // Light blue (same as key)
+  }
+
+  .syntax-value {
+    color: #ce9178; // Orange (same as number)
+  }
+
+  .syntax-at-rule {
+    color: #c586c0; // Purple/magenta
+  }
+
+  // JavaScript specific
+  .syntax-keyword {
+    color: #569cd6; // Blue
+  }
+
+  .syntax-operator {
+    color: #d4d4d4; // Gray/white
+  }
+
+  .syntax-regex {
+    color: #d16969; // Red
+  }
+
+  .syntax-template {
+    color: #ce9178; // Orange (same as string/number)
+  }
+
+  // HTML specific
+  .syntax-tag {
+    color: #569cd6; // Blue
+  }
+
+  .syntax-attribute {
+    color: #9cdcfe; // Light blue
+  }
+
+  .syntax-doctype {
+    color: #808080; // Gray
+  }
+
 
   // ==========================================
   // Editable mode (contenteditable)
@@ -218,6 +270,58 @@
       color: #64748b;
     }
 
+    // Light theme - Comments
+    .syntax-comment {
+      color: #6a9955;
+    }
+
+    // Light theme - CSS/HTML specific
+    .syntax-selector {
+      color: #b45309; // Amber/brown
+    }
+
+    .syntax-property {
+      color: #0369a1; // Blue (same as key)
+    }
+
+    .syntax-value {
+      color: #c2410c; // Orange (same as number)
+    }
+
+    .syntax-at-rule {
+      color: #7c3aed; // Purple
+    }
+
+    // Light theme - JavaScript specific
+    .syntax-keyword {
+      color: #0369a1; // Blue
+    }
+
+    .syntax-operator {
+      color: #64748b; // Gray
+    }
+
+    .syntax-regex {
+      color: #be123c; // Red/rose
+    }
+
+    .syntax-template {
+      color: #c2410c; // Orange
+    }
+
+    // Light theme - HTML specific
+    .syntax-tag {
+      color: #0369a1; // Blue
+    }
+
+    .syntax-attribute {
+      color: #0891b2; // Cyan
+    }
+
+    .syntax-doctype {
+      color: #64748b; // Gray
+    }
+
     .code-content.is-editable {
       caret-color: #1e293b;
 
@@ -228,6 +332,83 @@
       &:hover:not(:focus) {
         border-color: rgba(14, 165, 233, 0.3);
       }
+    }
+
+    // Light theme - Language badge component overrides
+    .dx-language-badge-container {
+      // Container needs no background changes
+    }
+
+    .dx-language-badge {
+      background: rgba(0, 0, 0, 0.08);
+      color: #64748b;
+
+      &.is-active {
+        background: rgba(0, 0, 0, 0.12);
+      }
+    }
+
+    .dx-language-option {
+      background: rgba(0, 0, 0, 0.06);
+      color: #64748b;
+      border-right: 1px solid rgba(0, 0, 0, 0.1);
+
+      &:hover {
+        background: rgba(0, 0, 0, 0.12);
+        color: #1e293b;
+      }
+    }
+
+    .dx-language-search-trigger {
+      // Inherits from dx-language-option
+    }
+
+    .dx-language-search-panel {
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+
+    .dx-language-search-input {
+      background: #f1f5f9;
+      border-bottom: 1px solid #e2e8f0;
+      color: #1e293b;
+
+      &::placeholder {
+        color: #94a3b8;
+      }
+
+      &:focus {
+        background: #e2e8f0;
+      }
+    }
+
+    .dx-language-search-list {
+      &::-webkit-scrollbar-track {
+        background: #f1f5f9;
+      }
+
+      &::-webkit-scrollbar-thumb {
+        background: #cbd5e1;
+
+        &:hover {
+          background: #94a3b8;
+        }
+      }
+    }
+
+    .dx-language-search-item {
+      color: #64748b;
+
+      &:hover,
+      &.is-selected {
+        background: #e2e8f0;
+        color: #1e293b;
+      }
+    }
+
+    .dx-language-search-empty {
+      color: #94a3b8;
     }
   }
 }

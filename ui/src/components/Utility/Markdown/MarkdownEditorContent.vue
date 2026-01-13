@@ -2,10 +2,10 @@
   <div
     ref="containerRef"
     class="dx-markdown-editor-content dx-markdown-content"
-    :class="{ 'is-readonly': readonly, 'is-empty': isEmpty }"
+    :class="{ 'is-readonly': readonly, 'is-empty': isContentEmpty }"
     :contenteditable="!readonly"
     :data-placeholder="placeholder"
-    @input="$emit('input')"
+    @input="onInput"
     @keydown="$emit('keydown', $event)"
     @blur="$emit('blur')"
     @click="handleClick"
@@ -14,7 +14,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref } from "vue";
+import { nextTick, ref, watch } from "vue";
 
 export interface MarkdownEditorContentProps {
   html: string;
@@ -27,13 +27,38 @@ const props = withDefaults(defineProps<MarkdownEditorContentProps>(), {
   placeholder: "Start typing..."
 });
 
-defineEmits<{
+const emit = defineEmits<{
   input: [];
   keydown: [event: KeyboardEvent];
   blur: [];
 }>();
 
 const containerRef = ref<HTMLElement | null>(null);
+const isContentEmpty = ref(true);
+
+/**
+ * Check if the editor content is empty by examining the actual DOM text content.
+ * This is needed because contenteditable changes the DOM directly without updating props.
+ */
+function checkIfEmpty(): void {
+  if (containerRef.value) {
+    const textContent = containerRef.value.textContent?.trim() || "";
+    isContentEmpty.value = textContent.length === 0;
+  }
+}
+
+/**
+ * Handle input events - check if content is empty and emit the input event.
+ */
+function onInput(): void {
+  checkIfEmpty();
+  emit("input");
+}
+
+// Watch for external HTML changes (e.g., from parent component)
+watch(() => props.html, () => {
+  nextTick(() => checkIfEmpty());
+}, { immediate: true });
 
 /**
  * Find the anchor element if the click target is inside one
@@ -73,10 +98,6 @@ function handleClick(event: MouseEvent): void {
   event.stopPropagation();
   window.open(href, "_blank", "noopener,noreferrer");
 }
-
-const isEmpty = computed(() => {
-  return !props.html || props.html === "<p></p>" || props.html === "<p><br></p>";
-});
 
 // Expose containerRef for parent component
 defineExpose({ containerRef });

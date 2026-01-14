@@ -29,7 +29,7 @@ function escapeHtml(text: string): string {
  * Highlight JSON syntax by tokenizing first, then applying highlights
  * This prevents issues with regex replacing content inside already-matched strings
  */
-export function highlightJSON(code: string): string {
+function highlightJSON(code: string): string {
 	if (!code) return "";
 
 	const result: string[] = [];
@@ -160,7 +160,7 @@ function getIndentLevel(line: string): number {
 /**
  * Highlight YAML syntax with multi-line string support
  */
-export function highlightYAML(code: string): string {
+function highlightYAML(code: string): string {
 	if (!code) return "";
 
 	const lines = code.split("\n");

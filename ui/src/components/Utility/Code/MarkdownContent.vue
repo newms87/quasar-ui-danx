@@ -9,29 +9,17 @@
       />
 
       <!-- Code blocks with syntax highlighting -->
-      <div
+      <CodeViewer
         v-else-if="token.type === 'code_block'"
-        class="dx-markdown-code-block"
-      >
-        <!-- Language toggle badge (only for json/yaml) -->
-        <LanguageBadge
-          v-if="isToggleableLanguage(token.language)"
-          :format="getCodeBlockFormat(index, token.language)"
-          :available-formats="['json', 'yaml']"
-          :toggleable="true"
-          @change="(fmt) => setCodeBlockFormat(index, fmt)"
-        />
-        <LanguageBadge
-          v-else-if="token.language"
-          :format="token.language"
-          :available-formats="[]"
-          :toggleable="false"
-        />
-        <pre><code
-          :class="'language-' + getCodeBlockFormat(index, token.language)"
-          v-html="highlightCodeBlock(index, token.content, token.language)"
-        ></code></pre>
-      </div>
+        :model-value="token.content"
+        :format="normalizeLanguage(token.language)"
+        :default-code-format="defaultCodeFormat"
+        :can-edit="false"
+        :collapsible="false"
+        hide-footer
+        allow-any-language
+        class="markdown-code-block"
+      />
 
       <!-- Blockquotes (recursive) -->
       <blockquote
@@ -186,12 +174,10 @@
 </template>
 
 <script setup lang="ts">
-import { computed, reactive } from "vue";
-import { parse as parseYAML, stringify as stringifyYAML } from "yaml";
+import { computed } from "vue";
 import { tokenizeBlocks, parseInline, renderMarkdown, getFootnotes, resetParserState } from "../../../helpers/formats/markdown";
 import type { BlockToken, ListItem } from "../../../helpers/formats/markdown";
-import { highlightJSON, highlightYAML } from "../../../helpers/formats/highlightSyntax";
-import LanguageBadge from "./LanguageBadge.vue";
+import CodeViewer from "./CodeViewer.vue";
 
 export interface MarkdownContentProps {
   content: string;
@@ -202,10 +188,21 @@ const props = withDefaults(defineProps<MarkdownContentProps>(), {
   content: ""
 });
 
-// Track format overrides for each code block (for toggling json<->yaml)
-const codeBlockFormats = reactive<Record<number, string>>({});
-// Cache converted content for each code block
-const convertedContent = reactive<Record<number, string>>({});
+// Normalize language aliases to standard names
+function normalizeLanguage(lang?: string): string {
+  if (!lang) return "text";
+  const aliases: Record<string, string> = {
+    js: "javascript",
+    ts: "typescript",
+    py: "python",
+    rb: "ruby",
+    yml: "yaml",
+    md: "markdown",
+    sh: "bash",
+    shell: "bash"
+  };
+  return aliases[lang.toLowerCase()] || lang.toLowerCase();
+}
 
 // Tokenize the markdown content
 const tokens = computed<BlockToken[]>(() => {
@@ -233,124 +230,6 @@ const sortedFootnotes = computed(() => {
     .sort((a, b) => a[1].index - b[1].index)
     .map(([id, fn]) => ({ id, content: fn.content, index: fn.index }));
 });
-
-// Check if a language is toggleable (json or yaml)
-function isToggleableLanguage(language: string): boolean {
-  if (!language) return false;
-  const lang = language.toLowerCase();
-  return lang === "json" || lang === "yaml";
-}
-
-// Get the current format for a code block (respecting user toggle, then default override, then original)
-function getCodeBlockFormat(index: number, originalLanguage: string): string {
-  // If user has toggled this block, use their choice
-  if (codeBlockFormats[index]) {
-    return codeBlockFormats[index];
-  }
-
-  // If a default is set and this is a toggleable language, use the default
-  const lang = originalLanguage?.toLowerCase();
-  if (props.defaultCodeFormat && (lang === "json" || lang === "yaml")) {
-    return props.defaultCodeFormat;
-  }
-
-  // Otherwise use the original language
-  return lang || "text";
-}
-
-// Get converted content for a code block (handles initial conversion for defaultCodeFormat)
-function getConvertedContent(index: number, originalContent: string, originalLang: string): string {
-  const format = getCodeBlockFormat(index, originalLang);
-
-  // If format matches original, no conversion needed
-  if (format === originalLang || !isToggleableLanguage(originalLang)) {
-    return originalContent;
-  }
-
-  // Convert from original to target format
-  try {
-    let parsed: unknown;
-
-    if (originalLang === "json") {
-      parsed = JSON.parse(originalContent);
-    } else if (originalLang === "yaml") {
-      parsed = parseYAML(originalContent);
-    }
-
-    if (parsed !== undefined) {
-      if (format === "json") {
-        return JSON.stringify(parsed, null, 2);
-      } else if (format === "yaml") {
-        return stringifyYAML(parsed as object);
-      }
-    }
-  } catch {
-    // Conversion failed, return original
-  }
-
-  return originalContent;
-}
-
-// Set format for a code block (converts content to the new format)
-function setCodeBlockFormat(index: number, newFormat: string) {
-  const token = tokens.value[index];
-  if (token?.type !== "code_block") return;
-
-  const originalLang = token.language?.toLowerCase() || "json";
-  const current = getCodeBlockFormat(index, originalLang);
-
-  // No change needed if already in target format
-  if (current === newFormat) return;
-
-  // Convert the content
-  try {
-    // Use the currently displayed content (which may already be converted due to defaultCodeFormat)
-    const sourceContent = convertedContent[index] || getConvertedContent(index, token.content, originalLang);
-    let parsed: unknown;
-
-    // Parse from current format
-    if (current === "json") {
-      parsed = JSON.parse(sourceContent);
-    } else {
-      parsed = parseYAML(sourceContent);
-    }
-
-    // Convert to new format
-    if (newFormat === "json") {
-      convertedContent[index] = JSON.stringify(parsed, null, 2);
-    } else {
-      convertedContent[index] = stringifyYAML(parsed as object);
-    }
-
-    codeBlockFormats[index] = newFormat;
-  } catch {
-    // If conversion fails, just set the format without converting
-    codeBlockFormats[index] = newFormat;
-  }
-}
-
-// Highlight code block content based on format
-function highlightCodeBlock(index: number, originalContent: string, originalLanguage: string): string {
-  const format = getCodeBlockFormat(index, originalLanguage);
-  const originalLang = originalLanguage?.toLowerCase() || "text";
-
-  // Get the content (converted if needed, or from cache if user toggled)
-  const content = convertedContent[index] || getConvertedContent(index, originalContent, originalLang);
-
-  // Apply syntax highlighting
-  switch (format) {
-    case "json":
-      return highlightJSON(content);
-    case "yaml":
-      return highlightYAML(content);
-    default:
-      // For other languages, just escape HTML
-      return content
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;");
-  }
-}
 
 // Parse inline markdown (bold, italic, links, etc.)
 function parseInlineContent(text: string): string {
@@ -383,23 +262,12 @@ function renderBlockquote(content: string): string {
 </script>
 
 <style lang="scss">
-.dx-markdown-code-block {
-  position: relative;
+.markdown-code-block {
   margin: 1em 0;
 
-  pre {
-    margin: 0;
-    background: rgba(0, 0, 0, 0.3);
-    padding: 1em;
-    border-radius: 6px;
-    overflow-x: auto;
-
-    code {
-      background: transparent;
-      padding: 0;
-      font-size: 0.875em;
-      font-family: 'Fira Code', 'Monaco', monospace;
-    }
+  // Ensure auto-height instead of 100%
+  &.dx-code-viewer {
+    height: auto;
   }
 }
 </style>

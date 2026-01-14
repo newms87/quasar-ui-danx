@@ -84,6 +84,7 @@
 
         <!-- Footer with char count and edit toggle -->
         <CodeViewerFooter
+          v-if="!hideFooter"
           :char-count="editor.charCount.value"
           :validation-error="editor.validationError.value"
           :can-edit="canEdit && currentFormat !== 'markdown'"
@@ -121,6 +122,7 @@ export interface CodeViewerProps {
 	allowAnyLanguage?: boolean;
 	theme?: "dark" | "light";
 	showVersion?: boolean;
+	hideFooter?: boolean;
 }
 
 const props = withDefaults(defineProps<CodeViewerProps>(), {
@@ -133,7 +135,8 @@ const props = withDefaults(defineProps<CodeViewerProps>(), {
 	collapsible: false,
 	defaultCollapsed: true,
 	theme: "dark",
-	showVersion: false
+	showVersion: false,
+	hideFooter: false
 });
 
 const emit = defineEmits<{

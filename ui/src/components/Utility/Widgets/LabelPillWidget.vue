@@ -14,6 +14,7 @@ const props = withDefaults(defineProps<LabelPillWidgetProps>(), {
 });
 
 const colorClasses = {
+	// Dark theme colors (dark backgrounds with bright text)
 	sky: "bg-sky-950 text-sky-400",
 	green: "bg-green-950 text-green-400",
 	red: "bg-red-950 text-red-400",
@@ -33,6 +34,25 @@ const colorClasses = {
 	indigo: "bg-indigo-950 text-indigo-400",
 	violet: "bg-violet-950 text-violet-400",
 	fuchsia: "bg-fuchsia-950 text-fuchsia-400",
+	// Soft/light theme colors (light backgrounds with darker text)
+	"sky-soft": "bg-sky-100 text-sky-700",
+	"green-soft": "bg-green-100 text-green-700",
+	"red-soft": "bg-red-100 text-red-700",
+	"amber-soft": "bg-amber-100 text-amber-700",
+	"yellow-soft": "bg-yellow-100 text-yellow-700",
+	"blue-soft": "bg-blue-100 text-blue-700",
+	"purple-soft": "bg-purple-100 text-purple-700",
+	"slate-soft": "bg-slate-100 text-slate-600",
+	"gray-soft": "bg-gray-100 text-gray-600",
+	"emerald-soft": "bg-emerald-100 text-emerald-700",
+	"orange-soft": "bg-orange-100 text-orange-700",
+	"lime-soft": "bg-lime-100 text-lime-700",
+	"teal-soft": "bg-teal-100 text-teal-700",
+	"cyan-soft": "bg-cyan-100 text-cyan-700",
+	"rose-soft": "bg-rose-100 text-rose-700",
+	"indigo-soft": "bg-indigo-100 text-indigo-700",
+	"violet-soft": "bg-violet-100 text-violet-700",
+	"fuchsia-soft": "bg-fuchsia-100 text-fuchsia-700",
 	none: ""
 };
 

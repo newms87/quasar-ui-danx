@@ -8,14 +8,14 @@
   >
     <div class="flex items-center flex-nowrap">
       <component
+        v-if="icon || typeOptions.icon"
         :is="icon || typeOptions.icon"
         class="transition-all"
         :class="resolvedIconClass"
       />
       <div
         v-if="label || label === 0"
-        class="ml-2"
-        :class="labelClass"
+        :class="[labelClass, { 'ml-2': icon || typeOptions.icon }]"
       >
         {{ label }}
       </div>
@@ -87,7 +87,7 @@ import { ActionTarget, ResourceAction } from "../../../types";
 
 export interface ActionButtonProps {
   type?: "save" | "trash" | "back" | "create" | "edit" | "copy" | "folder" | "document" | "play" | "stop" | "pause" | "refresh" | "restart" | "confirm" | "cancel" | "export" | "import" | "minus" | "merge" | "check" | "clock" | "view" | "database" | "users" | "close";
-  color?: "red" | "blue" | "blue-invert" | "sky" | "sky-invert" | "green" | "green-invert" | "lime" | "white" | "gray" | "slate" | "slate-invert" | "yellow" | "orange" | "amber" | "purple" | "teal" | "teal-invert";
+  color?: "red" | "blue" | "blue-invert" | "sky" | "sky-invert" | "sky-soft" | "green" | "green-invert" | "green-soft" | "lime" | "white" | "gray" | "slate" | "slate-invert" | "slate-soft" | "yellow" | "orange" | "amber" | "purple" | "blue-soft" | "red-soft" | "teal" | "teal-invert";
   size?: "xxs" | "xs" | "sm" | "md" | "lg";
   icon?: object | string;
   iconClass?: string;
@@ -126,7 +126,7 @@ const props = withDefaults(defineProps<ActionButtonProps>(), {
 const mappedSizeClass = {
   xxs: {
     icon: "w-2",
-    button: "px-.5 h-5"
+    button: "px-1 h-4 text-[10px]"
   },
   xs: {
     icon: "w-3",
@@ -157,16 +157,22 @@ const colorClass = computed(() => {
   switch (props.color) {
     case "red":
       return "text-red-900 bg-red-300 hover:bg-red-400";
+    case "red-soft":
+      return "text-red-700 bg-red-100 hover:bg-red-200";
     case "lime":
       return "text-lime-900 bg-lime-300 hover:bg-lime-400";
     case "green":
       return "text-green-900 bg-green-300 hover:bg-green-400";
     case "green-invert":
       return "text-green-300 bg-green-900 hover:bg-green-800";
+    case "green-soft":
+      return "text-green-700 bg-green-100 hover:bg-green-200";
     case "blue":
       return "text-blue-900 bg-blue-300 hover:bg-blue-400";
     case "blue-invert":
       return "text-blue-300 bg-blue-900 hover:bg-blue-800";
+    case "blue-soft":
+      return "text-blue-700 bg-blue-100 hover:bg-blue-200";
     case "teal":
       return "text-teal-800 bg-teal-200 hover:bg-teal-400";
     case "teal-invert":
@@ -175,6 +181,8 @@ const colorClass = computed(() => {
       return "text-sky-900 bg-sky-300 hover:bg-sky-400";
     case "sky-invert":
       return "text-sky-400 bg-sky-800 hover:bg-sky-900";
+    case "sky-soft":
+      return "text-sky-700 bg-sky-100 hover:bg-sky-200";
     case "white":
       return "text-white bg-gray-800 hover:bg-gray-200";
     case "yellow":
@@ -189,6 +197,8 @@ const colorClass = computed(() => {
       return "text-slate-900 bg-slate-300 hover:bg-slate-400";
     case "slate-invert":
       return "text-slate-300 bg-slate-900 hover:bg-slate-800";
+    case "slate-soft":
+      return "text-slate-600 bg-slate-100 hover:bg-slate-200";
     case "purple":
       return "text-purple-300 bg-purple-900 hover:bg-purple-800";
     default:
@@ -251,7 +261,7 @@ const typeOptions = computed(() => {
     case "close":
       return { icon: CloseIcon };
     default:
-      return { icon: EditIcon };
+      return { icon: null };
   }
 });
 

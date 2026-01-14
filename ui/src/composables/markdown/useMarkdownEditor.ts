@@ -323,10 +323,15 @@ export function useMarkdownEditor(options: UseMarkdownEditorOptions): UseMarkdow
 		codeBlocks.toggleCodeBlock();
 	}
 
-	// Computed character count
-	const charCount = computed(() => {
-		return contentRef.value?.textContent?.length || 0;
-	});
+	// Character count - updated on each input since textContent is not reactive
+	const charCount = ref(0);
+
+	/**
+	 * Update the character count from the current content
+	 */
+	function updateCharCount(): void {
+		charCount.value = contentRef.value?.textContent?.length || 0;
+	}
 
 	// Reactive hotkey definitions for UI
 	const hotkeyDefinitions = computed(() => {
@@ -738,6 +743,9 @@ export function useMarkdownEditor(options: UseMarkdownEditorOptions): UseMarkdow
 	 * Note: Code fence patterns (```) are only converted on Enter key press, not on input
 	 */
 	function onInput(): void {
+		// Update character count immediately for responsive UI
+		updateCharCount();
+
 		// Check for heading pattern (e.g., "# " -> H1)
 		let converted = headings.checkAndConvertHeadingPattern();
 
@@ -1007,6 +1015,7 @@ export function useMarkdownEditor(options: UseMarkdownEditorOptions): UseMarkdow
 		nextTick(() => {
 			if (contentRef.value) {
 				contentRef.value.innerHTML = sync.renderedHtml.value;
+				updateCharCount();
 			}
 		});
 	}

@@ -165,6 +165,23 @@
     vertical-align: super;
   }
 
+  // Hex color preview swatch
+  .color-preview {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25em;
+
+    .color-swatch {
+      display: inline-block;
+      width: 14px;
+      height: 14px;
+      border-radius: 3px;
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      vertical-align: middle;
+      flex-shrink: 0;
+    }
+  }
+
   // Tables
   table {
     border-collapse: collapse;
@@ -295,6 +312,11 @@
     // Highlight - light theme
     mark {
       background: rgba(250, 204, 21, 0.5);
+    }
+
+    // Color swatch - light theme
+    .color-preview .color-swatch {
+      border-color: rgba(0, 0, 0, 0.2);
     }
   }
 }

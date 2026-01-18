@@ -41,6 +41,19 @@ function processInlineContent(element: Element): string {
 		} else if (child.nodeType === Node.ELEMENT_NODE) {
 			const el = child as Element;
 			const tagName = el.tagName.toLowerCase();
+
+			// Handle color-preview spans - skip the swatch, return only the hex code text
+			if (tagName === "span" && el.classList.contains("color-preview")) {
+				// Get text content directly, skipping the color-swatch span
+				parts.push(el.textContent || "");
+				continue;
+			}
+
+			// Skip color-swatch spans entirely (they're purely decorative)
+			if (tagName === "span" && el.classList.contains("color-swatch")) {
+				continue;
+			}
+
 			const content = processInlineContent(el);
 
 			// Skip empty formatting elements
@@ -378,10 +391,22 @@ function processNode(node: Node): string {
 					break;
 				}
 
-				// Spans - just process children
-				case "span":
-					parts.push(processNode(element));
+				// Spans - handle special cases first
+				case "span": {
+					// Color preview: return only the hex color text
+					if (element.classList.contains("color-preview")) {
+						parts.push(element.textContent || "");
+					}
+					// Color swatch: skip entirely (purely decorative)
+					else if (element.classList.contains("color-swatch")) {
+						// Skip - don't output anything
+					}
+					// Default: process children
+					else {
+						parts.push(processNode(element));
+					}
 					break;
+				}
 
 				// Tables
 				case "table":

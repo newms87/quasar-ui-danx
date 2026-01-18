@@ -54,6 +54,13 @@ export function useCodeViewerCollapse(options: UseCodeViewerCollapseOptions): Us
 		const maxLength = 100;
 		let preview = "";
 
+		// For text and markdown formats, just show the first line - no parsing
+		if (format.value === "text" || format.value === "markdown") {
+			const firstLine = content.split("\n")[0].trim();
+			preview = firstLine.length > maxLength ? firstLine.slice(0, maxLength) + "..." : firstLine;
+			return preview;
+		}
+
 		if (format.value === "json") {
 			// For JSON, show compact inline format
 			try {

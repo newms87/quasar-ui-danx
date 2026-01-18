@@ -40,7 +40,9 @@ export function useActionRoutes(baseUrl: string, extend?: object): ListControlsR
 				...options,
 				ignoreAbort: true
 			};
-			fields && (options.params = { fields });
+			if (fields) {
+				options.params = { ...options.params, fields };
+			}
 			const item = await request.get(`${baseUrl}/${target.id}/details`, options);
 			return storeObject(item);
 		},

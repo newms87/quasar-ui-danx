@@ -10,7 +10,11 @@ export function useFileNavigation(initialFile: Ref<UploadedFile | null>, initial
 	const currentFile = ref<UploadedFile | null>(initialFile.value);
 	const relatedFiles = ref<UploadedFile[]>(initialRelatedFiles.value);
 	const parentStack = ref<FileNavigationParent[]>([]);
-	const currentIndex = ref(0);
+	const currentIndex = ref(
+		initialFile.value
+			? Math.max(0, initialRelatedFiles.value.findIndex(f => f.id === initialFile.value!.id))
+			: 0
+	);
 
 	// Computed properties
 	const hasParent = computed(() => parentStack.value.length > 0);

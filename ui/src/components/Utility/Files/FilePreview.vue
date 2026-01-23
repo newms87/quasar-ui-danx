@@ -179,7 +179,7 @@
     <FullScreenCarouselDialog
       v-if="showPreview && !disabled && previewableFiles"
       :files="previewableFiles"
-      :default-slide="previewableFiles[0]?.id || ''"
+      :default-slide="computedImage?.id || ''"
       @close="showPreview = false"
     />
   </div>
@@ -264,7 +264,7 @@ const statusMessage = computed(() => isUploading.value ? "Uploading..." : transc
 
 const previewableFiles = computed(() => {
   return props.relatedFiles?.length > 0
-    ? uniqueBy([computedImage.value, ...props.relatedFiles], filesHaveSameUrl)
+    ? uniqueBy([...props.relatedFiles, computedImage.value], filesHaveSameUrl)
     : [computedImage.value];
 });
 

@@ -92,4 +92,22 @@ const contentClassComputed = computed(() => [
 	]),
 	text.value ? "" : "!bg-none"
 ]);
+
+/**
+ * Focus the editable div and optionally select all text
+ */
+function focus(selectAll: boolean = false): void {
+	if (textDiv.value && !props.readonly) {
+		textDiv.value.focus();
+		if (selectAll && text.value) {
+			const range = document.createRange();
+			range.selectNodeContents(textDiv.value);
+			const selection = window.getSelection();
+			selection?.removeAllRanges();
+			selection?.addRange(range);
+		}
+	}
+}
+
+defineExpose({ focus });
 </script>

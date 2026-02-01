@@ -7,3 +7,4 @@ export { default as FullScreenDialog } from "./FullScreenDialog.vue";
 export { default as InfoDialog } from "./InfoDialog.vue";
 export { default as InputDialog } from "./InputDialog.vue";
 export { default as RenderedFormDialog } from "./RenderedFormDialog.vue";
+export { default as TabbedDialog } from "./TabbedDialog.vue";

@@ -1,6 +1,7 @@
 <template>
   <QDialog
-    class="dx-dialog"
+    class="dx-dialog dx-dialog-layout-v1.11"
+    :class="{ 'dx-dialog-light': lightTheme }"
     :full-height="fullHeight"
     :full-width="fullWidth"
     :model-value="true"
@@ -64,14 +65,15 @@ import { DialogLayoutProps } from "../../../types";
 const emit = defineEmits(["close"]);
 
 withDefaults(defineProps<DialogLayoutProps>(), {
-	title: "",
-	titleClass: "",
-	subtitle: "",
-	content: "",
-	contentClass: ""
+  title: "",
+  titleClass: "",
+  subtitle: "",
+  content: "",
+  contentClass: "",
+  lightTheme: false
 });
 
 function onClose() {
-	emit("close");
+  emit("close");
 }
 </script>

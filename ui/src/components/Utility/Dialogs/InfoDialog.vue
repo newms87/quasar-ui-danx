@@ -1,6 +1,6 @@
 <template>
   <DialogLayout
-    class="dx-info-dialog"
+    class="dx-info-dialog dx-info-dialog--v1.11"
     @close="onClose"
   >
     <slot />
@@ -41,17 +41,17 @@ import DialogLayout from "./DialogLayout";
 
 const emit = defineEmits(["update:model-value", "close"]);
 withDefaults(defineProps<{
-	disabled?: boolean;
-	hideDone?: boolean;
-	doneClass?: string | object;
-	doneText?: string;
+  disabled?: boolean;
+  hideDone?: boolean;
+  doneClass?: string | object;
+  doneText?: string;
 }>(), {
-	doneClass: "",
-	doneText: "Done"
+  doneClass: "",
+  doneText: "Done"
 });
 
 function onClose() {
-	emit("update:model-value", false);
-	emit("close");
+  emit("update:model-value", false);
+  emit("close");
 }
 </script>

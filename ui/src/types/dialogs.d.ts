@@ -11,6 +11,7 @@ export interface DialogLayoutProps {
 	fullWidth?: boolean;
 	fullHeight?: boolean;
 	contentClass?: string;
+	lightTheme?: boolean;
 }
 
 export interface ConfirmDialogProps extends DialogLayoutProps {

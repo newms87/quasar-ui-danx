@@ -1,13 +1,26 @@
 .dx-field-label {
-  @apply text-xs mb-1.5 flex items-center space-x-1;
+  font-size: 0.75rem;
+  line-height: 1rem;
+  margin-bottom: 0.375rem;
+  display: flex;
+  align-items: center;
+
+  > * + * {
+    margin-left: 0.25rem;
+  }
 
   .dx-field-required {
-    @apply text-red-900 ml-0.5 bottom-1 relative;
+    color: rgb(127, 29, 29);
+    margin-left: 0.125rem;
+    bottom: 0.25rem;
+    position: relative;
   }
 }
 
 .q-field {
   .q-field__label {
-    @apply text-sm text-gray-700;
+    font-size: 0.875rem;
+    line-height: 1.25rem;
+    color: rgb(55, 65, 81);
   }
 }

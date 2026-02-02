@@ -1,46 +1,56 @@
 .dx-dialog {
 	.dx-dialog-card {
-		@apply overflow-hidden;
+		overflow: hidden;
 	}
 
 	.dx-dialog-title {
-		@apply pl-6 pr-10 border-b border-gray-300 font-normal;
+		padding-left: 1.5rem;
+		padding-right: 2.5rem;
+		border-bottom: 1px solid rgb(209, 213, 219);
+		font-weight: 400;
 	}
 
 	.dx-dialog-subtitle {
-		@apply mt-1 text-sm;
+		margin-top: 0.25rem;
+		font-size: 0.875rem;
+		line-height: 1.25rem;
 	}
 
 	.dx-dialog-content {
-		@apply px-6 bg-gray-100;
+		padding-left: 1.5rem;
+		padding-right: 1.5rem;
+		background-color: rgb(243, 244, 246);
 	}
 
 	.dx-dialog-actions {
-		@apply px-6 py-4 border-t border-gray-300;
+		padding: 1rem 1.5rem;
+		border-top: 1px solid rgb(209, 213, 219);
 	}
 
 	.dx-dialog-button {
 		& + .dx-dialog-button {
-			@apply ml-4;
+			margin-left: 1rem;
 		}
 	}
 
 	.dx-close-button {
-		@apply p-4 text-black;
+		padding: 1rem;
+		color: rgb(0, 0, 0);
 	}
 
 	.dx-dialog-button-confirm .dx-dialog-button {
-		@apply bg-blue-600 text-white;
+		background-color: rgb(37, 99, 235);
+		color: rgb(255, 255, 255);
 	}
 
 	.dx-dialog-button-cancel {
-		@apply flex-grow;
+		flex-grow: 1;
 	}
 
 	&.dx-info-dialog {
 		.dx-dialog-actions {
 			& > .flex-grow {
-				@apply text-right;
+				text-align: right;
 			}
 		}
 	}
@@ -48,31 +58,41 @@
 	// Light theme variant
 	&.dx-dialog-light {
 		.dx-dialog-card {
-			@apply bg-white;
+			background-color: rgb(255, 255, 255);
 		}
 
 		.dx-dialog-header {
-			@apply bg-white border-b border-slate-200;
+			background-color: rgb(255, 255, 255);
+			border-bottom: 1px solid rgb(226, 232, 240);
 		}
 
 		.dx-dialog-title {
-			@apply border-b-0 text-slate-800;
+			border-bottom: 0;
+			color: rgb(30, 41, 59);
 		}
 
 		.dx-dialog-subtitle {
-			@apply text-slate-500;
+			color: rgb(100, 116, 139);
 		}
 
 		.dx-dialog-content {
-			@apply bg-white;
+			background-color: rgb(255, 255, 255);
 		}
 
 		.dx-dialog-actions {
-			@apply bg-slate-50 border-t border-slate-200;
+			background-color: rgb(248, 250, 252);
+			border-top: 1px solid rgb(226, 232, 240);
 		}
 
 		.dx-close-button {
-			@apply text-slate-400 hover:text-slate-600 transition-colors;
+			color: rgb(148, 163, 184);
+			transition-property: color;
+			transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+			transition-duration: 150ms;
+
+			&:hover {
+				color: rgb(71, 85, 105);
+			}
 		}
 	}
 }

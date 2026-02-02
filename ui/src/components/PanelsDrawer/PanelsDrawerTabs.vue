@@ -60,7 +60,7 @@ function isEnabled(panel) {
 
 <style lang="scss" module="cls">
 .panel-tabs {
-	@apply p-4 h-auto;
+	padding: 1rem; height: auto;
 
 	:global(.q-tab) {
 		justify-content: start !important;
@@ -70,7 +70,7 @@ function isEnabled(panel) {
 		}
 
 		:global(.q-tab__content) {
-			@apply p-0;
+			padding: 0;
 		}
 	}
 }

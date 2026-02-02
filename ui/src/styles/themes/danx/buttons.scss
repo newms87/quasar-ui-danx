@@ -1,13 +1,22 @@
 .dx-action-button {
-  @apply bg-slate-200 transition-all cursor-pointer rounded outline outline-transparent;
+  background-color: rgb(226, 232, 240);
+  transition-property: all;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 150ms;
+  cursor: pointer;
+  border-radius: 0.25rem;
+  outline: 2px solid transparent;
+  outline-offset: 2px;
 
   &.dx-column-action-menu:hover {
-    @apply bg-blue-200 outline-blue-600;
+    background-color: rgb(191, 219, 254);
+    outline-color: rgb(37, 99, 235);
   }
 }
 
 .dx-previous-next-controls {
   .dx-control {
-    @apply bg-slate-200 border-gray-300;
+    background-color: rgb(226, 232, 240);
+    border-color: rgb(209, 213, 219);
   }
 }

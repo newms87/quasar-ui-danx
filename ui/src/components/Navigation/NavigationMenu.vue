@@ -120,15 +120,15 @@ function resolveUrl(item) {
 	cursor: pointer;
 
 	&.is-disabled {
-		@apply bg-inherit;
+		background: inherit;
 	}
 
 	.label {
-		@apply transition-all;
+		transition-property: all; transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1); transition-duration: 150ms;
 	}
 
 	.nav-icon {
-		@apply w-5 h-5 flex-shrink-0;
+		width: 1.25rem; height: 1.25rem; flex-shrink: 0;
 	}
 }
 
@@ -138,7 +138,7 @@ function resolveUrl(item) {
 	}
 
 	.label {
-		@apply opacity-0;
+		opacity: 0;
 	}
 }
 </style>

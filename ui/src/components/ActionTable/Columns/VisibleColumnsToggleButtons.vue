@@ -150,10 +150,10 @@ function getCategoryClass(category) {
 </script>
 <style lang="scss" module>
 .category-toggle {
-  @apply text-xs font-bold rounded-lg border border-solid px-2 py-1 mx-1 cursor-pointer flex items-center border-gray-200;
+  font-size: 0.75rem; line-height: 1rem; font-weight: 700; border-radius: 0.5rem; border: 1px solid rgb(229, 231, 235); padding: 0.25rem 0.5rem; margin: 0 0.25rem; cursor: pointer; display: flex; align-items: center;
 
   &.has-visible-columns {
-    @apply text-white bg-blue-600;
+    color: rgb(255, 255, 255); background-color: rgb(37, 99, 235);
   }
 }
 </style>

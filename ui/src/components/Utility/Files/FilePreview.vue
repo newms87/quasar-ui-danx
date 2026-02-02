@@ -313,6 +313,6 @@ function onShowPreview() {
   width: 100%;
   height: 100%;
   pointer-events: none;
-  @apply text-blue-200;
+  color: rgb(191, 219, 254);
 }
 </style>

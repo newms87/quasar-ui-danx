@@ -1,19 +1,27 @@
 .dx-panels-drawer-header {
-  @apply border-b;
+  border-bottom-width: 1px;
 }
 
 .dx-panels-drawer-panels {
-  @apply bg-gray-100
+  background-color: rgb(243, 244, 246);
 }
 
 .dx-panels-drawer-tabs {
-  @apply bg-gray-200 border-r;
+  background-color: rgb(229, 231, 235);
+  border-right-width: 1px;
 
   .q-tab {
-    @apply text-left py-2.5 px-2 rounded-lg hover:bg-slate-200;
+    text-align: left;
+    padding: 0.625rem 0.5rem;
+    border-radius: 0.5rem;
+
+    &:hover {
+      background-color: rgb(226, 232, 240);
+    }
 
     &.q-tab--active {
-      @apply text-white bg-blue-600;
+      color: rgb(255, 255, 255);
+      background-color: rgb(37, 99, 235);
     }
   }
 }

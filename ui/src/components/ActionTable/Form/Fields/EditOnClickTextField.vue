@@ -68,16 +68,16 @@ function onUpdate(newText: string) {
 
 <style lang="scss" scoped>
 .danx-edit-on-click-text-field {
-	@apply transition-all;
+	transition-property: all; transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1); transition-duration: 150ms;
 
 	.edit-icon {
-		@apply opacity-0 transition-all;
+		opacity: 0; transition-property: all; transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1); transition-duration: 150ms;
 
 	}
 
 	&:hover {
 		.edit-icon {
-			@apply opacity-100;
+			opacity: 1;
 		}
 	}
 }

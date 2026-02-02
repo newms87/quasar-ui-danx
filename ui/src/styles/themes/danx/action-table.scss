@@ -2,29 +2,36 @@
 	.dx-column-shrink {
 		width: 1px;
 	}
-	
+
 	// Make sure the checkbox column is left aligned and always the same size
 	thead > tr:first-child > th:first-child, tbody > tr:not(.dx-table-summary-tr) > td:first-child {
-		@apply text-left w-[1px] pl-4;
+		text-align: left;
+		width: 1px;
+		padding-left: 1rem;
 	}
 }
 
 .dx-table-summary-tr {
-	@apply bg-gray-100;
+	background-color: rgb(243, 244, 246);
 
 	&.has-selection {
-		@apply bg-blue-600 text-white;
+		background-color: rgb(37, 99, 235);
+		color: rgb(255, 255, 255);
 	}
 
 	&.is-loading {
-		@apply opacity-50;
+		opacity: 0.5;
 	}
 
 	.dx-table-summary-td {
-		@apply font-bold bg-gray-100 pl-5;
+		font-weight: 700;
+		background-color: rgb(243, 244, 246);
+		padding-left: 1.25rem;
 
 		&.has-selection {
-			@apply bg-blue-600 text-white pl-4;
+			background-color: rgb(37, 99, 235);
+			color: rgb(255, 255, 255);
+			padding-left: 1rem;
 		}
 	}
 }

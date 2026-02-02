@@ -1,7 +1,7 @@
 <template>
   <div class="flex flex-nowrap items-center">
     <LocationIcon
-      class="mr-1 ml-[-.2em]"
+      class="mr-1 -ml-[0.2em]"
       :class="iconClass"
     />
     <div

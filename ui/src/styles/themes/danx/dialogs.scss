@@ -44,4 +44,35 @@
 			}
 		}
 	}
+
+	// Light theme variant
+	&.dx-dialog-light {
+		.dx-dialog-card {
+			@apply bg-white;
+		}
+
+		.dx-dialog-header {
+			@apply bg-white border-b border-slate-200;
+		}
+
+		.dx-dialog-title {
+			@apply border-b-0 text-slate-800;
+		}
+
+		.dx-dialog-subtitle {
+			@apply text-slate-500;
+		}
+
+		.dx-dialog-content {
+			@apply bg-white;
+		}
+
+		.dx-dialog-actions {
+			@apply bg-slate-50 border-t border-slate-200;
+		}
+
+		.dx-close-button {
+			@apply text-slate-400 hover:text-slate-600 transition-colors;
+		}
+	}
 }

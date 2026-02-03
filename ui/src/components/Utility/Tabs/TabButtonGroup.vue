@@ -1,8 +1,5 @@
 <template>
-  <div
-    ref="containerRef"
-    class="dx-tab-button-group relative flex items-center border border-slate-600 rounded-lg overflow-hidden bg-slate-800"
-  >
+  <div class="dx-tab-button-group relative flex items-center border border-slate-600 rounded-lg overflow-hidden bg-slate-800">
     <!-- Sliding active indicator -->
     <div
       class="absolute inset-y-0 transition-all duration-300 ease-out"
@@ -13,7 +10,7 @@
     <button
       v-for="(tab, index) in tabs"
       :key="tab.value"
-      ref="buttonRefs"
+      :ref="el => setButtonRef(tab.value, el as HTMLElement)"
       class="relative z-10 flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium transition-colors duration-300"
       :class="[
         modelValue === tab.value ? 'text-white' : 'text-slate-500 hover:text-slate-300',
@@ -60,17 +57,21 @@ defineEmits<{
 	"update:modelValue": [value: string];
 }>();
 
-const containerRef = ref<HTMLElement | null>(null);
-const buttonRefs = ref<HTMLElement[]>([]);
-const indicatorLeft = ref(0);
-const indicatorWidth = ref(0);
+const buttonRefs = ref<Map<string, HTMLElement>>(new Map());
 
 /**
- * Get the active tab's index
+ * Store button ref by tab value for stable lookups when tabs change
  */
-const activeIndex = computed(() =>
-	props.tabs.findIndex(tab => tab.value === props.modelValue)
-);
+function setButtonRef(tabValue: string, el: HTMLElement | null) {
+	if (el) {
+		buttonRefs.value.set(tabValue, el);
+	} else {
+		buttonRefs.value.delete(tabValue);
+	}
+}
+
+const indicatorLeft = ref(0);
+const indicatorWidth = ref(0);
 
 /**
  * Get the active tab's color
@@ -93,9 +94,8 @@ const indicatorStyle = computed(() => ({
  * Update indicator position based on active button
  */
 function updateIndicatorPosition() {
-	const index = activeIndex.value;
-	if (index >= 0 && buttonRefs.value[index]) {
-		const button = buttonRefs.value[index];
+	const button = buttonRefs.value.get(props.modelValue);
+	if (button) {
 		indicatorLeft.value = button.offsetLeft;
 		indicatorWidth.value = button.offsetWidth;
 	}

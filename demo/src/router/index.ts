@@ -17,10 +17,16 @@ const router = createRouter({
             // which is lazy-loaded when the route is visited.
             component: () => import("../views/AboutView.vue")
         },
+        // Temporarily disabled - esbuild has issues with template literals in this file
+        // {
+        //     path: "/demo",
+        //     name: "demo",
+        //     component: () => import("../views/DemoView.vue")
+        // },
         {
-            path: "/demo",
-            name: "demo",
-            component: () => import("../views/DemoView.vue")
+            path: "/markdown",
+            name: "markdown",
+            component: () => import("../views/MarkdownPlayground.vue")
         }
     ]
 });

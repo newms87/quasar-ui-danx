@@ -22,6 +22,11 @@
         @keydown="editor.onKeyDown"
         @blur="editor.onBlur"
       />
+
+      <!-- Badge slot for overlaying content (share button, etc.) -->
+      <div v-if="$slots.badge" class="dx-editor-badge">
+        <slot name="badge" />
+      </div>
     </div>
 
     <MarkdownEditorFooter
@@ -68,6 +73,7 @@ import { useFocusTracking } from "../../../composables/markdown/features/useFocu
 import { useLineTypeMenu } from "../../../composables/markdown/features/useLineTypeMenu";
 import { useLinkPopover, useTablePopover } from "../../../composables/markdown/features/usePopoverManager";
 import { useMarkdownEditor } from "../../../composables/markdown/useMarkdownEditor";
+import { TokenRenderer } from "../../../composables/markdown/types";
 import ContextMenu from "./ContextMenu.vue";
 import HotkeyHelpPopover from "./HotkeyHelpPopover.vue";
 import LineTypeMenu from "./LineTypeMenu.vue";
@@ -84,6 +90,8 @@ export interface MarkdownEditorProps {
   maxHeight?: string;
   theme?: "dark" | "light";
   hideFooter?: boolean;
+  /** Custom token renderers for inline tokens like {{123}} */
+  tokenRenderers?: TokenRenderer[];
 }
 
 const props = withDefaults(defineProps<MarkdownEditorProps>(), {
@@ -93,7 +101,8 @@ const props = withDefaults(defineProps<MarkdownEditorProps>(), {
   minHeight: "100px",
   maxHeight: "none",
   theme: "dark",
-  hideFooter: false
+  hideFooter: false,
+  tokenRenderers: () => []
 });
 
 const emit = defineEmits<{
@@ -121,7 +130,8 @@ const editor = useMarkdownEditor({
     emit("update:modelValue", markdown);
   },
   onShowLinkPopover: linkPopover.show,
-  onShowTablePopover: tablePopover.show
+  onShowTablePopover: tablePopover.show,
+  tokenRenderers: props.tokenRenderers
 });
 
 // Initialize focus tracking
@@ -228,6 +238,14 @@ defineExpose({
     flex: 1;
     min-height: v-bind(minHeight);
     max-height: v-bind(maxHeight);
+  }
+
+  // Badge slot positioned at top-right of editor body
+  .dx-editor-badge {
+    position: absolute;
+    top: 0.5rem;
+    right: 0.5rem;
+    z-index: 10;
   }
 }
 </style>

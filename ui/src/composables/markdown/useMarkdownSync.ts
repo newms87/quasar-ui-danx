@@ -1,6 +1,7 @@
 import { onUnmounted, Ref, ref } from "vue";
 import { renderMarkdown } from "../../helpers/formats/markdown";
 import { CodeBlockState } from "./features/useCodeBlocks";
+import { TokenRenderer, TokenState } from "./types";
 
 /**
  * Options for useMarkdownSync composable
@@ -13,6 +14,12 @@ export interface UseMarkdownSyncOptions {
 	getCodeBlockById?: (id: string) => CodeBlockState | undefined;
 	/** Optional function to register a new code block in state */
 	registerCodeBlock?: (id: string, content: string, language: string) => void;
+	/** Optional array of token renderers for custom inline tokens */
+	tokenRenderers?: TokenRenderer[];
+	/** Optional function to look up token state by ID */
+	getTokenById?: (id: string) => TokenState | undefined;
+	/** Optional function to register a new token in state */
+	registerToken?: (id: string, rendererId: string, groups: string[]) => void;
 }
 
 /**
@@ -31,6 +38,12 @@ type CodeBlockLookup = (id: string) => CodeBlockState | undefined;
 
 /** Code block registration function type */
 type CodeBlockRegister = (id: string, content: string, language: string) => void;
+
+/** Token state lookup function type */
+type TokenLookup = (id: string) => TokenState | undefined;
+
+/** Token registration function type */
+type TokenRegister = (id: string, rendererId: string, groups: string[]) => void;
 
 /**
  * Generate a unique ID for code blocks
@@ -90,21 +103,88 @@ function convertCodeBlocksToWrappers(html: string, registerCodeBlock?: CodeBlock
 }
 
 /**
+ * Generate a unique ID for tokens
+ */
+function generateTokenId(): string {
+	return `tok-${crypto.randomUUID()}`;
+}
+
+/**
+ * Convert token patterns in HTML string to token wrapper structures.
+ * This allows TokenManager to mount custom Vue components for tokens.
+ *
+ * Tokens are matched against renderer patterns and converted to:
+ * <span class="custom-token-wrapper" contenteditable="false"
+ *       data-token-id="tok-uuid" data-token-renderer="renderer-id"
+ *       data-token-groups='["group1","group2"]'>
+ *   <span class="token-mount-point"></span>
+ * </span>
+ */
+function convertTokensToWrappers(
+	html: string,
+	tokenRenderers?: TokenRenderer[],
+	registerToken?: TokenRegister
+): string {
+	if (!tokenRenderers || tokenRenderers.length === 0) {
+		return html;
+	}
+
+	let result = html;
+
+	for (const renderer of tokenRenderers) {
+		// Reset regex lastIndex since we're using global flag
+		renderer.pattern.lastIndex = 0;
+
+		// Create a new regex for each iteration to avoid issues with global flag state
+		const pattern = new RegExp(renderer.pattern.source, renderer.pattern.flags);
+
+		result = result.replace(pattern, (match, ...args) => {
+			// Extract captured groups (args before the last two which are offset and full string)
+			const groups = args.slice(0, -2).filter(g => g !== undefined) as string[];
+
+			// Generate unique ID for this token instance
+			const id = generateTokenId();
+
+			// Register token in state if callback provided
+			if (registerToken) {
+				registerToken(id, renderer.id, groups);
+			}
+
+			// Create wrapper HTML structure
+			const groupsJson = JSON.stringify(groups);
+			return `<span class="custom-token-wrapper" contenteditable="false" data-token-id="${id}" data-token-renderer="${renderer.id}" data-token-groups='${groupsJson}'><span class="token-mount-point"></span></span>`;
+		});
+	}
+
+	return result;
+}
+
+/**
  * Convert HTML back to markdown
  * This handles the reverse conversion from rendered HTML to markdown source
  */
-function htmlToMarkdown(html: string, getCodeBlockById?: CodeBlockLookup): string {
+function htmlToMarkdown(
+	html: string,
+	getCodeBlockById?: CodeBlockLookup,
+	tokenRenderers?: TokenRenderer[],
+	getTokenById?: TokenLookup
+): string {
 	// Create a temporary element to parse the HTML
 	const temp = document.createElement("div");
 	temp.innerHTML = html;
 
-	return processNode(temp, getCodeBlockById);
+	return processNode(temp, getCodeBlockById, tokenRenderers, getTokenById);
 }
 
 /**
  * Process a DOM node and convert it to markdown
  */
-function processNode(node: Node, getCodeBlockById?: CodeBlockLookup): string {
+function processNode(
+	node: Node,
+	getCodeBlockById?: CodeBlockLookup,
+	tokenRenderers?: TokenRenderer[],
+	getTokenById?: TokenLookup
+): string {
 	const parts: string[] = [];
 
 	for (const child of Array.from(node.childNodes)) {
@@ -125,6 +205,20 @@ function processNode(node: Node, getCodeBlockById?: CodeBlockLookup): string {
 					const cleanContent = content.replace(/\u200B/g, "");
 					parts.push(`\`\`\`${lang}\n${cleanContent}\n\`\`\`\n\n`);
 					continue;
+				}
+			}
+
+			// Check for token wrapper (custom token island)
+			const tokenId = element.getAttribute("data-token-id");
+			if (tokenId && tokenRenderers && getTokenById) {
+				const state = getTokenById(tokenId);
+				if (state) {
+					const renderer = tokenRenderers.find(r => r.id === state.rendererId);
+					if (renderer) {
+						// Call the renderer's toMarkdown function
+						parts.push(renderer.toMarkdown(element as HTMLElement));
+						continue;
+					}
 				}
 			}
 
@@ -194,7 +288,7 @@ function processNode(node: Node, getCodeBlockById?: CodeBlockLookup): string {
 
 				// Blockquotes
 				case "blockquote": {
-					const content = processNode(element, getCodeBlockById).trim();
+					const content = processNode(element, getCodeBlockById, tokenRenderers, getTokenById).trim();
 					const quotedLines = content.split("\n").map(line => `> ${line}`).join("\n");
 					parts.push(`${quotedLines}\n\n`);
 					break;
@@ -275,7 +369,7 @@ function processNode(node: Node, getCodeBlockById?: CodeBlockLookup): string {
 
 				// Spans - inline containers, just process children
 				case "span":
-					parts.push(processNode(element, getCodeBlockById));
+					parts.push(processNode(element, getCodeBlockById, tokenRenderers, getTokenById));
 					break;
 
 				// Tables
@@ -285,7 +379,7 @@ function processNode(node: Node, getCodeBlockById?: CodeBlockLookup): string {
 
 				default:
 					// Unknown elements - just get text content
-					parts.push(processNode(element, getCodeBlockById));
+					parts.push(processNode(element, getCodeBlockById, tokenRenderers, getTokenById));
 			}
 		}
 	}
@@ -485,7 +579,16 @@ function getTextContent(element: Element): string {
  * Composable for bidirectional markdown <-> HTML synchronization
  */
 export function useMarkdownSync(options: UseMarkdownSyncOptions): UseMarkdownSyncReturn {
-	const { contentRef, onEmitValue, debounceMs = 300, getCodeBlockById, registerCodeBlock } = options;
+	const {
+		contentRef,
+		onEmitValue,
+		debounceMs = 300,
+		getCodeBlockById,
+		registerCodeBlock,
+		tokenRenderers,
+		getTokenById,
+		registerToken
+	} = options;
 
 	const renderedHtml = ref("");
 	// Flag to track when changes originate from the editor itself (vs external prop changes)
@@ -496,11 +599,15 @@ export function useMarkdownSync(options: UseMarkdownSyncOptions): UseMarkdownSyn
 	/**
 	 * Convert markdown to HTML and update rendered content.
 	 * Code blocks are converted to wrapper structures for CodeViewer mounting.
+	 * Token patterns are converted to wrapper structures for TokenManager mounting.
 	 */
 	function syncFromMarkdown(markdown: string): void {
-		const baseHtml = renderMarkdown(markdown);
+		let html = renderMarkdown(markdown);
 		// Convert <pre><code> to code block wrappers so CodeBlockManager can mount CodeViewer
-		renderedHtml.value = convertCodeBlocksToWrappers(baseHtml, registerCodeBlock);
+		html = convertCodeBlocksToWrappers(html, registerCodeBlock);
+		// Convert token patterns to wrappers so TokenManager can mount custom components
+		html = convertTokensToWrappers(html, tokenRenderers, registerToken);
+		renderedHtml.value = html;
 	}
 
 	/**
@@ -510,7 +617,7 @@ export function useMarkdownSync(options: UseMarkdownSyncOptions): UseMarkdownSyn
 		if (!contentRef.value) return;
 
 		const html = contentRef.value.innerHTML;
-		const markdown = htmlToMarkdown(html, getCodeBlockById);
+		const markdown = htmlToMarkdown(html, getCodeBlockById, tokenRenderers, getTokenById);
 
 		// Clean up extra whitespace
 		const cleaned = markdown.replace(/\n{3,}/g, "\n\n").trim();

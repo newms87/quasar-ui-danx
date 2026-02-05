@@ -10,6 +10,8 @@ import { useInlineFormatting } from "./features/useInlineFormatting";
 import { ShowLinkPopoverOptions, useLinks } from "./features/useLinks";
 import { useLists } from "./features/useLists";
 import { ShowTablePopoverOptions, useTables } from "./features/useTables";
+import { useTokenManager } from "./features/useTokenManager";
+import { TokenRenderer, TokenState } from "./types";
 
 /**
  * Options for useMarkdownEditor composable
@@ -22,6 +24,8 @@ export interface UseMarkdownEditorOptions {
 	onShowLinkPopover?: (options: ShowLinkPopoverOptions) => void;
 	/** Callback to show the table popover UI */
 	onShowTablePopover?: (options: ShowTablePopoverOptions) => void;
+	/** Optional array of token renderers for custom inline tokens */
+	tokenRenderers?: TokenRenderer[];
 }
 
 /**
@@ -61,6 +65,10 @@ export interface UseMarkdownEditorReturn {
 	codeBlockManager: ReturnType<typeof useCodeBlockManager>;
 	blockquotes: ReturnType<typeof useBlockquotes>;
 	tables: ReturnType<typeof useTables>;
+	tokenManager: ReturnType<typeof useTokenManager>;
+
+	// Token state
+	tokens: Map<string, TokenState>;
 }
 
 /**
@@ -68,10 +76,13 @@ export interface UseMarkdownEditorReturn {
  * Composes selection, sync, hotkeys, and feature composables
  */
 export function useMarkdownEditor(options: UseMarkdownEditorOptions): UseMarkdownEditorReturn {
-	const { contentRef, initialValue, onEmitValue, onShowLinkPopover, onShowTablePopover } = options;
+	const { contentRef, initialValue, onEmitValue, onShowLinkPopover, onShowTablePopover, tokenRenderers } = options;
 
 	// State
 	const isShowingHotkeyHelp = ref(false);
+
+	// Token state - tracks all mounted token instances
+	const tokens = new Map<string, TokenState>();
 
 	// Initialize selection management
 	const selection = useMarkdownSelection(contentRef);
@@ -89,12 +100,18 @@ export function useMarkdownEditor(options: UseMarkdownEditorOptions): UseMarkdow
 
 	// Initialize sync with code block lookup for HTML-to-markdown conversion
 	// and registration for markdown-to-HTML conversion (initial render)
+	// Also includes token renderers for custom inline token handling
 	const sync = useMarkdownSync({
 		contentRef,
 		onEmitValue,
 		debounceMs: 300,
 		getCodeBlockById: codeBlocks.getCodeBlockById,
-		registerCodeBlock: codeBlocks.registerCodeBlock
+		registerCodeBlock: codeBlocks.registerCodeBlock,
+		tokenRenderers,
+		getTokenById: (id: string) => tokens.get(id),
+		registerToken: (id: string, rendererId: string, groups: string[]) => {
+			tokens.set(id, { id, rendererId, groups });
+		}
 	});
 
 	// Now set the sync callback for code blocks
@@ -247,6 +264,13 @@ export function useMarkdownEditor(options: UseMarkdownEditorOptions): UseMarkdow
 		onCodeBlockExit: handleCodeBlockExit,
 		onCodeBlockDelete: handleCodeBlockDelete,
 		onCodeBlockMounted: codeBlocks.handleCodeBlockMounted
+	});
+
+	// Initialize token manager for mounting custom token components
+	const tokenManager = useTokenManager({
+		contentRef,
+		tokenRenderers: tokenRenderers || [],
+		tokens
 	});
 
 	// Register default hotkeys
@@ -1072,6 +1096,10 @@ export function useMarkdownEditor(options: UseMarkdownEditorOptions): UseMarkdow
 		codeBlocks,
 		codeBlockManager,
 		blockquotes,
-		tables
+		tables,
+		tokenManager,
+
+		// Token state
+		tokens
 	};
 }

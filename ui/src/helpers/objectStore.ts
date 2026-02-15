@@ -1,9 +1,37 @@
 import { uid } from "quasar";
+import type { Ref } from "vue";
 import { ShallowReactive, shallowReactive } from "vue";
 import { AnyObject, TypedObject } from "../types";
 import { FlashMessages } from "./FlashMessages";
 
 const store = new Map<string, any>();
+
+/**
+ * External list refs registered for automatic optimistic delete support.
+ * When removeObjectFromLists fires, these arrays are also scanned and spliced.
+ */
+const registeredLists = new Set<Ref<TypedObject[]>>();
+
+/**
+ * Register a local ref array so optimistic deletes automatically remove items from it.
+ *
+ * Without registration, removeObjectFromLists only scans arrays that are properties
+ * of stored objects. Local component refs (e.g., from routes.list()) are invisible
+ * to the store. Registering bridges that gap.
+ *
+ * Always call unregisterList in onBeforeUnmount to prevent memory leaks.
+ */
+export function registerList(listRef: Ref<TypedObject[]>): void {
+	registeredLists.add(listRef);
+}
+
+/**
+ * Unregister a previously registered list ref.
+ * Call this in onBeforeUnmount to clean up.
+ */
+export function unregisterList(listRef: Ref<TypedObject[]>): void {
+	registeredLists.delete(listRef);
+}
 
 export function storeObjects<T extends TypedObject>(newObjects: T[]) {
 	for (const index in newObjects) {
@@ -163,9 +191,10 @@ function hasRecentUpdates(newObject: TypedObject, oldObject: TypedObject | null)
 }
 
 /**
- * Remove an object from all lists in the store
+ * Remove an object from all lists in the store AND from any registered external list refs.
  */
 function removeObjectFromLists<T extends TypedObject>(object: T) {
+	// Remove from arrays that are properties of stored objects
 	for (const storedObject of store.values()) {
 		for (const key of Object.keys(storedObject)) {
 			const value = storedObject[key];
@@ -175,6 +204,17 @@ function removeObjectFromLists<T extends TypedObject>(object: T) {
 					value.splice(index, 1);
 					storedObject[key] = [...value];
 				}
+			}
+		}
+	}
+
+	// Remove from registered external list refs
+	for (const listRef of registeredLists) {
+		const arr = listRef.value;
+		if (arr.length > 0) {
+			const index = arr.findIndex(v => v.__id === object.__id && v.__type === object.__type);
+			if (index !== -1) {
+				arr.splice(index, 1);
 			}
 		}
 	}

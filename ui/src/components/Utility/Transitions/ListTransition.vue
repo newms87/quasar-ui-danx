@@ -16,7 +16,7 @@ defineProps({
 <style lang="scss">
 [class*="list-move"], /* apply transition to moving elements */
 [class*="list-enter-active"],
-[class*=".list-leave-active"] {
+[class*="list-leave-active"] {
   transition: all 0.3s cubic-bezier(0.55, 0, 0.1, 1);
 }
 

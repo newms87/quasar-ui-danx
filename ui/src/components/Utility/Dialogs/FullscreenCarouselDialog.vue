@@ -1,9 +1,8 @@
 <template>
-  <dialog
-    ref="dialogRef"
-    class="fullscreen-carousel-dialog"
-    @close="$emit('close')"
-    @click.self="$emit('close')"
+  <QDialog
+    :model-value="true"
+    maximized
+    @update:model-value="$emit('close')"
   >
     <div class="absolute inset-0 bg-black">
       <!-- Main Content Area -->
@@ -148,13 +147,13 @@
         @dock="dockToSplit"
       />
     </div>
-  </dialog>
+  </QDialog>
 </template>
 
 <script setup lang="ts">
 import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/vue/outline";
 import { FaSolidWindowMaximize as UndockIcon } from "danx-icon";
-import { onMounted, onBeforeUnmount, ref } from "vue";
+import { ref } from "vue";
 import { useFileNavigation } from "../../../composables/useFileNavigation";
 import { useFilePreview } from "../../../composables/useFilePreview";
 import { useKeyboardNavigation } from "../../../composables/useKeyboardNavigation";
@@ -169,23 +168,12 @@ import FileRenderer from "../Files/FileRenderer.vue";
 import ThumbnailStrip from "../Files/ThumbnailStrip.vue";
 import TranscodeNavigator from "../Files/TranscodeNavigator.vue";
 
-const emit = defineEmits(["close"]);
+defineEmits(["close"]);
 
 const props = defineProps<{
 	files: UploadedFile[];
 	defaultSlide?: string;
 }>();
-
-// Native dialog ref — showModal() places it in the browser's top layer
-const dialogRef = ref<HTMLDialogElement | null>(null);
-
-onMounted(() => {
-	dialogRef.value?.showModal();
-});
-
-onBeforeUnmount(() => {
-	dialogRef.value?.close();
-});
 
 // Initialize with first file or file matching defaultSlide
 const initialIndex = props.defaultSlide
@@ -264,22 +252,3 @@ const {
 	filteredMetadata
 } = useFilePreview({ file: currentFile });
 </script>
-
-<style>
-.fullscreen-carousel-dialog {
-	position: fixed;
-	inset: 0;
-	width: 100vw;
-	height: 100vh;
-	max-width: none;
-	max-height: none;
-	margin: 0;
-	padding: 0;
-	border: none;
-	background: transparent;
-}
-
-.fullscreen-carousel-dialog::backdrop {
-	background: rgba(0, 0, 0, 0.7);
-}
-</style>

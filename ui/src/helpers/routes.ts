@@ -26,6 +26,7 @@ export function useActionRoutes(baseUrl: string, extend?: object): ListControlsR
 			if (response.data) {
 				response.data = storeObjects(response.data);
 				listRef.value = response.data;
+				response.data = listRef.value;
 			}
 
 			return response;

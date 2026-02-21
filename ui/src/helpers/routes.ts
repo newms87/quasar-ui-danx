@@ -1,9 +1,17 @@
+import { ref } from "vue";
 import { storeObject, storeObjects } from "../helpers";
 import { ActionTargetItem, ApplyActionResponse, ListControlsRoutes, PagedItems } from "../types";
 import { downloadFile } from "./downloadPdf";
+import { registerList } from "./objectStore";
 import { request } from "./request";
 
 export function useActionRoutes(baseUrl: string, extend?: object): ListControlsRoutes {
+	// Auto-register a ref to track the most recent list result for optimistic deletes.
+	// Since useActionRoutes is called once per controller at module scope, this ref
+	// lives for the app's lifetime — no unregister needed.
+	const listRef = ref<any[]>([]);
+	registerList(listRef);
+
 	return {
 		/**
 		 *  Loads a paged item list from the server
@@ -17,6 +25,7 @@ export function useActionRoutes(baseUrl: string, extend?: object): ListControlsR
 
 			if (response.data) {
 				response.data = storeObjects(response.data);
+				listRef.value = response.data;
 			}
 
 			return response;

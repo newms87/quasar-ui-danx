@@ -1,5 +1,7 @@
 <template>
-  <div class="dx-markdown-editor-footer flex items-center justify-between px-2 py-1">
+  <div
+    class="dx-markdown-editor-footer flex items-center justify-between px-2 py-1"
+  >
     <span class="char-count text-xs text-gray-500">
       {{ charCount.toLocaleString() }} chars
     </span>
@@ -27,24 +29,3 @@ defineEmits<{
   "show-hotkeys": [];
 }>();
 </script>
-
-<style lang="scss">
-.dx-markdown-editor-footer {
-  background-color: #252526;
-  border-radius: 0 0 0.375rem 0.375rem;
-  flex-shrink: 0;
-
-  .hotkey-help-btn {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: transparent;
-    border: none;
-    cursor: pointer;
-
-    &:hover {
-      background-color: rgba(255, 255, 255, 0.1);
-    }
-  }
-}
-</style>

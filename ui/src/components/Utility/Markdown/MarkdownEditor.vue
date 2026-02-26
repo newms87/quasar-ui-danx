@@ -1,5 +1,11 @@
 <template>
-  <div class="dx-markdown-editor" :class="[{ 'is-readonly': readonly }, props.theme === 'light' ? 'theme-light' : '']">
+  <div
+    class="dx-markdown-editor"
+    :class="[
+      { 'is-readonly': readonly },
+      props.theme === 'light' ? 'theme-light' : '',
+    ]"
+  >
     <div class="dx-markdown-editor-body" @contextmenu="contextMenu.show">
       <!-- Floating line type menu positioned next to current block -->
       <div
@@ -71,7 +77,10 @@ import { computed, onMounted, onUnmounted, ref, watch } from "vue";
 import { useContextMenu } from "../../../composables/markdown/features/useContextMenu";
 import { useFocusTracking } from "../../../composables/markdown/features/useFocusTracking";
 import { useLineTypeMenu } from "../../../composables/markdown/features/useLineTypeMenu";
-import { useLinkPopover, useTablePopover } from "../../../composables/markdown/features/usePopoverManager";
+import {
+  useLinkPopover,
+  useTablePopover,
+} from "../../../composables/markdown/features/usePopoverManager";
 import { useMarkdownEditor } from "../../../composables/markdown/useMarkdownEditor";
 import { TokenRenderer } from "../../../composables/markdown/types";
 import ContextMenu from "./ContextMenu.vue";
@@ -102,7 +111,7 @@ const props = withDefaults(defineProps<MarkdownEditorProps>(), {
   maxHeight: "none",
   theme: "dark",
   hideFooter: false,
-  tokenRenderers: () => []
+  tokenRenderers: () => [],
 });
 
 const emit = defineEmits<{
@@ -116,7 +125,9 @@ const contentRef = ref<InstanceType<typeof MarkdownEditorContent> | null>(null);
 const menuContainerRef = ref<HTMLElement | null>(null);
 
 // Get the actual HTMLElement from the content component
-const contentElementRef = computed(() => contentRef.value?.containerRef || null);
+const contentElementRef = computed(
+  () => contentRef.value?.containerRef || null,
+);
 
 // Initialize popover managers
 const linkPopover = useLinkPopover();
@@ -131,27 +142,27 @@ const editor = useMarkdownEditor({
   },
   onShowLinkPopover: linkPopover.show,
   onShowTablePopover: tablePopover.show,
-  tokenRenderers: props.tokenRenderers
+  tokenRenderers: props.tokenRenderers,
 });
 
 // Initialize focus tracking
 const focusTracking = useFocusTracking({
   contentRef: contentElementRef,
   menuContainerRef,
-  onSelectionChange: () => lineTypeMenu.updatePositionAndState()
+  onSelectionChange: () => lineTypeMenu.updatePositionAndState(),
 });
 
 // Initialize line type menu
 const lineTypeMenu = useLineTypeMenu({
   contentRef: contentElementRef,
   editor,
-  isEditorFocused: focusTracking.isEditorFocused
+  isEditorFocused: focusTracking.isEditorFocused,
 });
 
 // Initialize context menu
 const contextMenu = useContextMenu({
   editor,
-  readonly: computed(() => props.readonly)
+  readonly: computed(() => props.readonly),
 });
 
 // Setup line type menu listeners on mount
@@ -179,7 +190,7 @@ watch(
     if (newValue !== undefined) {
       editor.setMarkdown(newValue);
     }
-  }
+  },
 );
 
 // NOTE: Content is already initialized in useMarkdownEditor with initialValue.
@@ -190,62 +201,6 @@ watch(
 // Expose the editor for parent components that may need access
 defineExpose({
   editor,
-  setMarkdown: editor.setMarkdown
+  setMarkdown: editor.setMarkdown,
 });
 </script>
-
-<style lang="scss">
-.dx-markdown-editor {
-  display: flex;
-  flex-direction: column;
-  width: 100%;
-  border-radius: 0.375rem;
-  overflow: hidden;
-
-  &.is-readonly {
-    .dx-markdown-editor-content {
-      cursor: default;
-    }
-
-    .dx-line-type-menu-container {
-      display: none;
-    }
-  }
-
-  // Body container with floating menu and content side by side
-  .dx-markdown-editor-body {
-    display: flex;
-    position: relative;
-    flex: 1;
-    overflow: visible;
-  }
-
-  // Floating line type menu container - positioned outside editor bounds
-  .dx-line-type-menu-container {
-    position: absolute;
-    left: -1.75rem;
-    z-index: 10;
-    width: 1.75rem;
-    display: flex;
-    align-items: flex-start;
-    justify-content: center;
-    padding-top: 0.25rem;
-    transition: top 0.1s ease-out, opacity 0.15s ease;
-  }
-
-  // Apply min/max height to content area (no left margin needed - menu is outside)
-  .dx-markdown-editor-content {
-    flex: 1;
-    min-height: v-bind(minHeight);
-    max-height: v-bind(maxHeight);
-  }
-
-  // Badge slot positioned at top-right of editor body
-  .dx-editor-badge {
-    position: absolute;
-    top: 0.5rem;
-    right: 0.5rem;
-    z-index: 10;
-  }
-}
-</style>

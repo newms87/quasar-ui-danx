@@ -29,13 +29,13 @@
 
       <!-- Unordered lists -->
       <ul v-else-if="token.type === 'ul'">
-        <li
-          v-for="(item, itemIndex) in token.items"
-          :key="itemIndex"
-        >
+        <li v-for="(item, itemIndex) in token.items" :key="itemIndex">
           <span v-html="parseInlineContent(item.content)" />
           <template v-if="item.children && item.children.length > 0">
-            <template v-for="(child, childIndex) in item.children" :key="'child-' + childIndex">
+            <template
+              v-for="(child, childIndex) in item.children"
+              :key="'child-' + childIndex"
+            >
               <!-- Nested unordered list -->
               <ul v-if="child.type === 'ul'">
                 <li
@@ -58,17 +58,14 @@
       </ul>
 
       <!-- Ordered lists -->
-      <ol
-        v-else-if="token.type === 'ol'"
-        :start="token.start"
-      >
-        <li
-          v-for="(item, itemIndex) in token.items"
-          :key="itemIndex"
-        >
+      <ol v-else-if="token.type === 'ol'" :start="token.start">
+        <li v-for="(item, itemIndex) in token.items" :key="itemIndex">
           <span v-html="parseInlineContent(item.content)" />
           <template v-if="item.children && item.children.length > 0">
-            <template v-for="(child, childIndex) in item.children" :key="'child-' + childIndex">
+            <template
+              v-for="(child, childIndex) in item.children"
+              :key="'child-' + childIndex"
+            >
               <!-- Nested unordered list -->
               <ul v-if="child.type === 'ul'">
                 <li
@@ -91,20 +88,13 @@
       </ol>
 
       <!-- Task lists -->
-      <ul
-        v-else-if="token.type === 'task_list'"
-        class="task-list"
-      >
+      <ul v-else-if="token.type === 'task_list'" class="task-list">
         <li
           v-for="(item, itemIndex) in token.items"
           :key="itemIndex"
           class="task-list-item"
         >
-          <input
-            type="checkbox"
-            :checked="item.checked"
-            disabled
-          />
+          <input type="checkbox" :checked="item.checked" disabled />
           <span v-html="parseInlineContent(item.content)" />
         </li>
       </ul>
@@ -116,7 +106,11 @@
             <th
               v-for="(header, hIndex) in token.headers"
               :key="hIndex"
-              :style="token.alignments[hIndex] ? { textAlign: token.alignments[hIndex] } : {}"
+              :style="
+                token.alignments[hIndex]
+                  ? { textAlign: token.alignments[hIndex] }
+                  : {}
+              "
               v-html="parseInlineContent(header)"
             />
           </tr>
@@ -126,7 +120,11 @@
             <td
               v-for="(cell, cIndex) in row"
               :key="cIndex"
-              :style="token.alignments[cIndex] ? { textAlign: token.alignments[cIndex] } : {}"
+              :style="
+                token.alignments[cIndex]
+                  ? { textAlign: token.alignments[cIndex] }
+                  : {}
+              "
               v-html="parseInlineContent(cell)"
             />
           </tr>
@@ -175,7 +173,13 @@
 
 <script setup lang="ts">
 import { computed } from "vue";
-import { tokenizeBlocks, parseInline, renderMarkdown, getFootnotes, resetParserState } from "../../../helpers/formats/markdown";
+import {
+  tokenizeBlocks,
+  parseInline,
+  renderMarkdown,
+  getFootnotes,
+  resetParserState,
+} from "../../../helpers/formats/markdown";
 import type { BlockToken, ListItem } from "../../../helpers/formats/markdown";
 import CodeViewer from "./CodeViewer.vue";
 
@@ -185,7 +189,7 @@ export interface MarkdownContentProps {
 }
 
 const props = withDefaults(defineProps<MarkdownContentProps>(), {
-  content: ""
+  content: "",
 });
 
 // Normalize language aliases to standard names
@@ -199,7 +203,7 @@ function normalizeLanguage(lang?: string): string {
     yml: "yaml",
     md: "markdown",
     sh: "bash",
-    shell: "bash"
+    shell: "bash",
   };
   return aliases[lang.toLowerCase()] || lang.toLowerCase();
 }
@@ -242,10 +246,14 @@ function renderListItem(item: ListItem): string {
   if (item.children && item.children.length > 0) {
     for (const child of item.children) {
       if (child.type === "ul") {
-        const items = child.items.map((i) => `<li>${renderListItem(i)}</li>`).join("");
+        const items = child.items
+          .map((i) => `<li>${renderListItem(i)}</li>`)
+          .join("");
         html += `<ul>${items}</ul>`;
       } else if (child.type === "ol") {
-        const items = child.items.map((i) => `<li>${renderListItem(i)}</li>`).join("");
+        const items = child.items
+          .map((i) => `<li>${renderListItem(i)}</li>`)
+          .join("");
         const startAttr = child.start !== 1 ? ` start="${child.start}"` : "";
         html += `<ol${startAttr}>${items}</ol>`;
       }
@@ -260,14 +268,3 @@ function renderBlockquote(content: string): string {
   return renderMarkdown(content, { preserveState: true });
 }
 </script>
-
-<style lang="scss">
-.markdown-code-block {
-  margin: 1em 0;
-
-  // Ensure auto-height instead of 100%
-  &.dx-code-viewer {
-    height: auto;
-  }
-}
-</style>
